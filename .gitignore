@@ -35,6 +35,3 @@ project-bolt-extracted/
 # Claude Code local state
 .claude/settings.local.json
 .claude/skills/
-
-# Trial-licensed font (not for public redistribution)
-site/app/fonts/Saans-TRIAL-SemiBold.otf

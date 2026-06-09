@@ -1,0 +1,14 @@
+# Forces Nixpacks to provision Node even though package.json lives in site/.
+# Without this, Nixpacks scans the repo root, finds no language indicator,
+# and provisions nothing — causing `npm: command not found` at build time.
+
+providers = ["node"]
+
+[phases.install]
+cmds = ["cd site && npm ci"]
+
+[phases.build]
+cmds = ["cd site && npm run build"]
+
+[start]
+cmd = "cd site && npm start"
