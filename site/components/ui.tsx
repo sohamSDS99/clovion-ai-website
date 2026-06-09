@@ -158,25 +158,24 @@ export function Check({ className }: { className?: string }) {
 }
 
 export function HaloMark({ className, size = 28 }: { className?: string; size?: number }) {
-  // Clovion brand mark — two filled left-pointing `<` chevrons.
-  // The LARGE chevron is full-height on the left (outer tip at leftmost-midline,
-  // horizontal caps top + bottom). The SMALLER chevron sits in the LOWER-RIGHT,
-  // offset DOWN — its top cap is below the canvas top (~y=10), its bottom cap
-  // is flush with the canvas bottom. The offset gives the mark its distinctive
-  // stepped silhouette. Uses currentColor so it adapts to parent text color.
+  // Vector-traced from the canonical brand-mark PNG via potrace 1.16.
+  // Source: logo-reference.png — large outer chevron + small inner accent
+  // forming the Clovion "C" mark. Uses currentColor so it adapts to parent
+  // text color (cream, ink-dark, anywhere).
   return (
     <svg
-      viewBox="0 0 32 32"
+      viewBox="0 0 201.173 219.836"
       width={size}
       height={size}
       className={cn(className)}
       fill="currentColor"
       aria-hidden
     >
-      {/* Large left-pointing chevron — full height */}
-      <path d="M11.5 0 L17.5 0 L9 16 L17.5 32 L11.5 32 L2.5 16 Z" />
-      {/* Smaller left-pointing chevron — shorter, offset down to lower-right */}
-      <path d="M25 10 L29 10 L23 21 L29 32 L25 32 L18.5 21 Z" />
+      <g transform="translate(-0.71, 221) scale(0.1, -0.1)">
+        <path d="M544 1614 l-537 -596 29 -27 c71 -69 1044 -941 1049 -941 8 0 6 334 -3 345 -4 6 -164 152 -355 324 -191 173 -346 317 -345 321 2 5 162 184 356 400 l352 391 0 189 c0 105 -2 190 -5 190 -2 0 -246 -268 -541 -596z" />
+        <path d="M1280 1939 l1 -174 260 -235 c143 -129 272 -244 286 -254 l26 -20 83 90 c46 49 83 94 83 99 -1 9 -675 622 -720 654 -19 13 -19 9 -19 -160z" />
+        <path d="M1435 558 l-155 -172 0 -189 c0 -104 4 -187 8 -185 12 4 512 560 512 568 0 10 -187 150 -199 150 -6 0 -80 -77 -166 -172z" />
+      </g>
     </svg>
   )
 }

@@ -35,3 +35,10 @@ project-bolt-extracted/
 # Claude Code local state
 .claude/settings.local.json
 .claude/skills/
+
+# Logo tracing artifacts (workspace tools — not for repo)
+logo-reference.png
+logo-cmark.png
+logo-cmark.pbm
+logo-traced.svg
+traced-preview.png
