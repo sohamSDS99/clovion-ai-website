@@ -158,9 +158,12 @@ export function Check({ className }: { className?: string }) {
 }
 
 export function HaloMark({ className, size = 28 }: { className?: string; size?: number }) {
-  // Clovion brand mark — two filled left-pointing chevrons (one large, one smaller).
-  // Both have arms that reach the top and bottom edges with horizontal end-caps,
-  // tips pointing left. The pair reads as a stylized "C".
+  // Clovion brand mark — stylized "C" formed by two mirrored chevron halves
+  // (top + bottom) that meet at a sharp left-pointing tip at the midline.
+  // Each half has a horizontal cap flush with the canvas edge, an outer
+  // diagonal tapering to the tip, and an inner edge with a bent "shoulder"
+  // giving the chevron character. Uses currentColor so it adapts to parent
+  // text color (cream, ink-dark, anywhere).
   return (
     <svg
       viewBox="0 0 32 32"
@@ -170,10 +173,10 @@ export function HaloMark({ className, size = 28 }: { className?: string; size?: 
       fill="currentColor"
       aria-hidden
     >
-      {/* Large left chevron */}
-      <path d="M11.5 0 L17.5 0 L9 16 L17.5 32 L11.5 32 L2.5 16 Z" />
-      {/* Smaller right chevron */}
-      <path d="M25 0 L29 0 L23 16 L29 32 L25 32 L18.5 16 Z" />
+      {/* Top half */}
+      <path d="M0 16 L8 0 L24 0 L16 8 Z" />
+      {/* Bottom half (mirror) */}
+      <path d="M0 16 L8 32 L24 32 L16 24 Z" />
     </svg>
   )
 }
