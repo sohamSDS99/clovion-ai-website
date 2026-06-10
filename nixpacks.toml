@@ -1,8 +1,10 @@
-# Forces Nixpacks to provision Node even though package.json lives in site/.
-# Without this, Nixpacks scans the repo root, finds no language indicator,
-# and provisions nothing — causing `npm: command not found` at build time.
+# Forces Nixpacks to provision Node 20 explicitly via nixPkgs, since the
+# package.json lives in site/ (not at the repo root, so auto-detection won't
+# fire). Previously used `providers = ["node"]`, but Railway's Nixpacks builder
+# stopped honoring that field — explicit nixPkgs is the robust pattern.
 
-providers = ["node"]
+[phases.setup]
+nixPkgs = ["nodejs_20"]
 
 [phases.install]
 cmds = ["cd site && npm ci"]
