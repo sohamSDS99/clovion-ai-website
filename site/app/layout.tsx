@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     title: 'Clovion AI — Track your brand visibility in AI search',
     description: 'See how AI engines describe your brand. Fix what is holding you back. Across ChatGPT, Claude, Perplexity, Gemini, and AI Overviews.',
     type: 'website'
+  },
+  verification: {
+    google: 'Of0ydr1XJckA0sM0jA4HEKUzVOxrgvB-6R6ti5P3EjQ'
   }
 }
 
