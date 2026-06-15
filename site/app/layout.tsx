@@ -2,6 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import { JetBrains_Mono } from 'next/font/google'
+import { GoogleAnalytics } from '@next/third-parties/google'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main>{children}</main>
         <Footer />
       </body>
+      <GoogleAnalytics gaId="G-QXKYL1Z4LB" />
     </html>
   )
 }
