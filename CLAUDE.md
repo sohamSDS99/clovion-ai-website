@@ -8,12 +8,20 @@ The workspace root contains a single Next.js project under `site/`. There is no 
 
 ```
 .
-├── .claude/launch.json     # preview server config (autoPort, --prefix site)
-├── .claude/workflows/      # saved multi-agent orchestration scripts (see Workflows)
-├── site/                   # the Next.js 14 marketing site
-│   └── app/fonts/          # local font assets (Saans-TRIAL-SemiBold.otf)
+├── .claude/launch.json          # preview server config (autoPort, --prefix site)
+├── .claude/workflows/           # saved multi-agent orchestration scripts (see Workflows)
+├── site/                        # the Next.js 14 marketing site + admin console
+│   ├── app/                     # marketing routes + /admin tree (separate layout)
+│   ├── app/fonts/               # local font assets (Saans-TRIAL-SemiBold.otf)
+│   └── .env.example             # admin-console env vars template (feat branch)
+├── railway.json                 # Railway build config (NIXPACKS builder + restart policy)
+├── nixpacks.toml                # explicit Node 20 provisioning for the Railway build
+├── CLOVION_CONSOLE_PRD.md/.pdf  # admin-console PRD (locked architecture decisions)
+├── ADMIN_*.md                   # admin-build planning + metrics research notes
 └── CLAUDE.md
 ```
+
+**Branch model:** `main` is what Railway deploys to production. `feat/console-foundation` is the active development branch for the admin console (`/admin/*` routes). Most session work lands on the feature branch; only changes that should ship to production now (logo, analytics, SEO tags, Railway config fixes) go directly to `main`.
 
 ## Commands
 
@@ -30,6 +38,48 @@ npm run lint     # next lint
 There are no tests in this repo — it's a marketing site, not a product app.
 
 For the dev server in a Claude session, prefer `preview_start` over Bash. The launch config at `.claude/launch.json` (workspace root, not `site/`) already sets `--prefix site` and `autoPort: true`.
+
+## Deployment (Railway)
+
+**Production URL:** https://www.clovion.ai
+**Source:** `github.com/sohamSDS99/clovion-ai-website`, branch `main`.
+**Railway service:** lives in the `clovion.ai website` project (project ID `3d1302da-405c-48ca-a450-2701ea9d6907`, originally auto-named `passionate-illumination` and later renamed) inside the `Zahir Hasan's Projects` workspace. The duplicate service originally provisioned in the team's other project was deleted intentionally.
+
+Push to `main` → Railway auto-builds via Nixpacks → deploys. No manual step needed. The integration uses Railway's **GitHub App** (push events flow through the app installation, *not* through a repo-level webhook — checking `/repos/.../hooks` returns 0 and is not evidence of breakage).
+
+**Build config — sources of truth at the repo root:**
+
+- `nixpacks.toml` — declares Node 20 via `[phases.setup].nixPkgs = ["nodejs_20"]`. The older `providers = ["node"]` pattern stopped being honored by Railway's Nixpacks builder mid-2026; do not regress to it. Install/build/start phases each `cd site && …` because the package.json lives in `site/`.
+- `railway.json` — only declares `builder: NIXPACKS` + restart policy. Build/start commands intentionally live in `nixpacks.toml` (single source of truth).
+
+**Railway's vuln scanner blocks deploys on HIGH-severity CVEs in dependencies.** Keep `next` patched within its current major (`^14.2.x`). When a deploy fails with cryptic `npm: command not found`, always pull `railway logs --build <id>` — the scanner aborts the build *before* Nixpacks runs, which makes the install step appear to fail for no reason.
+
+**Diagnostic commands (Railway CLI at `/Users/sohamsarker/.railway/bin/railway`):**
+
+```bash
+railway deployment list --limit 3 --json     # status of recent deploys
+railway logs --build --lines 60 <id>         # build logs (includes security scanner output)
+railway logs --deployment <id> --lines 40    # runtime logs
+railway domain --json                        # currently-bound domain (don't assume *.up.railway.app)
+```
+
+The custom domain `www.clovion.ai` replaced the auto-generated railway.app subdomain. Always check `railway domain --json` for the canonical URL — earlier verifiers that curled the dead `*.up.railway.app` URL falsely reported 404s.
+
+**Apex (`clovion.ai`) is NOT bound to Railway — only `www.clovion.ai` is.** Apex has no DNS records and doesn't resolve (`dig clovion.ai` returns empty, curl fails with "Could not resolve host"). If Google Analytics or Search Console reports "tag not detected" when configured against the apex URL, the tag IS on the site — it's just that the tester is hitting a nonexistent host. The fix is either: (a) update the GA/GSC property Stream URL to `https://www.clovion.ai`, or (b) bind apex to Railway (requires workspace-owner permissions — see below) and add a DNS A record at the registrar.
+
+**Workspace permission caveat.** The user account (`soham@sdsmanager.com`) is a member of `Zahir Hasan's Projects` workspace but NOT the owner. Read operations all work (`whoami`, `status`, `deployment list`, `logs`, `domain --json`). Write operations differ:
+
+- ✅ Permitted: linking services, generating Railway-provided `*.up.railway.app` subdomains, deleting services, deploys via push
+- ❌ Denied: adding custom domains (`railway domain <hostname>` returns `Unauthorized` on both CLI and MCP — workspace-owner role required)
+
+When a custom-domain mutation fails with `Unauthorized`, **don't keep retrying `railway login`** — fresh tokens don't fix it because the gate is at the API permission level. Route through Zahir (workspace owner) via the Railway dashboard.
+
+## Analytics & SEO tags
+
+Wired into `app/layout.tsx` site-wide; do not duplicate per-page:
+
+- **Google Analytics 4** — measurement ID `G-QXKYL1Z4LB`, mounted via `<GoogleAnalytics gaId="..." />` from `@next/third-parties/google` (the official Next.js wrapper handles SPA route-change page_view firing).
+- **Google Search Console verification** — `metadata.verification.google` field on the root `Metadata` export emits the required `<meta name="google-site-verification" content="..." />` tag.
 
 ## Architecture
 
@@ -52,7 +102,9 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 
 **Testimonials are short-form (~20–28 words each).** Intentionally trimmed for card-readable length in `TestimonialRail`. If you add more, match that length. Preserve concrete numbers (e.g. "8.4× mentions", "5.2× share of voice") and real-sounding voice.
 
-### Pages map 1:1 to routes (Next.js App Router) — 21 routes, locked structure
+### Pages map 1:1 to routes (Next.js App Router)
+
+**Marketing surface — 21 routes, locked structure (on `main`):**
 
 ```
 /                                              (homepage — uses <HomeHero />)
@@ -78,7 +130,11 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 /legal/terms
 ```
 
-`app/layout.tsx` wires the fonts (Saans-TRIAL-SemiBold via `next/font/local`, JetBrains Mono via `next/font/google`), Header, and Footer.
+**Admin console — `/admin/*` tree (on `feat/console-foundation`, not yet merged to main):**
+
+`/admin` overview, `/admin/login`, `/admin/accounts` (+ `[id]` detail), `/admin/acquisition`, `/admin/activation`, `/admin/alerts`, `/admin/audit`, `/admin/engagement`, `/admin/flags`, `/admin/funnels`, `/admin/gdpr`, `/admin/operations`, `/admin/performance`, `/admin/pipeline`, `/admin/retention`, `/admin/revenue`. Has its own `app/admin/layout.tsx` (separate from the marketing root layout), its own `/admin/login` sub-layout, and reads env vars from `site/.env.example`. Architecture decisions are captured in `CLOVION_CONSOLE_PRD.md` at the repo root; planning notes in `ADMIN_BUILD_PLAN.md` / `ADMIN_PRD_SPEC.md` / `ADMIN_REVIEW_NOTES.md` / `ADMIN_METRICS_RESEARCH.md`. The marketing surface uses `FooterGate` (also added on this branch) to hide the marketing Footer on admin routes.
+
+**Root layout (`app/layout.tsx`)** wires the fonts (Saans-TRIAL-SemiBold via `next/font/local`, JetBrains Mono via `next/font/google`), Header, Footer, **Google Analytics 4** (via `@next/third-parties/google`), and the **Google Search Console verification** meta tag (via `metadata.verification.google`). See Analytics & SEO tags section above.
 
 ### Component layers
 
@@ -91,7 +147,21 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 
 #### HaloMark (the brand mark)
 
-The Clovion "C" mark — two filled left-pointing `<` chevrons (large + smaller) defined as SVG paths in `HaloMark`. Both have horizontal end-caps reaching the top and bottom of the viewBox. The internal name `HaloMark` is legacy; what renders is the twin-chevron logo. **Single source of truth** — Header and Footer both consume it. Uses `fill="currentColor"` so it adapts to parent text color (works on cream body, ink-dark CTABanner, anywhere).
+The Clovion "C" mark is **vector-traced from the canonical brand PNG** (`logo-reference.png` at repo root, gitignored). `HaloMark` in `components/ui.tsx` contains three `<path>` elements (large outer chevron + small inner accent split into 2 sub-regions by an internal notch) wrapped in `<g transform="translate(-0.71, 221) scale(0.1, -0.1)">` (potrace's y-flip convention). `viewBox="0 0 201.173 219.836"` — the actual logo aspect ratio, not square. `fill="currentColor"` so the mark adapts to the parent's text color. **Single source of truth** — Header and Footer both consume it.
+
+**To modify the logo, do NOT eyeball SVG coordinates from the PNG.** Three iterations of doing that all failed before switching to vector tracing. The deterministic pipeline (with `potrace` + `imagemagick` installed locally via Homebrew):
+
+```bash
+magick logo-reference.png -crop 240x232+0+0 +repage -trim +repage \
+    -background white -alpha remove -alpha off -threshold 50% logo-cmark.pbm
+potrace -s --tight -o logo-traced.svg logo-cmark.pbm
+# render preview to confirm trace fidelity:
+magick -background white logo-traced.svg -resize 400x400 -gravity center -extent 400x400 traced-preview.png
+```
+
+Paste the path data from `logo-traced.svg` into `HaloMark`, swap the hardcoded `fill="#000000"` for `fill="currentColor"` on the parent SVG, and keep the `<g transform>`. All trace intermediates (`logo-*.png`, `logo-*.pbm`, `logo-traced.svg`, `traced-preview.png`) are gitignored.
+
+**Favicon (`site/app/icon.svg`)** uses the same three traced paths inside a 240×240 rounded square tile (white background `#ffffff`, ink-black mark `#0a0a0f`). Next.js 14's App Router auto-detects `app/icon.svg` and injects `<link rel="icon" type="image/svg+xml" href="/icon.svg" />` site-wide — no `layout.tsx` wiring needed. If you re-trace HaloMark, also update `icon.svg` so the favicon and Header/Footer marks stay in sync. The favicon transform is `translate(18.79, 231) scale(0.1, -0.1)` (centers the 201×220 mark inside the 240×240 square with light padding); HaloMark's transform is `translate(-0.71, 221) scale(0.1, -0.1)` because its viewBox is the natural mark dimensions.
 
 #### HeroShade (corner vignette)
 
@@ -190,5 +260,7 @@ User-confirmed preferences. Treat as load-bearing:
 - Featured cards that should feel premium → wrap in `<SpotlightCard>`
 - New horizontal carousel → reuse the `TestimonialRail` scaffold; don't roll your own snap logic
 - New page → `app/<route>/page.tsx` with `export const metadata` for SEO, hero pattern above, `<HeroShade />` inside the hero `<Section>`. Compose with `Section` + `Container` + `components/sections.tsx`. Client components can't export metadata — see `BlogIndex.tsx` and `free-ai-visibility-score/page.tsx` for the pattern (server wrapper imports client child, or skip metadata)
-- Touching the logo → edit `HaloMark` in `components/ui.tsx`. Single source — Header and Footer both consume it
+- Touching the logo → edit `logo-reference.png` (gitignored at repo root) → re-run the potrace pipeline (see HaloMark section) → paste new path data into `HaloMark` in `components/ui.tsx`. Single source — Header and Footer both consume it. Do not eyeball SVG coordinates.
+- Bumping Next.js or any dependency → check `npm audit` first; Railway's vuln scanner hard-blocks deploys on HIGH CVEs. Patch within the major (e.g. `^14.2.x`) — avoid Next 16 unless you're prepared for the breaking-change cleanup.
+- Deploy verification → curl `https://www.clovion.ai/?cb=$(date +%s)` for cache-busted live HTML, not the `*.up.railway.app` URL (it's no longer bound). Use `railway logs --build <id>` when a deploy fails — the security scanner output lives there, not in the runtime log.
 - Multi-page mechanical sweeps (e.g. weight conversion, hero pattern application) → write a script in `.claude/workflows/` and run via the Workflow tool. Past scripts are precedents
