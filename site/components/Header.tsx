@@ -140,10 +140,10 @@ export function Header() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Button href="/free-ai-visibility-score" variant="ghost" size="sm">
+          <Button href="/free-ai-visibility-score" variant="ghost" size="sm" trackLocation="header">
             Get free score
           </Button>
-          <Button href="/pricing" variant="primary" size="sm">
+          <Button href="/pricing" variant="primary" size="sm" trackLocation="header">
             Start free trial
           </Button>
         </div>
@@ -194,10 +194,10 @@ export function Header() {
               </Link>
             ))}
             <div className="mt-3 flex flex-col gap-2 px-2 pb-2">
-              <Button href="/free-ai-visibility-score" variant="secondary">
+              <Button href="/free-ai-visibility-score" variant="secondary" trackLocation="header_mobile">
                 Get free score
               </Button>
-              <Button href="/pricing" variant="primary">
+              <Button href="/pricing" variant="primary" trackLocation="header_mobile">
                 Start free trial
               </Button>
             </div>

@@ -160,7 +160,7 @@ export function CTABanner({
             <h2 className="display-lg mt-5 text-balance">{heading}</h2>
             {body && <p className="lead mt-6 text-white/70 max-w-xl">{body}</p>}
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button href={primaryHref} variant="invert" size="lg">
+              <Button href={primaryHref} variant="invert" size="lg" trackLocation="final_cta">
                 {primary} <ArrowRight />
               </Button>
               {secondary && (

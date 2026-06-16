@@ -12,6 +12,7 @@ import {
   HairlineDivider,
   HeroShade
 } from '@/components/ui'
+import { analytics } from '@/lib/analytics'
 
 // ---------- Mock result data (hardcoded until backend exists) ----------
 
@@ -160,6 +161,7 @@ export default function FreeAIVisibilityScorePage() {
     }
     setSubmittedDomain(clean)
     setStage('analyzing')
+    analytics.formSubmit('free_ai_visibility_score', 'free_score_page')
   }
 
   const handleTryExample = () => {

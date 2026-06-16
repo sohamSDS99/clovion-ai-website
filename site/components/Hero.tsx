@@ -49,10 +49,10 @@ export function HomeHero() {
             className="mt-10 flex flex-wrap items-center justify-center gap-3 opacity-0 animate-rise"
             style={{ animationDelay: '240ms' }}
           >
-            <Button href="/pricing" variant="primary" size="lg">
+            <Button href="/pricing" variant="primary" size="lg" trackLocation="hero">
               Start free trial <ArrowRight />
             </Button>
-            <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+            <Button href="/free-ai-visibility-score" variant="secondary" size="lg" trackLocation="hero">
               Get free score
             </Button>
           </div>

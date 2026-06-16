@@ -1,6 +1,21 @@
+'use client'
+
 import Link from 'next/link'
 import { cn } from '@/lib/cn'
 import type { ComponentProps, ReactNode } from 'react'
+import { analytics, track } from '@/lib/analytics'
+
+// Recursively extract plain text from a ReactNode tree (e.g. Button children
+// may be "Start free trial <ArrowRight/>" — we want just the text part).
+function extractText(node: ReactNode): string {
+  if (typeof node === 'string') return node
+  if (typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(extractText).join('')
+  if (node && typeof node === 'object' && 'props' in node) {
+    return extractText((node as { props?: { children?: ReactNode } }).props?.children)
+  }
+  return ''
+}
 
 export function Container({ className, children }: { className?: string; children: ReactNode }) {
   return <div className={cn('container-page', className)}>{children}</div>
@@ -44,6 +59,13 @@ type ButtonProps = {
   href?: string
   className?: string
   children: ReactNode
+  // Adds a dataLayer push on click. trackLocation is the only required field
+  // to enable tracking; the event name is auto-detected from the button text
+  // (free trial → start_trial, free score → get_free_score, demo → book_demo,
+  // else → cta_click). Override with trackEvent + trackPlan for pricing tiers.
+  trackLocation?: string
+  trackEvent?: string
+  trackPlan?: string
 } & Omit<ComponentProps<'button'>, 'children'>
 
 export function Button({
@@ -52,6 +74,9 @@ export function Button({
   href,
   className,
   children,
+  trackLocation,
+  trackEvent,
+  trackPlan,
   ...rest
 }: ButtonProps) {
   const classes = cn(
@@ -65,16 +90,44 @@ export function Button({
     className
   )
 
+  const fireTracking = () => {
+    if (!trackLocation) return
+    const text = extractText(children).trim()
+    if (trackEvent) {
+      track({
+        event: trackEvent,
+        cta_text: text,
+        cta_location: trackLocation,
+        ...(trackPlan ? { plan_name: trackPlan } : {}),
+        ...(href ? { link_url: href } : {})
+      })
+      return
+    }
+    if (!text) return
+    const lower = text.toLowerCase()
+    if (lower.includes('free trial')) analytics.startTrial(trackLocation, trackPlan)
+    else if (lower.includes('free score')) analytics.getFreeScore(trackLocation)
+    else if (lower.includes('demo')) analytics.bookDemo(trackLocation)
+    else analytics.ctaClick(text, trackLocation, href)
+  }
+
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link href={href} className={classes} onClick={fireTracking}>
         {children}
       </Link>
     )
   }
 
   return (
-    <button className={classes} {...rest}>
+    <button
+      className={classes}
+      {...rest}
+      onClick={(e) => {
+        fireTracking()
+        rest.onClick?.(e)
+      }}
+    >
       {children}
     </button>
   )

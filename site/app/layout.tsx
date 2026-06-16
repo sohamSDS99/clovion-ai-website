@@ -5,6 +5,7 @@ import { JetBrains_Mono } from 'next/font/google'
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { RouteTracker } from '@/components/RouteTracker'
 
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
@@ -47,6 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${saans.variable} ${mono.variable}`}>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">
+        <RouteTracker />
         <Header />
         <main>{children}</main>
         <Footer />
