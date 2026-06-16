@@ -2,7 +2,7 @@ import './globals.css'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import { JetBrains_Mono } from 'next/font/google'
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 
@@ -42,6 +42,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${saans.variable} ${mono.variable}`}>
+      <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">
         <Header />
         <main>{children}</main>
