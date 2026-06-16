@@ -178,10 +178,10 @@ function SuggestionsHero() {
               Prioritized actions, ranked by visibility lift. Schema patches, citation opportunities, content gaps — each one tagged with the engine and prompt it affects.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button href="/pricing" variant="primary" size="lg">
+              <Button href="/pricing" trackLocation="geo_suggestions_hero" variant="primary" size="lg">
                 Start free trial <ArrowRight />
               </Button>
-              <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+              <Button href="/free-ai-visibility-score" trackLocation="geo_suggestions_hero" variant="secondary" size="lg">
                 Get free score
               </Button>
             </div>

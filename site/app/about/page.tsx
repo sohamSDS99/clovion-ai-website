@@ -317,7 +317,7 @@ export default function AboutPage() {
           </ul>
 
           <div className="mt-16 flex flex-wrap items-center gap-4">
-            <Button href="/pricing" variant="primary" size="lg">
+            <Button href="/pricing" trackLocation="about_hero" variant="primary" size="lg">
               Start free trial <ArrowRight />
             </Button>
             <Button href="/contact" variant="ghost" size="lg">

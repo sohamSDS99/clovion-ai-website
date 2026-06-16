@@ -370,7 +370,7 @@ function FlywheelSection() {
         </div>
 
         <div className="mt-20 flex flex-wrap justify-center gap-3">
-          <Button href="/pricing" variant="invert" size="lg">
+          <Button href="/pricing" trackLocation="home_loop" variant="invert" size="lg">
             Start free trial <ArrowRight />
           </Button>
           <Link

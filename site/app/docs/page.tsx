@@ -130,7 +130,7 @@ export default function DocsPage() {
               Designed for engineering teams.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Button href="/pricing" variant="primary" size="lg">
+              <Button href="/pricing" trackLocation="docs_hero" variant="primary" size="lg">
                 Start free trial
               </Button>
               <Button href="/docs/getting-started" variant="secondary" size="lg">

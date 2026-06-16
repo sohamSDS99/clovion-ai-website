@@ -472,6 +472,7 @@ export default function PricingPage() {
                   href="mailto:sales@clovion.ai"
                   variant="primary"
                   className="mt-7 w-full justify-center"
+                  trackLocation="pricing_enterprise"
                 >
                   Talk to sales
                   <ArrowRight />

@@ -118,10 +118,10 @@ export default function AIVisibilityTrackingPage() {
                 Multi-engine visibility, refreshed daily, built on real consumer prompts — not synthetic API calls. The dataset other GEO tools wish they had.
               </p>
               <div className="mt-9 flex flex-wrap gap-3">
-                <Button href="/pricing" size="lg">
+                <Button href="/pricing" trackLocation="ai_visibility_hero" size="lg">
                   Start free trial <ArrowRight />
                 </Button>
-                <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+                <Button href="/free-ai-visibility-score" trackLocation="ai_visibility_hero" variant="secondary" size="lg">
                   Get free score
                 </Button>
               </div>
@@ -461,7 +461,7 @@ export default function AIVisibilityTrackingPage() {
                 </p>
               </div>
               <div className="mt-9 flex flex-wrap gap-3">
-                <Button href="/pricing" variant="invert" size="lg">
+                <Button href="/pricing" trackLocation="ai_visibility_final_cta" variant="invert" size="lg">
                   Start free trial <ArrowRight />
                 </Button>
                 <Link

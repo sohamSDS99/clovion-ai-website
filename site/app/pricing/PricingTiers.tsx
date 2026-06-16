@@ -163,6 +163,9 @@ export function PricingTiers() {
                   href={ctaHref}
                   variant={isHighlight ? 'invert' : 'primary'}
                   className="w-full justify-center"
+                  trackEvent="pricing_click"
+                  trackPlan={tier.name}
+                  trackLocation="pricing_card"
                 >
                   {tier.cta}
                   <ArrowRight />

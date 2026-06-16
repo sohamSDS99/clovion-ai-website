@@ -284,10 +284,10 @@ export default function PlatformCoveragePage() {
               grows the day a new model ships.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button href="/pricing" size="lg">
+              <Button href="/pricing" trackLocation="features_platform_coverage_hero" size="lg">
                 Start free trial <ArrowRight />
               </Button>
-              <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+              <Button href="/free-ai-visibility-score" trackLocation="features_platform_coverage_hero" variant="secondary" size="lg">
                 Get free score
               </Button>
             </div>

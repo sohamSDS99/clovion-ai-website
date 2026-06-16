@@ -110,10 +110,10 @@ export default function ProfoundAlternativePage() {
               and ten engines tracked — including the ones Profound doesn&apos;t.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Button href="/pricing" variant="primary" size="lg">
+              <Button href="/pricing" trackLocation="alt_profound_hero" variant="primary" size="lg">
                 Start free trial <ArrowRight />
               </Button>
-              <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+              <Button href="/free-ai-visibility-score" trackLocation="alt_profound_hero" variant="secondary" size="lg">
                 Get free score
               </Button>
             </div>
@@ -241,7 +241,7 @@ export default function ProfoundAlternativePage() {
             <Button href="/contact" variant="primary" size="md">
               Book migration call <ArrowRight />
             </Button>
-            <Button href="/pricing" variant="ghost" size="md">
+            <Button href="/pricing" trackLocation="alt_profound_footer" variant="ghost" size="md">
               See pricing
             </Button>
           </div>

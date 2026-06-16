@@ -161,7 +161,7 @@ export default function CustomersPage() {
               From Linear&apos;s docs to Notion&apos;s category leadership — see how teams use Clovion to win the AI visibility race.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <Button href="/pricing" variant="primary" size="lg">
+              <Button href="/pricing" trackLocation="customers_hero" variant="primary" size="lg">
                 Start free trial <ArrowRight />
               </Button>
               <Button href="#stories" variant="secondary" size="lg">

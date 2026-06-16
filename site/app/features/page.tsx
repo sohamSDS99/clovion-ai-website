@@ -154,10 +154,10 @@ function FeaturesHero() {
             Track how ChatGPT, Claude, and Perplexity describe your brand. Fix what is broken. Watch every major AI surface from one workspace.
           </p>
           <div className="mt-9 flex flex-wrap items-center gap-3">
-            <Button href="/pricing" variant="primary" size="lg">
+            <Button href="/pricing" trackLocation="features_hero" variant="primary" size="lg">
               Start free trial <ArrowRight />
             </Button>
-            <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+            <Button href="/free-ai-visibility-score" trackLocation="features_hero" variant="secondary" size="lg">
               Get free score
             </Button>
           </div>

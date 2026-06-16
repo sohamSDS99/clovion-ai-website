@@ -123,10 +123,10 @@ export default function ComparePage() {
               Honest comparisons against every major AI visibility tool. Feature parity, where we win, where they win, and what to ask in a demo.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Button href="/pricing" variant="primary" size="lg">
+              <Button href="/pricing" trackLocation="compare_hero" variant="primary" size="lg">
                 Start free trial
               </Button>
-              <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+              <Button href="/free-ai-visibility-score" trackLocation="compare_hero" variant="secondary" size="lg">
                 Get free score
               </Button>
             </div>

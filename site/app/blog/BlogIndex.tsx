@@ -119,10 +119,10 @@ export default function BlogIndex() {
               We publish what we learn from the dashboards our customers run on.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <Button href="/pricing" variant="primary" size="lg">
+              <Button href="/pricing" trackLocation="blog_hero" variant="primary" size="lg">
                 Start free trial
               </Button>
-              <Button href="/free-ai-visibility-score" variant="secondary" size="lg">
+              <Button href="/free-ai-visibility-score" trackLocation="blog_hero" variant="secondary" size="lg">
                 Get free score
               </Button>
             </div>
@@ -395,7 +395,7 @@ export default function BlogIndex() {
                 scored against your competitors.
               </p>
             </div>
-            <Button href="/free-ai-visibility-score" variant="invert">
+            <Button href="/free-ai-visibility-score" trackLocation="blog_footer_cta" variant="invert">
               Get free score
             </Button>
           </div>

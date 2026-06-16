@@ -156,10 +156,10 @@ export default function ClovionVsProfoundPage() {
               Profound built the category. We took the lessons and built something tighter &mdash; daily refresh, real consumer prompts, and a free tier that actually works.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
-              <Button href="/pricing" size="lg">
+              <Button href="/pricing" trackLocation="compare_profound_hero" size="lg">
                 Start free trial <ArrowRight />
               </Button>
-              <Button href="/pricing" size="lg" variant="secondary">
+              <Button href="/pricing" trackLocation="compare_profound_hero" size="lg" variant="secondary">
                 Get free score
               </Button>
             </div>
