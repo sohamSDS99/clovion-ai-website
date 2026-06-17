@@ -76,10 +76,62 @@ When a custom-domain mutation fails with `Unauthorized`, **don't keep retrying `
 
 ## Analytics & SEO tags
 
-Wired into `app/layout.tsx` site-wide; do not duplicate per-page:
+Wired into `app/layout.tsx` site-wide; do not duplicate per-page. All four use the canonical Next.js Metadata API or `@next/third-parties/google`:
 
-- **Google Analytics 4** — measurement ID `G-QXKYL1Z4LB`, mounted via `<GoogleAnalytics gaId="..." />` from `@next/third-parties/google` (the official Next.js wrapper handles SPA route-change page_view firing).
-- **Google Search Console verification** — `metadata.verification.google` field on the root `Metadata` export emits the required `<meta name="google-site-verification" content="..." />` tag.
+- **Google Tag Manager** — container `GTM-WHCPZS4P`, mounted via `<GoogleTagManager gtmId="..." />` from `@next/third-parties/google`. Renders both halves of the GTM snippet (head script + post-body noscript iframe). Defers via `strategy="afterInteractive"` — the head script tag isn't in the initial SSR HTML, it's in the RSC payload and Next.js injects it post-hydration. This is normal; don't be alarmed by a curl grep showing 0 inline `<script>` matches.
+- **Google Analytics 4** — measurement ID `G-QXKYL1Z4LB`, mounted via `<GoogleAnalytics gaId="..." />` from the same package. Coexists with GTM. **Beware double-counting:** if the GTM container has a GA4 Configuration tag firing `G-QXKYL1Z4LB`, pageviews will count twice. Either remove the direct GA install or don't add GA as a GTM tag — not both.
+- **Google Search Console verification** — `metadata.verification.google` emits `<meta name="google-site-verification" content="..." />`.
+- **Bing Webmaster Tools verification** — Next.js's `Metadata` type has no Bing shortcut, so wired via `metadata.verification.other = { 'msvalidate.01': '...' }`. Coexists with the Google verification under the same `verification` object.
+
+**Tester URL gotcha.** When verifying a tag in any of the Google/Bing setup tools, the property URL must be `https://www.clovion.ai` (with www). The apex `clovion.ai` has no DNS records — testers configured against it get "tag not detected" even though the tag IS correctly served. See the "Apex is NOT bound to Railway" paragraph above.
+
+## Click tracking (dataLayer)
+
+A semantic dataLayer push system sits on top of GTM, so conversions surface as clean GA4 events with structured dimensions (`cta_location`, `plan_name`, etc.) instead of just opaque clicks.
+
+**The helper — `site/lib/analytics.ts`** — exports `track(event)` plus typed named methods. Event names match GTM Custom Event triggers exactly:
+
+| Method | Event | Key dimensions |
+|--------|-------|----------------|
+| `startTrial(location, plan?)` | `start_trial` | `cta_location`, `plan_name` |
+| `getFreeScore(location)` | `get_free_score` | `cta_location` |
+| `bookDemo(location)` | `book_demo` | `cta_location` |
+| `pricingClick(plan, location)` | `pricing_click` | `plan_name`, `cta_location` |
+| `formSubmit(name, location)` | `generate_lead` | `form_name`, `form_location` |
+| `ctaClick(text, location, url?)` | `cta_click` | `cta_text`, `cta_location`, `link_url` |
+| `fileDownload(file, url)` | `file_download` | `file_name`, `link_url` |
+| `pageView(path)` | `page_view` | `page_path` |
+
+**SPA route tracking — `site/components/RouteTracker.tsx`** — client component mounted in the root layout. Fires `page_view` on `usePathname()` changes, skipping the first render (GTM's own pageview catches the initial load).
+
+**Button-driven tracking — `site/components/ui.tsx`** — the `Button` primitive is a client component that accepts optional `trackLocation`, `trackEvent`, `trackPlan` props. When `trackLocation` is set, an onClick handler runs `extractText(children)` and auto-routes the event:
+
+- "Start free trial" → `start_trial`
+- "Get free score" → `get_free_score`
+- "Book a Demo" → `book_demo`
+- Any other text → `cta_click`
+
+Override the auto-detect with explicit `trackEvent` (e.g. pricing tier cards use `trackEvent="pricing_click"` + `trackPlan={tier.name}`).
+
+**`cta_location` naming convention.** Every page's hero CTAs use `<page-slug>_hero`. End-of-page CTAs use `<page-slug>_final_cta` or `<page-slug>_footer`. Header is `header` (desktop) / `header_mobile`. CTABanner is `final_cta`. Homepage loop section is `home_loop`. Pricing tier cards are `pricing_card` (with `plan_name` differentiating each tier). Enterprise sales is `pricing_enterprise`.
+
+**Where the wiring lives:**
+
+| CTA group | File | Location values |
+|-----------|------|-----------------|
+| Header (desktop + mobile) | `components/Header.tsx` | `header`, `header_mobile` |
+| Homepage hero | `components/Hero.tsx` (HomeHero) | `hero` |
+| Final CTA banner (used across pages) | `components/sections.tsx` (CTABanner) | `final_cta` |
+| Pricing tier cards (4 tiers via map) | `app/pricing/PricingTiers.tsx` | `pricing_card` + per-tier `plan_name` |
+| Enterprise mailto | `app/pricing/page.tsx` | `pricing_enterprise` |
+| Each marketing page hero / end CTA | the page's own `page.tsx` | `<page>_hero`, `<page>_final_cta`, etc. |
+| Free-score form submit | `app/free-ai-visibility-score/page.tsx` (handleSubmit) | `free_score_page` |
+
+**Pricing tier CTAs live in a client island.** `app/pricing/page.tsx` is a server component; the per-tier CTAs are rendered inside `app/pricing/PricingTiers.tsx` (a client island composed in at line 223). Modifying tier tracking goes into `PricingTiers.tsx`, not `page.tsx`.
+
+**Catch-all safety net (GTM auto triggers, no code).** Anything not semantically wired still fires through the container's built-in auto triggers: `ui_click` for any `<a>`/`<button>`/`[role=button]`, `outbound_click` for non-`clovion.ai` hosts, `scroll` at 25/50/75/90% depth. Nav links, footer links, "Read the spec"-type inline CTAs all surface this way — just without the structured `cta_location` dimension.
+
+**When adding a new page or CTA:** if the Button uses the standard "Start free trial" / "Get free score" text and you set `trackLocation="<page>_hero"`, the right semantic event fires automatically — no extra wiring needed.
 
 ## Architecture
 
