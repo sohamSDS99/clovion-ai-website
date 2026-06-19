@@ -10,6 +10,7 @@ const groups = [
       { label: 'AI Visibility Tracking', href: '/features/ai-visibility-tracking' },
       { label: 'GEO Suggestions', href: '/features/geo-improvement-suggestions' },
       { label: 'Platform Coverage', href: '/features/platform-coverage' },
+      { label: 'Sentiment Analysis', href: '/features/sentiment-analysis' },
       { label: 'Pricing', href: '/pricing' },
       { label: 'Free AI Visibility Score', href: '/free-ai-visibility-score' }
     ]

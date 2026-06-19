@@ -11,7 +11,7 @@ import { RouteTracker } from '@/components/RouteTracker'
 // for routes that ship dark (currently just `/`) so the body bg paints
 // black from the first frame instead of cream→black flickering after
 // ThemeShell's useEffect runs. Mirrors ThemeShell's DARK_ROUTES set.
-const themeBootstrap = `(function(){try{var p=location.pathname;if(p==='/'||p==='/features/ai-visibility-tracking'||p==='/features/geo-improvement-suggestions')document.documentElement.classList.add('clv-dark');}catch(_){}})();`
+const themeBootstrap = `(function(){try{var p=location.pathname;if(p==='/'||p==='/features/ai-visibility-tracking'||p==='/features/geo-improvement-suggestions'||p==='/features/sentiment-analysis')document.documentElement.classList.add('clv-dark');}catch(_){}})();`
 
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
