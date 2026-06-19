@@ -6,7 +6,7 @@ import { Footer } from './Footer'
 import { HomeHeader } from './HomeHeader'
 import { HomeFooter } from './HomeFooter'
 
-const HOME_ROUTES = new Set<string>(['/'])
+const HOME_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking'])
 
 export function ChromeHeader() {
   const pathname = usePathname()

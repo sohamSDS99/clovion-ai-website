@@ -513,6 +513,10 @@
   from { opacity: 0; transform: scale(0.86); }
   to { opacity: 1; transform: scale(1); }
 }
+@keyframes clv-sweep {
+  0% { transform: translateX(-160%); }
+  100% { transform: translateX(420%); }
+}
 .clv-logo-fade { animation: clv-logo-fade 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -553,4 +557,10 @@
 .clv-dark .btn-invert:hover {
   background: #ececf0;
   color: #0a0a0f;
+}
+
+/* AI Visibility Tracking page — Hanken Grotesk paragraphs (Saans ships only SemiBold) */
+.clv-ai-vis-page p {
+  font-family: var(--font-body-reg, 'Hanken Grotesk', system-ui, -apple-system, sans-serif);
+  font-weight: 400;
 }

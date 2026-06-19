@@ -1,7 +1,7 @@
 import './globals.css'
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import { JetBrains_Mono } from 'next/font/google'
+import { JetBrains_Mono, Hanken_Grotesk } from 'next/font/google'
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
 import { ChromeHeader, ChromeFooter } from '@/components/Chrome'
 import { ThemeShell } from '@/components/ThemeShell'
@@ -11,7 +11,7 @@ import { RouteTracker } from '@/components/RouteTracker'
 // for routes that ship dark (currently just `/`) so the body bg paints
 // black from the first frame instead of cream→black flickering after
 // ThemeShell's useEffect runs. Mirrors ThemeShell's DARK_ROUTES set.
-const themeBootstrap = `(function(){try{var d=['/'];if(d.indexOf(location.pathname)>-1)document.documentElement.classList.add('clv-dark');}catch(_){}})();`
+const themeBootstrap = `(function(){try{var p=location.pathname;if(p==='/'||p==='/features/ai-visibility-tracking')document.documentElement.classList.add('clv-dark');}catch(_){}})();`
 
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
@@ -26,6 +26,13 @@ const mono = JetBrains_Mono({
   variable: '--font-mono',
   weight: ['400', '500'],
   display: 'swap'
+})
+
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  variable: '--font-body-reg',
+  display: 'swap',
 })
 
 export const metadata: Metadata = {
@@ -53,7 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${saans.variable} ${mono.variable}`}
+      className={`${saans.variable} ${mono.variable} ${hankenGrotesk.variable}`}
       suppressHydrationWarning
     >
       <head>
