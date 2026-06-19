@@ -46,7 +46,7 @@ export const nav = {
           desc: 'One dashboard. Every major AI search surface.'
         },
         {
-          label: 'Sentiment Analysis',
+          label: 'Brand Perception',
           href: '/features/sentiment-analysis',
           desc: 'See how ChatGPT, Claude, Gemini, and Perplexity describe your brand'
         }
