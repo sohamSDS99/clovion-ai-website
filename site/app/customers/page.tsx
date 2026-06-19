@@ -162,7 +162,7 @@ export default function CustomersPage() {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button href="/pricing" trackLocation="customers_hero" variant="primary" size="lg">
-                Start free trial <ArrowRight />
+                Start Free Trial <ArrowRight />
               </Button>
               <Button href="#stories" variant="secondary" size="lg">
                 Browse stories
@@ -403,9 +403,9 @@ export default function CustomersPage() {
         sub="Your story next"
         heading="Join the brands buyers ask AI about."
         body="Free score in 24 hours. The same engine our paid customers use, narrowed to the four largest models. No card, no trial timer."
-        primary="Start free trial"
+        primary="Start Free Trial"
         primaryHref="/pricing"
-        secondary="Get free score"
+        secondary="Get Free Score"
         secondaryHref="/free-ai-visibility-score"
       />
     </>

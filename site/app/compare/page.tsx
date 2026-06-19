@@ -124,10 +124,10 @@ export default function ComparePage() {
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button href="/pricing" trackLocation="compare_hero" variant="primary" size="lg">
-                Start free trial
+                Start Free Trial
               </Button>
               <Button href="/free-ai-visibility-score" trackLocation="compare_hero" variant="secondary" size="lg">
-                Get free score
+                Get Free Score
               </Button>
             </div>
           </div>
@@ -392,9 +392,9 @@ export default function ComparePage() {
         sub="GET STARTED"
         heading="The fastest comparison is your own score."
         body="Twenty-four hours, real prompts, real engines. See where you sit before you decide who to buy from."
-        primary="Get free score"
+        primary="Get Free Score"
         primaryHref="/free-ai-visibility-score"
-        secondary="Start free trial"
+        secondary="Start Free Trial"
         secondaryHref="/pricing"
       />
     </>

@@ -285,10 +285,10 @@ export default function PlatformCoveragePage() {
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
               <Button href="/pricing" trackLocation="features_platform_coverage_hero" size="lg">
-                Start free trial <ArrowRight />
+                Start Free Trial <ArrowRight />
               </Button>
               <Button href="/free-ai-visibility-score" trackLocation="features_platform_coverage_hero" variant="secondary" size="lg">
-                Get free score
+                Get Free Score
               </Button>
             </div>
           </div>
@@ -693,7 +693,7 @@ export default function PlatformCoveragePage() {
         heading="Track every surface from day one."
         sub="Coverage"
         body="Ten engines, three regions, forty-seven languages — running before your first standup."
-        primary="Start free trial"
+        primary="Start Free Trial"
         primaryHref="/pricing"
         secondary="Talk to sales"
         secondaryHref="/pricing#enterprise"

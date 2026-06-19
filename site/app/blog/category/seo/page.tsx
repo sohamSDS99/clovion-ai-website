@@ -400,9 +400,9 @@ export default function BlogCategorySeoPage() {
         sub="Your SEO foundation, scored for AI"
         heading="Your authority signals are already there. See which engines are reading them."
         body="A free visibility score across ChatGPT, Claude, Gemini, and Perplexity in 24 hours. No card. The top 10 prioritized fixes ship with the report, ordered by expected lift."
-        primary="Get free score"
+        primary="Get Free Score"
         primaryHref="/free-ai-visibility-score"
-        secondary="Start free trial"
+        secondary="Start Free Trial"
         secondaryHref="/pricing"
       />
     </main>

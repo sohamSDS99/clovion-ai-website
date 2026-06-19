@@ -65,10 +65,10 @@ export function HomeCTA() {
             </p>
             <div style={{ marginTop: 36, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               <Button href="/pricing" variant="primary" size="lg" trackLocation="home_final_cta">
-                Start free trial <ArrowRight />
+                Start Free Trial <ArrowRight />
               </Button>
               <Button href="/free-ai-visibility-score" variant="secondary" size="lg" trackLocation="home_final_cta">
-                Get free score
+                Get Free Score
               </Button>
             </div>
           </div>

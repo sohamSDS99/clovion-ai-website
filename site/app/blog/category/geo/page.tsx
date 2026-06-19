@@ -295,9 +295,9 @@ export default function BlogCategoryGeoPage() {
         sub="See your GEO score"
         heading="The category is moving. Know where you stand on it."
         body="Get a free visibility score across ChatGPT, Claude, Gemini, and Perplexity in 24 hours. No card. The top 10 prioritized GEO fixes ship with the report."
-        primary="Get free score"
+        primary="Get Free Score"
         primaryHref="/free-ai-visibility-score"
-        secondary="Start free trial"
+        secondary="Start Free Trial"
         secondaryHref="/pricing"
       />
     </main>

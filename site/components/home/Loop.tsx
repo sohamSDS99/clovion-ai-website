@@ -142,7 +142,7 @@ export function Loop() {
 
         <div style={{ marginTop: 80, display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
           <Button href="/pricing" variant="invert" size="lg" trackLocation="home_loop">
-            Start free trial <ArrowRight />
+            Start Free Trial <ArrowRight />
           </Button>
           <Link
             href="/features"

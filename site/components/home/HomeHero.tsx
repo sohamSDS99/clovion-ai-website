@@ -77,10 +77,10 @@ export function HomeHero() {
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Button href="/pricing" variant="primary" size="lg" trackLocation="home_hero">
-              Start free trial <ArrowRight />
+              Start Free Trial <ArrowRight />
             </Button>
             <Button href="/free-ai-visibility-score" variant="secondary" size="lg" trackLocation="home_hero">
-              Get free score
+              Get Free Score
             </Button>
           </div>
           <p

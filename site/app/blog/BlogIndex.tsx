@@ -120,10 +120,10 @@ export default function BlogIndex() {
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button href="/pricing" trackLocation="blog_hero" variant="primary" size="lg">
-                Start free trial
+                Start Free Trial
               </Button>
               <Button href="/free-ai-visibility-score" trackLocation="blog_hero" variant="secondary" size="lg">
-                Get free score
+                Get Free Score
               </Button>
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function BlogIndex() {
               </p>
             </div>
             <Button href="/free-ai-visibility-score" trackLocation="blog_footer_cta" variant="invert">
-              Get free score
+              Get Free Score
             </Button>
           </div>
         </Container>

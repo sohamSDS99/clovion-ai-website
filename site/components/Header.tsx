@@ -49,23 +49,28 @@ export function Header() {
         >
           {nav.primary.map((item) => {
             const hasChildren = 'children' in item && Array.isArray(item.children) && item.children.length > 0
-            const isActive =
-              pathname === item.href || pathname.startsWith(item.href + '/')
+            const isActive = 'href' in item && typeof item.href === 'string'
+              ? (pathname === item.href || pathname.startsWith(item.href + '/'))
+              : false
+            const triggerClassName = cn(
+              'flex items-center gap-1 px-3 h-9 rounded-pill text-[0.95rem] font-semibold tracking-[-0.01em] text-ink transition-colors',
+              isActive ? 'bg-ink/5' : 'hover:bg-ink/5'
+            )
             return (
               <div
                 key={item.label}
                 className="relative"
                 onMouseEnter={() => hasChildren && setOpen(item.label)}
               >
-                <Link
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-1 px-3 h-9 rounded-pill text-[0.95rem] font-semibold tracking-[-0.01em] text-ink transition-colors',
-                    isActive ? 'bg-ink/5' : 'hover:bg-ink/5'
-                  )}
-                >
-                  {item.label}
-                  {hasChildren && (
+                {hasChildren ? (
+                  <button
+                    type="button"
+                    aria-haspopup="menu"
+                    aria-expanded={open === item.label}
+                    onFocus={() => setOpen(item.label)}
+                    className={cn(triggerClassName, 'cursor-pointer bg-transparent border-0')}
+                  >
+                    {item.label}
                     <svg
                       viewBox="0 0 12 12"
                       width="9"
@@ -85,8 +90,12 @@ export function Header() {
                         strokeLinejoin="round"
                       />
                     </svg>
-                  )}
-                </Link>
+                  </button>
+                ) : (
+                  <Link href={'href' in item ? item.href : '#'} className={triggerClassName}>
+                    {item.label}
+                  </Link>
+                )}
                 {hasChildren && (
                   <div
                     className={cn(
@@ -141,10 +150,10 @@ export function Header() {
 
         <div className="hidden lg:flex items-center gap-2">
           <Button href="/free-ai-visibility-score" variant="ghost" size="sm" trackLocation="header">
-            Get free score
+            Get Free Score
           </Button>
           <Button href="/pricing" variant="primary" size="sm" trackLocation="header">
-            Start free trial
+            Start Free Trial
           </Button>
         </div>
 
@@ -184,21 +193,39 @@ export function Header() {
       {mobileOpen && (
         <div className="lg:hidden border-t border-line bg-white">
           <Container className="py-4 flex flex-col gap-1">
-            {nav.primary.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                className="px-3 py-3 rounded-2xl hover:bg-subtle font-semibold text-ink"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {nav.primary.map((item) => {
+              if ('children' in item && Array.isArray(item.children) && item.children.length > 0) {
+                return (
+                  <div key={item.label}>
+                    <div className="px-3 py-3 font-semibold text-ink">{item.label}</div>
+                    {item.children.map((c) => (
+                      <Link
+                        key={c.label}
+                        href={c.href}
+                        className="block px-6 py-2 text-[0.9rem] text-ink-70 hover:bg-subtle hover:text-ink rounded-2xl"
+                      >
+                        {c.label}
+                      </Link>
+                    ))}
+                  </div>
+                )
+              }
+              return (
+                <Link
+                  key={item.label}
+                  href={'href' in item ? item.href : '#'}
+                  className="px-3 py-3 rounded-2xl hover:bg-subtle font-semibold text-ink"
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
             <div className="mt-3 flex flex-col gap-2 px-2 pb-2">
               <Button href="/free-ai-visibility-score" variant="secondary" trackLocation="header_mobile">
-                Get free score
+                Get Free Score
               </Button>
               <Button href="/pricing" variant="primary" trackLocation="header_mobile">
-                Start free trial
+                Start Free Trial
               </Button>
             </div>
           </Container>

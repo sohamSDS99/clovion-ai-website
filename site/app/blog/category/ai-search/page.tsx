@@ -383,7 +383,7 @@ export default function BlogAISearchCategoryPage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button href="/free-ai-visibility-score" trackLocation="blog_category_ai_search_final_cta" variant="primary" size="lg">
-                Get free score <ArrowRight />
+                Get Free Score <ArrowRight />
               </Button>
               <Button href="/pricing" trackLocation="blog_category_ai_search_final_cta" variant="secondary" size="lg">
                 See pricing

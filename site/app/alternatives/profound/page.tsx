@@ -111,10 +111,10 @@ export default function ProfoundAlternativePage() {
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-3">
               <Button href="/pricing" trackLocation="alt_profound_hero" variant="primary" size="lg">
-                Start free trial <ArrowRight />
+                Start Free Trial <ArrowRight />
               </Button>
               <Button href="/free-ai-visibility-score" trackLocation="alt_profound_hero" variant="secondary" size="lg">
-                Get free score
+                Get Free Score
               </Button>
             </div>
             <p className="mt-6 text-sm text-ink-60">
@@ -286,7 +286,7 @@ export default function ProfoundAlternativePage() {
         sub="The honest pitch"
         heading="Choosing between us? Run both. Decide on data."
         body="Thirty days side-by-side. Same prompts, same engines, same window. The tool that surfaces more, faster, wins your renewal."
-        primary="Start free trial"
+        primary="Start Free Trial"
         primaryHref="/pricing"
         secondary="Talk to sales"
         secondaryHref="/pricing#enterprise"

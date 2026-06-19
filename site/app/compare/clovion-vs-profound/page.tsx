@@ -157,10 +157,10 @@ export default function ClovionVsProfoundPage() {
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Button href="/pricing" trackLocation="compare_profound_hero" size="lg">
-                Start free trial <ArrowRight />
+                Start Free Trial <ArrowRight />
               </Button>
               <Button href="/pricing" trackLocation="compare_profound_hero" size="lg" variant="secondary">
-                Get free score
+                Get Free Score
               </Button>
             </div>
             <p className="mt-6 text-sm text-ink-50">
@@ -341,7 +341,7 @@ export default function ClovionVsProfoundPage() {
         heading="Run the comparison yourself. Free score in 60 seconds."
         sub="See the difference"
         body="No card, no sales call. Four engines, twenty prompts, top ten fixes, refreshed weekly on the free tier. Upgrade when it earns it."
-        primary="Get free score"
+        primary="Get Free Score"
         primaryHref="/pricing"
         secondary="Talk to sales"
         secondaryHref="/pricing#enterprise"

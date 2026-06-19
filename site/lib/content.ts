@@ -18,7 +18,6 @@ export const nav = {
   primary: [
     {
       label: 'Features',
-      href: '/features',
       children: [
         {
           label: 'AI Visibility Tracking',
@@ -374,7 +373,7 @@ export const pricingTiers = [
       'Side-by-side comparison against 3 competitors',
       'Community support'
     ],
-    cta: 'Get free score',
+    cta: 'Get Free Score',
     highlight: false
   },
   {
@@ -392,7 +391,7 @@ export const pricingTiers = [
       'Competitor benchmarking against 10 competitors',
       'Email support, next business day'
     ],
-    cta: 'Start free trial',
+    cta: 'Start Free Trial',
     highlight: false
   },
   {
@@ -411,7 +410,7 @@ export const pricingTiers = [
       'REST API access',
       'Slack support, same-day response'
     ],
-    cta: 'Start free trial',
+    cta: 'Start Free Trial',
     highlight: true
   },
   {

@@ -75,7 +75,7 @@ export function PricingTiers() {
           const ctaHref =
             tier.cta === 'Talk to sales'
               ? '/pricing#enterprise'
-              : tier.cta === 'Get free score'
+              : tier.cta === 'Get Free Score'
               ? '/free-ai-visibility-score'
               : '/pricing'
 

@@ -632,7 +632,7 @@ export default function FreeAIVisibilityScorePage() {
 
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <Button variant="invert" size="lg" href="/pricing">
-                    Start free trial
+                    Start Free Trial
                     <ArrowRight />
                   </Button>
                 </div>

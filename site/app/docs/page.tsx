@@ -131,7 +131,7 @@ export default function DocsPage() {
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Button href="/pricing" trackLocation="docs_hero" variant="primary" size="lg">
-                Start free trial
+                Start Free Trial
               </Button>
               <Button href="/docs/getting-started" variant="secondary" size="lg">
                 Read quickstart
@@ -357,10 +357,10 @@ export default function DocsPage() {
             </p>
             <div className="flex items-center gap-3">
               <Button variant="invert" size="md" href="/pricing">
-                Start free trial
+                Start Free Trial
               </Button>
               <Button variant="ghost" size="md" href="/free-ai-visibility-score" className="text-white hover:bg-white/10">
-                Get free score
+                Get Free Score
               </Button>
             </div>
           </div>

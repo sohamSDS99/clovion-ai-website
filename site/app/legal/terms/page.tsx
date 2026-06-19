@@ -504,7 +504,7 @@ export default function TermsPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button href="/pricing" trackLocation="legal_terms" variant="primary" size="md">Start free trial</Button>
+              <Button href="/pricing" trackLocation="legal_terms" variant="primary" size="md">Start Free Trial</Button>
               <Button href="/contact" variant="secondary" size="md">Talk to sales</Button>
             </div>
           </div>

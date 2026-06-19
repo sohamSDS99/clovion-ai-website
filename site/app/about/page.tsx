@@ -318,7 +318,7 @@ export default function AboutPage() {
 
           <div className="mt-16 flex flex-wrap items-center gap-4">
             <Button href="/pricing" trackLocation="about_hero" variant="primary" size="lg">
-              Start free trial <ArrowRight />
+              Start Free Trial <ArrowRight />
             </Button>
             <Button href="/contact" variant="ghost" size="lg">
               General enquiries

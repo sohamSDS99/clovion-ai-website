@@ -6,7 +6,6 @@ const groups = [
   {
     title: 'Product',
     links: [
-      { label: 'Features', href: '/features' },
       { label: 'AI Visibility Tracking', href: '/features/ai-visibility-tracking' },
       { label: 'GEO Suggestions', href: '/features/geo-improvement-suggestions' },
       { label: 'Fanout Query', href: '/features/fanout-query' },
