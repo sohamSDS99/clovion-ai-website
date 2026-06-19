@@ -3,9 +3,15 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import { JetBrains_Mono } from 'next/font/google'
 import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { ChromeHeader, ChromeFooter } from '@/components/Chrome'
+import { ThemeShell } from '@/components/ThemeShell'
 import { RouteTracker } from '@/components/RouteTracker'
+
+// Inline pre-hydration script — applies the .clv-dark scope synchronously
+// for routes that ship dark (currently just `/`) so the body bg paints
+// black from the first frame instead of cream→black flickering after
+// ThemeShell's useEffect runs. Mirrors ThemeShell's DARK_ROUTES set.
+const themeBootstrap = `(function(){try{var d=['/'];if(d.indexOf(location.pathname)>-1)document.documentElement.classList.add('clv-dark');}catch(_){}})();`
 
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
@@ -45,13 +51,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${saans.variable} ${mono.variable}`}>
+    <html
+      lang="en"
+      className={`${saans.variable} ${mono.variable}`}
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">
+        <ThemeShell />
         <RouteTracker />
-        <Header />
+        <ChromeHeader />
         <main>{children}</main>
-        <Footer />
+        <ChromeFooter />
       </body>
       <GoogleAnalytics gaId="G-QXKYL1Z4LB" />
     </html>

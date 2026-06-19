@@ -347,3 +347,210 @@
     display: none;
   }
 }
+
+/* ====================================================================
+ * Clovion AI Design System tokens — homepage redesign (2026-06-19)
+ *
+ * Light defaults below augment the :root block above; .clv-dark scopes
+ * the dark override to the new homepage root only so the other 20 routes
+ * remain untouched. Components on the homepage consume var(--ink),
+ * var(--bg), etc. so they auto-flip when wrapped in .clv-dark.
+ * ==================================================================== */
+:root {
+  --white: #ffffff;
+  --on-ink: #ffffff;
+  --ink-surface: #0a0a0f;
+  --muted-ramp: #9aa0aa;
+
+  /* Ink alpha ramp (dark ink on light bg) */
+  --ink-90: rgba(10, 10, 15, 0.92);
+  --ink-70: rgba(10, 10, 15, 0.70);
+  --ink-60: rgba(10, 10, 15, 0.60);
+  --ink-50: rgba(10, 10, 15, 0.50);
+  --ink-40: rgba(10, 10, 15, 0.38);
+  --ink-30: rgba(10, 10, 15, 0.28);
+  --ink-20: rgba(10, 10, 15, 0.20);
+  --ink-15: rgba(10, 10, 15, 0.15);
+  --ink-10: rgba(10, 10, 15, 0.10);
+  --ink-07: rgba(10, 10, 15, 0.08);
+  --ink-06: rgba(10, 10, 15, 0.07);
+  --ink-05: rgba(10, 10, 15, 0.06);
+  --ink-04: rgba(10, 10, 15, 0.05);
+  --ink-035: rgba(10, 10, 15, 0.045);
+
+  /* On-ink alpha ramp (light text on dark surfaces) */
+  --on-ink-90: rgba(255, 255, 255, 0.92);
+  --on-ink-70: rgba(255, 255, 255, 0.70);
+  --on-ink-60: rgba(255, 255, 255, 0.60);
+  --on-ink-50: rgba(255, 255, 255, 0.48);
+  --on-ink-40: rgba(255, 255, 255, 0.38);
+  --on-ink-15: rgba(255, 255, 255, 0.15);
+  --on-ink-10: rgba(255, 255, 255, 0.10);
+
+  /* The single mono-emerald positive accent used in the product mocks
+     for affordance (lifts, "where you win" callouts). Brand body copy
+     stays strictly B&W — positive only appears inside the dashboard
+     mockups where data UI needs a tone for "good." */
+  --positive: #047857;
+  --positive-bg: #ecfdf5;
+  --positive-border: rgba(4, 120, 87, 0.30);
+
+  /* Theme-aware atoms */
+  --logo-filter: brightness(0); /* renders engine SVGs ink-black on light */
+  --header-bg: rgba(255, 255, 255, 0.80);
+  --focus-ring: rgba(10, 10, 15, 0.22);
+
+  /* Layout */
+  --container-max: 1240px;
+  --section: clamp(4.5rem, 8vw, 7rem);
+
+  /* Radii + shadows + motion */
+  --radius-pill: 999px;
+  --radius-card: 20px;
+  --shadow-card: 0 1px 2px rgba(10, 10, 15, 0.04), 0 8px 24px -8px rgba(10, 10, 15, 0.08), 0 0 0 1px rgba(10, 10, 15, 0.04);
+  --shadow-soft: 0 1px 2px rgba(10, 10, 15, 0.04), 0 12px 32px -10px rgba(10, 10, 15, 0.10);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Display type scales (mirror the .display-* classes for inline use) */
+  --display-xl: clamp(3rem, 7vw + 1rem, 7.5rem);
+  --display-lg: clamp(2.5rem, 5vw + 0.5rem, 4.75rem);
+  --display-md: clamp(1.75rem, 2vw + 0.5rem, 2.5rem);
+  --display-sm: clamp(1.5rem, 1.5vw + 0.6rem, 2rem);
+  --track-display-xl: -0.04em;
+  --track-display-lg: -0.033em;
+  --track-display-md: -0.028em;
+  --text-lead: clamp(1.0625rem, 0.3vw + 1rem, 1.25rem);
+}
+
+/* ── Dark homepage scope ──────────────────────────────────────────────
+   Apply .clv-dark on the homepage root container. All var(--*) lookups
+   inside flip; outside this scope the light defaults above remain. */
+.clv-dark {
+  --bg: #08080b;
+  --ink: #ffffff;
+  --white: #161619;
+  --subtle: #101013;
+  --line: rgba(255, 255, 255, 0.12);
+
+  --ink-90: rgba(255, 255, 255, 0.92);
+  --ink-80: rgba(255, 255, 255, 0.84);
+  --ink-70: rgba(255, 255, 255, 0.72);
+  --ink-60: rgba(255, 255, 255, 0.60);
+  --ink-50: rgba(255, 255, 255, 0.48);
+  --ink-40: rgba(255, 255, 255, 0.38);
+  --ink-30: rgba(255, 255, 255, 0.28);
+  --ink-20: rgba(255, 255, 255, 0.20);
+  --ink-15: rgba(255, 255, 255, 0.15);
+  --ink-10: rgba(255, 255, 255, 0.10);
+  --ink-07: rgba(255, 255, 255, 0.08);
+  --ink-06: rgba(255, 255, 255, 0.07);
+  --ink-05: rgba(255, 255, 255, 0.06);
+  --ink-04: rgba(255, 255, 255, 0.05);
+  --ink-035: rgba(255, 255, 255, 0.045);
+
+  --ink-surface: #17171c;
+  --on-ink: #ffffff;
+  --logo-filter: brightness(0) invert(1); /* engine SVGs render white */
+  --header-bg: rgba(10, 10, 12, 0.72);
+  --focus-ring: rgba(255, 255, 255, 0.22);
+
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* The chat-window mock inside the dark ChatDemo section resets to the
+   light token ramp so it reads as a bright real product surface
+   glowing against the black section. */
+.clv-chat-island {
+  --ink: #0a0a0f;
+  --white: #ffffff;
+  --subtle: #F5F3EF;
+  --line: #eceae5;
+  --ink-80: rgba(10, 10, 15, 0.80);
+  --ink-70: rgba(10, 10, 15, 0.70);
+  --ink-60: rgba(10, 10, 15, 0.60);
+  --ink-50: rgba(10, 10, 15, 0.50);
+  --ink-40: rgba(10, 10, 15, 0.40);
+  --ink-30: rgba(10, 10, 15, 0.30);
+  --ink-15: rgba(10, 10, 15, 0.15);
+  --ink-10: rgba(10, 10, 15, 0.10);
+  --ink-06: rgba(10, 10, 15, 0.07);
+  --ink-04: rgba(10, 10, 15, 0.05);
+  --ink-surface: #0a0a0f;
+  --on-ink: #ffffff;
+  --logo-filter: brightness(0);
+}
+
+/* ── Homepage keyframes (clv- prefix) ─────────────────────────────── */
+@keyframes clv-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+@keyframes clv-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes clv-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes clv-flow {
+  to { stroke-dashoffset: -28; }
+}
+@keyframes clv-ping {
+  0% { transform: scale(1); opacity: 0.5; }
+  70%, 100% { transform: scale(2.4); opacity: 0; }
+}
+@keyframes clv-chatdot {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+@keyframes clv-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(var(--dx, 0), var(--dy, 0)); }
+}
+@keyframes clv-logo-fade {
+  from { opacity: 0; transform: scale(0.86); }
+  to { opacity: 1; transform: scale(1); }
+}
+.clv-logo-fade { animation: clv-logo-fade 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .clv-logo-fade { animation: none; }
+}
+
+/* ── Button overrides inside .clv-dark ────────────────────────────────
+   The light btn-primary is dark-bg + white-text — on a dark page that
+   collapses to white-on-near-white. Swap to white-bg + ink-text. */
+.clv-dark .btn-primary {
+  background: #ffffff;
+  color: #0a0a0f;
+}
+.clv-dark .btn-primary:hover {
+  background: #ececf0;
+  color: #0a0a0f;
+}
+.clv-dark .btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.clv-dark .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+.clv-dark .btn-ghost {
+  color: #ffffff;
+}
+.clv-dark .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.clv-dark .btn-invert {
+  background: #ffffff;
+  color: #0a0a0f;
+  border-color: #ffffff;
+}
+.clv-dark .btn-invert:hover {
+  background: #ececf0;
+  color: #0a0a0f;
+}
