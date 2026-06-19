@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
-const DARK_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking'])
+const DARK_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/features/geo-improvement-suggestions'])
 
 /**
  * Mounts the dark-theme class on <html> for the homepage redesign and
