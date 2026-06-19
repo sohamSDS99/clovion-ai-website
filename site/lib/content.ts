@@ -36,6 +36,11 @@ export const nav = {
           desc: 'Expand one seed prompt into the variations AI engines actually search'
         },
         {
+          label: 'AI Crawlability',
+          href: '/features/ai-crawlability',
+          desc: 'Make sure AI crawlers can access, read, and cite your pages'
+        },
+        {
           label: 'Platform Coverage',
           href: '/features/platform-coverage',
           desc: 'One dashboard. Every major AI search surface.'
