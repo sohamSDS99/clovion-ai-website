@@ -13,6 +13,8 @@ The workspace root contains a single Next.js project under `site/`. There is no 
 ├── site/                        # the Next.js 14 marketing site + admin console
 │   ├── app/                     # marketing routes + /admin tree (separate layout)
 │   ├── app/fonts/               # local font assets (Saans-TRIAL-SemiBold.otf)
+│   ├── components/home/         # the dark homepage redesign — sections used only by /
+│   ├── public/logos/            # 13 logo assets (7 engine SVGs + 6 customer knockout PNGs)
 │   └── .env.example             # admin-console env vars template (feat branch)
 ├── railway.json                 # Railway build config (NIXPACKS builder + restart policy)
 ├── nixpacks.toml                # explicit Node 20 provisioning for the Railway build
@@ -119,9 +121,9 @@ Override the auto-detect with explicit `trackEvent` (e.g. pricing tier cards use
 
 | CTA group | File | Location values |
 |-----------|------|-----------------|
-| Header (desktop + mobile) | `components/Header.tsx` | `header`, `header_mobile` |
-| Homepage hero | `components/Hero.tsx` (HomeHero) | `hero` |
-| Final CTA banner (used across pages) | `components/sections.tsx` (CTABanner) | `final_cta` |
+| Header (desktop + mobile, both light + dark variants) | `components/Header.tsx` / `components/HomeHeader.tsx` | `header`, `header_mobile` |
+| Homepage hero + final CTA (dark redesign) | `components/home/HomeHero.tsx`, `components/home/HomeCTA.tsx`, `components/home/Loop.tsx` | `home_hero`, `home_final_cta`, `home_loop` |
+| Final CTA banner (other pages) | `components/sections.tsx` (CTABanner) | `final_cta` |
 | Pricing tier cards (4 tiers via map) | `app/pricing/PricingTiers.tsx` | `pricing_card` + per-tier `plan_name` |
 | Enterprise mailto | `app/pricing/page.tsx` | `pricing_enterprise` |
 | Each marketing page hero / end CTA | the page's own `page.tsx` | `<page>_hero`, `<page>_final_cta`, etc. |
@@ -159,7 +161,7 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 **Marketing surface — 21 routes, locked structure (on `main`):**
 
 ```
-/                                              (homepage — uses <HomeHero />)
+/                                              (homepage — dark redesign, uses components/home/* — see "Homepage / is its own world")
 /features
 /features/ai-visibility-tracking
 /features/geo-improvement-suggestions
@@ -186,16 +188,66 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 
 `/admin` overview, `/admin/login`, `/admin/accounts` (+ `[id]` detail), `/admin/acquisition`, `/admin/activation`, `/admin/alerts`, `/admin/audit`, `/admin/engagement`, `/admin/flags`, `/admin/funnels`, `/admin/gdpr`, `/admin/operations`, `/admin/performance`, `/admin/pipeline`, `/admin/retention`, `/admin/revenue`. Has its own `app/admin/layout.tsx` (separate from the marketing root layout), its own `/admin/login` sub-layout, and reads env vars from `site/.env.example`. Architecture decisions are captured in `CLOVION_CONSOLE_PRD.md` at the repo root; planning notes in `ADMIN_BUILD_PLAN.md` / `ADMIN_PRD_SPEC.md` / `ADMIN_REVIEW_NOTES.md` / `ADMIN_METRICS_RESEARCH.md`. The marketing surface uses `FooterGate` (also added on this branch) to hide the marketing Footer on admin routes.
 
-**Root layout (`app/layout.tsx`)** wires the fonts (Saans-TRIAL-SemiBold via `next/font/local`, JetBrains Mono via `next/font/google`), Header, Footer, **Google Analytics 4** (via `@next/third-parties/google`), and the **Google Search Console verification** meta tag (via `metadata.verification.google`). See Analytics & SEO tags section above.
+**Root layout (`app/layout.tsx`)** wires the fonts (Saans-TRIAL-SemiBold via `next/font/local`, JetBrains Mono via `next/font/google`), `<ChromeHeader />` + `<ChromeFooter />` gates (which pick light or dark chrome by pathname), `<ThemeShell />` (toggles `.clv-dark` on `<html>` for SPA navigations), an inline pre-hydration `<script>` that synchronously sets `.clv-dark` on the homepage's first paint to avoid FOUC, **Google Analytics 4** (via `@next/third-parties/google`), **Google Tag Manager**, and SEO/verification metadata. `<html suppressHydrationWarning>` is intentional — the bootstrap script mutates className before React hydration. See "Homepage / is its own world" below for the full theme-scoping story.
 
 ### Component layers
 
-- `components/ui.tsx` — server-rendered primitives: `Container`, `Section`, `Button`, `Card`, `Eyebrow`, `Tag`, `GradientOrb`, `HeroShade`, `ArrowRight`, `Check`, `HairlineDivider`, `HaloMark`. `Section` accepts `id`, `tight`, `bg` ('subtle' | 'ink' | 'gradient'), and `className`. `Button` variants: `primary` | `secondary` | `ghost` | `invert` (white-on-dark, for use inside `bg-ink` sections).
-- `components/sections.tsx` — composed marketing sections: `LogoMarquee`, `AIEngineStrip`, `FAQ`, `CTABanner`, `StatStrip`, `FeatureGrid`, `TestimonialRail`, `TestimonialPullQuote` (legacy — kept defined for reference). Marked `'use client'`.
-- `components/Hero.tsx` — `HomeHero` for the homepage ONLY. Includes the `HeroBento` product mock with `IntersectionObserver`-driven animations (count-up metric, animated bar chart, engine breakdown rows, SVG callout). Client component.
+- `components/ui.tsx` — server-rendered primitives: `Container`, `Section`, `Button`, `Card`, `Eyebrow`, `Tag`, `GradientOrb`, `HeroShade`, `ArrowRight`, `Check`, `HairlineDivider`, `HaloMark`. `Section` accepts `id`, `tight`, `bg` ('subtle' | 'ink' | 'gradient'), and `className`. `Button` variants: `primary` | `secondary` | `ghost` | `invert` (white-on-dark, for use inside `bg-ink` sections). The `Button` primitive carries the dataLayer tracking props (`trackLocation` / `trackEvent` / `trackPlan`).
+- `components/sections.tsx` — composed marketing sections used on the OTHER 20 routes: `AIEngineStrip`, `FAQ`, `CTABanner`, `StatStrip`, `FeatureGrid`, `TestimonialRail`, `TestimonialPullQuote` (legacy — kept defined for reference). Marked `'use client'`. (Not used on the homepage — `/` has its own section components under `components/home/`.)
 - `components/SpotlightCard.tsx` — standalone client component with mouse-tracking `--mouse-x/--mouse-y` CSS variables. Pairs with `.spotlight-overlay` in globals.css. Drop in for premium cards.
-- `components/Header.tsx` — sticky header. Mega-menu for "Features" (the only nav item with children). Pulls nav from `lib/content.ts`. Right-side dual CTA: `Get free score` (ghost) + `Start free trial` (primary). Nav links are full-ink, font-semibold, with `hover:bg-ink/5`.
-- `components/Footer.tsx` — cream-background footer with 4 columns: Product / Resources / Company / Legal.
+- `components/Chrome.tsx` — client gate. Exports `ChromeHeader` and `ChromeFooter` that route between the light Header/Footer and the dark HomeHeader/HomeFooter based on `usePathname()`. Layout uses these instead of importing Header/Footer directly.
+- `components/Header.tsx` + `components/Footer.tsx` — the LIGHT variants, used on all 20 non-homepage routes. Sticky header with mega-menu for "Features", dual CTAs. Cream-background footer with 4 columns. Unchanged by the homepage rebuild.
+- `components/HomeHeader.tsx` + `components/HomeFooter.tsx` — the DARK variants, used only on `/`. Same nav structure as the light variants, but white-on-dark surfaces, `rgba(10,10,12,0.72)` blur backdrop when scrolled, dark mega-menu, dark mobile drawer.
+- `components/ThemeShell.tsx` — tiny client component, no markup. On mount + every `usePathname()` change, toggles `.clv-dark` on `document.documentElement` based on `DARK_ROUTES` (just `/` today). Pairs with the inline bootstrap script in `app/layout.tsx`.
+- `components/home/*` — the homepage redesign's section components. See the next subsection.
+
+**Dead code from the prior homepage design** (unreferenced from any route, safe to delete):
+- `components/Hero.tsx` (old centered light hero + HeroBento — replaced by `home/HomeHero.tsx`)
+- `components/HomeInteractive.tsx` (LiveAIDemo / MetricsTickerStrip / AIEngineMarquee — replaced by `home/ChatDemo`, `home/MetricsStrip`, `home/LogoMarquee`)
+
+**Name collision watchout.** Two different `LogoMarquee` exports coexist: the OLD text-wordmark version in `components/sections.tsx` is **still used by `app/features/page.tsx`** (so it's not dead). The NEW real-image marquee at `components/home/LogoMarquee.tsx` is homepage-only. Don't merge them — they serve different sections of the site with different visual contracts.
+
+#### Homepage `/` is its own world (dark)
+
+The homepage was rebuilt 2026-06-19 from the "Clovion AI Design System" handoff and is a **deliberate exception** to the otherwise strict light B&W brand book. It's the only route that ships dark; the other 20 marketing routes remain on cream + ink, untouched. Light theme is still the default for any NEW route.
+
+**Section components** — all under `components/home/`, used only by `app/page.tsx`:
+
+- `HomeHero.tsx` — centered hero. Headline reads `See how {RotatingLogo} sees your brand.` where `RotatingLogo` crossfades through six engine SVGs (ChatGPT → Claude → Gemini → Perplexity → Grok → Google AI) every 2s. Below the headline is a dashboard `HeroBento` mock with `IntersectionObserver`-driven count-up to 28.4%, animated bar chart, and 5 engine score rows. The bento dropped the SVG callout arrow + "+7.1× lift" pull-quote that the old light hero had — by design.
+- `PillarStepper.tsx` — scroll-pinned 4-pillar section. Left side: a vertical list with inactive items at 0.45 opacity and an animated progress bar on the active item. Right side: framed product-UI mocks (`MockVisibility`, `MockPerception`, `MockRankings`, `MockRecommendations`), all defined inline in the same file because they're only used here. Active step is derived from scroll position within the pinned section. **Falls back to stacked layout under 1000px** via `matchMedia('(max-width: 1000px)')` — no scroll-pin on mobile.
+- `ChatDemo.tsx` — 500vh scroll-pinned section. Phase A (`p 0 → 0.5`): 20 floating frosted-glass `WindowCard` instances with engine logos drift then converge into a chat box, each card staggered. Phase B (`p 0.54 → 1`): the chat materializes and steps through `prompt → typing dots → "Thought for 163s" → streamed response → analysis card → row reveal`. Progress is written to CSS custom properties `--pa` and `--cardin` on the sticky element; component state tracks `step` and `words` for the response stream.
+- `MetricsStrip.tsx` — 5-tile metrics row (`6 / 25 / 24h / 0–100 / AI-ready`) with a `<TypingHeadline>` at the top.
+- `LogoMarquee.tsx` — 34s infinite-scroll customer logos with `WebkitMaskImage` edge fades and `animationPlayState: paused` on hover. Uses real customer logos (Netpower, SDS Manager, Canon, Unilever, DHL, Reckitt) from `public/logos/ko-*.png`. **Usage rights cleared with the user** before shipping.
+- `Testimonials.tsx` — 3-card grid (Mirjam Meling / Jordan Lucena / Morten André Hjelle). Quotes are long-form here (vs. the short-form testimonials in `lib/content.ts` used by `TestimonialRail` elsewhere).
+- `Loop.tsx` — dark "Tracking. Intelligence. Improvement. One loop." section with a `<TypingHeadline>` and 3 node cards on `var(--ink-surface)` background.
+- `HomeCTA.tsx` — final dark rounded CTA banner with `<TypingHeadline>` and dual CTAs.
+- `TypingHeadline.tsx` — shared helper. Continuously cycles `typing → holding 4.2s → deleting → retyping` with a blinking caret. Honors `prefers-reduced-motion` (renders static full text). Used by `MetricsStrip`, `Testimonials`, `Loop`, and `HomeCTA`.
+
+**Theme scoping mechanism** — `.clv-dark` is the single class that flips the whole token system from light to dark. Applied in three layers, belt-and-suspenders against FOUC:
+
+1. **Inline pre-hydration script in `app/layout.tsx`** — runs synchronously when the browser parses the head: `if (location.pathname === '/') document.documentElement.classList.add('clv-dark')`. This makes `<html>` carry `.clv-dark` from the very first CSS application, so the body bg paints `#08080b` instead of cream-flashing on initial load.
+2. **`<ThemeShell />`** — client component, no markup. On `usePathname()` change, mirrors the script: adds `.clv-dark` for routes in the `DARK_ROUTES` set (`/` today), removes it elsewhere. Handles SPA navigation that the inline script can't see.
+3. **`<div className="clv-dark">` wrapper in `app/page.tsx`** — scopes the dark tokens to the page content itself even if the global class somehow isn't there yet.
+
+**`<html suppressHydrationWarning>` is intentional** and must stay — the bootstrap script modifies the className before React hydration, so the SSR'd html (no `.clv-dark`) differs from the live DOM (`.clv-dark` already added). Without `suppressHydrationWarning` the console fills with hydration warnings.
+
+**Design tokens** (defined in `app/globals.css`, all light defaults; `.clv-dark` overrides to dark):
+- Full ink alpha ramp: `--ink-90 / --ink-80 / --ink-70 / … / --ink-035`. In light, dark-on-cream at decreasing alpha. In `.clv-dark`, white-on-black at decreasing alpha.
+- `--white`, `--subtle`, `--line`, `--ink-surface` — surface tokens that flip on dark scope.
+- `--on-ink`, `--on-ink-70`, `--on-ink-60`, etc. — contrast text for dark surfaces (always white-on-dark, regardless of scope).
+- `--positive`, `--positive-bg`, `--positive-border` — the **single** emerald accent (`#047857` / `#ecfdf5`). **Used only inside dashboard mocks** to mark affordance ("where you win", "↑ +18%" lifts). It is not a brand color — body copy and CTAs stay strictly B&W.
+- `--logo-filter` — flips between `brightness(0)` (light) and `brightness(0) invert(1)` (dark) so engine SVGs render the right tone without per-logo asset duplication.
+- `--header-bg`, `--focus-ring`, `--container-max`, `--section`, `--radius-pill`, `--radius-card`, `--shadow-card`, `--shadow-soft`, `--ease-out-expo`, `--display-{xl,lg,md,sm}`, `--track-display-{xl,lg,md}`, `--text-lead` — layout / type / motion atoms used inline-style throughout `components/home/`.
+
+**`.clv-chat-island`** — a CSS class that resets to the light token ramp inside the chat box on the dark `ChatDemo` section. Used so the mock chat UI reads as a bright real-product surface glowing against the black page.
+
+**`.clv-dark .btn-*` overrides** — `.btn-primary` is hardcoded dark-bg-white-text in the base layer, which collapses on a dark page. In `.clv-dark` scope: primary swaps to white-bg-ink-text, secondary to translucent-white-on-dark, invert / ghost adjusted to match. So Button primitives auto-flip without per-call variant changes.
+
+**Keyframes** (in `globals.css`, prefixed `clv-` to avoid Tailwind collision): `clv-blink`, `clv-marquee`, `clv-pulse`, `clv-flow`, `clv-ping`, `clv-chatdot`, `clv-drift`, `clv-logo-fade`. Drive the caret, marquee scroll, ping dot, chat typing dots, card drift, and logo fade-in animations.
+
+**When editing the homepage:** values are inlined with `style={{ … }}` referencing `var(--*)` — not Tailwind utilities — because Tailwind tokens are hardcoded to light values and don't auto-flip. Keep that pattern. For any new dark-scoped element, reach for `var(--ink)`, `var(--white)`, etc. instead of `text-ink`, `bg-white`.
+
+**When NOT to extend this pattern:** new routes default to LIGHT (the brand book). Don't add a route to `DARK_ROUTES` without re-confirming with the user — the homepage exception was an explicit override approved 2026-06-19, not a license to switch the whole site to dark.
 
 #### HaloMark (the brand mark)
 
@@ -222,6 +274,8 @@ Drop-in component for hero `<Section>`s. Renders 4 soft radial gradients at the 
 ### Design system (in `app/globals.css` + `tailwind.config.ts`)
 
 **Colors. Strict B&W brand book — no purple, no chromatic accents anywhere.** Body bg is cream `#FAFAF7`. Surfaces are white. Subtle alt bg is `#F5F3EF`. Line `#eceae5`. Ink `#0a0a0f` plus rgba steps via Tailwind tokens (`ink/80/70/60/50/40/20/10`). Mid-grays via Tailwind's built-in `neutral-*`. Distinctiveness comes from typography, density, surface contrast, dot-grid textures, and motion — **never color**. Gradients allowed but only monochrome (e.g. `from-black via-neutral-700 to-neutral-400`). **Do NOT reintroduce `purple-*` utilities.**
+
+**Theme exception: the homepage `/` ships dark** (`--bg: #08080b`, white-on-dark ramp) per the 2026-06-19 design handoff, scoped via `.clv-dark`. The single emerald `--positive` accent (`#047857`) appears only inside dashboard mocks for affordance — not in body copy or CTAs. All other 20 routes remain on the light B&W book. Don't add new routes to the dark scope without explicit user authorization. Full mechanics in "Homepage / is its own world" above.
 
 **Typography.** Site-wide font is **Saans-TRIAL-SemiBold** (Indian Type Foundry), loaded via `next/font/local` from `site/app/fonts/Saans-TRIAL-SemiBold.otf`. Exposed as CSS variable `--font-saans`. Both `--font-display` and `--font-body` in globals.css resolve to `var(--font-saans)`. **Body weight defaults to 600 (Semibold)**, as do all `.display-*` classes, `.btn`, `.eyebrow`, `.tag`. The Tailwind utility `font-medium` and lighter have been globally converted to `font-semibold` across the source — keep using `font-semibold` for any new weight-related styling. Custom display classes `.display-xl` (clamp max 7.5rem / 120px), `.display-lg`, `.display-md`, `.display-sm`, and `.lead` own all letter-spacing. **Note: Saans is a TRIAL license** — production deploy requires the full ITF Saans license.
 
@@ -264,7 +318,7 @@ Every page except the homepage uses this exact hero shape. Headlines are **≤5 
 </Section>
 ```
 
-The homepage hero (in `components/Hero.tsx`) is the **only centered hero on the site**. It also uses a two-part headline with a monochrome gradient on the emphasis phrase: `bg-gradient-to-br from-black via-neutral-700 to-neutral-400 bg-clip-text text-transparent`. No gradient on any other hero — they're plain ink.
+The homepage hero (`components/home/HomeHero.tsx`) is the **only centered hero on the site** and the only one on a dark surface. It uses a two-line headline (`See how {RotatingLogo} sees your brand.`) with a 6-engine logo crossfade replacing the old gradient-text emphasis pattern. **No gradient — the rotating logo IS the emphasis.** All other heroes are plain ink on cream, following the pattern block above.
 
 **Eyebrows are scarce** — only on flagship section openings and hero bands.
 
@@ -296,9 +350,9 @@ The pattern: parallel `agent()` calls inside `parallel(...)` phases for mechanic
 User-confirmed preferences. Treat as load-bearing:
 
 - **Brand is "Clovion AI"**. Twin-chevron mark + Saans Semibold wordmark.
-- **Strict B&W brand book.** No purple, no chromatic accents. Light theme only. Memory files `feedback_light_theme.md` and `feedback_hero_gradient_accent.md` track the directive.
+- **Strict B&W brand book.** No purple, no chromatic accents. **Light theme everywhere except `/`**, which ships dark per the 2026-06-19 design handoff (single exception, do not extend without re-confirmation). Memory file `feedback_light_theme.md` records the override.
 - **Saans-TRIAL-SemiBold is the typography.** Site-wide weight 600. `font-medium` and lower have been globally converted to `font-semibold`.
-- **Monochrome gradient on the homepage hero only.** `from-black via-neutral-700 to-neutral-400 bg-clip-text text-transparent` on 1–3 emphasis words. Other heroes are plain ink — no gradients.
+- **Homepage hero emphasizes via a rotating engine logo, not a gradient.** Headline reads `See how {RotatingLogo} sees your brand.` Other heroes are plain ink — no gradients, no rotating logo treatment.
 - **Hero headlines are ≤5 words.** No exceptions.
 - **Only marketing CTA is "Start free trial."** No "View demo", "Book a demo". Secondary CTA is "Get free score" → `/free-ai-visibility-score`. Sales CTA ("Talk to sales") is fine in pricing/enterprise context only.
 - **Humanized voice.** Avoid triplet sentence rhythm, em-dash overuse, AI-startup buzzwords ("leverage", "unlock", "closed loop", "operating system", "the only X built for Y"). Vary sentence length. Section leads 20–25 words.
@@ -306,9 +360,9 @@ User-confirmed preferences. Treat as load-bearing:
 
 ## When editing
 
-- Copy changes → `lib/content.ts` first, then inline strings in pages
-- New marketing sections → add to `components/sections.tsx` so they're reusable
-- Design tokens → `tailwind.config.ts` for colors/spacing/animation, `globals.css` for component classes (`.btn-*`, `.card`, `.section-y-*`, font tokens)
+- Copy changes → `lib/content.ts` first, then inline strings in pages. Homepage `/` copy is mostly inlined per-section in `components/home/*` — that's intentional, the dark redesign sections are tightly co-located with their copy and aren't reused.
+- New marketing sections for the LIGHT routes → add to `components/sections.tsx`. New sections for the DARK homepage → add to `components/home/`. Don't cross the streams.
+- Design tokens → `tailwind.config.ts` for colors/spacing/animation (LIGHT side only — Tailwind utilities don't auto-flip on `.clv-dark`), `globals.css` for component classes (`.btn-*`, `.card`, `.section-y-*`, font tokens) AND the design-system CSS variables (`--ink-*`, `--positive`, `--logo-filter`, etc.) that DO auto-flip via `.clv-dark`. On the homepage, reach for `style={{ color: 'var(--ink)' }}` instead of `text-ink`.
 - Featured cards that should feel premium → wrap in `<SpotlightCard>`
 - New horizontal carousel → reuse the `TestimonialRail` scaffold; don't roll your own snap logic
 - New page → `app/<route>/page.tsx` with `export const metadata` for SEO, hero pattern above, `<HeroShade />` inside the hero `<Section>`. Compose with `Section` + `Container` + `components/sections.tsx`. Client components can't export metadata — see `BlogIndex.tsx` and `free-ai-visibility-score/page.tsx` for the pattern (server wrapper imports client child, or skip metadata)
