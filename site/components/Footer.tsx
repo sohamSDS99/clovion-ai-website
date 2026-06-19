@@ -36,7 +36,8 @@ const groups = [
       { label: 'Customers', href: '/customers' },
       { label: 'Compare', href: '/compare' },
       { label: 'vs Profound', href: '/compare/clovion-vs-profound' },
-      { label: 'Profound alternatives', href: '/alternatives/profound' }
+      { label: 'Profound alternatives', href: '/alternatives/profound' },
+      { label: 'Affiliate Program', href: '/affiliate' }
     ]
   },
   {
