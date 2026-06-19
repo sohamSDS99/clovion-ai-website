@@ -31,6 +31,11 @@ export const nav = {
           desc: 'Concrete fixes that make AI engines cite you more often'
         },
         {
+          label: 'Fanout Query',
+          href: '/features/fanout-query',
+          desc: 'Expand one seed prompt into the variations AI engines actually search'
+        },
+        {
           label: 'Platform Coverage',
           href: '/features/platform-coverage',
           desc: 'One dashboard. Every major AI search surface.'

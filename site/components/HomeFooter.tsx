@@ -9,6 +9,7 @@ const groups = [
       { label: 'Features', href: '/features' },
       { label: 'AI Visibility Tracking', href: '/features/ai-visibility-tracking' },
       { label: 'GEO Suggestions', href: '/features/geo-improvement-suggestions' },
+      { label: 'Fanout Query', href: '/features/fanout-query' },
       { label: 'Platform Coverage', href: '/features/platform-coverage' },
       { label: 'Sentiment Analysis', href: '/features/sentiment-analysis' },
       { label: 'Pricing', href: '/pricing' },
