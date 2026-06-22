@@ -1005,7 +1005,7 @@ export function PillarStepper() {
   }
 
   const Heading = (
-    <div style={{ maxWidth: 820, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center', marginBottom: narrow ? 36 : 'clamp(20px, 3vh, 36px)' }}>
+    <div style={{ maxWidth: 880, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center', marginBottom: narrow ? 36 : 'clamp(18px, 2.6vh, 32px)' }}>
       <h2
         style={{
           fontFamily: 'var(--font-display)',
@@ -1018,21 +1018,21 @@ export function PillarStepper() {
           color: 'var(--ink)'
         }}
       >
-        Understand and improve your AI visibility.
+        Everything you need to understand and improve AI visibility.
       </h2>
       <p
         style={{
           fontSize: 'var(--text-lead)',
-          lineHeight: 1.5,
+          lineHeight: 1.45,
           color: 'var(--ink-70)',
-          marginTop: 14,
+          marginTop: 12,
           marginLeft: 'auto',
           marginRight: 'auto',
-          maxWidth: 620,
+          maxWidth: 760,
           textWrap: 'balance'
         }}
       >
-        Millions of buying decisions start with AI. Clovion helps your brand earn more recommendations.
+        Millions of buying decisions now start with AI. Most brands don&rsquo;t know how they&rsquo;re represented — or whether AI recommends them at all. Clovion helps you earn more.
       </p>
     </div>
   )
