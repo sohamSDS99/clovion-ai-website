@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactElement } fr
 import Link from 'next/link'
 import { Container, ArrowRight } from '@/components/ui'
 
-const STEP_VH = 50
+const STEP_VH = 30
 
 // ── glyph paths ───────────────────────────────────────────────────────
 const G = {
@@ -907,66 +907,103 @@ export function PillarStepper() {
     const el = pinRef.current
     if (!el) return
 
-    let inGesture = false
-    let endTimer: ReturnType<typeof setTimeout> | null = null
+    // Gesture detection state. A "gesture" is one continuous user motion
+    // (a single trackpad swipe — many momentum events at <50ms intervals;
+    //  or a single mouse-wheel click — one event with deltaY ~100).
+    //
+    // We treat any quiet period > GAP_MS (no wheel events) as the end of a
+    // gesture. The next event after such a quiet period is a NEW gesture
+    // and is allowed to advance idx by 1.
+    let lastEventTime = 0
+    let lastDirection = 0
+    let gestureLocked = false
+    const GAP_MS = 70
 
-    const armEndTimer = () => {
-      if (endTimer) clearTimeout(endTimer)
-      endTimer = setTimeout(() => {
-        inGesture = false
-        endTimer = null
-      }, 220)
+    const advance = (dir: 1 | -1) => {
+      const cur = idxRef.current
+      const next = cur + dir
+      if (next < 0 || next > PILLARS.length - 1) return false
+      idxRef.current = next
+      setActive(next)
+      setProg(1)
+      return true
+    }
+
+    // Snap the page so the pin section is fully aligned with the viewport
+    // (sticky engaged). Idempotent — does nothing if already aligned.
+    const snapToPin = (r: DOMRect) => {
+      const vh = window.innerHeight
+      if (r.top > 0) {
+        window.scrollTo({ top: window.scrollY + r.top })
+        return true
+      }
+      if (r.bottom < vh) {
+        window.scrollTo({ top: window.scrollY - (vh - r.bottom) })
+        return true
+      }
+      return false
     }
 
     const onWheel = (e: WheelEvent) => {
       const r = el.getBoundingClientRect()
       const vh = window.innerHeight
 
+      // Outside pin section — never hijack
       if (r.bottom <= 0 || r.top >= vh) {
-        inGesture = false
-        if (endTimer) {
-          clearTimeout(endTimer)
-          endTimer = null
-        }
+        gestureLocked = false
+        lastEventTime = 0
         return
-      }
-
-      e.preventDefault()
-
-      if (inGesture) {
-        armEndTimer()
-        return
-      }
-
-      if (r.top > 0) {
-        window.scrollTo({ top: window.scrollY + r.top })
-      } else if (r.bottom < vh) {
-        window.scrollTo({ top: window.scrollY - (vh - r.bottom) })
       }
 
       const cur = idxRef.current
-      if (e.deltaY > 0 && cur < PILLARS.length - 1) {
-        idxRef.current = cur + 1
-        setActive(cur + 1)
-        setProg(1)
-      } else if (e.deltaY < 0 && cur > 0) {
-        idxRef.current = cur - 1
-        setActive(cur - 1)
-        setProg(1)
-      } else {
-        if (e.deltaY > 0) {
-          window.scrollTo({ top: window.scrollY + r.bottom + 2 })
-        } else {
-          window.scrollTo({ top: window.scrollY + r.top - vh - 2 })
-        }
+      const goingDown = e.deltaY > 0
+      const goingUp = e.deltaY < 0
+
+      // Boundary release: at last pillar going DOWN, or first pillar going UP,
+      // no further advance possible — let native scroll continue out of the
+      // section. Do NOT preventDefault. We also reset gesture state so the
+      // very next event after re-entry starts a fresh gesture.
+      if (
+        (goingDown && cur >= PILLARS.length - 1) ||
+        (goingUp && cur <= 0)
+      ) {
+        gestureLocked = false
+        lastEventTime = 0
+        return
       }
-      inGesture = true
-      armEndTimer()
+
+      // Inside pin, advance is possible — hijack.
+      e.preventDefault()
+
+      // Gesture window: gap-since-last-event > GAP_MS means a NEW gesture.
+      // A direction reversal also counts as a new gesture (trackpad momentum
+      // never flips sign mid-decay, so a sign flip is always intentional).
+      const now = performance.now()
+      const gap = now - lastEventTime
+      const direction = goingDown ? 1 : -1
+      lastEventTime = now
+      if (gap > GAP_MS || direction !== lastDirection) gestureLocked = false
+      lastDirection = direction
+
+      if (gestureLocked) {
+        // Continuation of current gesture (trackpad momentum) — swallow.
+        return
+      }
+
+      // Snap to pin on first event of fresh entry (when sticky not yet engaged).
+      snapToPin(r)
+
+      // Advance exactly one pillar in the direction of the gesture.
+      advance(direction as 1 | -1)
+
+      gestureLocked = true
     }
 
     const onScroll = () => {
       const r = el.getBoundingClientRect()
       const vh = window.innerHeight
+      // When user is completely above the pin, normalize idx to 0 so that
+      // re-entry from above advances 0 → 1 on the first wheel event.
       if (r.top >= vh) {
         if (idxRef.current !== 0) {
           idxRef.current = 0
@@ -974,6 +1011,8 @@ export function PillarStepper() {
           setProg(1)
         }
       } else if (r.bottom <= 0) {
+        // Completely below pin — normalize to last, so re-entry from below
+        // advances N-1 → N-2 on the first upward wheel.
         if (idxRef.current !== PILLARS.length - 1) {
           idxRef.current = PILLARS.length - 1
           setActive(PILLARS.length - 1)
@@ -988,7 +1027,6 @@ export function PillarStepper() {
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('scroll', onScroll)
-      if (endTimer) clearTimeout(endTimer)
     }
   }, [narrow])
 
