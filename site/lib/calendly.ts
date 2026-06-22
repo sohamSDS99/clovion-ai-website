@@ -1,2 +1,2 @@
 export const CALENDLY_URL =
-  'https://calendly.com/d/ds8v-39t-vjq/clovion-ai-demo'
+  'https://calendly.com/zahir-clovion/30min?primary_color=000000'
