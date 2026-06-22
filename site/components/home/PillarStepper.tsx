@@ -948,14 +948,14 @@ export function PillarStepper() {
         setActive(cur + 1)
         setProg(1)
         decision = 'advance'
-        cooldownUntil = now + 150
+        cooldownUntil = now + 80
       } else if (e.deltaY < 0 && cur > 0) {
         e.preventDefault()
         idxRef.current = cur - 1
         setActive(cur - 1)
         setProg(1)
         decision = 'advance'
-        cooldownUntil = now + 150
+        cooldownUntil = now + 80
       } else {
         decision = 'release'
         const r = el.getBoundingClientRect()
