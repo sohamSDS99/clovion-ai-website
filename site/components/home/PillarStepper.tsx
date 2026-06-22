@@ -948,14 +948,14 @@ export function PillarStepper() {
         setActive(cur + 1)
         setProg(1)
         decision = 'advance'
-        cooldownUntil = now + 1500
+        cooldownUntil = now + 250
       } else if (e.deltaY < 0 && cur > 0) {
         e.preventDefault()
         idxRef.current = cur - 1
         setActive(cur - 1)
         setProg(1)
         decision = 'advance'
-        cooldownUntil = now + 1500
+        cooldownUntil = now + 250
       } else {
         decision = 'release'
         const r = el.getBoundingClientRect()
@@ -1022,13 +1022,13 @@ export function PillarStepper() {
       </h2>
       <p
         style={{
-          fontSize: 'var(--text-lead)',
+          fontSize: '0.95rem',
           lineHeight: 1.45,
           color: 'var(--ink-70)',
           marginTop: 12,
           marginLeft: 'auto',
           marginRight: 'auto',
-          maxWidth: 760,
+          maxWidth: 1020,
           textWrap: 'balance'
         }}
       >
