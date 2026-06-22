@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactElement } fr
 import Link from 'next/link'
 import { Container, ArrowRight } from '@/components/ui'
 
-const STEP_VH = 64
+const STEP_VH = 50
 
 // ── glyph paths ───────────────────────────────────────────────────────
 const G = {
@@ -885,8 +885,9 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
 
 export function PillarStepper() {
   const pinRef = useRef<HTMLDivElement>(null)
+  const idxRef = useRef(0)
   const [active, setActive] = useState(0)
-  const [prog, setProg] = useState(0)
+  const [prog, setProg] = useState(1)
   const [narrow, setNarrow] = useState(false)
 
   useEffect(() => {
@@ -898,68 +899,140 @@ export function PillarStepper() {
   }, [])
 
   useEffect(() => {
+    idxRef.current = active
+  }, [active])
+
+  useEffect(() => {
     if (narrow) return
-    const onScroll = () => {
-      const el = pinRef.current
-      if (!el) return
-      const vh = window.innerHeight
-      const total = el.offsetHeight - vh
-      const scrolled = Math.min(Math.max(-el.getBoundingClientRect().top, 0), total)
-      const p = total > 0 ? scrolled / total : 0
-      const raw = p * PILLARS.length
-      let idx = Math.floor(raw)
-      if (idx >= PILLARS.length) idx = PILLARS.length - 1
-      setActive(idx)
-      setProg(Math.min(1, Math.max(0, raw - idx)))
+    const el = pinRef.current
+    if (!el) return
+
+    let lastWheelTime = 0
+    let cooldownUntil = 0
+    let decision: 'advance' | 'held' | 'release' | null = null
+
+    const isEngaged = () => {
+      const r = el.getBoundingClientRect()
+      return r.top <= 0 && r.bottom > window.innerHeight
     }
+
+    const onWheel = (e: WheelEvent) => {
+      const now = performance.now()
+      const isNew = now - lastWheelTime > 250
+      lastWheelTime = now
+
+      if (isNew) decision = null
+      if (!isEngaged()) return
+
+      if (now < cooldownUntil) {
+        e.preventDefault()
+        return
+      }
+
+      if (decision === 'release') return
+      if (decision === 'advance' || decision === 'held') {
+        e.preventDefault()
+        return
+      }
+
+      if (!isNew) {
+        e.preventDefault()
+        decision = 'held'
+        return
+      }
+
+      const cur = idxRef.current
+      if (e.deltaY > 0 && cur < PILLARS.length - 1) {
+        e.preventDefault()
+        idxRef.current = cur + 1
+        setActive(cur + 1)
+        setProg(1)
+        decision = 'advance'
+        cooldownUntil = now + 1500
+      } else if (e.deltaY < 0 && cur > 0) {
+        e.preventDefault()
+        idxRef.current = cur - 1
+        setActive(cur - 1)
+        setProg(1)
+        decision = 'advance'
+        cooldownUntil = now + 1500
+      } else {
+        decision = 'release'
+        const r = el.getBoundingClientRect()
+        if (e.deltaY > 0) {
+          window.scrollTo({ top: window.scrollY + r.bottom - window.innerHeight + 2 })
+        } else {
+          window.scrollTo({ top: window.scrollY + r.top - 2 })
+        }
+      }
+    }
+
+    const onScroll = () => {
+      const r = el.getBoundingClientRect()
+      const vh = window.innerHeight
+      if (r.top >= vh) {
+        if (idxRef.current !== 0) {
+          idxRef.current = 0
+          setActive(0)
+          setProg(1)
+        }
+      } else if (r.bottom <= 0) {
+        if (idxRef.current !== PILLARS.length - 1) {
+          idxRef.current = PILLARS.length - 1
+          setActive(PILLARS.length - 1)
+          setProg(1)
+        }
+      }
+    }
+
     onScroll()
+    window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
     return () => {
+      window.removeEventListener('wheel', onWheel)
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
     }
   }, [narrow])
 
   const goto = (i: number) => {
     const el = pinRef.current
     if (!el) return
-    const vh = window.innerHeight
-    const total = el.offsetHeight - vh
     const absTop = window.scrollY + el.getBoundingClientRect().top
-    const top = absTop + ((i + 0.5) / PILLARS.length) * total
-    window.scrollTo({ top, behavior: 'smooth' })
+    window.scrollTo({ top: absTop, behavior: 'smooth' })
+    idxRef.current = i
+    setActive(i)
+    setProg(1)
   }
 
   const Heading = (
-    <div style={{ maxWidth: 880, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center', marginBottom: narrow ? 40 : 'clamp(24px, 4vh, 44px)' }}>
+    <div style={{ maxWidth: 820, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center', marginBottom: narrow ? 36 : 'clamp(20px, 3vh, 36px)' }}>
       <h2
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'var(--display-lg)',
+          fontSize: 'var(--display-md)',
           fontWeight: 600,
-          letterSpacing: 'var(--track-display-lg)',
-          lineHeight: 1.02,
-          margin: '20px 0 0',
+          letterSpacing: 'var(--track-display-md)',
+          lineHeight: 1.05,
+          margin: 0,
           textWrap: 'balance',
           color: 'var(--ink)'
         }}
       >
-        Everything you need to understand and improve AI visibility.
+        Understand and improve your AI visibility.
       </h2>
       <p
         style={{
           fontSize: 'var(--text-lead)',
-          lineHeight: 1.55,
+          lineHeight: 1.5,
           color: 'var(--ink-70)',
-          marginTop: 20,
+          marginTop: 14,
           marginLeft: 'auto',
           marginRight: 'auto',
-          maxWidth: 760,
+          maxWidth: 620,
           textWrap: 'balance'
         }}
       >
-        Millions of buying decisions now start with AI. Most brands don&rsquo;t know how they&rsquo;re represented — or whether AI recommends them at all. Clovion helps you earn more.
+        Millions of buying decisions start with AI. Clovion helps your brand earn more recommendations.
       </p>
     </div>
   )
@@ -992,8 +1065,7 @@ export function PillarStepper() {
   }
 
   return (
-    <section style={{ position: 'relative', paddingTop: 'var(--section)' }}>
-      <Container>{Heading}</Container>
+    <section style={{ position: 'relative' }}>
       <div ref={pinRef} style={{ position: 'relative', height: `${PILLARS.length * STEP_VH}vh` }}>
         <div
           style={{
@@ -1007,6 +1079,7 @@ export function PillarStepper() {
           }}
         >
           <Container>
+            {Heading}
             <div
               style={
                 {
@@ -1022,7 +1095,7 @@ export function PillarStepper() {
                   <PillarItem key={s.sku} s={s} i={i} active={active} prog={prog} onClick={() => goto(i)} />
                 ))}
               </div>
-              <div style={{ position: 'relative', height: 'clamp(380px, 56vh, 560px)' }}>
+              <div style={{ position: 'relative', height: 'clamp(340px, 46vh, 460px)' }}>
                 {PILLARS.map((s, i) => (
                   <MockPanel key={s.sku} s={s} show={i === active} />
                 ))}
