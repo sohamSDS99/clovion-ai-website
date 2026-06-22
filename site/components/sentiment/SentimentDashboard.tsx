@@ -63,7 +63,8 @@ export default function SentimentDashboard() {
   const [ref, on] = useSentReveal()
 
   return (
-    <div ref={ref}>
+    <div ref={ref} className="overflow-x-auto md:overflow-visible">
+      <div className="min-w-[420px] md:min-w-0">
       <SentWindow label="Clovion AI / Sentiment / Overview">
         <div style={{ padding: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -255,6 +256,7 @@ export default function SentimentDashboard() {
           </div>
         </div>
       </SentWindow>
+      </div>
     </div>
   )
 }

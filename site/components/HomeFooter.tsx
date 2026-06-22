@@ -80,7 +80,7 @@ export function HomeFooter() {
             </div>
           </div>
 
-          <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             {groups.map((g) => (
               <div key={g.title}>
                 <div
@@ -114,7 +114,7 @@ export function HomeFooter() {
           <p className="text-[0.84rem]" style={{ color: 'rgba(255,255,255,0.50)' }}>
             © {new Date().getFullYear()} Clovion AI, Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-3 md:gap-5">
             <Link href="/legal/privacy" className="text-[0.8rem] hover:text-white" style={{ color: 'rgba(255,255,255,0.60)' }}>Privacy</Link>
             <span aria-hidden className="h-3 w-px" style={{ background: 'rgba(255,255,255,0.10)' }} />
             <Link href="/legal/terms" className="text-[0.8rem] hover:text-white" style={{ color: 'rgba(255,255,255,0.60)' }}>Terms</Link>

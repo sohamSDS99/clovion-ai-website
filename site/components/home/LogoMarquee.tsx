@@ -19,13 +19,7 @@ function LogoLockup({ logo }: { logo: (typeof LOGOS)[number] }) {
     <span
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '0 40px',
-        flexShrink: 0
-      }}
+      className="px-6 md:px-10 inline-flex items-center justify-center shrink-0"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
@@ -33,13 +27,8 @@ function LogoLockup({ logo }: { logo: (typeof LOGOS)[number] }) {
         alt={logo.name}
         loading="lazy"
         decoding="async"
+        className="max-h-[64px] max-w-[180px] md:max-h-[96px] md:max-w-[260px] w-auto h-auto object-contain block"
         style={{
-          maxHeight: 96,
-          maxWidth: 260,
-          width: 'auto',
-          height: 'auto',
-          objectFit: 'contain',
-          display: 'block',
           opacity: hover ? 1 : 0.85,
           transform: hover ? 'translateY(-2px)' : 'none',
           transition: 'opacity 0.25s ease, transform 0.25s ease'
@@ -60,8 +49,8 @@ export function LogoMarquee() {
   const track = [...LOGOS, ...LOGOS]
   return (
     <section
+      className="py-10 md:py-14"
       style={{
-        padding: '3.25rem 0',
         background: 'var(--subtle)',
         borderTop: '1px solid var(--line)',
         borderBottom: '1px solid var(--line)'

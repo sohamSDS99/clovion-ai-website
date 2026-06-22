@@ -169,26 +169,30 @@ export default function ProfoundAlternativePage() {
             </p>
           </div>
 
-          <div className="mt-14 overflow-hidden rounded-2xl border border-line bg-white">
-            <div className="grid grid-cols-[1.5fr_1fr_1fr] text-sm font-semibold text-ink-60 border-b border-line">
-              <div className="px-6 py-4">Dimension</div>
-              <div className="px-6 py-4 border-l border-line bg-ink/[0.02]">Clovion AI</div>
-              <div className="px-6 py-4 border-l border-line">Profound</div>
+          <div className="mt-14 -mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
+            <div className="min-w-[640px] md:min-w-0 px-4 md:px-0">
+              <div className="overflow-hidden rounded-2xl border border-line bg-white">
+                <div className="grid grid-cols-[1.5fr_1fr_1fr] text-sm font-semibold text-ink-60 border-b border-line">
+                  <div className="px-6 py-4">Dimension</div>
+                  <div className="px-6 py-4 border-l border-line bg-ink/[0.02]">Clovion AI</div>
+                  <div className="px-6 py-4 border-l border-line">Profound</div>
+                </div>
+                <ul>
+                  {sideBySide.map((row, i) => (
+                    <li
+                      key={row.dim}
+                      className={`grid grid-cols-[1.5fr_1fr_1fr] text-[0.95rem] ${
+                        i !== sideBySide.length - 1 ? 'border-b border-line' : ''
+                      }`}
+                    >
+                      <div className="px-6 py-5 text-ink font-semibold">{row.dim}</div>
+                      <div className="px-6 py-5 border-l border-line bg-ink/[0.02] text-ink-80">{row.us}</div>
+                      <div className="px-6 py-5 border-l border-line text-ink-70">{row.them}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <ul>
-              {sideBySide.map((row, i) => (
-                <li
-                  key={row.dim}
-                  className={`grid grid-cols-[1.5fr_1fr_1fr] text-[0.95rem] ${
-                    i !== sideBySide.length - 1 ? 'border-b border-line' : ''
-                  }`}
-                >
-                  <div className="px-6 py-5 text-ink font-semibold">{row.dim}</div>
-                  <div className="px-6 py-5 border-l border-line bg-ink/[0.02] text-ink-80">{row.us}</div>
-                  <div className="px-6 py-5 border-l border-line text-ink-70">{row.them}</div>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <p className="mt-8 text-sm text-ink-60">

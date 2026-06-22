@@ -157,7 +157,7 @@ export default function DocsPage() {
             </Link>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-4">
             {quickStart.map((q) => (
               <Link key={q.sku} href={q.href} className="group block">
                 <Card className="bg-white h-full flex flex-col">
@@ -190,7 +190,7 @@ export default function DocsPage() {
             </div>
           </div>
 
-          <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-3">
             {browseSurfaces.map((group, i) => (
               <div key={group.title}>
                 <div className="flex items-center gap-3 pb-4 border-b border-line">
@@ -242,7 +242,7 @@ export default function DocsPage() {
             </Link>
           </div>
 
-          <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
             {frameworkQuickstarts.map((fw) => (
               <Link key={fw.name} href={fw.href} className="group block">
                 <Card className="bg-white h-full flex flex-col p-6">

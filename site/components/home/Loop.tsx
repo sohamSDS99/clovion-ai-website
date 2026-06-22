@@ -26,9 +26,9 @@ const NODES = [
 export function Loop() {
   return (
     <section
+      className="py-16 md:py-28"
       style={{
         position: 'relative',
-        padding: '7rem 0',
         background: 'var(--ink-surface, var(--ink))',
         color: 'var(--on-ink)',
         overflow: 'hidden'
@@ -45,7 +45,7 @@ export function Loop() {
         }}
       />
       <Container className="relative">
-        <div style={{ maxWidth: 768, margin: '0 auto 80px', textAlign: 'center' }}>
+        <div className="mb-12 md:mb-20" style={{ maxWidth: 768, margin: '0 auto', textAlign: 'center' }}>
           <TypingHeadline
             text="Tracking. Intelligence. Improvement. One loop."
             caretColor="var(--on-ink)"
@@ -74,15 +74,15 @@ export function Loop() {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 40, maxWidth: 1024, margin: '0 auto' }} className="md:grid-cols-3 grid-cols-1">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-10" style={{ maxWidth: 1024, margin: '0 auto' }}>
           {NODES.map((n, i) => (
             <div
               key={n.label}
+              className="p-6 md:p-8"
               style={{
                 borderRadius: 16,
                 border: '1px solid var(--on-ink-15)',
-                background: 'rgba(255,255,255,0.03)',
-                padding: 32
+                background: 'rgba(255,255,255,0.03)'
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -140,7 +140,7 @@ export function Loop() {
           ))}
         </div>
 
-        <div style={{ marginTop: 80, display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <div className="mt-12 md:mt-20" style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
           <Button href="/pricing" variant="invert" size="lg" trackLocation="home_loop">
             Start Free Trial <ArrowRight />
           </Button>

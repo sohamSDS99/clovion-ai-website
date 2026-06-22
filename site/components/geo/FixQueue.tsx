@@ -48,7 +48,8 @@ function useGeoReveal() {
 export default function FixQueue() {
   const [ref, on] = useGeoReveal();
   return (
-    <div ref={ref}>
+    <div ref={ref} className="overflow-x-auto md:overflow-visible">
+      <div className="min-w-[420px] md:min-w-0">
       <GeoWindow label="Clovion AI / GEO / Fix Queue">
         <div style={{ padding: 22 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -214,6 +215,7 @@ export default function FixQueue() {
           </div>
         </div>
       </GeoWindow>
+      </div>
     </div>
   );
 }

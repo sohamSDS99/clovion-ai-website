@@ -247,9 +247,9 @@ export function FeatureGrid({
   cols?: 2 | 3 | 4
   variant?: 'default' | 'bordered' | 'subtle'
 }) {
-  const colClass = cols === 4 ? 'md:grid-cols-2 lg:grid-cols-4' : cols === 2 ? 'md:grid-cols-2' : 'md:grid-cols-2 lg:grid-cols-3'
+  const colClass = cols === 4 ? 'sm:grid-cols-2 md:grid-cols-4' : cols === 2 ? 'md:grid-cols-2' : 'sm:grid-cols-2 md:grid-cols-3'
   return (
-    <ul className={cn('grid gap-5', colClass)}>
+    <ul className={cn('grid gap-4 md:gap-5', colClass)}>
       {items.map((it, i) => (
         <li
           key={it.name}
@@ -380,7 +380,7 @@ export function TestimonialRail({
               ref={(el) => {
                 itemRefs.current[i] = el
               }}
-              className="card snap-start shrink-0 w-[320px] md:w-[380px] p-7 md:p-8 flex flex-col"
+              className="card snap-start shrink-0 w-[calc(100vw-3rem)] sm:w-[320px] md:w-[380px] p-7 md:p-8 flex flex-col"
             >
               <div className="text-ink/15" aria-hidden>
                 <svg width="28" height="22" viewBox="0 0 32 24" fill="currentColor">

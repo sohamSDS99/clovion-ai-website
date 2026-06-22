@@ -260,39 +260,43 @@ export default function ClovionVsProfoundPage() {
             </p>
           </div>
 
-          <div className="mt-14 overflow-hidden rounded-2xl border border-line bg-white">
-            <div className="grid grid-cols-[1.6fr_1fr_1fr] border-b border-line bg-bg">
-              <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] text-ink-60 font-semibold">
-                Dimension
-              </div>
-              <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink">
-                Clovion AI
-              </div>
-              <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink-60">
-                Profound
+          <div className="mt-14 -mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
+            <div className="min-w-[640px] md:min-w-0 px-4 md:px-0">
+              <div className="overflow-hidden rounded-2xl border border-line bg-white">
+                <div className="grid grid-cols-[1.6fr_1fr_1fr] border-b border-line bg-bg">
+                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] text-ink-60 font-semibold">
+                    Dimension
+                  </div>
+                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink">
+                    Clovion AI
+                  </div>
+                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink-60">
+                    Profound
+                  </div>
+                </div>
+                <ul>
+                  {tableRows.map((row, idx) => (
+                    <li
+                      key={row.dim}
+                      className={
+                        'grid grid-cols-[1.6fr_1fr_1fr] items-center border-b border-line last:border-b-0' +
+                        (idx % 2 === 1 ? ' bg-bg/40' : '')
+                      }
+                    >
+                      <div className="px-6 py-5 text-[0.95rem] text-ink font-semibold">
+                        {row.dim}
+                      </div>
+                      <div className="px-6 py-5">
+                        <Cell value={row.clovion} />
+                      </div>
+                      <div className="px-6 py-5">
+                        <Cell value={row.profound} />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-            <ul>
-              {tableRows.map((row, idx) => (
-                <li
-                  key={row.dim}
-                  className={
-                    'grid grid-cols-[1.6fr_1fr_1fr] items-center border-b border-line last:border-b-0' +
-                    (idx % 2 === 1 ? ' bg-bg/40' : '')
-                  }
-                >
-                  <div className="px-6 py-5 text-[0.95rem] text-ink font-semibold">
-                    {row.dim}
-                  </div>
-                  <div className="px-6 py-5">
-                    <Cell value={row.clovion} />
-                  </div>
-                  <div className="px-6 py-5">
-                    <Cell value={row.profound} />
-                  </div>
-                </li>
-              ))}
-            </ul>
           </div>
 
           <p className="mt-8 text-sm text-ink-50 max-w-2xl">

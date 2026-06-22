@@ -34,7 +34,8 @@ function FanoutToneChip({ tag, tone }: { tag: string; tone: FanoutTone }) {
 export default function FanoutDashboard() {
   const [ref, on] = useFanoutReveal();
   return (
-    <div ref={ref}>
+    <div ref={ref} className="overflow-x-auto md:overflow-visible">
+      <div className="min-w-[420px] md:min-w-0">
       <FanoutWindow label="Clovion AI / Fanout / AI Visibility">
         <div style={{ padding: 22 }}>
           {/* seed prompt */}
@@ -76,6 +77,7 @@ export default function FanoutDashboard() {
           </div>
         </div>
       </FanoutWindow>
+      </div>
     </div>
   );
 }

@@ -166,14 +166,7 @@ function Hero() {
         }}
       />
       <div style={{ ...AC_CONTAINER, padding: '3.5rem 2rem 5rem' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1.02fr 1fr',
-            gap: 64,
-            alignItems: 'center',
-          }}
-        >
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
           <div>
             <TypingHeadline
               as="h1"
@@ -252,7 +245,7 @@ function JumpLinks() {
   return (
     <section style={{ padding: '0 0 1rem' }}>
       <div style={AC_CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 16 }}>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
           {AC_JUMPS.map((j) => (
             <a key={j.n} href={j.href} style={{ textDecoration: 'none' }}>
               <div
@@ -420,13 +413,8 @@ function FourLayers() {
           </p>
         </div>
         <div
-          style={{
-            marginTop: 56,
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 64,
-            alignItems: 'center',
-          }}
+          className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 items-center"
+          style={{ marginTop: 56 }}
         >
           <div style={{ display: 'grid', gap: 12 }}>
             {AC_LAYERS.map((f) => (
@@ -584,14 +572,7 @@ function WorkflowStep({ eyebrow, headline, body, example, visual, flip, first }:
   )
   return (
     <div style={{ paddingTop: first ? 0 : 'var(--section-sm)' }}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: 64,
-          alignItems: 'center',
-        }}
-      >
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 items-center">
         {flip ? (
           <>
             <div>{visual}</div>
@@ -810,15 +791,8 @@ function FAQ() {
   return (
     <section id="faq" style={{ padding: 'var(--section) 0', scrollMarginTop: 80 }}>
       <div style={AC_CONTAINER}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '5fr 7fr',
-            gap: 64,
-            alignItems: 'start',
-          }}
-        >
-          <div style={{ position: 'sticky', top: 96 }}>
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
+          <div className="lg:sticky lg:top-24">
             <span
               style={{
                 fontFamily: 'var(--font-mono)',

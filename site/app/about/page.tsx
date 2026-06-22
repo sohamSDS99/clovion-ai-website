@@ -72,7 +72,7 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
             {companyStats.map((s, i) => (
               <div
                 key={s.label}
@@ -139,7 +139,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-14 max-w-[1080px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-10 md:gap-y-14 max-w-[1080px]">
             {leadership.map((person) => (
               <div key={person.name} className="border-t border-line pt-8">
                 <div className="flex items-start justify-between gap-6 mb-4">
@@ -213,7 +213,7 @@ export default function AboutPage() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 border-t border-line">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 border-t border-line">
             {offices.map((office) => (
               <div
                 key={office.city}

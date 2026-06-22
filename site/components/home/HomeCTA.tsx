@@ -3,16 +3,16 @@ import { TypingHeadline } from './TypingHeadline'
 
 export function HomeCTA() {
   return (
-    <section style={{ padding: 'var(--section) 0' }}>
+    <section className="py-12 md:py-20">
       <Container>
         <div
           style={{
             position: 'relative',
             overflow: 'hidden',
-            borderRadius: 28,
+            borderRadius: 24,
             background: 'var(--ink-surface, var(--ink))',
             color: 'var(--on-ink)',
-            padding: 'clamp(3rem, 6vw, 6rem) clamp(1.75rem, 4vw, 3.5rem)'
+            padding: 'clamp(2.25rem, 6vw, 6rem) clamp(1.25rem, 4vw, 3.5rem)'
           }}
         >
           <div

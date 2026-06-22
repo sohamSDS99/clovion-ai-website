@@ -167,7 +167,7 @@ function Hero() {
         }}
       />
       <div style={{ ...FQ_CONTAINER, padding: '3.5rem 2rem 5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.02fr 1fr', gap: 64, alignItems: 'center' }}>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
           <div>
             <TypingHeadline
               as="h1"
@@ -227,7 +227,7 @@ function JumpLinks() {
   return (
     <section style={{ padding: '0 0 1rem' }}>
       <div style={FQ_CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
           {FQ_JUMPS.map((j) => (
             <a key={j.n} href={j.href} style={{ textDecoration: 'none' }}>
               <FqCard padding="1.5rem">
@@ -306,7 +306,7 @@ function WorkflowStep({ eyebrow, headline, body, example, visual, flip, first }:
   )
   return (
     <div style={{ paddingTop: first ? 0 : 'var(--section-sm)' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16 items-center">
         {flip ? (
           <Fragment>
             <div>{visual}</div>
@@ -485,7 +485,7 @@ function WhyFanout() {
             Clovion’s Fanout Query helps you map those variations, so your team can see where your brand appears, where competitors win, and which content gaps need attention.
           </p>
         </div>
-        <div style={{ marginTop: 56, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+        <div className="mt-14 grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16 items-center">
           <div style={{ display: 'grid', gap: 12 }}>
             {FQ_WHY.map((f) => (
               <div
@@ -719,8 +719,8 @@ function FAQ() {
   return (
     <section id="faq" style={{ padding: 'var(--section) 0', scrollMarginTop: 80 }}>
       <div style={FQ_CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 64, alignItems: 'start' }}>
-          <div style={{ position: 'sticky', top: 96 }}>
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
+          <div className="lg:sticky lg:top-24">
             <FqEyebrow mono>FAQ</FqEyebrow>
             <h2 style={{ ...FQ_DISPLAY_MD, margin: '16px 0 0' }}>Questions about fanout queries.</h2>
             <a
@@ -776,13 +776,7 @@ function FinalCTA() {
             }}
           />
           <div
-            style={{
-              position: 'relative',
-              display: 'grid',
-              gridTemplateColumns: '1fr 0.92fr',
-              gap: 56,
-              alignItems: 'center',
-            }}
+            className="relative grid grid-cols-1 gap-10 md:grid-cols-[1fr_0.92fr] md:gap-14 items-center"
           >
             <div>
               <h2 style={{ ...FQ_DISPLAY_LG, margin: 0, color: 'var(--on-ink)' }}>Turn one prompt into a roadmap.</h2>

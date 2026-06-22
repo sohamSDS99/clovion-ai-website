@@ -90,7 +90,8 @@ export default function HeroDashboard() {
   ];
 
   return (
-    <div>
+    <div className="overflow-x-auto md:overflow-visible">
+      <div className="min-w-[420px] md:min-w-0">
       <WindowChrome label="Clovion AI / Visibility / Rank Tracker">
         <div style={{ padding: 24 }}>
           <div
@@ -303,6 +304,7 @@ export default function HeroDashboard() {
           </div>
         </div>
       </WindowChrome>
+      </div>
     </div>
   );
 }

@@ -149,6 +149,7 @@ function TierCard({ t, billing }: { t: Tier; billing: 'monthly' | 'annual' }) {
 
   return (
     <div
+      className={dark ? 'md:-translate-y-5' : ''}
       style={{
         position: 'relative',
         display: 'flex',
@@ -159,7 +160,6 @@ function TierCard({ t, billing }: { t: Tier; billing: 'monthly' | 'annual' }) {
         color: c.ink,
         border: `${dark ? '2px' : '1px'} solid ${dark ? '#ffffff' : 'var(--line)'}`,
         boxShadow: dark ? '0 36px 80px -24px rgba(10,10,15,0.55)' : 'var(--shadow-card)',
-        transform: dark ? 'translateY(-20px)' : 'none',
       }}
     >
       {t.popular && (
@@ -418,11 +418,8 @@ export default function PricingTiers() {
         </span>
       </div>
       <div
+        className="mt-11 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-6"
         style={{
-          marginTop: 44,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 20,
           alignItems: 'stretch',
         }}
       >

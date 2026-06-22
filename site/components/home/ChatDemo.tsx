@@ -288,11 +288,28 @@ export function ChatDemo() {
   const stickyRef = useRef<HTMLDivElement>(null)
   const [step, setStep] = useState(0)
   const [words, setWords] = useState(0)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(max-width: 640px)')
+    const apply = () => setIsMobile(mq.matches)
+    apply()
+    mq.addEventListener?.('change', apply)
+    return () => mq.removeEventListener?.('change', apply)
+  }, [])
 
   useEffect(() => {
     const sec = sectionRef.current
     const sticky = stickyRef.current
     if (!sec || !sticky) return
+
+    // Mobile: skip the 500vh scroll-pin animation entirely. Static fallback handled in render.
+    if (isMobile) {
+      setStep(6)
+      setWords(RESPONSE_WORDS.length)
+      return
+    }
 
     const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduce) {
@@ -351,7 +368,218 @@ export function ChatDemo() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-  }, [])
+  }, [isMobile])
+
+  // Mobile fallback: simplified static layout — no 500vh pin, no floating cards
+  if (isMobile) {
+    return (
+      <section
+        ref={sectionRef}
+        style={{
+          position: 'relative',
+          padding: '4rem 0 5rem',
+          background: 'radial-gradient(120% 70% at 50% 26%, #14141c 0%, #17171c 62%)'
+        }}
+      >
+        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center', padding: '0 1.25rem 2rem' }}>
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1.4rem, 6vw, 1.9rem)',
+              fontWeight: 600,
+              letterSpacing: 'var(--track-display-lg)',
+              lineHeight: 1.12,
+              margin: 0,
+              color: '#ffffff',
+              textWrap: 'balance'
+            }}
+          >
+            The answer is in the data. You just shouldn&rsquo;t have to find it yourself.
+          </h2>
+          <p
+            style={{
+              fontSize: '0.96rem',
+              lineHeight: 1.55,
+              color: 'rgba(255,255,255,0.70)',
+              margin: '14px auto 0',
+              maxWidth: 560,
+              textWrap: 'balance'
+            }}
+          >
+            Ask Clovion questions about rankings, competitors, prompts, and perception — and get answers backed by your data.
+          </p>
+        </div>
+
+        <div style={{ padding: '0 1rem', maxWidth: 640, margin: '0 auto' }}>
+          <div
+            className="clv-chat-island"
+            style={{
+              borderRadius: 18,
+              border: '1px solid rgba(255,255,255,0.10)',
+              background: 'var(--subtle)',
+              overflow: 'hidden',
+              boxShadow: '0 30px 60px -22px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)'
+            }}
+          >
+            <div style={{ height: 38, borderBottom: '1px solid var(--line)', background: 'var(--white)', display: 'flex', alignItems: 'center', padding: '0 14px', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 5 }}>
+                {[0, 1, 2].map((i) => (
+                  <span key={i} style={{ height: 9, width: 9, borderRadius: 999, background: 'var(--ink-15)' }} />
+                ))}
+              </div>
+              <div style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--ink-50)' }}>
+                clovion.ai
+              </div>
+              <div style={{ width: 24 }} />
+            </div>
+            <div style={{ padding: '18px 18px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <div
+                  style={{
+                    maxWidth: '88%',
+                    background: 'var(--ink)',
+                    color: 'var(--on-ink)',
+                    borderRadius: '16px 16px 4px 16px',
+                    padding: '11px 14px',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.45,
+                    fontWeight: 500
+                  }}
+                >
+                  Go deep and research what is driving my visibility score.
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: 11, alignItems: 'flex-start' }}>
+                <div
+                  style={{
+                    height: 28,
+                    width: 28,
+                    flexShrink: 0,
+                    borderRadius: 999,
+                    background: 'var(--white)',
+                    border: '1px solid var(--line)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <span style={{ height: 7, width: 7, borderRadius: 999, background: 'var(--ink)' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontFamily: 'var(--font-mono)', fontSize: '0.66rem', color: 'var(--ink-50)' }}>
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <circle cx="12" cy="12" r="8.5" />
+                      <path d="M12 8v4.4l3 1.8" />
+                    </svg>
+                    Thought for 163s
+                  </span>
+                  <p style={{ margin: '8px 0 0', fontSize: '0.92rem', lineHeight: 1.55, color: 'var(--ink-70)' }}>
+                    I have all the data needed. Here is the complete deep-dive analysis.
+                  </p>
+                  <div
+                    style={{
+                      marginTop: 14,
+                      borderRadius: 11,
+                      border: '1px solid var(--line)',
+                      background: 'var(--white)',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div style={{ padding: '11px 13px 9px', borderBottom: '1px solid var(--line)' }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.92rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
+                        SDS Manager — Deep-Dive
+                      </div>
+                      <div style={{ marginTop: 4, fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)' }}>
+                        May 18 – Jun 15, 2026 · ChatGPT
+                      </div>
+                    </div>
+                    <div style={{ padding: '10px 13px 12px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
+                        {(
+                          [
+                            ['Visibility', '17.3%'],
+                            ['Rank', '#11 / 147'],
+                            ['SoV', '2.4%'],
+                            ['Avg. pos', '5.4']
+                          ] as const
+                        ).map(([k, v]) => (
+                          <div
+                            key={k}
+                            style={{
+                              borderRadius: 8,
+                              background: 'var(--subtle)',
+                              border: '1px solid var(--line)',
+                              padding: '7px 9px'
+                            }}
+                          >
+                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.52rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)' }}>
+                              {k}
+                            </div>
+                            <div style={{ marginTop: 2, fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+                              {v}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div style={{ marginTop: 11, display: 'grid', gap: 6 }}>
+                        {CATEGORY_ROWS.map((c) => (
+                          <div
+                            key={c.n}
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: '6rem 1fr auto',
+                              alignItems: 'center',
+                              gap: 8
+                            }}
+                          >
+                            <span
+                              style={{
+                                fontSize: '0.74rem',
+                                fontWeight: c.you ? 700 : 500,
+                                color: c.you ? 'var(--ink)' : 'var(--ink-70)',
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }}
+                            >
+                              {c.n}
+                            </span>
+                            <span style={{ height: 5, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden' }}>
+                              <span
+                                style={{
+                                  display: 'block',
+                                  height: '100%',
+                                  width: `${c.v}%`,
+                                  borderRadius: 999,
+                                  background: c.you ? 'var(--ink)' : 'var(--ink-30)'
+                                }}
+                              />
+                            </span>
+                            <span
+                              style={{
+                                width: 38,
+                                textAlign: 'right',
+                                fontFamily: 'var(--font-mono)',
+                                fontSize: '0.68rem',
+                                color: c.you ? 'var(--ink)' : 'var(--ink-60)',
+                                fontVariantNumeric: 'tabular-nums'
+                              }}
+                            >
+                              {c.v}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section

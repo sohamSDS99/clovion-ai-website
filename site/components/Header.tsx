@@ -28,7 +28,7 @@ export function Header() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 transition-all duration-300',
+        'sticky top-0 z-50 transition-all duration-300 pt-[env(safe-area-inset-top)]',
         scrolled
           ? 'backdrop-blur-xl bg-white/80 border-b border-line/80'
           : 'bg-transparent'
@@ -40,7 +40,7 @@ export function Header() {
           className="flex items-center gap-2 font-display font-semibold tracking-[-0.02em] text-[1.05rem] text-ink"
         >
           <HaloMark size={24} />
-          <span>Clovion AI</span>
+          <span className="truncate max-w-[160px] md:max-w-none">Clovion AI</span>
         </Link>
 
         <nav
@@ -99,13 +99,13 @@ export function Header() {
                 {hasChildren && (
                   <div
                     className={cn(
-                      'absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-[opacity,transform] duration-200 ease-out origin-top',
+                      'hidden lg:block absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-[opacity,transform] duration-200 ease-out origin-top',
                       open === item.label
                         ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
                         : 'opacity-0 -translate-y-1 scale-[0.98] pointer-events-none'
                     )}
                   >
-                    <div className="w-[480px] rounded-card bg-white border border-line shadow-card p-3">
+                    <div className="w-[min(480px,calc(100vw-2rem))] rounded-card bg-white border border-line shadow-card p-3">
                       {item.children!.map((child) => (
                         <Link
                           key={child.label}
@@ -159,7 +159,7 @@ export function Header() {
 
         <button
           aria-label="Toggle menu"
-          className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-ink/5 text-ink"
+          className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full hover:bg-ink/5 text-ink"
           onClick={() => setMobileOpen((v) => !v)}
         >
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
@@ -191,7 +191,7 @@ export function Header() {
       </Container>
 
       {mobileOpen && (
-        <div className="lg:hidden border-t border-line bg-white">
+        <div className="lg:hidden border-t border-line bg-white max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain">
           <Container className="py-4 flex flex-col gap-1">
             {nav.primary.map((item) => {
               if ('children' in item && Array.isArray(item.children) && item.children.length > 0) {

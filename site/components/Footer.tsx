@@ -74,7 +74,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
             {groups.map((g) => (
               <div key={g.title}>
                 <div className="text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-ink-50 mb-4">{g.title}</div>
@@ -96,7 +96,7 @@ export function Footer() {
           <p className="text-[0.84rem] text-ink-50">
             © {new Date().getFullYear()} Clovion AI, Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-5">
+          <div className="flex flex-wrap items-center gap-3 md:gap-5">
             <Link href="/legal/privacy" className="text-[0.8rem] text-ink-60 hover:text-ink hover:underline underline-offset-4 decoration-ink/30">Privacy</Link>
             <span aria-hidden className="h-3 w-px bg-ink/10" />
             <Link href="/legal/terms" className="text-[0.8rem] text-ink-60 hover:text-ink hover:underline underline-offset-4 decoration-ink/30">Terms</Link>

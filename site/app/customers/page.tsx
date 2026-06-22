@@ -302,69 +302,73 @@ export default function CustomersPage() {
           {filteredRows.length === 0 ? (
             <EmptyState category={active} onReset={() => setActive('All')} />
           ) : (
-            <div className="border-t border-b border-line">
-              {/* Header row */}
-              <div className="grid grid-cols-12 gap-4 py-3 px-2 border-b border-line font-mono text-[0.7rem] uppercase tracking-[0.14em] text-ink-50">
-                <div className="col-span-5 md:col-span-3">Customer</div>
-                <div className="col-span-3 md:col-span-2">Industry</div>
-                <div className="hidden md:block md:col-span-5">Outcome</div>
-                <div className="col-span-4 md:col-span-2 text-right">Link</div>
-              </div>
+            <div className="-mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
+              <div className="min-w-[640px] md:min-w-0 px-4 md:px-0">
+                <div className="border-t border-b border-line">
+                  {/* Header row */}
+                  <div className="grid grid-cols-12 gap-4 py-3 px-2 border-b border-line font-mono text-[0.7rem] uppercase tracking-[0.14em] text-ink-50">
+                    <div className="col-span-5 md:col-span-3">Customer</div>
+                    <div className="col-span-3 md:col-span-2">Industry</div>
+                    <div className="hidden md:block md:col-span-5">Outcome</div>
+                    <div className="col-span-4 md:col-span-2 text-right">Link</div>
+                  </div>
 
-              <ul>
-                {filteredRows.map((row, i) => (
-                  <li
-                    key={row.name}
-                    id={`row-${row.name.toLowerCase().replace(/\s+/g, '-')}`}
-                    className={cn(
-                      'grid grid-cols-12 gap-4 py-4 px-2 items-center transition-colors hover:bg-subtle/60',
-                      i !== filteredRows.length - 1 && 'border-b border-line'
-                    )}
-                  >
-                    <div className="col-span-5 md:col-span-3 flex items-center gap-3 min-w-0">
-                      <span className="font-mono text-[0.7rem] tabular-nums text-ink-40 hidden md:inline">
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <span className="font-display text-[1.05rem] md:text-[1.15rem] tracking-[-0.02em] truncate">
-                        {row.name}
-                      </span>
-                    </div>
-                    <div className="col-span-3 md:col-span-2">
-                      <span className="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-ink-60">
-                        {row.industry}
-                      </span>
-                    </div>
-                    <div className="hidden md:block md:col-span-5">
-                      <span className="font-mono text-[0.82rem] tabular-nums text-ink-80">
-                        {row.outcome}
-                      </span>
-                    </div>
-                    <div className="col-span-4 md:col-span-2 text-right">
-                      {row.hasStory ? (
-                        <Link
-                          href="#stories"
-                          className="inline-flex items-center gap-1.5 text-[0.82rem] font-semibold text-ink hover:gap-2 transition-all"
-                        >
-                          Read <ArrowRight />
-                        </Link>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 text-[0.82rem] text-ink-50">
-                          Visit site
-                          <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden>
-                            <path d="M5 11l6-6M11 5H6m5 0v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                          </svg>
-                        </span>
-                      )}
-                    </div>
-                    {/* Mobile outcome row */}
-                    <div className="col-span-12 md:hidden -mt-2">
-                      <span className="font-mono text-[0.78rem] tabular-nums text-ink-70">
-                        {row.outcome}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
+                  <ul>
+                    {filteredRows.map((row, i) => (
+                      <li
+                        key={row.name}
+                        id={`row-${row.name.toLowerCase().replace(/\s+/g, '-')}`}
+                        className={cn(
+                          'grid grid-cols-12 gap-4 py-4 px-2 items-center transition-colors hover:bg-subtle/60',
+                          i !== filteredRows.length - 1 && 'border-b border-line'
+                        )}
+                      >
+                        <div className="col-span-5 md:col-span-3 flex items-center gap-3 min-w-0">
+                          <span className="font-mono text-[0.7rem] tabular-nums text-ink-40 hidden md:inline">
+                            {String(i + 1).padStart(2, '0')}
+                          </span>
+                          <span className="font-display text-[1.05rem] md:text-[1.15rem] tracking-[-0.02em] truncate">
+                            {row.name}
+                          </span>
+                        </div>
+                        <div className="col-span-3 md:col-span-2">
+                          <span className="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-ink-60">
+                            {row.industry}
+                          </span>
+                        </div>
+                        <div className="hidden md:block md:col-span-5">
+                          <span className="font-mono text-[0.82rem] tabular-nums text-ink-80">
+                            {row.outcome}
+                          </span>
+                        </div>
+                        <div className="col-span-4 md:col-span-2 text-right">
+                          {row.hasStory ? (
+                            <Link
+                              href="#stories"
+                              className="inline-flex items-center gap-1.5 text-[0.82rem] font-semibold text-ink hover:gap-2 transition-all"
+                            >
+                              Read <ArrowRight />
+                            </Link>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 text-[0.82rem] text-ink-50">
+                              Visit site
+                              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden>
+                                <path d="M5 11l6-6M11 5H6m5 0v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                              </svg>
+                            </span>
+                          )}
+                        </div>
+                        {/* Mobile outcome row */}
+                        <div className="col-span-12 md:hidden -mt-2">
+                          <span className="font-mono text-[0.78rem] tabular-nums text-ink-70">
+                            {row.outcome}
+                          </span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           )}
 
@@ -376,7 +380,7 @@ export default function CustomersPage() {
                 Logos shown when contracts permit
               </p>
             </div>
-            <div className="flex flex-wrap gap-x-8 gap-y-3 text-ink-40">
+            <div className="flex flex-wrap gap-x-4 md:gap-x-8 gap-y-3 text-ink-40">
               {customers.map((name) => (
                 <span
                   key={name}

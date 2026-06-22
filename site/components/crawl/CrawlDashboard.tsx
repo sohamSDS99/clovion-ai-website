@@ -34,7 +34,7 @@ export default function CrawlDashboard() {
         <div style={{ padding: 22 }}>
           {/* preset selector */}
           <div style={C_MONO_LABEL}>Access preset</div>
-          <div style={{ marginTop: 10, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8" style={{ marginTop: 10 }}>
             {HERO_PRESETS.map((p, i) => (
               <button
                 key={p}
@@ -71,7 +71,8 @@ export default function CrawlDashboard() {
               {allowed}/{HERO_BOTS.length} allowed
             </span>
           </div>
-          <div style={{ display: 'grid', gap: 7 }}>
+          <div className="overflow-x-auto md:overflow-visible">
+          <div className="min-w-[420px] md:min-w-0" style={{ display: 'grid', gap: 7 }}>
             {HERO_BOTS.map((b, i) => (
               <div
                 key={b.ua}
@@ -135,6 +136,7 @@ export default function CrawlDashboard() {
                 <AccessPill kind={b.s[preset]} />
               </div>
             ))}
+          </div>
           </div>
           {/* diff footer */}
           <div

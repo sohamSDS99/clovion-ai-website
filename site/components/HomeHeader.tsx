@@ -33,7 +33,7 @@ export function HomeHeader() {
   return (
     <header
       className={cn(
-        'sticky top-0 z-50 transition-all duration-300',
+        'sticky top-0 z-50 transition-all duration-300 pt-[env(safe-area-inset-top)]',
         scrolled
           ? 'backdrop-blur-xl border-b border-white/10'
           : 'bg-transparent'
@@ -50,7 +50,7 @@ export function HomeHeader() {
           className="flex items-center gap-2 font-display font-semibold tracking-[-0.02em] text-[1.05rem] text-white"
         >
           <HaloMark size={24} />
-          <span>Clovion AI</span>
+          <span className="truncate max-w-[160px] md:max-w-none">Clovion AI</span>
         </Link>
 
         <nav
@@ -109,14 +109,14 @@ export function HomeHeader() {
                 {hasChildren && (
                   <div
                     className={cn(
-                      'absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-[opacity,transform] duration-200 ease-out origin-top',
+                      'hidden lg:block absolute top-full left-1/2 -translate-x-1/2 pt-3 transition-[opacity,transform] duration-200 ease-out origin-top',
                       open === item.label
                         ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
                         : 'opacity-0 -translate-y-1 scale-[0.98] pointer-events-none'
                     )}
                   >
                     <div
-                      className="w-[480px] rounded-card border border-white/10 p-3"
+                      className="w-[min(480px,calc(100vw-2rem))] rounded-card border border-white/10 p-3"
                       style={{
                         background: '#161619',
                         boxShadow: '0 24px 60px -24px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.4)'
@@ -175,7 +175,7 @@ export function HomeHeader() {
 
         <button
           aria-label="Toggle menu"
-          className="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-full hover:bg-white/5 text-white"
+          className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-full hover:bg-white/5 text-white"
           onClick={() => setMobileOpen((v) => !v)}
         >
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" aria-hidden>
@@ -193,7 +193,7 @@ export function HomeHeader() {
 
       {mobileOpen && (
         <div
-          className="lg:hidden border-t border-white/10"
+          className="lg:hidden border-t border-white/10 max-h-[calc(100vh-4rem)] overflow-y-auto overscroll-contain"
           style={{ background: '#0f0f12' }}
         >
           <Container className="py-4 flex flex-col gap-1">

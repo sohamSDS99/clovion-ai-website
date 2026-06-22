@@ -211,7 +211,7 @@ function AllPlansInclude() {
             padding: '2.25rem 2rem'
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4 md:gap-8">
             {P_INCLUDE.map((it) => (
               <div key={it.t} style={{ display: 'flex', gap: 13, alignItems: 'flex-start' }}>
                 <span
@@ -384,14 +384,12 @@ function FAQ() {
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={P_CONTAINER}>
         <div
+          className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16"
           style={{
-            display: 'grid',
-            gridTemplateColumns: '5fr 7fr',
-            gap: 64,
             alignItems: 'start'
           }}
         >
-          <div style={{ position: 'sticky', top: 96 }}>
+          <div className="lg:sticky lg:top-24">
             <Eyebrow>FAQ</Eyebrow>
             <h2 style={{ ...P_DISPLAY_MD, margin: '16px 0 0' }}>Questions about pricing.</h2>
             <a

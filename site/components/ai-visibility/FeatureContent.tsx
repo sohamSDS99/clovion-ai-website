@@ -157,7 +157,7 @@ function Hero() {
         }}
       />
       <div style={{ ...CONTAINER, padding: '7rem 2rem 5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.02fr 1fr', gap: 64, alignItems: 'center' }}>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
           <div>
             <p
               style={{
@@ -228,7 +228,7 @@ function JumpLinks() {
   return (
     <section style={{ padding: '0 0 1rem' }}>
       <div style={CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-4 md:gap-8">
           {JUMPS.map((j) => (
             <a key={j.n} href={j.href} style={{ textDecoration: 'none' }}>
               <div
@@ -298,7 +298,7 @@ function FeatureBlock({
   return (
     <section id={id} style={{ padding: 'var(--section) 0', scrollMarginTop: 80 }}>
       <div style={CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }}>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:gap-12 items-center">
           {flip ? (
             <>
               <div>{visual}</div>
@@ -446,7 +446,7 @@ function Versus() {
             Most AI rank tracking tools stop at reporting. Clovion connects AI visibility tracking with competitor intelligence and GEO recommendations, so your team can move from “where are we invisible?” to “what should we fix next?”
           </p>
         </div>
-        <div style={{ marginTop: 56, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
+        <div className="mt-14 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
           {VERSUS.map((v) => (
             <div
               key={v.n}
@@ -529,7 +529,7 @@ function EngineCoverage() {
           </p>
         </div>
 
-        <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
           {COVERAGE.map((e) => (
             <div
               key={e.name}
@@ -685,7 +685,7 @@ function UseCases() {
           <Eyebrow>Use cases</Eyebrow>
           <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0' }}>Built for the teams that own AI visibility.</h2>
         </div>
-        <div style={{ marginTop: 48, display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 20 }}>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 md:gap-8">
           {USE_CASES.map((u) => (
             <div
               key={u.title}
@@ -815,8 +815,8 @@ function FAQ() {
   return (
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: '5fr 7fr', gap: 64, alignItems: 'start' }}>
-          <div style={{ position: 'sticky', top: 96 }}>
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
+          <div className="lg:sticky lg:top-24">
             <Eyebrow>FAQ</Eyebrow>
             <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0' }}>Tracking, answered.</h2>
             <a

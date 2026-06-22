@@ -179,7 +179,7 @@ function Hero() {
             <TypingHeadline
               as="h1"
               text="Earn for every brand you help get found in AI search."
-              style={{ ...A_DISPLAY_LG, fontSize: 'clamp(2rem, 3vw + 0.3rem, 3.1rem)', margin: 0, whiteSpace: 'nowrap' }}
+              style={{ ...A_DISPLAY_LG, fontSize: 'clamp(2rem, 3vw + 0.3rem, 3.1rem)', margin: 0 }}
             />
             <p style={{ ...A_LEAD, maxWidth: 'none', fontSize: '1.02rem', textWrap: 'pretty' as any, margin: '1.75rem auto 0' }}>
               Clovion helps businesses track, understand, and improve their visibility across ChatGPT, Claude, Gemini, Perplexity, Grok, and Google AI Overviews. Refer brands, marketers, SEO teams, agencies, or founders — and earn commission for every successful signup.
@@ -231,7 +231,7 @@ function WhyJoin() {
             The Clovion affiliate program rewards you for connecting brands with the platform that shows them how AI search sees them — and earns you commission while you do it.
           </p>
         </div>
-        <div style={{ marginTop: 36, display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 12 }}>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2" style={{ marginTop: 36 }}>
           {WHY.map((f) => (
             <div
               key={f.name}
@@ -277,7 +277,7 @@ function HowItWorks() {
   return (
     <section id="how" style={{ padding: 'var(--section-sm) 0', background: 'var(--subtle)', scrollMarginTop: 80 }}>
       <div style={A_CONTAINER}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.05fr', gap: 64, alignItems: 'center' }}>
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1fr_1.05fr] md:gap-16 items-center">
           <div>
             <Eyebrow>How it works</Eyebrow>
             <h2 style={{ ...A_DISPLAY_MD, margin: '14px 0 0' }}>Three steps from link to payout.</h2>

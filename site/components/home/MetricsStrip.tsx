@@ -11,7 +11,7 @@ const METRICS = [
 
 export function MetricsStrip() {
   return (
-    <section style={{ padding: '5rem 0' }}>
+    <section className="py-12 md:py-20">
       <Container>
         <div style={{ maxWidth: 680 }}>
           <span
@@ -54,10 +54,8 @@ export function MetricsStrip() {
         </div>
 
         <div
+          className="mt-8 md:mt-12 grid grid-cols-2 md:grid-cols-5"
           style={{
-            marginTop: 48,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
             borderTop: '1px solid var(--line)',
             borderBottom: '1px solid var(--line)'
           }}
@@ -65,10 +63,9 @@ export function MetricsStrip() {
           {METRICS.map((m, i) => (
             <div
               key={m.value}
-              style={{
-                padding: '32px 20px',
-                borderRight: i < METRICS.length - 1 ? '1px solid var(--line)' : 'none'
-              }}
+              className="p-5 md:p-8 metrics-cell"
+              data-idx={i}
+              data-last={i === METRICS.length - 1}
             >
               <div
                 style={{
@@ -85,7 +82,7 @@ export function MetricsStrip() {
                 style={{
                   marginTop: 14,
                   fontFamily: 'var(--font-display)',
-                  fontSize: '3rem',
+                  fontSize: 'clamp(2.25rem, 4.5vw, 3rem)',
                   fontWeight: 600,
                   letterSpacing: '-0.04em',
                   lineHeight: 1,
@@ -110,6 +107,17 @@ export function MetricsStrip() {
             </div>
           ))}
         </div>
+        <style dangerouslySetInnerHTML={{ __html: `
+          .metrics-cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+          @media (max-width: 767px) {
+            .metrics-cell:nth-child(2n) { border-right: none; }
+            .metrics-cell[data-last="true"] { border-bottom: none; }
+          }
+          @media (min-width: 768px) {
+            .metrics-cell { border-bottom: none; }
+            .metrics-cell[data-last="true"] { border-right: none; }
+          }
+        ` }} />
         <p
           style={{
             marginTop: 28,

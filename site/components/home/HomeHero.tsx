@@ -35,7 +35,7 @@ export function HomeHero() {
             'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 30%, transparent 70%)'
         }}
       />
-      <Container className="relative pt-32 pb-24">
+      <Container className="relative pt-20 pb-16 md:pt-32 md:pb-24">
         <div className="max-w-4xl mx-auto text-center">
           <h1
             style={{
@@ -91,8 +91,10 @@ export function HomeHero() {
           </p>
         </div>
 
-        <div className="mt-20 max-w-6xl mx-auto">
-          <HeroBento />
+        <div className="mt-12 md:mt-20 max-w-6xl mx-auto -mx-4 md:mx-auto px-4 md:px-0 overflow-x-auto md:overflow-visible">
+          <div className="min-w-[520px] md:min-w-0">
+            <HeroBento />
+          </div>
         </div>
       </Container>
     </section>
@@ -339,11 +341,8 @@ function HeroBento() {
               {BENTO_ENGINES.map((e, i) => (
                 <div
                   key={e.name}
+                  className="grid grid-cols-[5.5rem_1fr_auto] sm:grid-cols-[8.5rem_1fr_auto] gap-3 items-center"
                   style={{
-                    display: 'grid',
-                    gridTemplateColumns: '8.5rem 1fr auto',
-                    alignItems: 'center',
-                    gap: 12,
                     opacity: on ? 1 : 0,
                     transform: on ? 'none' : 'translateY(6px)',
                     transition: `all 0.5s ease ${1200 + i * 100}ms`

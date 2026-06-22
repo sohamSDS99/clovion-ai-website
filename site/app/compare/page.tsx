@@ -156,7 +156,7 @@ export default function ComparePage() {
                   className="group relative block"
                   aria-label={`Compare Clovion AI vs ${c.name}`}
                 >
-                  <Card className="h-full flex flex-col gap-6 p-7 md:p-8 transition-colors duration-200 group-hover:border-ink/30">
+                  <Card className="h-full flex flex-col gap-6 p-5 md:p-8 transition-colors duration-200 group-hover:border-ink/30">
                     {/* status pill */}
                     <div className="flex items-center justify-between">
                       <div className="text-xs font-mono uppercase tracking-[0.2em] text-ink/50">
@@ -229,11 +229,11 @@ export default function ComparePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {switchingCosts.map((s, i) => (
               <div
                 key={s.numeral}
-                className="card bg-white p-7 md:p-8 flex flex-col gap-4"
+                className="card bg-white p-5 md:p-8 flex flex-col gap-4"
               >
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-sm tracking-[0.2em] text-ink/40">

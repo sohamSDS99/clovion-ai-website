@@ -109,6 +109,8 @@ export default function ComparisonTable() {
   const popCol = 2 // 1-indexed value column for Growth
 
   return (
+    <div className="-mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
+      <div className="min-w-[720px] md:min-w-0 px-4 md:px-0">
     <div
       style={{
         borderRadius: 24,
@@ -264,6 +266,8 @@ export default function ComparisonTable() {
             </div>
           ))}
         </div>
+      </div>
+    </div>
       </div>
     </div>
   )

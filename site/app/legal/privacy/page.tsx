@@ -426,8 +426,8 @@ export default function PrivacyPolicyPage() {
               <span className="whitespace-nowrap"> dpo@clovion.ai</span>.
             </p>
 
-            <div className="mt-10 overflow-x-auto">
-              <table className="w-full min-w-[800px] border-collapse">
+            <div className="mt-10 -mx-4 overflow-x-auto md:mx-0">
+              <table className="w-full min-w-[800px] border-collapse px-4 md:px-0">
                 <thead>
                   <tr className="border-y border-[var(--line)] font-mono text-[11px] uppercase tracking-[0.16em] text-ink/50">
                     <th className="py-3 pr-6 text-left font-semibold w-[28%]">Subprocessor</th>
