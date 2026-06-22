@@ -917,6 +917,7 @@ export function PillarStepper() {
     let lastEventTime = 0
     let lastDirection = 0
     let gestureLocked = false
+    let wasEngaged = false
     const GAP_MS = 70
 
     const advance = (dir: 1 | -1) => {
@@ -948,54 +949,73 @@ export function PillarStepper() {
       const r = el.getBoundingClientRect()
       const vh = window.innerHeight
 
-      // Outside pin section — never hijack
+      // Outside pin section — never hijack. Reset state so re-entry is fresh.
       if (r.bottom <= 0 || r.top >= vh) {
         gestureLocked = false
         lastEventTime = 0
+        wasEngaged = false
         return
       }
 
       const cur = idxRef.current
       const goingDown = e.deltaY > 0
-      const goingUp = e.deltaY < 0
+      const direction = goingDown ? 1 : -1
+      // 2px tolerance — browsers sometimes leave r.top at 0.5 / 1 after a snap.
+      const engaged = r.top <= 2 && r.bottom >= vh - 2
 
       // Boundary release: at last pillar going DOWN, or first pillar going UP,
-      // no further advance possible — let native scroll continue out of the
-      // section. Do NOT preventDefault. We also reset gesture state so the
-      // very next event after re-entry starts a fresh gesture.
+      // pin already engaged, and the user already had a gesture in this entry
+      // — allow native scroll to exit. Do NOT preventDefault.
       if (
-        (goingDown && cur >= PILLARS.length - 1) ||
-        (goingUp && cur <= 0)
+        engaged &&
+        wasEngaged &&
+        ((goingDown && cur >= PILLARS.length - 1) ||
+          (!goingDown && cur <= 0))
       ) {
         gestureLocked = false
         lastEventTime = 0
+        wasEngaged = false
         return
       }
 
-      // Inside pin, advance is possible — hijack.
+      // Pin is in viewport — hijack every wheel from here on.
       e.preventDefault()
 
-      // Gesture window: gap-since-last-event > GAP_MS means a NEW gesture.
-      // A direction reversal also counts as a new gesture (trackpad momentum
-      // never flips sign mid-decay, so a sign flip is always intentional).
+      // Not yet engaged: snap pin precisely to the engagement edge, lock,
+      // no advance. User lands on current pillar (0 from above, N-1 from below).
+      if (!engaged) {
+        if (goingDown) {
+          window.scrollTo({ top: window.scrollY + r.top })
+        } else {
+          window.scrollTo({ top: window.scrollY + r.bottom - vh })
+        }
+        wasEngaged = true
+        gestureLocked = true
+        lastEventTime = performance.now()
+        lastDirection = direction
+        return
+      }
+
+      // Engaged. First wheel since entry? Lock + return without advancing.
+      // (User just landed on current pillar; next gesture advances them.)
+      if (!wasEngaged) {
+        wasEngaged = true
+        gestureLocked = true
+        lastEventTime = performance.now()
+        lastDirection = direction
+        return
+      }
+
+      // Engaged + already had a gesture. Gesture-detect + advance.
       const now = performance.now()
       const gap = now - lastEventTime
-      const direction = goingDown ? 1 : -1
       lastEventTime = now
       if (gap > GAP_MS || direction !== lastDirection) gestureLocked = false
       lastDirection = direction
 
-      if (gestureLocked) {
-        // Continuation of current gesture (trackpad momentum) — swallow.
-        return
-      }
+      if (gestureLocked) return
 
-      // Snap to pin on first event of fresh entry (when sticky not yet engaged).
-      snapToPin(r)
-
-      // Advance exactly one pillar in the direction of the gesture.
       advance(direction as 1 | -1)
-
       gestureLocked = true
     }
 
@@ -1005,14 +1025,21 @@ export function PillarStepper() {
       // When user is completely above the pin, normalize idx to 0 so that
       // re-entry from above advances 0 → 1 on the first wheel event.
       if (r.top >= vh) {
+        // Pin out of view above — clear engagement so re-entry is fresh.
+        wasEngaged = false
+        gestureLocked = false
+        lastEventTime = 0
         if (idxRef.current !== 0) {
           idxRef.current = 0
           setActive(0)
           setProg(1)
         }
       } else if (r.bottom <= 0) {
-        // Completely below pin — normalize to last, so re-entry from below
-        // advances N-1 → N-2 on the first upward wheel.
+        // Completely below pin — normalize to last. Clear engagement so
+        // re-entry from below is fresh.
+        wasEngaged = false
+        gestureLocked = false
+        lastEventTime = 0
         if (idxRef.current !== PILLARS.length - 1) {
           idxRef.current = PILLARS.length - 1
           setActive(PILLARS.length - 1)
