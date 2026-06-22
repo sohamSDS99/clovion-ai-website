@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui'
+import { openCalendly } from '@/lib/openCalendly'
 
 const P_MONO_LABEL = {
   fontFamily: 'var(--font-mono)',
@@ -274,6 +275,14 @@ function TierCard({ t, billing }: { t: Tier; billing: 'monthly' | 'annual' }) {
             trackLocation="pricing_card"
             trackEvent="pricing_click"
             trackPlan={t.name}
+            onClick={
+              t.cta === 'Talk to Sales'
+                ? (e) => {
+                    e.preventDefault()
+                    openCalendly('pricing_card', t.name)
+                  }
+                : undefined
+            }
           >
             {t.cta}
             {!t.custom && (

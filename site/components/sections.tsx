@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 import { Container, Section, Button, Eyebrow, Tag, ArrowRight, Check } from './ui'
 import { cn } from '@/lib/cn'
 import { customers, aiEngines, faqs as defaultFaqs, testimonials as defaultTestimonials } from '@/lib/content'
+import { openCalendly } from '@/lib/openCalendly'
 import Link from 'next/link'
 
 export function LogoMarquee({
@@ -163,14 +164,35 @@ export function CTABanner({
               <Button href={primaryHref} variant="invert" size="lg" trackLocation="final_cta">
                 {primary} <ArrowRight />
               </Button>
-              {secondary && (
-                <Link
-                  href={secondaryHref}
-                  className="btn h-12 px-6 text-base text-white border border-white/15 hover:bg-white/5"
-                >
-                  {secondary}
-                </Link>
-              )}
+              {secondary &&
+                (secondaryHref.startsWith('https://calendly.com') ? (
+                  <a
+                    href={secondaryHref}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      openCalendly('final_cta')
+                    }}
+                    className="btn h-12 px-6 text-base text-white border border-white/15 hover:bg-white/5 cursor-pointer"
+                  >
+                    {secondary}
+                  </a>
+                ) : /^(https?:|mailto:|tel:)/i.test(secondaryHref) ? (
+                  <a
+                    href={secondaryHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn h-12 px-6 text-base text-white border border-white/15 hover:bg-white/5"
+                  >
+                    {secondary}
+                  </a>
+                ) : (
+                  <Link
+                    href={secondaryHref}
+                    className="btn h-12 px-6 text-base text-white border border-white/15 hover:bg-white/5"
+                  >
+                    {secondary}
+                  </Link>
+                ))}
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { Section, Container, Button, Eyebrow, Tag, ArrowRight, Check, HairlineDivider, HeroShade } from '@/components/ui'
+import { TalkToSalesButton } from '@/components/TalkToSalesButton'
 
 export const metadata = {
   title: 'Terms of Service | Clovion AI',
@@ -505,7 +506,7 @@ export default function TermsPage() {
             </div>
             <div className="flex flex-wrap gap-3">
               <Button href="/pricing" trackLocation="legal_terms" variant="primary" size="md">Start Free Trial</Button>
-              <Button href="/contact" variant="secondary" size="md">Talk to sales</Button>
+              <TalkToSalesButton location="legal_terms" variant="secondary" size="md">Talk to sales</TalkToSalesButton>
             </div>
           </div>
         </Container>

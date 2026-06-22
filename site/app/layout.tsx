@@ -65,6 +65,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        <link
+          rel="stylesheet"
+          href="https://assets.calendly.com/assets/external/widget.css"
+        />
+        <script
+          async
+          src="https://assets.calendly.com/assets/external/widget.js"
+        />
       </head>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">

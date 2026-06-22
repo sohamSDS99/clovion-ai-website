@@ -10,6 +10,7 @@ import {
   HeroShade
 } from '@/components/ui'
 import { FAQ, CTABanner } from '@/components/sections'
+import { CALENDLY_URL } from '@/lib/calendly'
 
 export const metadata = {
   title: 'Clovion AI vs Profound: A side-by-side comparison | Clovion AI',
@@ -344,7 +345,7 @@ export default function ClovionVsProfoundPage() {
         primary="Get Free Score"
         primaryHref="/pricing"
         secondary="Talk to sales"
-        secondaryHref="/pricing#enterprise"
+        secondaryHref={CALENDLY_URL}
       />
     </>
   )

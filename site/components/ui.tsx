@@ -112,6 +112,20 @@ export function Button({
   }
 
   if (href) {
+    const isExternal = /^(https?:|mailto:|tel:)/i.test(href)
+    if (isExternal) {
+      return (
+        <a
+          href={href}
+          className={classes}
+          onClick={fireTracking}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {children}
+        </a>
+      )
+    }
     return (
       <Link href={href} className={classes} onClick={fireTracking}>
         {children}

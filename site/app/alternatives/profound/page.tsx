@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Section, Container, Button, Card, Eyebrow, Tag, ArrowRight, Check, HeroShade } from '@/components/ui'
 import { FAQ, CTABanner } from '@/components/sections'
 import { testimonials } from '@/lib/content'
+import { CALENDLY_URL } from '@/lib/calendly'
 
 export const metadata = {
   title: 'The Profound Alternative for GEO Teams | Clovion AI',
@@ -289,7 +290,7 @@ export default function ProfoundAlternativePage() {
         primary="Start Free Trial"
         primaryHref="/pricing"
         secondary="Talk to sales"
-        secondaryHref="/pricing#enterprise"
+        secondaryHref={CALENDLY_URL}
       />
     </main>
   )
