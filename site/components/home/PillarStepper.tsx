@@ -907,37 +907,28 @@ export function PillarStepper() {
     const el = pinRef.current
     if (!el) return
 
-    let lastWheelTime = 0
-    let cooldownUntil = 0
-    let decision: 'advance' | 'held' | 'release' | null = null
+    let inGesture = false
+    let endTimer: ReturnType<typeof setTimeout> | null = null
 
     const isEngaged = () => {
       const r = el.getBoundingClientRect()
       return r.top <= 0 && r.bottom > window.innerHeight
     }
 
-    const onWheel = (e: WheelEvent) => {
-      const now = performance.now()
-      const isNew = now - lastWheelTime > 250
-      lastWheelTime = now
+    const armEndTimer = () => {
+      if (endTimer) clearTimeout(endTimer)
+      endTimer = setTimeout(() => {
+        inGesture = false
+        endTimer = null
+      }, 220)
+    }
 
-      if (isNew) decision = null
+    const onWheel = (e: WheelEvent) => {
       if (!isEngaged()) return
 
-      if (now < cooldownUntil) {
+      if (inGesture) {
         e.preventDefault()
-        return
-      }
-
-      if (decision === 'release') return
-      if (decision === 'advance' || decision === 'held') {
-        e.preventDefault()
-        return
-      }
-
-      if (!isNew) {
-        e.preventDefault()
-        decision = 'held'
+        armEndTimer()
         return
       }
 
@@ -947,23 +938,24 @@ export function PillarStepper() {
         idxRef.current = cur + 1
         setActive(cur + 1)
         setProg(1)
-        decision = 'advance'
-        cooldownUntil = now + 80
+        inGesture = true
+        armEndTimer()
       } else if (e.deltaY < 0 && cur > 0) {
         e.preventDefault()
         idxRef.current = cur - 1
         setActive(cur - 1)
         setProg(1)
-        decision = 'advance'
-        cooldownUntil = now + 80
+        inGesture = true
+        armEndTimer()
       } else {
-        decision = 'release'
         const r = el.getBoundingClientRect()
         if (e.deltaY > 0) {
           window.scrollTo({ top: window.scrollY + r.bottom - window.innerHeight + 2 })
         } else {
           window.scrollTo({ top: window.scrollY + r.top - 2 })
         }
+        inGesture = true
+        armEndTimer()
       }
     }
 
@@ -991,6 +983,7 @@ export function PillarStepper() {
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('scroll', onScroll)
+      if (endTimer) clearTimeout(endTimer)
     }
   }, [narrow])
 
