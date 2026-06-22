@@ -3,6 +3,7 @@
 import { useState, useEffect, type CSSProperties, type ReactNode } from 'react'
 import PricingTiers from './PricingTiers'
 import ComparisonTable from './ComparisonTable'
+import { openCalendly } from '@/lib/openCalendly'
 
 const P_CONTAINER: CSSProperties = {
   maxWidth: 'var(--container-max)',
@@ -394,7 +395,11 @@ function FAQ() {
             <Eyebrow>FAQ</Eyebrow>
             <h2 style={{ ...P_DISPLAY_MD, margin: '16px 0 0' }}>Questions about pricing.</h2>
             <a
-              href="mailto:sales@clovion.ai"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault()
+                openCalendly('pricing_faq')
+              }}
               style={{
                 marginTop: 24,
                 display: 'inline-flex',
@@ -518,7 +523,11 @@ function FinalCTA() {
               </a>
               <a
                 className="btn btn-secondary"
-                href="mailto:sales@clovion.ai"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault()
+                  openCalendly('pricing_final_cta')
+                }}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -532,7 +541,8 @@ function FinalCTA() {
                   background: 'transparent',
                   color: 'var(--on-ink)',
                   border: '1px solid var(--on-ink-15)',
-                  textDecoration: 'none'
+                  textDecoration: 'none',
+                  cursor: 'pointer'
                 }}
               >
                 Talk to Sales

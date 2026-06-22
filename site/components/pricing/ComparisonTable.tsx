@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui'
+import { openCalendly } from '@/lib/openCalendly'
 
 const COL = ['Starter', 'Growth', 'Enterprise']
 
@@ -249,6 +250,14 @@ export default function ComparisonTable() {
                 trackLocation="pricing_table"
                 trackEvent="pricing_click"
                 trackPlan={COL[i]}
+                onClick={
+                  c.label === 'Talk to Sales'
+                    ? (e) => {
+                        e.preventDefault()
+                        openCalendly('pricing_table', COL[i])
+                      }
+                    : undefined
+                }
               >
                 {c.label}
               </Button>

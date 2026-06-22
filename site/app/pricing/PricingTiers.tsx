@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button, Tag, ArrowRight, Check } from '@/components/ui'
 import { pricingTiers } from '@/lib/content'
 import { cn } from '@/lib/cn'
+import { CALENDLY_URL } from '@/lib/calendly'
 
 export function PricingTiers() {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly')
@@ -74,7 +75,7 @@ export function PricingTiers() {
 
           const ctaHref =
             tier.cta === 'Talk to sales'
-              ? '/pricing#enterprise'
+              ? CALENDLY_URL
               : tier.cta === 'Get Free Score'
               ? '/free-ai-visibility-score'
               : '/pricing'

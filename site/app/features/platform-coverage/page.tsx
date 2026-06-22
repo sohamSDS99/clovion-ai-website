@@ -11,6 +11,7 @@ import {
   HeroShade
 } from '@/components/ui'
 import { FAQ, CTABanner } from '@/components/sections'
+import { CALENDLY_URL } from '@/lib/calendly'
 
 export const metadata = {
   title: 'Platform coverage — every AI surface that matters | Clovion AI',
@@ -696,7 +697,7 @@ export default function PlatformCoveragePage() {
         primary="Start Free Trial"
         primaryHref="/pricing"
         secondary="Talk to sales"
-        secondaryHref="/pricing#enterprise"
+        secondaryHref={CALENDLY_URL}
       />
     </>
   )
