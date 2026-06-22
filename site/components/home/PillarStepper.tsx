@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type ReactElement } fr
 import Link from 'next/link'
 import { Container, ArrowRight } from '@/components/ui'
 
-const STEP_VH = 30
+const STEP_VH = 60
 
 // ── glyph paths ───────────────────────────────────────────────────────
 const G = {
@@ -907,164 +907,97 @@ export function PillarStepper() {
     const el = pinRef.current
     if (!el) return
 
-    // Gesture detection state. A "gesture" is one continuous user motion
-    // (a single trackpad swipe — many momentum events at <50ms intervals;
-    //  or a single mouse-wheel click — one event with deltaY ~100).
-    //
-    // We treat any quiet period > GAP_MS (no wheel events) as the end of a
-    // gesture. The next event after such a quiet period is a NEW gesture
-    // and is allowed to advance idx by 1.
-    let lastEventTime = 0
-    let lastDirection = 0
-    let gestureLocked = false
-    let wasEngaged = false
-    const GAP_MS = 70
+    // Scroll-driven pillar progression. No wheel hijack. Native scroll feels
+    // natural for trackpad momentum, mouse wheel, and keyboard PageDown.
+    // Active idx is derived from how far the pin parent has scrolled past
+    // the viewport top: progress 0 → 1 across the engagement window
+    // (parent height - 100vh). Each pillar occupies an equal slice of that.
+    const N = PILLARS.length
+    let rafPending = false
+    let lastProg = -1
 
-    const advance = (dir: 1 | -1) => {
-      const cur = idxRef.current
-      const next = cur + dir
-      if (next < 0 || next > PILLARS.length - 1) return false
-      idxRef.current = next
-      setActive(next)
-      setProg(1)
-      return true
-    }
-
-    // Snap the page so the pin section is fully aligned with the viewport
-    // (sticky engaged). Idempotent — does nothing if already aligned.
-    const snapToPin = (r: DOMRect) => {
-      const vh = window.innerHeight
-      if (r.top > 0) {
-        window.scrollTo({ top: window.scrollY + r.top })
-        return true
-      }
-      if (r.bottom < vh) {
-        window.scrollTo({ top: window.scrollY - (vh - r.bottom) })
-        return true
-      }
-      return false
-    }
-
-    const onWheel = (e: WheelEvent) => {
+    const compute = () => {
+      rafPending = false
       const r = el.getBoundingClientRect()
       const vh = window.innerHeight
 
-      // Outside pin section — never hijack. Reset state so re-entry is fresh.
-      if (r.bottom <= 0 || r.top >= vh) {
-        gestureLocked = false
-        lastEventTime = 0
-        wasEngaged = false
-        return
-      }
-
-      const cur = idxRef.current
-      const goingDown = e.deltaY > 0
-      const direction = goingDown ? 1 : -1
-      // 2px tolerance — browsers sometimes leave r.top at 0.5 / 1 after a snap.
-      const engaged = r.top <= 2 && r.bottom >= vh - 2
-
-      // Boundary release: at last pillar going DOWN, or first pillar going UP,
-      // pin already engaged, and the user already had a gesture in this entry
-      // — allow native scroll to exit. Do NOT preventDefault.
-      if (
-        engaged &&
-        wasEngaged &&
-        ((goingDown && cur >= PILLARS.length - 1) ||
-          (!goingDown && cur <= 0))
-      ) {
-        gestureLocked = false
-        lastEventTime = 0
-        wasEngaged = false
-        return
-      }
-
-      // Pin is in viewport — hijack every wheel from here on.
-      e.preventDefault()
-
-      // Not yet engaged: snap pin precisely to the engagement edge, lock,
-      // no advance. User lands on current pillar (0 from above, N-1 from below).
-      if (!engaged) {
-        if (goingDown) {
-          window.scrollTo({ top: window.scrollY + r.top })
-        } else {
-          window.scrollTo({ top: window.scrollY + r.bottom - vh })
+      // Pin fully above viewport → last pillar
+      if (r.bottom <= 0) {
+        const last = N - 1
+        if (idxRef.current !== last) {
+          idxRef.current = last
+          setActive(last)
         }
-        wasEngaged = true
-        gestureLocked = true
-        lastEventTime = performance.now()
-        lastDirection = direction
+        if (lastProg !== 1) {
+          lastProg = 1
+          setProg(1)
+        }
         return
       }
-
-      // Engaged. First wheel since entry? Lock + return without advancing.
-      // (User just landed on current pillar; next gesture advances them.)
-      if (!wasEngaged) {
-        wasEngaged = true
-        gestureLocked = true
-        lastEventTime = performance.now()
-        lastDirection = direction
-        return
-      }
-
-      // Engaged + already had a gesture. Gesture-detect + advance.
-      const now = performance.now()
-      const gap = now - lastEventTime
-      lastEventTime = now
-      if (gap > GAP_MS || direction !== lastDirection) gestureLocked = false
-      lastDirection = direction
-
-      if (gestureLocked) return
-
-      advance(direction as 1 | -1)
-      gestureLocked = true
-    }
-
-    const onScroll = () => {
-      const r = el.getBoundingClientRect()
-      const vh = window.innerHeight
-      // When user is completely above the pin, normalize idx to 0 so that
-      // re-entry from above advances 0 → 1 on the first wheel event.
+      // Pin fully below viewport → first pillar
       if (r.top >= vh) {
-        // Pin out of view above — clear engagement so re-entry is fresh.
-        wasEngaged = false
-        gestureLocked = false
-        lastEventTime = 0
         if (idxRef.current !== 0) {
           idxRef.current = 0
           setActive(0)
+        }
+        if (lastProg !== 0) {
+          lastProg = 0
+          setProg(0)
+        }
+        return
+      }
+
+      // Engagement zone: pin top has crossed viewport top, pin bottom not yet exited.
+      const travel = el.offsetHeight - vh
+      if (travel <= 0) {
+        // Pin shorter than viewport — shouldn't happen with STEP_VH > 100/N.
+        if (lastProg !== 1) {
+          lastProg = 1
           setProg(1)
         }
-      } else if (r.bottom <= 0) {
-        // Completely below pin — normalize to last. Clear engagement so
-        // re-entry from below is fresh.
-        wasEngaged = false
-        gestureLocked = false
-        lastEventTime = 0
-        if (idxRef.current !== PILLARS.length - 1) {
-          idxRef.current = PILLARS.length - 1
-          setActive(PILLARS.length - 1)
-          setProg(1)
-        }
+        return
+      }
+      const scrolled = Math.max(0, -r.top)
+      const progress = Math.min(1, scrolled / travel)
+      const raw = progress * N
+      const idx = Math.min(N - 1, Math.floor(raw))
+      const within = Math.min(1, Math.max(0, raw - idx))
+      if (idx !== idxRef.current) {
+        idxRef.current = idx
+        setActive(idx)
+      }
+      // Throttle prog updates to ~1% deltas to avoid render thrash
+      if (Math.abs(within - lastProg) > 0.01) {
+        lastProg = within
+        setProg(within)
       }
     }
 
-    onScroll()
-    window.addEventListener('wheel', onWheel, { passive: false })
-    window.addEventListener('scroll', onScroll, { passive: true })
+    const schedule = () => {
+      if (rafPending) return
+      rafPending = true
+      requestAnimationFrame(compute)
+    }
+
+    schedule()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule, { passive: true })
     return () => {
-      window.removeEventListener('wheel', onWheel)
-      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
     }
   }, [narrow])
 
   const goto = (i: number) => {
     const el = pinRef.current
     if (!el) return
-    const absTop = window.scrollY + el.getBoundingClientRect().top
-    window.scrollTo({ top: absTop, behavior: 'smooth' })
-    idxRef.current = i
-    setActive(i)
-    setProg(1)
+    const vh = window.innerHeight
+    const travel = el.offsetHeight - vh
+    if (travel <= 0) return
+    const pinAbsTop = window.scrollY + el.getBoundingClientRect().top
+    const targetProgress = (i + 0.5) / PILLARS.length
+    const targetScrollY = pinAbsTop + travel * targetProgress
+    window.scrollTo({ top: targetScrollY, behavior: 'smooth' })
   }
 
   const Heading = (
