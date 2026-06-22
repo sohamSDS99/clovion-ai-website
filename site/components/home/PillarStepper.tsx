@@ -910,11 +910,6 @@ export function PillarStepper() {
     let inGesture = false
     let endTimer: ReturnType<typeof setTimeout> | null = null
 
-    const isEngaged = () => {
-      const r = el.getBoundingClientRect()
-      return r.top <= 0 && r.bottom > window.innerHeight
-    }
-
     const armEndTimer = () => {
       if (endTimer) clearTimeout(endTimer)
       endTimer = setTimeout(() => {
@@ -924,39 +919,49 @@ export function PillarStepper() {
     }
 
     const onWheel = (e: WheelEvent) => {
-      if (!isEngaged()) return
+      const r = el.getBoundingClientRect()
+      const vh = window.innerHeight
+
+      if (r.bottom <= 0 || r.top >= vh) {
+        inGesture = false
+        if (endTimer) {
+          clearTimeout(endTimer)
+          endTimer = null
+        }
+        return
+      }
+
+      e.preventDefault()
 
       if (inGesture) {
-        e.preventDefault()
         armEndTimer()
         return
       }
 
+      if (r.top > 0) {
+        window.scrollTo({ top: window.scrollY + r.top })
+      } else if (r.bottom < vh) {
+        window.scrollTo({ top: window.scrollY - (vh - r.bottom) })
+      }
+
       const cur = idxRef.current
       if (e.deltaY > 0 && cur < PILLARS.length - 1) {
-        e.preventDefault()
         idxRef.current = cur + 1
         setActive(cur + 1)
         setProg(1)
-        inGesture = true
-        armEndTimer()
       } else if (e.deltaY < 0 && cur > 0) {
-        e.preventDefault()
         idxRef.current = cur - 1
         setActive(cur - 1)
         setProg(1)
-        inGesture = true
-        armEndTimer()
       } else {
-        const r = el.getBoundingClientRect()
         if (e.deltaY > 0) {
-          window.scrollTo({ top: window.scrollY + r.bottom - window.innerHeight + 2 })
+          window.scrollTo({ top: window.scrollY + r.bottom + 2 })
         } else {
-          window.scrollTo({ top: window.scrollY + r.top - 2 })
+          window.scrollTo({ top: window.scrollY + r.top - vh - 2 })
         }
-        inGesture = true
-        armEndTimer()
       }
+      inGesture = true
+      armEndTimer()
     }
 
     const onScroll = () => {
