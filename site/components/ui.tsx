@@ -114,13 +114,20 @@ export function Button({
   if (href) {
     const isExternal = /^(https?:|mailto:|tel:)/i.test(href)
     if (isExternal) {
+      // Same-tab for clovion.ai apex + subdomains (in-product navigation
+      // like app.clovion.ai/login). New tab for fully external destinations
+      // (calendly.com, social, etc).
+      let sameTab = false
+      try {
+        const u = new URL(href)
+        sameTab = u.hostname === 'clovion.ai' || u.hostname.endsWith('.clovion.ai')
+      } catch {}
       return (
         <a
           href={href}
           className={classes}
           onClick={fireTracking}
-          target="_blank"
-          rel="noopener noreferrer"
+          {...(sameTab ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
         >
           {children}
         </a>

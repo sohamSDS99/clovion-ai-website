@@ -165,10 +165,10 @@ export function HomeHeader() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Button href="/login" variant="ghost" size="sm" trackLocation="header">
+          <Button href="https://app.clovion.ai/login" variant="ghost" size="sm" trackLocation="header">
             Log in
           </Button>
-          <Button href="/signup" variant="primary" size="sm" trackLocation="header">
+          <Button href="https://app.clovion.ai/signup" variant="primary" size="sm" trackLocation="header">
             Sign up
           </Button>
         </div>
@@ -225,10 +225,10 @@ export function HomeHeader() {
               )
             })}
             <div className="mt-3 flex flex-col gap-2 px-2 pb-2">
-              <Button href="/login" variant="secondary" trackLocation="header_mobile">
+              <Button href="https://app.clovion.ai/login" variant="secondary" trackLocation="header_mobile">
                 Log in
               </Button>
-              <Button href="/signup" variant="primary" trackLocation="header_mobile">
+              <Button href="https://app.clovion.ai/signup" variant="primary" trackLocation="header_mobile">
                 Sign up
               </Button>
             </div>
