@@ -354,34 +354,72 @@ function MockPerception() {
 }
 
 // ── Mock 03 · Rankings by topic ─────────────────────────────────────
-const RANK_ROWS = [
-  { topic: 'Centralized SDS Repository', rank: '1st', share: 28.4, delta: '+3.7', up: true, tag: 'Strong', comp: ['S', 'E', 'P', '3E'] },
-  { topic: 'SDS Management', rank: '2nd', share: 22.3, delta: '+2.9', up: true, tag: 'Strong', comp: ['E', 'S', 'C', 'I'] },
-  { topic: 'Regulatory Compliance', rank: '5th', share: 9.1, delta: '−0.8', up: false, tag: 'Needs work', comp: ['S', 'I', 'C', 'P'] },
-  { topic: 'Compliance Reporting', rank: '6th', share: 8.7, delta: '−1.3', up: false, tag: 'Needs work', comp: ['C', 'I', 'S', 'E'] },
-  { topic: 'Audit Readiness', rank: '7th', share: 6.2, delta: '−2.1', up: false, tag: 'Needs work', comp: ['I', 'S', 'C', 'P'] }
+type Brand = 'monday' | 'pipedrive' | 'salesforce' | 'sds'
+
+const RANK_ROWS: { topic: string; rank: string; share: number; tag: 'Strong' | 'Needs work'; comp: Brand[] }[] = [
+  { topic: 'Centralized SDS Repository', rank: '1st', share: 28.4, tag: 'Strong', comp: ['monday', 'pipedrive', 'salesforce', 'sds'] },
+  { topic: 'SDS Management', rank: '2nd', share: 22.3, tag: 'Strong', comp: ['salesforce', 'sds', 'monday', 'pipedrive'] },
+  { topic: 'Audit Readiness', rank: '7th', share: 6.2, tag: 'Needs work', comp: ['pipedrive', 'monday', 'sds', 'salesforce'] },
+  { topic: 'Compliance Reporting', rank: '5th', share: 9.1, tag: 'Needs work', comp: ['sds', 'salesforce', 'pipedrive', 'monday'] },
+  { topic: 'Regulatory Compliance', rank: '6th', share: 8.7, tag: 'Needs work', comp: ['monday', 'salesforce', 'sds', 'pipedrive'] }
 ]
 const NEG = '#fb7185'
+const WIN_BLUE = '#3b82f6'
+const OPP_GREEN = '#10b981'
+const LOSE_RED = '#ef4444'
 
-function CompBadge({ t }: { t: string }) {
+function MondayMark() {
   return (
-    <span
-      style={{
-        height: 22,
-        width: 22,
-        borderRadius: 999,
-        background: 'var(--ink-07)',
-        border: '1px solid var(--line)',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.6rem',
-        fontWeight: 600,
-        color: 'var(--ink-60)'
-      }}
-    >
-      {t}
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden style={{ display: 'block' }}>
+      <rect x="3" y="6.5" width="4" height="11" rx="2" fill="#FF3D57" transform="rotate(18 5 12)" />
+      <rect x="10" y="6.5" width="4" height="11" rx="2" fill="#FFCB00" transform="rotate(18 12 12)" />
+      <circle cx="19.5" cy="15.5" r="3" fill="#00CA72" />
+    </svg>
+  )
+}
+
+function PipedriveMark() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden style={{ display: 'block' }}>
+      <circle cx="12" cy="12" r="11" fill="#017737" />
+      <path d="M11 7c2.2 0 3.8 1.6 3.8 4s-1.6 4-3.8 4c-1 0-1.7-.3-2.2-.8V18H7V7.3h1.6v.7c.6-.6 1.4-1 2.4-1zm-.2 6.5c1.3 0 2.2-1 2.2-2.5s-.9-2.5-2.2-2.5c-1.3 0-2.2 1-2.2 2.5s.9 2.5 2.2 2.5z" fill="#fff" />
+    </svg>
+  )
+}
+
+function SalesforceMark() {
+  return (
+    <svg width="22" height="20" viewBox="0 0 32 22" aria-hidden style={{ display: 'block' }}>
+      <path d="M12.6 4.2c1.1-1.1 2.6-1.8 4.3-1.8 2.3 0 4.3 1.3 5.3 3.2.9-.4 1.9-.6 2.9-.6 4 0 7.2 3.3 7.2 7.3s-3.2 7.3-7.2 7.3c-.5 0-1-.05-1.4-.14-.9 1.6-2.6 2.7-4.6 2.7-.8 0-1.6-.2-2.3-.5-1 2.2-3.2 3.7-5.7 3.7-2.6 0-4.9-1.7-5.8-4-.4.1-.8.1-1.2.1C2 21.5 0 19.4 0 16.9c0-1.7.9-3.2 2.3-4-.3-.7-.5-1.5-.5-2.3 0-3 2.4-5.4 5.5-5.4 1.8 0 3.4.9 4.4 2.3.1-.4.5-.7.9-1.2v-1.6c0 0 .1-.2 0-.5z" fill="#00A1E0" />
+    </svg>
+  )
+}
+
+function SdsMark() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden style={{ display: 'block' }}>
+      <g transform="translate(12 12) rotate(45)">
+        <rect x="-7.5" y="-7.5" width="6.5" height="6.5" rx="0.6" fill="#0A0A0F" />
+        <rect x="1" y="-7.5" width="6.5" height="6.5" rx="0.6" fill="#FFCB00" />
+        <rect x="-7.5" y="1" width="6.5" height="6.5" rx="0.6" fill="#2C3E8C" />
+        <rect x="1" y="1" width="6.5" height="6.5" rx="0.6" fill="#0A0A0F" />
+      </g>
+    </svg>
+  )
+}
+
+const BRAND_MARK: Record<Brand, () => ReactElement> = {
+  monday: MondayMark,
+  pipedrive: PipedriveMark,
+  salesforce: SalesforceMark,
+  sds: SdsMark
+}
+
+function CompCell({ b }: { b: Brand }) {
+  const Mark = BRAND_MARK[b]
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Mark />
     </span>
   )
 }
@@ -413,10 +451,20 @@ function MockRankings() {
     return () => clearTimeout(t)
   }, [])
 
-  const cols = '1.55fr 0.42fr 0.34fr 0.34fr 0.34fr 0.34fr 1.3fr'
+  const cols = '1.55fr 0.42fr 0.32fr 0.32fr 0.32fr 0.32fr 1.45fr'
+  const ease = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 10, overflow: 'hidden', minWidth: 0 }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateRows: 'auto auto 1fr auto',
+        gap: 8,
+        height: '100%',
+        overflow: 'hidden',
+        minWidth: 0
+      }}
+    >
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div style={{ minWidth: 0 }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
@@ -452,16 +500,17 @@ function MockRankings() {
         </div>
       </div>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 6, padding: '0 4px 6px', fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', borderBottom: '1px solid var(--line)' }}>
-          <span>Topics</span>
-          <span style={{ textAlign: 'center' }}>Your Brand</span>
-          <span style={{ textAlign: 'center' }}>#2</span>
-          <span style={{ textAlign: 'center' }}>#3</span>
-          <span style={{ textAlign: 'center' }}>#4</span>
-          <span style={{ textAlign: 'center' }}>#5</span>
-          <span style={{ textAlign: 'right' }}>Visibility Share</span>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 6, padding: '0 4px 5px', fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', borderBottom: '1px solid var(--line)' }}>
+        <span>Topics</span>
+        <span style={{ textAlign: 'center' }}>Your Brand</span>
+        <span style={{ textAlign: 'center' }}>#2</span>
+        <span style={{ textAlign: 'center' }}>#3</span>
+        <span style={{ textAlign: 'center' }}>#4</span>
+        <span style={{ textAlign: 'center' }}>#5</span>
+        <span style={{ textAlign: 'right' }}>Visibility Share</span>
+      </div>
+
+      <div style={{ display: 'grid', gridAutoRows: 'minmax(0, 1fr)', minHeight: 0 }}>
         {RANK_ROWS.map((r, i) => (
           <div
             key={r.topic}
@@ -471,28 +520,28 @@ function MockRankings() {
               gap: 6,
               alignItems: 'center',
               padding: '0 4px',
-              flex: 1,
-              borderBottom: '1px solid var(--line)',
+              borderBottom: i === RANK_ROWS.length - 1 ? 'none' : '1px solid var(--line)',
               opacity: animated ? 1 : 0,
               transform: animated ? 'translateY(0)' : 'translateY(6px)',
-              transition: 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-              transitionDelay: `${i * 70}ms`
+              transition: `opacity 0.5s ${ease}, transform 0.5s ${ease}`,
+              transitionDelay: `${i * 70}ms`,
+              minHeight: 0
             }}
           >
-            <div style={{ minWidth: 0 }}>
-              <span style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+            <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2, minWidth: 0 }}>
                 {r.topic}
               </span>
               <span
                 style={{
+                  flexShrink: 0,
                   display: 'inline-block',
-                  marginTop: 3,
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '0.52rem',
+                  fontSize: '0.5rem',
                   fontWeight: 600,
                   letterSpacing: '0.04em',
                   textTransform: 'uppercase',
-                  padding: '2px 7px',
+                  padding: '2px 6px',
                   borderRadius: 999,
                   background: r.tag === 'Strong' ? 'var(--positive-bg)' : 'rgba(251,113,133,0.12)',
                   color: r.tag === 'Strong' ? 'var(--positive)' : NEG,
@@ -502,13 +551,11 @@ function MockRankings() {
                 {r.tag}
               </span>
             </div>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}>
               {r.rank}
             </span>
-            {r.comp.map((c, ci) => (
-              <span key={ci} style={{ display: 'flex', justifyContent: 'center' }}>
-                <CompBadge t={c} />
-              </span>
+            {r.comp.map((b, ci) => (
+              <CompCell key={ci} b={b} />
             ))}
             <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'flex-end' }}>
               <span style={{ flex: 1, height: 6, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden', minWidth: 22 }}>
@@ -519,12 +566,12 @@ function MockRankings() {
                     width: animated ? `${(r.share / max) * 100}%` : '0%',
                     borderRadius: 999,
                     background: r.tag === 'Strong' ? 'var(--positive)' : 'var(--ink-40)',
-                    transition: 'width 0.85s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transition: `width 0.85s ${ease}`,
                     transitionDelay: `${260 + i * 70}ms`
                   }}
                 />
               </span>
-              <span style={{ width: 38, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+              <span style={{ width: 38, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
                 {r.share}%
               </span>
             </div>
@@ -539,42 +586,45 @@ function MockRankings() {
           gap: 8,
           opacity: animated ? 1 : 0,
           transform: animated ? 'translateY(0)' : 'translateY(8px)',
-          transition: 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          transition: `opacity 0.5s ${ease}, transform 0.5s ${ease}`,
           transitionDelay: `${260 + RANK_ROWS.length * 70}ms`
         }}
       >
-        <div style={{ padding: '8px 10px', borderRadius: 10, background: 'var(--positive-bg)', border: '1px solid var(--positive-border)' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: 'var(--positive)' }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <polygon points="12 2 15 9 22 9 17 14 19 22 12 17 5 22 7 14 2 9 9 9 12 2" />
+        <div style={{ padding: '7px 10px', borderRadius: 10, background: 'var(--ink-04)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.52rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, color: WIN_BLUE }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="12" cy="12" r="10" />
+              <polygon points="12 7 13.5 11 18 11 14.5 14 16 18 12 15.5 8 18 9.5 14 6 11 10.5 11 12 7" fill="currentColor" stroke="none" />
             </svg>
             Where you win
           </div>
-          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
+          <p style={{ margin: '3px 0 0', fontSize: '0.66rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
             Top 2 on <strong style={{ color: 'var(--ink)' }}>Repository</strong> &amp; <strong style={{ color: 'var(--ink)' }}>SDS Management</strong>.
           </p>
         </div>
-        <div style={{ padding: '8px 10px', borderRadius: 10, background: 'var(--ink-04)', border: '1px solid var(--line)' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: 'var(--ink)' }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <line x1="12" y1="19" x2="12" y2="5" />
-              <polyline points="5 12 12 5 19 12" />
+        <div style={{ padding: '7px 10px', borderRadius: 10, background: 'var(--ink-04)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.52rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, color: OPP_GREEN }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16.5" x2="12" y2="7.5" />
+              <polyline points="7.5 12 12 7.5 16.5 12" />
             </svg>
             Top opportunity
           </div>
-          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
+          <p style={{ margin: '3px 0 0', fontSize: '0.66rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
             Close the gap on <strong style={{ color: 'var(--ink)' }}>Audit Readiness</strong> first.
           </p>
         </div>
-        <div style={{ padding: '8px 10px', borderRadius: 10, background: 'rgba(251,113,133,0.10)', border: '1px solid rgba(251,113,133,0.30)' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: NEG }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <polyline points="19 12 12 19 5 12" />
+        <div style={{ padding: '7px 10px', borderRadius: 10, background: 'var(--ink-04)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.52rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, color: LOSE_RED }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="7.5" x2="12" y2="16.5" />
+              <polyline points="7.5 12 12 16.5 16.5 12" />
             </svg>
             Where you lose
           </div>
-          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
+          <p style={{ margin: '3px 0 0', fontSize: '0.66rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
             Competitors dominate <strong style={{ color: 'var(--ink)' }}>Audit Readiness</strong>.
           </p>
         </div>
