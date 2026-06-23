@@ -809,7 +809,7 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
         transform: show ? 'none' : 'translateY(14px) scale(0.985)',
         transition: 'opacity 0.5s ease, transform 0.55s var(--ease-out-expo)',
         pointerEvents: show ? 'auto' : 'none',
-        ...(isFullBleed ? { display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 32 } : {})
+        ...(isFullBleed ? { display: 'flex', alignItems: 'flex-start', justifyContent: 'center' } : {})
       }}
     >
       <div
@@ -1067,7 +1067,7 @@ export function PillarStepper() {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'flex-start',
-            paddingTop: 'clamp(96px, 16vh, 180px)',
+            paddingTop: 'clamp(64px, 11vh, 110px)',
             overflow: 'hidden'
           }}
         >
@@ -1093,7 +1093,7 @@ export function PillarStepper() {
               </div>
               {/* Card height bumped so the visibility-insights slideshow can
                   display the dashboard frames at a usable size. */}
-              <div style={{ position: 'relative', height: 'clamp(640px, 80vh, 880px)' }}>
+              <div style={{ position: 'relative', height: 'clamp(480px, 58vh, 680px)' }}>
                 {PILLARS.map((s, i) => (
                   <MockPanel key={s.sku} s={s} show={i === active} />
                 ))}
