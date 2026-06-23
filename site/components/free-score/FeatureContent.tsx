@@ -15,6 +15,7 @@ import PromptCards from './PromptCards'
 import RecommendationList from './RecommendationList'
 import { analytics } from '@/lib/analytics'
 import { openCalendly } from '@/lib/openCalendly'
+import type { FreeScoreResult } from '@/app/api/free-score/route'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
 const CONTAINER: CSSProperties = {
@@ -278,7 +279,9 @@ function Hero({
   setDomain,
   submittedDomain,
   setSubmittedDomain,
-  stepIndex
+  stepIndex,
+  scanResult,
+  scanError
 }: {
   stage: Stage
   setStage: (s: Stage) => void
@@ -287,6 +290,8 @@ function Hero({
   submittedDomain: string
   setSubmittedDomain: (s: string) => void
   stepIndex: number
+  scanResult: FreeScoreResult | null
+  scanError: string
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string>('')
@@ -410,7 +415,7 @@ function Hero({
                   {stage !== 'analyzing' && <ArrowRight size={14} />}
                 </button>
               </div>
-              {error && (
+              {(error || scanError) && (
                 <p
                   role="alert"
                   style={{
@@ -420,7 +425,7 @@ function Hero({
                     color: 'var(--ink-70)'
                   }}
                 >
-                  {error}
+                  {error || scanError}
                 </p>
               )}
               <div
@@ -534,9 +539,9 @@ function Hero({
 
           <ScoreDial
             stage={stage}
-            score={SCORE}
-            subscoreSummary={SUBSCORES.map((s) => ({ label: s.label, value: s.value }))}
-            platforms={PLATFORMS}
+            score={scanResult?.score ?? SCORE}
+            subscoreSummary={(scanResult?.subscores ?? SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
+            platforms={scanResult?.platforms ?? PLATFORMS}
             submittedDomain={submittedDomain}
             stepIndex={stepIndex}
           />
@@ -687,7 +692,7 @@ function FeatureBlock({
 }
 
 /* ── 05 — REAL PROMPTS ───────────────────────────────────────────── */
-function RealPrompts() {
+function RealPrompts({ prompts }: { prompts: typeof SAMPLE_PROMPTS }) {
   return (
     <section
       style={{ padding: 'var(--section) 0', background: 'var(--subtle)', scrollMarginTop: 80 }}
@@ -704,14 +709,18 @@ function RealPrompts() {
             mentioned. No black box. The free score includes a deeper sample on request.
           </p>
         </div>
-        <PromptCards prompts={SAMPLE_PROMPTS} />
+        <PromptCards prompts={prompts} />
       </div>
     </section>
   )
 }
 
 /* ── 06 — RECOMMENDATIONS ───────────────────────────────────────── */
-function RecommendationsSection() {
+function RecommendationsSection({
+  recommendations
+}: {
+  recommendations: typeof RECOMMENDATIONS
+}) {
   return (
     <section style={{ padding: 'var(--section) 0', scrollMarginTop: 80 }} id="deliverable">
       <div style={CONTAINER}>
@@ -725,7 +734,7 @@ function RecommendationsSection() {
             the most, ranked by estimated impact. Pick the ones that fit your team this quarter.
           </p>
         </div>
-        <RecommendationList items={RECOMMENDATIONS} />
+        <RecommendationList items={recommendations} />
       </div>
     </section>
   )
@@ -1061,30 +1070,67 @@ export default function FeatureContent() {
   const [domain, setDomain] = useState('')
   const [submittedDomain, setSubmittedDomain] = useState('')
   const [stepIndex, setStepIndex] = useState(0)
+  const [scanResult, setScanResult] = useState<FreeScoreResult | null>(null)
+  const [scanError, setScanError] = useState('')
 
-  // Drive the analysis step animation
+  // Walk the analysis-step indicator while we wait on the API. Holds at
+  // the last step until the fetch effect below transitions stage.
   useEffect(() => {
     if (stage !== 'analyzing') return
     setStepIndex(0)
     let cancelled = false
     const tick = (i: number) => {
       if (cancelled) return
-      if (i >= ANALYSIS_STEPS_COUNT) {
-        setStage('result')
-        return
-      }
-      const delay = i === ANALYSIS_STEPS_COUNT - 1 ? 1400 : 1100
+      if (i >= ANALYSIS_STEPS_COUNT - 1) return
       setTimeout(() => {
         if (cancelled) return
         setStepIndex(i + 1)
         tick(i + 1)
-      }, delay)
+      }, 1100)
     }
     tick(0)
     return () => {
       cancelled = true
     }
   }, [stage])
+
+  // Call the real /api/free-score endpoint when the form submits.
+  // The mock step walker above keeps the loading UX alive in parallel;
+  // this effect owns the stage transition to 'result' (or back to 'idle'
+  // on error).
+  useEffect(() => {
+    if (stage !== 'analyzing' || !submittedDomain) return
+    let cancelled = false
+    setScanResult(null)
+    setScanError('')
+    ;(async () => {
+      try {
+        const res = await fetch('/api/free-score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain: submittedDomain })
+        })
+        const data: { error?: string; result?: FreeScoreResult } = await res
+          .json()
+          .catch(() => ({}))
+        if (cancelled) return
+        if (!res.ok || !data.result) {
+          setScanError(data.error || 'Scan failed. Try again.')
+          setStage('idle')
+          return
+        }
+        setScanResult(data.result)
+        setStage('result')
+      } catch {
+        if (cancelled) return
+        setScanError('Network error. Try again.')
+        setStage('idle')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [stage, submittedDomain])
 
   const today = useMemo(
     () =>
@@ -1107,6 +1153,8 @@ export default function FeatureContent() {
         submittedDomain={submittedDomain}
         setSubmittedDomain={setSubmittedDomain}
         stepIndex={stepIndex}
+        scanResult={scanResult}
+        scanError={scanError}
       />
 
       <JumpLinks />
@@ -1125,7 +1173,7 @@ export default function FeatureContent() {
           'Citation Strength: how often your domain is cited as a source.',
           'Competitive Position: your share of voice against the top three rivals.'
         ]}
-        visual={<SubscoreCards subscores={SUBSCORES} />}
+        visual={<SubscoreCards subscores={scanResult?.subscores ?? SUBSCORES} />}
       />
 
       <FeatureBlock
@@ -1143,11 +1191,13 @@ export default function FeatureContent() {
           'Perplexity for cited, source-linked answers.',
           'Google AI Overviews for generative results inside search.'
         ]}
-        visual={<PlatformPanel platforms={PLATFORMS} />}
+        visual={<PlatformPanel platforms={scanResult?.platforms ?? PLATFORMS} />}
       />
 
-      <RealPrompts />
-      <RecommendationsSection />
+      <RealPrompts prompts={scanResult?.prompts ?? SAMPLE_PROMPTS} />
+      <RecommendationsSection
+        recommendations={scanResult?.recommendations ?? RECOMMENDATIONS}
+      />
       <MetricsBand />
       <FAQ />
       <FinalCTA />
