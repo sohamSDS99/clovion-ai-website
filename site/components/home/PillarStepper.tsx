@@ -191,164 +191,22 @@ function MockVisibility() {
 }
 
 
-// ── Mock 02 · Brand Perception ──────────────────────────────────────
-const PERC_CATS = ['Audience', 'Intent', 'Industry', 'Use Case', 'Perception', 'Sentiment']
-const PERC_YOURS = ['SMB', 'Ease of use', 'Fast implementation']
-const PERC_COMP = ['Enterprise', 'Security', 'Scalability']
-
-function Hl({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      style={{
-        background: 'var(--positive-bg)',
-        borderRadius: 4,
-        padding: '1px 4px',
-        boxDecorationBreak: 'clone',
-        WebkitBoxDecorationBreak: 'clone'
-      }}
-    >
-      {children}
-    </span>
-  )
-}
-
+// ── Mock 02 · Brand Perception — static image of the design spec ────
 function MockPerception() {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.15fr 0.7fr 1fr', gap: 14, height: '100%', overflow: 'hidden' }}>
-      {/* col 1 — tagged AI answer */}
-      <div style={{ display: 'flex', flexDirection: 'column', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--white)', padding: 14, overflow: 'hidden' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-          <span
-            style={{
-              height: 20,
-              width: 20,
-              borderRadius: 999,
-              background: 'var(--ink-surface, var(--ink))',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <span style={{ height: 7, width: 7, borderRadius: 999, background: 'var(--on-ink)' }} />
-          </span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-50)' }}>
-            Tagged AI response
-          </span>
-        </span>
-        <p style={{ margin: '12px 0 0', fontSize: '0.82rem', lineHeight: 1.7, color: 'var(--ink-80, var(--ink-70))' }}>
-          Best CRM for a growing SaaS team? Often recommended for <Hl>small and mid-sized businesses</Hl> because it combines <Hl>CRM, marketing automation</Hl> in a <Hl>single platform</Hl>.
-        </p>
-        <div style={{ marginTop: 'auto', paddingTop: 12, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-          {['Audience', 'Use case', 'Perception'].map((k) => (
-            <span
-              key={k}
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.58rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.06em',
-                color: 'var(--ink-60)',
-                background: 'var(--subtle)',
-                border: '1px solid var(--line)',
-                borderRadius: 999,
-                padding: '3px 8px'
-              }}
-            >
-              {k}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* col 2 — Clovion analyzes → categories */}
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <span style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--ink-70)', lineHeight: 1.4 }}>Clovion tags every AI response</span>
-        <span
-          aria-hidden
-          style={{
-            margin: '10px 0',
-            height: 1,
-            background: 'linear-gradient(90deg, var(--positive), transparent)'
-          }}
-        />
-        <div style={{ display: 'grid', gap: 6 }}>
-          {PERC_CATS.map((c) => (
-            <span
-              key={c}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.68rem',
-                color: 'var(--ink-70)',
-                padding: '4px 9px',
-                borderRadius: 7,
-                background: 'var(--ink-04)',
-                border: '1px solid var(--line)'
-              }}
-            >
-              <span style={{ height: 5, width: 5, borderRadius: 999, background: 'var(--positive)' }} />
-              {c}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* col 3 — perception insights */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 0 }}>
-        <div>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--positive)', fontWeight: 600 }}>
-            You&rsquo;re associated with
-          </span>
-          <div style={{ marginTop: 9, display: 'flex', flexDirection: 'column', gap: 7 }}>
-            {PERC_YOURS.map((p) => (
-              <span key={p} style={{ display: 'flex', alignItems: 'center', gap: 9, fontSize: '0.82rem', color: 'var(--ink-80, var(--ink-70))' }}>
-                <MiniCheck size={17} />
-                {p}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div style={{ borderTop: '1px solid var(--line)', paddingTop: 11 }}>
-          <span style={{ fontSize: '0.74rem', fontWeight: 600, color: 'var(--ink-60)' }}>Competitors own</span>
-          <div style={{ marginTop: 9, display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {PERC_COMP.map((c) => (
-              <span
-                key={c}
-                style={{
-                  fontSize: '0.76rem',
-                  fontWeight: 600,
-                  color: 'var(--ink-70)',
-                  background: 'var(--ink-04)',
-                  border: '1px solid var(--line)',
-                  borderRadius: 999,
-                  padding: '4px 11px'
-                }}
-              >
-                {c}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div
-          style={{
-            marginTop: 'auto',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: 9,
-            padding: 11,
-            borderRadius: 10,
-            background: 'var(--positive-bg)',
-            border: '1px solid var(--positive-border)'
-          }}
-        >
-          <OppBulb />
-          <span style={{ fontSize: '0.74rem', lineHeight: 1.4, color: 'var(--ink-80, var(--ink-70))' }}>
-            Strengthen authority around <strong style={{ color: 'var(--ink)' }}>security</strong> &amp; <strong style={{ color: 'var(--ink)' }}>scalability</strong> to win enterprise prompts.
-          </span>
-        </div>
-      </div>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <Image
+        src="/home/brand-perception.png"
+        alt="Brand Perception — how AI describes your brand across audiences, industries, and use cases"
+        width={1834}
+        height={961}
+        priority={false}
+        loading="lazy"
+        quality={95}
+        sizes="(max-width: 1000px) 100vw, 60vw"
+        unoptimized
+        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+      />
     </div>
   )
 }
@@ -564,7 +422,8 @@ const PILLARS: Pillar[] = [
     tint: '#ecfdf5',
     fg: '#047857',
     glyph: G.face,
-    Mock: MockPerception
+    Mock: MockPerception,
+    mockAspect: '1834 / 961'
   },
   {
     sku: '03 — Competitive',
