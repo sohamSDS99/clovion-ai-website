@@ -72,7 +72,7 @@ export function Loop() {
               textWrap: 'balance'
             }}
           >
-            Every AI answer is a signal. Clovion connects prompt tracking, sentiment analysis, competitor intelligence, GEO recommendations, and AI crawlability into one workflow for improving AI search visibility.
+            Every AI answer is a signal. Clovion connects tracking, intelligence, and recommendations into one workflow for AI visibility.
           </p>
         </div>
 
@@ -87,18 +87,7 @@ export function Loop() {
                 background: 'rgba(255,255,255,0.03)'
               }}
             >
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.7rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.14em',
-                    color: 'var(--on-ink-50)'
-                  }}
-                >
-                  Node 0{i + 1}
-                </span>
+              <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <span
                   style={{
                     fontFamily: 'var(--font-mono)',
