@@ -136,10 +136,15 @@ function normalizeDomain(input: string) {
     .replace(/^www\./, '')
     .replace(/\/+$/, '')
 }
+// Mirror the backend validation so we don't round-trip obviously-invalid
+// domains and return a generic 400. Reject IPs, localhost, RFC1918 ranges,
+// missing TLD, length > 253.
 function isValidDomain(d: string) {
   if (!d || d.length > 253) return false
   if (/\s/.test(d)) return false
-  if (!d.includes('.')) return false
+  if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(d)) return false
+  if (/^\d+\.\d+\.\d+\.\d+/.test(d)) return false
+  if (/^(localhost|127\.|10\.|172\.(1[6-9]|2\d|3[01])\.|192\.168\.)/i.test(d)) return false
   return true
 }
 
@@ -439,7 +444,10 @@ function Hero({
               >
                 <button
                   type="button"
+                  disabled={stage === 'analyzing'}
                   onClick={() => {
+                    if (stage === 'analyzing') return
+                    setError('')
                     setDomain('notion.so')
                     setSubmittedDomain('notion.so')
                     setStage('analyzing')
@@ -454,8 +462,9 @@ function Hero({
                     border: '1px solid var(--line)',
                     borderRadius: 999,
                     padding: '6px 14px',
-                    cursor: 'pointer',
-                    background: 'transparent'
+                    cursor: stage === 'analyzing' ? 'not-allowed' : 'pointer',
+                    background: 'transparent',
+                    opacity: stage === 'analyzing' ? 0.5 : 1
                   }}
                 >
                   Try: notion.so <ArrowRight size={12} />
@@ -539,9 +548,9 @@ function Hero({
 
           <ScoreDial
             stage={stage}
-            score={scanResult?.score ?? SCORE}
-            subscoreSummary={(scanResult?.subscores ?? SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
-            platforms={scanResult?.platforms ?? PLATFORMS}
+            score={typeof scanResult?.score === 'number' ? scanResult.score : SCORE}
+            subscoreSummary={(scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
+            platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS}
             submittedDomain={submittedDomain}
             stepIndex={stepIndex}
           />
@@ -1173,7 +1182,7 @@ export default function FeatureContent() {
           'Citation Strength: how often your domain is cited as a source.',
           'Competitive Position: your share of voice against the top three rivals.'
         ]}
-        visual={<SubscoreCards subscores={scanResult?.subscores ?? SUBSCORES} />}
+        visual={<SubscoreCards subscores={scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES} />}
       />
 
       <FeatureBlock
@@ -1191,12 +1200,12 @@ export default function FeatureContent() {
           'Perplexity for cited, source-linked answers.',
           'Google AI Overviews for generative results inside search.'
         ]}
-        visual={<PlatformPanel platforms={scanResult?.platforms ?? PLATFORMS} />}
+        visual={<PlatformPanel platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS} />}
       />
 
-      <RealPrompts prompts={scanResult?.prompts ?? SAMPLE_PROMPTS} />
+      <RealPrompts prompts={scanResult?.prompts && scanResult.prompts.length > 0 ? scanResult.prompts : SAMPLE_PROMPTS} />
       <RecommendationsSection
-        recommendations={scanResult?.recommendations ?? RECOMMENDATIONS}
+        recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
       />
       <MetricsBand />
       <FAQ />

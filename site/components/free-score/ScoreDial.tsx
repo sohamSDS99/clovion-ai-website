@@ -62,7 +62,10 @@ export default function ScoreDial({
   stepIndex
 }: Props) {
   const filled = stage === 'result'
-  const displayedScore = useCountUp(score, filled, 1200)
+  // Clamp to [0,100] and guard against NaN/undefined/Infinity. Without
+  // this the arc math goes negative or NaN and the dial fails to render.
+  const clampedScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0
+  const displayedScore = useCountUp(clampedScore, filled, 1200)
 
   // Arc math
   const RADIUS = 130
@@ -70,7 +73,7 @@ export default function ScoreDial({
   const CIRC = 2 * Math.PI * RADIUS
   const ARC_FRACTION = 0.75
   const ARC_LEN = CIRC * ARC_FRACTION
-  const fillLen = filled ? ARC_LEN * (score / 100) : 0
+  const fillLen = filled ? ARC_LEN * (clampedScore / 100) : 0
 
   const label = stage === 'idle'
     ? 'Awaiting domain'

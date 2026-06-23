@@ -37,8 +37,17 @@ function useReveal(): [React.RefObject<HTMLDivElement>, boolean] {
   return [ref, on]
 }
 
+// Escape regex special chars before constructing the highlight RegExp.
+// Without this, brand names containing characters like "." or "+" (e.g.
+// "Booking.com") throw or mis-match.
+const REGEX_ESCAPE = /[.*+?^${}()|[\]\\]/g
+function escapeForRegex(s: string): string {
+  return s.replace(REGEX_ESCAPE, '\\$&')
+}
+
 function HighlightedExcerpt({ text, brand }: { text: string; brand: string }) {
-  const parts = text.split(new RegExp(`(${brand})`, 'gi'))
+  if (!brand || !text) return <span>{text || ''}</span>
+  const parts = text.split(new RegExp(`(${escapeForRegex(brand)})`, 'gi'))
   return (
     <span>
       {parts.map((part, i) =>
