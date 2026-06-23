@@ -363,12 +363,12 @@ const RANK_ROWS = [
 ]
 const NEG = '#fb7185'
 
-function CompDot({ t }: { t: string }) {
+function CompBadge({ t }: { t: string }) {
   return (
     <span
       style={{
-        height: 18,
-        width: 18,
+        height: 22,
+        width: 22,
         borderRadius: 999,
         background: 'var(--ink-07)',
         border: '1px solid var(--line)',
@@ -376,9 +376,9 @@ function CompDot({ t }: { t: string }) {
         alignItems: 'center',
         justifyContent: 'center',
         fontFamily: 'var(--font-mono)',
-        fontSize: '0.52rem',
+        fontSize: '0.6rem',
         fontWeight: 600,
-        color: 'var(--ink-50)'
+        color: 'var(--ink-60)'
       }}
     >
       {t}
@@ -386,117 +386,197 @@ function CompDot({ t }: { t: string }) {
   )
 }
 
+function RangePill({ d, active }: { d: string; active: boolean }) {
+  return (
+    <span
+      style={{
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.58rem',
+        fontWeight: 600,
+        padding: '4px 9px',
+        borderRadius: 999,
+        background: active ? 'var(--ink)' : 'transparent',
+        color: active ? 'var(--on-ink, var(--white))' : 'var(--ink-60)',
+        transition: 'background 0.25s ease, color 0.25s ease'
+      }}
+    >
+      {d}
+    </span>
+  )
+}
+
 function MockRankings() {
   const max = 28.4
+  const [animated, setAnimated] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setAnimated(true), 120)
+    return () => clearTimeout(t)
+  }, [])
+
+  const cols = '1.55fr 0.42fr 0.34fr 0.34fr 0.34fr 0.34fr 1.3fr'
+
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1.55fr 0.9fr', gap: 16, height: '100%', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 9 }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-50)' }}>
-            Rankings by topic
-          </span>
-          <span style={{ display: 'inline-flex', gap: 5 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-60)', background: 'var(--ink-04)', border: '1px solid var(--line)', borderRadius: 999, padding: '3px 8px', whiteSpace: 'nowrap' }}>
-              May 12 – Jun 11
-            </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-60)', background: 'var(--ink-04)', border: '1px solid var(--line)', borderRadius: 999, padding: '3px 8px', whiteSpace: 'nowrap' }}>
-              All engines
-            </span>
-          </span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.45fr 0.85fr 1.2fr', padding: '0 2px 8px', fontFamily: 'var(--font-mono)', fontSize: '0.58rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', borderBottom: '1px solid var(--line)' }}>
-          <span>Topic</span>
-          <span>Rank</span>
-          <span>Top 4</span>
-          <span style={{ textAlign: 'right' }}>Share</span>
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {RANK_ROWS.map((r) => (
-            <div
-              key={r.topic}
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 10, overflow: 'hidden', minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div style={{ minWidth: 0 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <span
+              aria-hidden
               style={{
-                display: 'grid',
-                gridTemplateColumns: '1.5fr 0.45fr 0.85fr 1.2fr',
+                height: 14,
+                width: 14,
+                borderRadius: 3,
+                background: 'var(--ink)',
+                display: 'inline-flex',
                 alignItems: 'center',
-                gap: 6,
-                padding: '0 2px',
-                flex: 1,
-                borderBottom: '1px solid var(--line)'
+                justifyContent: 'center',
+                color: 'var(--on-ink, var(--white))',
+                fontSize: '0.55rem',
+                fontWeight: 700
               }}
             >
-              <span style={{ minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {r.topic}
-                </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', fontWeight: 600, color: r.tag === 'Strong' ? 'var(--positive)' : 'var(--ink-50)' }}>
-                  {r.tag}
-                </span>
-              </span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
-                {r.rank}
-              </span>
-              <span style={{ display: 'inline-flex', gap: 3 }}>
-                {r.comp.map((c, ci) => (
-                  <CompDot key={ci} t={c} />
-                ))}
-              </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'flex-end' }}>
-                <span style={{ flex: 1, height: 6, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden', minWidth: 22 }}>
-                  <span
-                    style={{
-                      display: 'block',
-                      height: '100%',
-                      width: `${(r.share / max) * 100}%`,
-                      borderRadius: 999,
-                      background: r.tag === 'Strong' ? 'var(--positive)' : 'var(--ink-40)'
-                    }}
-                  />
-                </span>
-                <span style={{ width: 34, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
-                  {r.share}%
-                </span>
-                <span style={{ width: 38, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.68rem', fontWeight: 600, color: r.up ? 'var(--positive)' : NEG, fontVariantNumeric: 'tabular-nums' }}>
-                  {r.delta}pp
-                </span>
-              </span>
-            </div>
-          ))}
+              ★
+            </span>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600, color: 'var(--ink)' }}>
+              Visibility Ranking by Topic
+            </span>
+          </span>
+          <p style={{ margin: '4px 0 0', fontSize: '0.62rem', color: 'var(--ink-50)', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            SDS Manager rankings vs Chemical Compliance Software brands
+          </p>
+        </div>
+        <div style={{ flexShrink: 0, display: 'inline-flex', gap: 2, padding: 2, borderRadius: 999, background: 'var(--ink-04)', border: '1px solid var(--line)' }}>
+          <RangePill d="7d" active={false} />
+          <RangePill d="30d" active={true} />
+          <RangePill d="90d" active={false} />
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 9, minWidth: 0 }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-50)' }}>
-          Insights &amp; opportunities
-        </span>
-        <div style={{ padding: '10px 11px', borderRadius: 10, background: 'var(--positive-bg)', border: '1px solid var(--positive-border)' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: 'var(--positive)' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: cols, gap: 6, padding: '0 4px 6px', fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', borderBottom: '1px solid var(--line)' }}>
+          <span>Topics</span>
+          <span style={{ textAlign: 'center' }}>Your Brand</span>
+          <span style={{ textAlign: 'center' }}>#2</span>
+          <span style={{ textAlign: 'center' }}>#3</span>
+          <span style={{ textAlign: 'center' }}>#4</span>
+          <span style={{ textAlign: 'center' }}>#5</span>
+          <span style={{ textAlign: 'right' }}>Visibility Share</span>
+        </div>
+        {RANK_ROWS.map((r, i) => (
+          <div
+            key={r.topic}
+            style={{
+              display: 'grid',
+              gridTemplateColumns: cols,
+              gap: 6,
+              alignItems: 'center',
+              padding: '0 4px',
+              flex: 1,
+              borderBottom: '1px solid var(--line)',
+              opacity: animated ? 1 : 0,
+              transform: animated ? 'translateY(0)' : 'translateY(6px)',
+              transition: 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+              transitionDelay: `${i * 70}ms`
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', lineHeight: 1.2 }}>
+                {r.topic}
+              </span>
+              <span
+                style={{
+                  display: 'inline-block',
+                  marginTop: 3,
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.52rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.04em',
+                  textTransform: 'uppercase',
+                  padding: '2px 7px',
+                  borderRadius: 999,
+                  background: r.tag === 'Strong' ? 'var(--positive-bg)' : 'rgba(251,113,133,0.12)',
+                  color: r.tag === 'Strong' ? 'var(--positive)' : NEG,
+                  border: `1px solid ${r.tag === 'Strong' ? 'var(--positive-border)' : 'rgba(251,113,133,0.30)'}`
+                }}
+              >
+                {r.tag}
+              </span>
+            </div>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', textAlign: 'center' }}>
+              {r.rank}
+            </span>
+            {r.comp.map((c, ci) => (
+              <span key={ci} style={{ display: 'flex', justifyContent: 'center' }}>
+                <CompBadge t={c} />
+              </span>
+            ))}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7, justifyContent: 'flex-end' }}>
+              <span style={{ flex: 1, height: 6, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden', minWidth: 22 }}>
+                <span
+                  style={{
+                    display: 'block',
+                    height: '100%',
+                    width: animated ? `${(r.share / max) * 100}%` : '0%',
+                    borderRadius: 999,
+                    background: r.tag === 'Strong' ? 'var(--positive)' : 'var(--ink-40)',
+                    transition: 'width 0.85s cubic-bezier(0.16, 1, 0.3, 1)',
+                    transitionDelay: `${260 + i * 70}ms`
+                  }}
+                />
+              </span>
+              <span style={{ width: 38, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
+                {r.share}%
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: 8,
+          opacity: animated ? 1 : 0,
+          transform: animated ? 'translateY(0)' : 'translateY(8px)',
+          transition: 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          transitionDelay: `${260 + RANK_ROWS.length * 70}ms`
+        }}
+      >
+        <div style={{ padding: '8px 10px', borderRadius: 10, background: 'var(--positive-bg)', border: '1px solid var(--positive-border)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: 'var(--positive)' }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <polygon points="12 2 15 9 22 9 17 14 19 22 12 17 5 22 7 14 2 9 9 9 12 2" />
+            </svg>
             Where you win
-          </span>
-          <p style={{ margin: '5px 0 0', fontSize: '0.74rem', lineHeight: 1.4, color: 'var(--ink-80, var(--ink-70))' }}>
+          </div>
+          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
             Top 2 on <strong style={{ color: 'var(--ink)' }}>Repository</strong> &amp; <strong style={{ color: 'var(--ink)' }}>SDS Management</strong>.
           </p>
         </div>
-        <div style={{ padding: '10px 11px', borderRadius: 10, background: 'rgba(251,113,133,0.10)', border: '1px solid rgba(251,113,133,0.30)' }}>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: NEG }}>
-            Where you lose
-          </span>
-          <p style={{ margin: '5px 0 0', fontSize: '0.74rem', lineHeight: 1.4, color: 'var(--ink-80, var(--ink-70))' }}>
-            Competitors dominate <strong style={{ color: 'var(--ink)' }}>Audit Readiness</strong>.
+        <div style={{ padding: '8px 10px', borderRadius: 10, background: 'var(--ink-04)', border: '1px solid var(--line)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: 'var(--ink)' }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+            Top opportunity
+          </div>
+          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
+            Close the gap on <strong style={{ color: 'var(--ink)' }}>Audit Readiness</strong> first.
           </p>
         </div>
-        <div style={{ marginTop: 'auto', display: 'flex', gap: 8 }}>
-          <div style={{ flex: 1, padding: '9px 10px', borderRadius: 10, background: 'var(--subtle)', border: '1px solid var(--line)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--positive)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-              +18.7%
-            </div>
-            <div style={{ marginTop: 5, fontSize: '0.62rem', color: 'var(--ink-60)', lineHeight: 1.2 }}>Potential gain</div>
+        <div style={{ padding: '8px 10px', borderRadius: 10, background: 'rgba(251,113,133,0.10)', border: '1px solid rgba(251,113,133,0.30)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontFamily: 'var(--font-mono)', fontSize: '0.54rem', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, color: NEG }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <polyline points="19 12 12 19 5 12" />
+            </svg>
+            Where you lose
           </div>
-          <div style={{ flex: 1, padding: '9px 10px', borderRadius: 10, background: 'var(--subtle)', border: '1px solid var(--line)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-              1.6x
-            </div>
-            <div style={{ marginTop: 5, fontSize: '0.62rem', color: 'var(--ink-60)', lineHeight: 1.2 }}>More likely cited</div>
-          </div>
+          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', lineHeight: 1.35, color: 'var(--ink-80, var(--ink-70))' }}>
+            Competitors dominate <strong style={{ color: 'var(--ink)' }}>Audit Readiness</strong>.
+          </p>
         </div>
       </div>
     </div>
