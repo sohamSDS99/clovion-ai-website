@@ -29,7 +29,7 @@ export function Loop() {
       className="py-16 md:py-28"
       style={{
         position: 'relative',
-        background: 'var(--ink-surface, var(--ink))',
+        background: 'linear-gradient(to bottom, var(--bg) 0%, var(--ink-surface) 8%, var(--ink-surface) 92%, var(--bg) 100%)',
         color: 'var(--on-ink)',
         overflow: 'hidden'
       }}

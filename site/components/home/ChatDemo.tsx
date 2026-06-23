@@ -378,7 +378,7 @@ export function ChatDemo() {
         style={{
           position: 'relative',
           padding: '4rem 0 5rem',
-          background: 'radial-gradient(120% 70% at 50% 26%, #14141c 0%, #17171c 62%)'
+          background: 'linear-gradient(to bottom, var(--bg) 0%, transparent 8%, transparent 92%, var(--bg) 100%), radial-gradient(120% 70% at 50% 26%, #14141c 0%, #17171c 62%)'
         }}
       >
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center', padding: '0 1.25rem 2rem' }}>
@@ -587,7 +587,7 @@ export function ChatDemo() {
       style={{
         position: 'relative',
         height: '500vh',
-        background: 'radial-gradient(120% 70% at 50% 26%, #14141c 0%, #17171c 62%)'
+        background: 'linear-gradient(to bottom, var(--bg) 0%, transparent 4%, transparent 96%, var(--bg) 100%), radial-gradient(120% 70% at 50% 26%, #14141c 0%, #17171c 62%)'
       }}
     >
       <div

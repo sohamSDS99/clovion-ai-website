@@ -51,9 +51,7 @@ export function LogoMarquee() {
     <section
       className="py-10 md:py-14"
       style={{
-        background: 'var(--subtle)',
-        borderTop: '1px solid var(--line)',
-        borderBottom: '1px solid var(--line)'
+        background: 'linear-gradient(to bottom, var(--bg) 0%, var(--subtle) 14%, var(--subtle) 86%, var(--bg) 100%)'
       }}
     >
       <Container>

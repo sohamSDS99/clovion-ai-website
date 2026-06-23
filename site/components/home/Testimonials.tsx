@@ -35,7 +35,7 @@ function initials(name: string) {
 
 export function Testimonials() {
   return (
-    <section style={{ padding: 'var(--section) 0', background: 'var(--subtle)' }}>
+    <section style={{ padding: 'var(--section) 0', background: 'linear-gradient(to bottom, var(--bg) 0%, var(--subtle) 8%, var(--subtle) 92%, var(--bg) 100%)' }}>
       <Container>
         <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 48px' }}>
           <span
