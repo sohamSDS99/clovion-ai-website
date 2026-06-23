@@ -360,8 +360,8 @@ function MockRankings() {
       <Image
         src="/home/visibility-ranking.png"
         alt="Visibility Ranking by Topic — SDS Manager rankings vs Chemical Compliance Software brands"
-        width={1920}
-        height={1280}
+        width={1821}
+        height={898}
         priority={false}
         loading="lazy"
         quality={95}
@@ -577,7 +577,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bars,
     Mock: MockRankings,
-    mockAspect: '1920 / 1280'
+    mockAspect: '1821 / 898'
   },
   {
     sku: '04 — Recommendations',
