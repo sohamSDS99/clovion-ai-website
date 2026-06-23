@@ -537,6 +537,7 @@ type Pillar = {
   fg: string
   glyph: ReactElement
   Mock: () => ReactElement
+  mockAspect?: string
 }
 
 const PILLARS: Pillar[] = [
@@ -550,7 +551,8 @@ const PILLARS: Pillar[] = [
     tint: '#ecfdf5',
     fg: '#047857',
     glyph: G.track,
-    Mock: MockVisibility
+    Mock: MockVisibility,
+    mockAspect: '1880 / 1075'
   },
   {
     sku: '02 — Perception',
@@ -574,7 +576,8 @@ const PILLARS: Pillar[] = [
     tint: '#ecfdf5',
     fg: '#047857',
     glyph: G.bars,
-    Mock: MockRankings
+    Mock: MockRankings,
+    mockAspect: '1920 / 1280'
   },
   {
     sku: '04 — Recommendations',
@@ -667,9 +670,7 @@ function PillarItem({
 
 function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
   const Mock = s.Mock
-  // Visibility pillar is full-bleed: no internal headline/subtitle/link
-  // chrome — the dashboard slideshow IS the visual, edge to edge.
-  const isFullBleed = s.sku.startsWith('01 ')
+  const isFullBleed = !!s.mockAspect
   return (
     <div
       style={{
@@ -684,8 +685,8 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
     >
       <div
         style={{
-          ...(isFullBleed
-            ? { width: '100%', aspectRatio: '1880 / 1075', maxHeight: '100%' }
+          ...(isFullBleed && s.mockAspect
+            ? { width: '100%', aspectRatio: s.mockAspect, maxHeight: '100%' }
             : { height: '100%' }),
           borderRadius: 22,
           border: '1px solid var(--line)',
