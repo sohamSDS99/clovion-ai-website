@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties, type ReactElement } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Container, ArrowRight } from '@/components/ui'
 
@@ -88,126 +89,107 @@ function MiniCheck({ size = 18 }: { size?: number }) {
   )
 }
 
-// ── Mock 01 · AI Visibility Insights ─────────────────────────────────
-const VIS_ENGINES = [
-  { e: 'ChatGPT', v: 12.3, d: 22 },
-  { e: 'Perplexity', v: 7.6, d: 15 },
-  { e: 'Gemini', v: 6.1, d: 9 },
-  { e: 'Claude', v: 4.8, d: 11 },
-  { e: 'Copilot', v: 3.2, d: 7 }
+// ── Mock 01 · AI Visibility Insights — animated 4-frame slideshow ──
+//
+// Auto-cycles through 4 hi-res Figma exports (1880×1075 PNGs, ~1.75:1
+// — tightly cropped to the dashboard card so content reads larger).
+// Container locks to the same aspect ratio so the full picture is always
+// visible — no cropping. Full cycle ~3.2s (800ms per frame).
+// Source images at /public/home/visibility-frame-{1..4}-*.png.
+
+const VIS_FRAMES = [
+  { id: 'engine', src: '/home/visibility-frame-1-engine.png', alt: 'AI Visibility Insights — By AI Engine' },
+  { id: 'audience', src: '/home/visibility-frame-2-audience.png', alt: 'AI Visibility Insights — By Audience' },
+  { id: 'intent', src: '/home/visibility-frame-3-intent.png', alt: 'AI Visibility Insights — By Intent' },
+  { id: 'topic', src: '/home/visibility-frame-4-topic.png', alt: 'AI Visibility Insights — By Topic' }
 ]
-const VIS_TABS = ['By AI Engine', 'By Audience', 'By Intent', 'By Topic']
-const VIS_OPPS = [
-  'Increase visibility in enterprise-focused prompts where competitors appear more often.',
-  'Improve presence on Gemini and Copilot for project-management use cases.'
-]
+
+const VIS_HOLD_MS = 800
+const VIS_FADE = '0.5s cubic-bezier(0.4, 0.0, 0.2, 1)'
+const VIS_BLUR = '0.4s cubic-bezier(0.4, 0.0, 0.2, 1)'
 
 function MockVisibility() {
-  const max = 12.3
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [reduce, setReduce] = useState(false)
+  const [hover, setHover] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  }, [])
+
+  useEffect(() => {
+    if (reduce || hover) return
+    const id = setInterval(() => setActiveIdx((i) => (i + 1) % VIS_FRAMES.length), VIS_HOLD_MS)
+    return () => clearInterval(id)
+  }, [reduce, hover])
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', gap: 10, overflow: 'hidden' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 9 }}>
-          <span
-            style={{
-              height: 24,
-              width: 24,
-              borderRadius: 7,
-              background: 'var(--positive-bg)',
-              border: '1px solid var(--positive-border)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--positive)'
-            }}
-          >
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" aria-hidden>
-              <path d="M4 20V11h3.5v9H4zm6.25 0V4h3.5v16h-3.5zM16.5 20v-6H20v6h-3.5z" />
-            </svg>
-          </span>
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.66rem', textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600, color: 'var(--ink)' }}>
-            AI Visibility Insights
-          </span>
-        </span>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--ink-50)', whiteSpace: 'nowrap' }}>
-          12,540 prompts · 6 engines
-        </span>
-      </div>
-
-      <div style={{ display: 'flex', gap: 8 }}>
-        <StatTile value="2.4K" label="Total mentions" />
-        <StatTile value="8.7%" label="Visibility share" />
-        <StatTile value="#3.6" label="Avg. position" />
-        <StatTile value="+18%" label="vs last 30 days" pos />
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, borderTop: '1px solid var(--line)', paddingTop: 10 }}>
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-50)', whiteSpace: 'nowrap' }}>
-          Visibility breakdown
-        </span>
-        <span style={{ display: 'inline-flex', gap: 5 }}>
-          {VIS_TABS.map((t, i) => (
-            <span
-              key={t}
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        // Full-bleed inside the parent card — no padding, no negative
+        // margin tricks; the parent in MockPanel renders us in a clean
+        // edge-to-edge slot when isFullBleed is true.
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          aspectRatio: '1880 / 1075',
+          maxHeight: '100%',
+          background: '#ffffff',
+          overflow: 'hidden'
+        }}
+      >
+        {VIS_FRAMES.map((f, i) => {
+          const on = i === activeIdx
+          return (
+            <Image
+              key={f.id}
+              src={f.src}
+              alt={f.alt}
+              width={1880}
+              height={1075}
+              priority={i === 0}
+              loading={i === 0 ? 'eager' : 'lazy'}
+              quality={95}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1100px"
+              placeholder="empty"
+              unoptimized
               style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.68rem',
-                fontWeight: 600,
-                padding: '3px 9px',
-                borderRadius: 999,
-                whiteSpace: 'nowrap',
-                background: i === 0 ? 'var(--ink-07)' : 'transparent',
-                border: `1px solid ${i === 0 ? 'var(--line)' : 'transparent'}`,
-                color: i === 0 ? 'var(--ink)' : 'var(--ink-50)'
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                // Source aspect (1.5) matches container aspect — `contain`
+                // shows the full picture with zero crop and zero letterbox.
+                objectFit: 'contain',
+                objectPosition: 'center',
+                opacity: on ? 1 : 0,
+                transform: reduce ? 'none' : on ? 'scale(1)' : 'scale(1.006)',
+                filter: reduce ? 'none' : on ? 'blur(0px)' : 'blur(2px)',
+                transition: reduce
+                  ? 'none'
+                  : `opacity ${VIS_FADE}, transform ${VIS_FADE}, filter ${VIS_BLUR}`,
+                willChange: 'opacity, transform'
               }}
-            >
-              {t}
-            </span>
-          ))}
-        </span>
-      </div>
-
-      <div style={{ display: 'grid', gap: 6 }}>
-        {VIS_ENGINES.map((r, i) => (
-          <div key={r.e} style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
-            <span style={{ width: 70, flexShrink: 0, fontSize: '0.8rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{r.e}</span>
-            <span style={{ flex: 1, height: 7, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden' }}>
-              <span
-                style={{
-                  display: 'block',
-                  height: '100%',
-                  width: `${(r.v / max) * 100}%`,
-                  borderRadius: 999,
-                  background: i === 0 ? 'var(--positive)' : 'var(--ink-40)'
-                }}
-              />
-            </span>
-            <span style={{ width: 40, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.76rem', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
-              {r.v}%
-            </span>
-            <span style={{ width: 38, textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 600, color: 'var(--positive)', fontVariantNumeric: 'tabular-nums' }}>
-              ↑{r.d}%
-            </span>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ marginTop: 'auto', borderTop: '1px solid var(--line)', paddingTop: 9 }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-50)', marginBottom: 7 }}>
-          Top opportunities
-        </div>
-        <div style={{ display: 'grid', gap: 6 }}>
-          {VIS_OPPS.map((o, i) => (
-            <span key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9 }}>
-              <OppBulb />
-              <span style={{ fontSize: '0.78rem', lineHeight: 1.4, color: 'var(--ink-70)' }}>{o}</span>
-            </span>
-          ))}
-        </div>
+            />
+          )
+        })}
       </div>
     </div>
   )
 }
+
 
 // ── Mock 02 · Brand Perception ──────────────────────────────────────
 const PERC_CATS = ['Audience', 'Intent', 'Industry', 'Use Case', 'Perception', 'Sentiment']
@@ -815,6 +797,9 @@ function PillarItem({
 
 function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
   const Mock = s.Mock
+  // Visibility pillar is full-bleed: no internal headline/subtitle/link
+  // chrome — the dashboard slideshow IS the visual, edge to edge.
+  const isFullBleed = s.sku.startsWith('01 ')
   return (
     <div
       style={{
@@ -823,12 +808,15 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
         opacity: show ? 1 : 0,
         transform: show ? 'none' : 'translateY(14px) scale(0.985)',
         transition: 'opacity 0.5s ease, transform 0.55s var(--ease-out-expo)',
-        pointerEvents: show ? 'auto' : 'none'
+        pointerEvents: show ? 'auto' : 'none',
+        ...(isFullBleed ? { display: 'flex', alignItems: 'flex-start', justifyContent: 'center', paddingTop: 32 } : {})
       }}
     >
       <div
         style={{
-          height: '100%',
+          ...(isFullBleed
+            ? { width: '100%', aspectRatio: '1880 / 1075', maxHeight: '100%' }
+            : { height: '100%' }),
           borderRadius: 22,
           border: '1px solid var(--line)',
           background: 'var(--white)',
@@ -838,46 +826,54 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
           flexDirection: 'column'
         }}
       >
-        <div style={{ padding: '26px 28px 18px' }}>
-          <h3
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(1.5rem, 2.2vw, 2rem)',
-              fontWeight: 600,
-              letterSpacing: '-0.02em',
-              lineHeight: 1.08,
-              margin: 0,
-              textWrap: 'balance',
-              color: 'var(--ink)'
-            }}
-          >
-            {s.headline}
-          </h3>
-          <p style={{ margin: '12px 0 0', fontSize: '0.95rem', fontWeight: 400, lineHeight: 1.55, color: 'var(--ink-70)', maxWidth: 560 }}>
-            {s.body}
-          </p>
-          <Link
-            href="/features"
-            className="mt-4 inline-flex items-center gap-1.5"
-            style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)', textDecoration: 'none' }}
-          >
-            {s.link} <ArrowRight />
-          </Link>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            margin: '0 18px 18px',
-            borderRadius: 14,
-            border: '1px solid var(--line)',
-            background: 'var(--subtle)',
-            padding: 16,
-            overflow: 'hidden'
-          }}
-        >
-          <Mock />
-        </div>
+        {isFullBleed ? (
+          <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <Mock />
+          </div>
+        ) : (
+          <>
+            <div style={{ padding: '26px 28px 18px' }}>
+              <h3
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(1.5rem, 2.2vw, 2rem)',
+                  fontWeight: 600,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.08,
+                  margin: 0,
+                  textWrap: 'balance',
+                  color: 'var(--ink)'
+                }}
+              >
+                {s.headline}
+              </h3>
+              <p style={{ margin: '12px 0 0', fontSize: '0.95rem', fontWeight: 400, lineHeight: 1.55, color: 'var(--ink-70)', maxWidth: 560 }}>
+                {s.body}
+              </p>
+              <Link
+                href="/features"
+                className="mt-4 inline-flex items-center gap-1.5"
+                style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--ink)', textDecoration: 'none' }}
+              >
+                {s.link} <ArrowRight />
+              </Link>
+            </div>
+            <div
+              style={{
+                flex: 1,
+                minHeight: 0,
+                margin: '0 18px 18px',
+                borderRadius: 14,
+                border: '1px solid var(--line)',
+                background: 'var(--subtle)',
+                padding: 16,
+                overflow: 'hidden'
+              }}
+            >
+              <Mock />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
@@ -1001,14 +997,14 @@ export function PillarStepper() {
   }
 
   const Heading = (
-    <div style={{ maxWidth: 880, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center', marginBottom: narrow ? 36 : 'clamp(18px, 2.6vh, 32px)' }}>
+    <div style={{ maxWidth: 880, marginLeft: 'auto', marginRight: 'auto', textAlign: 'center', marginBottom: narrow ? 56 : 'clamp(40px, 5vh, 72px)' }}>
       <h2
         style={{
           fontFamily: 'var(--font-display)',
           fontSize: 'var(--display-md)',
           fontWeight: 600,
           letterSpacing: 'var(--track-display-md)',
-          lineHeight: 1.05,
+          lineHeight: 1.2,
           margin: 0,
           textWrap: 'balance',
           color: 'var(--ink)'
@@ -1018,10 +1014,10 @@ export function PillarStepper() {
       </h2>
       <p
         style={{
-          fontSize: '0.95rem',
-          lineHeight: 1.45,
+          fontSize: '1.075rem',
+          lineHeight: 1.5,
           color: 'var(--ink-70)',
-          marginTop: 12,
+          marginTop: 16,
           marginLeft: 'auto',
           marginRight: 'auto',
           maxWidth: 1020,
@@ -1070,7 +1066,8 @@ export function PillarStepper() {
             height: '100vh',
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
+            paddingTop: 'clamp(96px, 16vh, 180px)',
             overflow: 'hidden'
           }}
         >
@@ -1080,7 +1077,10 @@ export function PillarStepper() {
               style={
                 {
                   display: 'grid',
-                  gridTemplateColumns: 'minmax(240px, 0.5fr) 1.5fr',
+                  // Right column widened (Option A) so the visibility-insights
+                  // slideshow has more room. Pillars list keeps a comfortable
+                  // minimum of 220px to stay readable.
+                  gridTemplateColumns: 'minmax(220px, 0.32fr) 1.68fr',
                   gap: 44,
                   alignItems: 'center'
                 } as CSSProperties
@@ -1091,7 +1091,9 @@ export function PillarStepper() {
                   <PillarItem key={s.sku} s={s} i={i} active={active} prog={prog} onClick={() => goto(i)} />
                 ))}
               </div>
-              <div style={{ position: 'relative', height: 'clamp(340px, 46vh, 460px)' }}>
+              {/* Card height bumped so the visibility-insights slideshow can
+                  display the dashboard frames at a usable size. */}
+              <div style={{ position: 'relative', height: 'clamp(640px, 80vh, 880px)' }}>
                 {PILLARS.map((s, i) => (
                   <MockPanel key={s.sku} s={s} show={i === active} />
                 ))}

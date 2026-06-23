@@ -15,6 +15,7 @@ The workspace root contains a single Next.js project under `site/`. There is no 
 │   ├── app/fonts/               # local font assets (Saans-TRIAL-SemiBold.otf)
 │   ├── components/home/         # the dark homepage redesign — sections used only by /
 │   ├── public/logos/            # 13 logo assets (7 engine SVGs + 6 customer knockout PNGs)
+│   ├── public/home/             # 4 hi-res dashboard PNGs (1920×1280) for the homepage Visibility-pillar slideshow
 │   └── .env.example             # admin-console env vars template (feat branch)
 ├── railway.json                 # Railway build config (NIXPACKS builder + restart policy)
 ├── nixpacks.toml                # explicit Node 20 provisioning for the Railway build
@@ -170,17 +171,48 @@ Every "Talk to Sales" / "Talk to sales" CTA opens the Calendly **PopupWidget** (
 
 ## Free AI Visibility Score backend
 
-The `/free-ai-visibility-score` page is interactive — users type a domain, hit submit, and see a real scored breakdown. Two pieces:
+The `/free-ai-visibility-score` page is interactive — users type a domain, hit submit, and see a real scored breakdown.
 
-- **`site/app/api/free-score/route.ts`** — POST endpoint (Node runtime, `maxDuration = 60`). Reads `{ domain }` from the body, normalizes it, validates with a basic regex, then calls **OpenRouter** at `https://openrouter.ai/api/v1/chat/completions` with `model: 'openai/gpt-4o:online'`. The `:online` suffix activates OpenRouter's web-search tool — the model researches the brand in real time. One analyzer system prompt does the whole job: identify the brand + category, find top 3 competitors, score AI visibility across mention rate / sentiment / citation strength / competitive position, generate 3 buyer-style prompts with whether the brand was mentioned, write 3 prioritized recommendations. `response_format: { type: 'json_object' }` enforces JSON-only output. Returns `{ domain, result: FreeScoreResult }`. Round-trip ~11s, ~$0.05–0.15 per scan.
+### Backend — `site/app/api/free-score/route.ts`
 
-- **`components/free-score/FeatureContent.tsx`** — owns the form state (`stage`, `domain`, `submittedDomain`, `stepIndex`, `scanResult`, `scanError`). Two useEffects watch `stage === 'analyzing'`: one walks the mock step indicator (kept as loading UX), the other fires the real fetch. Fetch owns the stage transition to `'result'` (or back to `'idle'` on error). Mock step walker just holds at the last step. The hardcoded `SCORE / SUBSCORES / PLATFORMS / SAMPLE_PROMPTS / RECOMMENDATIONS` constants are still in the file but only render in the idle/analyzing placeholder — once `scanResult` populates, every mock receives real data via `scanResult?.x ?? CONSTANT_FALLBACK`.
+POST endpoint, Node runtime, `maxDuration = 60`. Hardened in commit `7f34376` after the original implementation returned identical templated scores (45 with 40/60/30/50 subscores) for any unknown brand — the model collapsed to a memory template instead of grounding in fresh web search. Current pipeline:
 
-**Env requirement.** `OPENROUTER_API_KEY` must be set in `site/.env.local` for dev and in Railway env vars for prod. Without it, the API route returns `500` with `"OPENROUTER_API_KEY not configured"`. The key is **not** committed (`.env.local` is gitignored).
+1. **Rate limit by IP first** (cheapest reject). In-memory token bucket on `globalThis.__clvIpRateLimit`, **5 req / 60s / IP**. Returns `429` with `Retry-After` header. IP comes from `x-forwarded-for` then `x-real-ip` then `'unknown'`.
+2. **Validate body** — JSON body must contain `domain: string`, non-empty.
+3. **Normalize + validate domain** — `validateDomain()` lowercases, strips protocol/www/path, then rejects: empty, length > 253, fails `/^[a-z0-9.-]+\.[a-z]{2,}$/i`, **literal IPv4 (`^\d+\.\d+\.\d+\.\d+`), localhost / RFC1918 ranges (`127.`/`10.`/`172.16-31.`/`192.168.`)**. SSRF defence — model could otherwise be told to research internal hostnames.
+4. **Cache hit** — `globalThis.__clvDomainCache` Map keyed by normalized domain, **24h TTL**. Returns `{ domain, result, cached: true }` instantly (~20ms vs ~8s fresh).
+5. **Call OpenRouter** via `callModel()` — `openai/gpt-4o` (no `:online` suffix; we use explicit `plugins: [{ id: 'web', max_results: 8 }]` so the web tool is forced per request, not a memory shortcut). Temperature 0.6 on first pass. Wrapped in `AbortController` with **25s timeout** → maps to `504`. **`JSON.stringify(domain)` in the user prompt** to neutralise newline-based prompt injection. **`MAX_RESPONSE_BYTES = 100_000`** size guard before `JSON.parse` (memory-bomb defence).
+6. **`validateShape()`** — hard checks: 4 subscores, 4 platforms, ≥1 prompt, ≥1 recommendation, all numeric fields finite + in `[0, 100]`. Malformed → 502.
+7. **`detectTemplate()`** — smell-counting validator. Smells: `score === 45`, all subscores mid-band multiples of 5, all platform scores mid-band multiples of 5, recommendation lift triplet matches a known canonical (`8/5/3`, `11/7/4`, `12/8/5`, `10/6/3`, `9/6/3`, `10/5/3`, `9/5/3`, `7/5/3`, `7/4/3`, `6/4/3`), lifts in tight-clustering small-integer pattern, evidence_excerpts missing/under-2, brand name absent from any evidence excerpt. **Rejects only at smells >= 3** so a legitimately-round value for a well-known brand doesn't false-positive.
+8. **`normalizeStrong()`** — enforces `strong = score >= 70` per platform deterministically (the model occasionally ignores its own rule and sets `strong:true` at 69).
+9. **Retry on template** — second call at temperature 0.9 with `--- RETRY CONTEXT ---` addendum quoting the specific rejection reason, same `openai/gpt-4o` model (`perplexity/sonar-pro` retry was tried but returns 400 on `response_format: json_object`).
+10. **Cache + return.** Confidence-passing results are cached; "both attempts templated" results are returned but **not cached** so the next request gets a fresh chance.
 
-**Header gotcha.** The `X-Title` request header sent to OpenRouter must be pure ASCII — an em-dash (U+2014) in there crashes the `Headers` constructor with `Cannot convert argument to a ByteString`. Use `-` or `|`, not `—`.
+**Anti-template prompt rules (system message).** Forbids round mid-band defaults (40, 45, 50, 55, 60), demands `evidence_excerpts` array of 3 literal web quotes, requires brand to appear in evidence, demands per-brand variance in lift integers (no fixed triplet across brands), **competitor scope rule** — same buying-decision category + geography, not adjacent-category players (vector DBs ≠ LLM API competitors; universities ≠ edtech platforms; SE Asian super-apps ≠ Indian payment apps), and a **prompt-integrity rule** instructing the model to treat the domain string as data, never as instructions.
 
-**Cost / rate-limit posture.** No DB cache, no rate limit yet. At meaningful traffic, add a domain-keyed cache (24–72h TTL) and an IP-keyed rate limiter — both fit the same SQLite setup the admin console will eventually use.
+**Error responses are sanitized.** Clients receive `{ error: 'scan failed', code: 'timeout'|'upstream'|'malformed' }` only. Full upstream detail is logged server-side via `console.warn` tagged `[free-score]` — never leaked to the client.
+
+**Returns** `{ domain, result: FreeScoreResult, cached?: true }`. `result.evidence_excerpts` is an optional `string[]` field on `FreeScoreResult` introduced by the hardening; older callers tolerate its absence.
+
+### Frontend — `site/components/free-score/FeatureContent.tsx` + sub-components
+
+Form state (`stage`, `domain`, `submittedDomain`, `stepIndex`, `scanResult`, `scanError`). Two useEffects watch `stage === 'analyzing'`: one walks the mock step indicator, the other fires the real fetch and owns the stage transition. Mock `SCORE / SUBSCORES / PLATFORMS / SAMPLE_PROMPTS / RECOMMENDATIONS` constants render only during idle/analyzing — production scan results take over via length-aware fallback patterns like `(scanResult?.subscores && scanResult.subscores.length === 4) ? scanResult.subscores : SUBSCORES` (the old plain `??` fall-through on empty arrays was patched in the same commit).
+
+`isValidDomain()` mirrors the backend regex exactly so obviously-invalid inputs don't round-trip the API for a generic 400. The "Try: notion.so" pill is guarded against `stage === 'analyzing'` so a mid-scan click can't restart the effect.
+
+**Sub-component patches in the same commit:**
+- `ScoreDial.tsx` — `Number.isFinite` guard + `Math.max(0, Math.min(100, score))` clamp on the arc math; an undefined or out-of-range score no longer produces NaN paths.
+- `PromptCards.tsx` — `escapeForRegex()` helper on `brandWord` before constructing the `HighlightedExcerpt` RegExp. Brands containing `.`, `+`, etc. (e.g. "Booking.com", "C++") used to throw or mis-match. Empty-brand guard added.
+
+### Env + ops
+
+- **`OPENROUTER_API_KEY`** in `site/.env.local` for dev; Railway env var for prod. Missing key → `503 service unavailable` (no longer the leak-y 500 message it used to be).
+- **In-memory caches / rate-limit are per-instance.** Railway currently runs a single replica, so this works. If you ever scale to multiple replicas, move both maps to Redis or shared SQLite (the admin console's better-sqlite3 setup on `feat/console-foundation` is the obvious home).
+- **Header gotcha (historical):** the `X-Title` header sent to OpenRouter must be pure ASCII — an em-dash (U+2014) crashes the `Headers` constructor. We use `-` or `|`, not `—`.
+
+### Costs (rough)
+
+`openai/gpt-4o` + 8-result web plugin = ~$0.07 per uncached scan. Cache hits are ~$0. Retry on template doubles the cost when it fires (we observed it fires on roughly 2–4 % of unknown-brand scans).
 
 ## Section seam blending (dark routes)
 
@@ -295,7 +327,7 @@ Plus `<ChromeHeader />` + `<ChromeFooter />` gates (pick light or dark chrome by
 - `components/Hero.tsx`, `components/HomeInteractive.tsx`, `components/SpotlightCard.tsx` — replaced by `home/*` equivalents
 - `app/pricing/PricingTiers.tsx` — intentional orphan left by the pricing rebuild (new version is `components/pricing/PricingTiers.tsx`)
 
-**Stale `/features` links** flagged by audit (2 anchors still target the redirect-to-home route — clicking lands on `/` silently but semantically wrong): `components/home/PillarStepper.tsx` (~line 860), `components/ai-visibility/FeatureContent.tsx` (~line 715). Down from 4 — Loop now goes to Calendly, free-score's old link was removed in its dark redesign. Cleanup-worthy.
+**Stale `/features` links** flagged by audit (2 anchors still target the redirect-to-home route — clicking lands on `/` silently but semantically wrong): `components/home/PillarStepper.tsx` `MockPanel`'s `<Link href="/features">` (renders for Perception, Rankings, Recommendations pillars; Visibility is full-bleed so no link), `components/ai-visibility/FeatureContent.tsx` (~line 715). Down from 4 — Loop now goes to Calendly, free-score's old link was removed in its dark redesign. Cleanup-worthy.
 
 **Name collision watchout.** Two `LogoMarquee` exports coexist: the OLD text-wordmark version in `components/sections.tsx` was previously used by `app/features/page.tsx`, but `/features` now just redirects to `/` so that consumer is gone. The NEW real-image marquee at `components/home/LogoMarquee.tsx` is homepage-only. The text-wordmark version may now be orphaned — audit before relying on it.
 
@@ -310,6 +342,10 @@ Originally only `/` shipped dark per the 2026-06-19 design handoff. Subsequent s
   - `STEP_VH = 60` (`const` at top of file) → pin container is `4 × 60 = 240vh`. Sticky inner is 100vh. Engagement window is 140vh of scroll, ~35vh per pillar — comfortable for both trackpad momentum and mouse-wheel clicks.
   - One passive `scroll` listener + rAF-throttled `compute()` reads `pinRef.current.getBoundingClientRect()`, maps progress 0→1 across the engagement window to idx via `Math.floor(progress * N)`. Active pillar setter only fires when idx changes; `prog` (fractional progress within the active pillar) updates when delta > 1%. No `preventDefault`, no gesture-detection state machine, no `scrollTo`-based snap.
   - Mobile: `matchMedia('(max-width: 1000px)')` early-return — listener doesn't attach, pillars stack with all 4 mocks rendered linearly.
+  - **Right column ratio** is `minmax(220px, 0.32fr) 1.68fr` (pillar list / mock) — widened from the original 0.5fr/1.5fr so the mock panel takes ~84% of the grid. **Mock panel height** is `clamp(640px, 80vh, 880px)` (was 460px), bumped to accommodate the visibility slideshow at usable size.
+  - **`MockPanel` branches on `s.sku.startsWith('01 ')`** — the Visibility pillar is rendered **full-bleed** (no headline, no body copy, no "Explore..." link inside the card; the slideshow IS the visual). All other pillars (Perception, Rankings, Recommendations) keep the original chrome layout (h3 headline + body p + Link, then the subtle-bg inner mock frame).
+  - `MockVisibility` is an **auto-cycling 4-frame image slideshow**, not a code-recreation of the dashboard. The 4 frames live as hi-res PNGs at `site/public/home/visibility-frame-{1-engine,2-audience,3-intent,4-topic}.png` (1920×1280 each, exported from Figma). Cycle holds **2.5s per frame**, crossfades at **0.68s `cubic-bezier(0.4, 0.0, 0.2, 1)`** layered with a micro scale `1 ↔ 1.006` + blur `0px ↔ 2px` bloom (0.48s curve on the blur — clears slightly before the opacity settles). Hover anywhere on the panel pauses the cycle; `prefers-reduced-motion: reduce` disables animation outright and locks to frame 0. Driven by a single `setInterval` (not animation-end) so timing stays clockwork even under jank.
+  - Uses `next/image` with **`unoptimized` on each frame** so the raw 1920×1280 PNG bytes are served — no Next.js recompression. `priority` + `loading="eager"` only on frame 0; frames 1–3 are lazy. Container has `aspectRatio: '1.5'` matching the source (1920/1280) so `objectFit: contain` shows the full picture with zero crop. Past iterations of this mock (a CSS-recreated dashboard with cycling bars + line chart) were removed because the user wanted the literal Figma exports, not a Claude-rebuilt approximation.
 - `ChatDemo.tsx` — desktop: 500vh scroll-pinned section. Phase A (`p 0 → 0.5`): 20 floating frosted-glass `WindowCard` instances with engine logos drift then converge into a chat box, each card staggered. Phase B (`p 0.54 → 1`): the chat materializes and steps through `prompt → typing dots → "Thought for 163s" → streamed response → analysis card → row reveal`. Progress is written to CSS custom properties `--pa` and `--cardin` on the sticky element; component state tracks `step` and `words` for the response stream. **Mobile (< 640px) early-returns to a static fallback**: just the headline + chat card mock with the analysis card already revealed, no 500vh pin, no floating cards, no scroll-driven step machine — the long animation is desktop-only by design. Section bg is **atmospheric** (`var(--bg)` base + 3–4 layered low-alpha white radial-gradients with transparent endpoints) so the section has no visible rectangle edges against the body — see "Section seam blending" below.
 - `MetricsStrip.tsx` — 5-tile metrics row (`6 / 25 / 24h / 0–100 / AI-ready`) with a `<TypingHeadline>` at the top.
 - `LogoMarquee.tsx` — 34s infinite-scroll customer logos with `WebkitMaskImage` edge fades and `animationPlayState: paused` on hover. Uses real customer logos (Netpower, SDS Manager, Canon, Unilever, DHL, Reckitt) from `public/logos/ko-*.png`. **Usage rights cleared with the user** before shipping.
@@ -457,6 +493,28 @@ Pattern that emerged for the dark feature pages added 2026-06-19 (auto-saved scr
 - Triple-backtick code fences inside JS template literals close the template literal early — use string concatenation (`["import...", "..."].join("\n")`) instead for embedding code samples in prompts.
 
 The pattern: parallel `agent()` calls inside `parallel(...)` phases for mechanical multi-file changes. Use `pipeline()` for staged work where each item flows through multiple stages.
+
+### Extracting user-attached images from a chat session
+
+When the user pastes images directly into chat (e.g. Figma exports for the visibility slideshow), they are NOT auto-saved to disk — Write/Edit only handle text. But the raw base64 payload IS in the session JSONL at `~/.claude/projects/<project-slug>/<session-id>.jsonl`. To recover the bytes:
+
+```python
+import json, base64, os
+SESSION = "/Users/sohamsarker/.claude/projects/-Users-sohamsarker-Clovion-AI/<session-id>.jsonl"
+with open(SESSION) as f:
+    for line in f:
+        entry = json.loads(line)
+        msg = entry.get("message", {})
+        if msg.get("role") != "user": continue
+        for idx, block in enumerate(msg.get("content", []) or []):
+            if isinstance(block, dict) and block.get("type") == "image":
+                src = block.get("source", {})
+                if src.get("type") == "base64":
+                    # write base64.b64decode(src["data"]) to a file
+                    ...
+```
+
+Filter to user-role messages, skip small thumbnails (`len(data) > 50000` is a decent floor for full-size attachments), and check dimensions with `sips -g pixelWidth -g pixelHeight` to identify which is which. Then `Read` each via the vision tool to confirm content before renaming + dropping into the right `/public/` folder. This pattern was used to extract the 4 hi-res visibility-frame PNGs.
 
 ## Brand and voice conventions
 

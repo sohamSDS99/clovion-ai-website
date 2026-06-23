@@ -42,3 +42,13 @@ logo-cmark.png
 logo-cmark.pbm
 logo-traced.svg
 traced-preview.png
+
+# Asset backups (kept locally, never committed)
+site/public/home/originals/
+site/public/logos/originals/
+
+# Admin console SQLite db (feat/console-foundation only, runtime data)
+site/data/
+
+# Local agent / skill state
+.agents/

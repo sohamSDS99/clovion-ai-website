@@ -5,12 +5,12 @@ import Link from 'next/link'
 import { Container, ArrowRight } from '@/components/ui'
 
 const LOGOS = [
-  { name: 'Netpower', src: '/logos/ko-netpower.png' },
-  { name: 'SDS Manager', src: '/logos/ko-sdsmanager.png' },
   { name: 'Canon', src: '/logos/ko-canon.png' },
-  { name: 'Unilever', src: '/logos/ko-unilever.png' },
   { name: 'DHL', src: '/logos/ko-dhl.png' },
-  { name: 'Reckitt', src: '/logos/ko-reckitt.png' }
+  { name: 'Netpower', src: '/logos/ko-netpower.png' },
+  { name: 'Reckitt', src: '/logos/ko-reckitt.png' },
+  { name: 'SDS Manager', src: '/logos/ko-sdsmanager.png' },
+  { name: 'Unilever', src: '/logos/ko-unilever.png' }
 ]
 
 function LogoLockup({ logo }: { logo: (typeof LOGOS)[number] }) {
@@ -27,7 +27,7 @@ function LogoLockup({ logo }: { logo: (typeof LOGOS)[number] }) {
         alt={logo.name}
         loading="lazy"
         decoding="async"
-        className="max-h-[64px] max-w-[180px] md:max-h-[96px] md:max-w-[260px] w-auto h-auto object-contain block"
+        className="h-[40px] md:h-[56px] w-auto object-contain block"
         style={{
           opacity: hover ? 1 : 0.85,
           transform: hover ? 'translateY(-2px)' : 'none',
