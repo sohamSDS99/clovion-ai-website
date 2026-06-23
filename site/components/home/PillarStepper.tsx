@@ -193,18 +193,17 @@ function MockVisibility() {
 
 // ── Mock 02 · Brand Perception — picture + animated reveal ─────────
 //
-// Renders the design-spec PNG as the visual base and overlays four
-// white masks that scale-X away from left to right in sequence,
-// simulating a typing reveal on the underlying prompt and brand-card
-// text. Once all four reveals complete, a short radial-glow pulse
-// sweeps across the picture to spotlight the highlighted phrases.
-// Honors prefers-reduced-motion by jumping to the final state.
+// Renders the design-spec PNG as the visual base. Four white overlay
+// rectangles cover the prompt + 3 brand-card text regions and collapse
+// horizontally from left to right in sequence, simulating a typing
+// reveal on the underlying text. The picture starts fully grayscale so
+// the colored highlight pills are invisible; once all four text reveals
+// complete, the picture animates from grayscale → full color, making
+// the highlights "light up" after the text is written. Honors
+// prefers-reduced-motion by jumping to the final state.
 
 const BP_REGIONS = [
-  // Each region is positioned as a percent of the underlying picture.
-  // Values were sampled from /home/brand-perception.png (1834×961).
-  // The overlay covers the underlying text until the reveal animation
-  // collapses it horizontally from left to right.
+  // Position is in percent of the underlying picture (1834 × 961).
   { key: 'prompt', top: 4.2, left: 3.4, width: 33, height: 7 },
   { key: 'monday', top: 23.5, left: 3.4, width: 64, height: 21 },
   { key: 'pipedrive', top: 44.5, left: 3.4, width: 64, height: 21 },
@@ -215,7 +214,7 @@ const BP_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
 function MockPerception() {
   const [stage, setStage] = useState(-1)
-  const [pulse, setPulse] = useState(false)
+  const [colored, setColored] = useState(false)
   const [reduce, setReduce] = useState(false)
 
   useEffect(() => {
@@ -227,20 +226,15 @@ function MockPerception() {
   useEffect(() => {
     if (reduce) {
       setStage(BP_REGIONS.length - 1)
-      setPulse(false)
+      setColored(true)
       return
     }
     const timers: ReturnType<typeof setTimeout>[] = []
-    const steps = [320, 1900, 4000, 6100, 8200, 9400]
+    const steps = [320, 1900, 4000, 6100]
     steps.forEach((ms, i) => {
-      timers.push(
-        setTimeout(() => {
-          if (i < BP_REGIONS.length) setStage(i)
-          else if (i === BP_REGIONS.length) setPulse(true)
-          else setPulse(false)
-        }, ms)
-      )
+      timers.push(setTimeout(() => setStage(i), ms))
     })
+    timers.push(setTimeout(() => setColored(true), 8200))
     return () => { timers.forEach(clearTimeout) }
   }, [reduce])
 
@@ -257,7 +251,14 @@ function MockPerception() {
           quality={95}
           sizes="(max-width: 1000px) 100vw, 60vw"
           unoptimized
-          style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            objectPosition: 'center',
+            filter: colored ? 'grayscale(0%) saturate(1)' : 'grayscale(100%) saturate(0)',
+            transition: reduce ? 'none' : 'filter 1.4s ease-out'
+          }}
         />
         {BP_REGIONS.map((r, i) => (
           <div
@@ -277,23 +278,6 @@ function MockPerception() {
             }}
           />
         ))}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            pointerEvents: 'none',
-            opacity: pulse ? 1 : 0,
-            transition: reduce ? 'none' : 'opacity 0.6s ease',
-            background:
-              'radial-gradient(circle at 18% 38%, rgba(34,197,94,0.25) 0, transparent 9%),' +
-              'radial-gradient(circle at 52% 40%, rgba(34,197,94,0.22) 0, transparent 8%),' +
-              'radial-gradient(circle at 33% 56%, rgba(245,158,11,0.22) 0, transparent 9%),' +
-              'radial-gradient(circle at 28% 73%, rgba(245,158,11,0.22) 0, transparent 9%),' +
-              'radial-gradient(circle at 38% 42%, rgba(239,68,68,0.20) 0, transparent 10%)',
-            mixBlendMode: 'multiply'
-          }}
-        />
       </div>
     </div>
   )
