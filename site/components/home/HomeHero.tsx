@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Button, Container, ArrowRight } from '@/components/ui'
+import { openCalendly } from '@/lib/openCalendly'
 
 const HERO_LOGOS = [
   { src: '/logos/chatgpt.svg', alt: 'ChatGPT' },
@@ -72,15 +73,27 @@ export function HomeHero() {
               textWrap: 'balance'
             }}
           >
-            Track your brand&rsquo;s visibility across AI search engines, benchmark against competitors, and uncover the gaps preventing you from getting mentioned. Know exactly where to improve.
+            Track your brand&rsquo;s visibility across AI engines and find the gaps stopping you from getting mentioned.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Button href="/pricing" variant="primary" size="lg" trackLocation="home_hero">
+            <Button href="https://app.clovion.ai/signup" variant="primary" size="lg" trackLocation="home_hero">
               Start Free Trial <ArrowRight />
             </Button>
             <Button href="/free-ai-visibility-score" variant="secondary" size="lg" trackLocation="home_hero">
               Get Free Score
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              trackLocation="home_hero"
+              onClick={(e) => {
+                e.preventDefault()
+                openCalendly('home_hero')
+              }}
+              style={{ background: 'var(--positive)', color: '#ffffff', borderColor: 'var(--positive)' }}
+            >
+              Book a Demo
             </Button>
           </div>
           <p
