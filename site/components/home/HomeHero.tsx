@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Button, Container, ArrowRight } from '@/components/ui'
-import { openCalendly } from '@/lib/openCalendly'
 
 const HERO_LOGOS = [
   { src: '/logos/chatgpt.svg', alt: 'ChatGPT' },
@@ -82,18 +81,6 @@ export function HomeHero() {
             </Button>
             <Button href="/free-ai-visibility-score" variant="secondary" size="lg" trackLocation="home_hero">
               Get Free Score
-            </Button>
-            <Button
-              variant="primary"
-              size="lg"
-              trackLocation="home_hero"
-              onClick={(e) => {
-                e.preventDefault()
-                openCalendly('home_hero')
-              }}
-              style={{ background: 'var(--positive)', color: '#ffffff', borderColor: 'var(--positive)' }}
-            >
-              Book a Demo
             </Button>
           </div>
           <p

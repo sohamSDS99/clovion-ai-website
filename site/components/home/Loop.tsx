@@ -1,6 +1,8 @@
-import Link from 'next/link'
+'use client'
+
 import { Button, Container, ArrowRight } from '@/components/ui'
 import { TypingHeadline } from './TypingHeadline'
+import { openCalendly } from '@/lib/openCalendly'
 
 const NODES = [
   {
@@ -144,25 +146,22 @@ export function Loop() {
           <Button href="/pricing" variant="invert" size="lg" trackLocation="home_loop">
             Start Free Trial <ArrowRight />
           </Button>
-          <Link
-            href="/features"
+          <Button
+            variant="ghost"
+            size="lg"
+            trackLocation="home_loop"
+            onClick={(e) => {
+              e.preventDefault()
+              openCalendly('home_loop')
+            }}
             style={{
-              height: '3rem',
-              padding: '0 1.5rem',
-              fontSize: '1rem',
-              fontWeight: 600,
-              fontFamily: 'var(--font-body)',
-              borderRadius: 999,
               background: 'transparent',
               color: 'var(--on-ink)',
-              border: '1px solid var(--on-ink-15)',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center'
+              border: '1px solid var(--on-ink-15)'
             }}
           >
-            See the product
-          </Link>
+            Talk to an Expert
+          </Button>
         </div>
       </Container>
     </section>
