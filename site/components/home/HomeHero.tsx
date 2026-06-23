@@ -56,10 +56,10 @@ export function HomeHero() {
                 flexWrap: 'wrap'
               }}
             >
-              <span>See how</span>
+              <span>See how AI</span>
               <RotatingLogo />
             </span>
-            <span style={{ display: 'block' }}>sees your brand.</span>
+            <span style={{ display: 'block' }}>sees your brand</span>
           </h1>
 
           <p
