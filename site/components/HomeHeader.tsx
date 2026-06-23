@@ -165,11 +165,11 @@ export function HomeHeader() {
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Button href="/free-ai-visibility-score" variant="ghost" size="sm" trackLocation="header">
-            Get Free Score
+          <Button href="/login" variant="ghost" size="sm" trackLocation="header">
+            Log in
           </Button>
-          <Button href="/pricing" variant="primary" size="sm" trackLocation="header">
-            Start Free Trial
+          <Button href="/signup" variant="primary" size="sm" trackLocation="header">
+            Sign up
           </Button>
         </div>
 
@@ -225,11 +225,11 @@ export function HomeHeader() {
               )
             })}
             <div className="mt-3 flex flex-col gap-2 px-2 pb-2">
-              <Button href="/free-ai-visibility-score" variant="secondary" trackLocation="header_mobile">
-                Get Free Score
+              <Button href="/login" variant="secondary" trackLocation="header_mobile">
+                Log in
               </Button>
-              <Button href="/pricing" variant="primary" trackLocation="header_mobile">
-                Start Free Trial
+              <Button href="/signup" variant="primary" trackLocation="header_mobile">
+                Sign up
               </Button>
             </div>
           </Container>
