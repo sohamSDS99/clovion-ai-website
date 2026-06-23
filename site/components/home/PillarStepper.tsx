@@ -191,628 +191,109 @@ function MockVisibility() {
 }
 
 
-// ── Mock 02 · Brand Perception — animated dashboard recreation ──────
+// ── Mock 02 · Brand Perception — picture + animated reveal ─────────
 //
-// Replaces the static design-spec PNG with a typed-prompt + brand-card
-// reveal + highlight-pill sweep. Plays once on mount (no loop). Honors
-// prefers-reduced-motion by jumping to the final state.
+// Renders the design-spec PNG as the visual base and overlays four
+// white masks that scale-X away from left to right in sequence,
+// simulating a typing reveal on the underlying prompt and brand-card
+// text. Once all four reveals complete, a short radial-glow pulse
+// sweeps across the picture to spotlight the highlighted phrases.
+// Honors prefers-reduced-motion by jumping to the final state.
 
-type Hue = 'pos' | 'yel' | 'neg'
-type Seg = { t: string; h?: Hue }
-
-// Each brand paragraph is pre-split into segments. Segments with a `h`
-// (hue) become highlight pills once `highlightsOn` is true. Segments
-// without `h` are plain text. Joining all segment text gives the full
-// paragraph, which is what the typewriter renders.
-const BP_CARDS: Array<{
-  rank: string
-  name: string
-  Mark: () => ReactElement
-  paragraph: Seg[]
-  tags: Array<{ k: string; v: string; hue: string }>
-}> = [
-  {
-    rank: '#1',
-    name: 'Monday',
-    Mark: MondayMark,
-    paragraph: [
-      { t: 'Monday offers a ' },
-      { t: 'strong free tier', h: 'pos' },
-      { t: ' with contact management, email tracking, reporting and ' },
-      { t: 'integrations with many integrations', h: 'pos' },
-      { t: '. It ' },
-      { t: 'easily expands', h: 'pos' },
-      { t: ' into Sales, Marketing, or Service Hubs as you grow. ' },
-      { t: 'Paid plans can become expensive, and some advanced features are locked', h: 'neg' },
-      { t: ' behind higher tiers.' }
-    ],
-    tags: [
-      { k: 'Company Size', v: 'Startup', hue: '#a78bfa' },
-      { k: 'Industry', v: 'Saas', hue: '#60a5fa' },
-      { k: 'Use Case', v: 'CRM', hue: '#34d399' },
-      { k: 'Buyer Persona', v: 'Founder', hue: '#fb7185' },
-      { k: 'Perception', v: 'Easy to use', hue: '#fbbf24' },
-      { k: 'Perception (Negative)', v: 'Expensive', hue: '#f87171' }
-    ]
-  },
-  {
-    rank: '#2',
-    name: 'Pipedrive',
-    Mark: PipedriveMark,
-    paragraph: [
-      { t: 'Pipedrive is a ' },
-      { t: 'flexible modern CRM', h: 'yel' },
-      { t: ' that works like a relational database, letting you design pipelines, views, and workflows around your process. It’s ' },
-      { t: 'highly customizable', h: 'yel' },
-      { t: ' and connects with tools like Slack, Notion, and Segment. Attio is ideal for teams that want ' },
-      { t: 'power and flexibility', h: 'yel' },
-      { t: ' without the complexity or cost of traditional CRMs.' }
-    ],
-    tags: [
-      { k: 'Company Size', v: 'Startup', hue: '#a78bfa' },
-      { k: 'Industry', v: 'Saas', hue: '#60a5fa' },
-      { k: 'Use Case', v: 'CRM', hue: '#34d399' },
-      { k: 'Buyer Persona', v: 'Founder', hue: '#fb7185' },
-      { k: 'Intent', v: 'Easiest', hue: '#f472b6' },
-      { k: 'Perception', v: 'Easy to use', hue: '#fbbf24' }
-    ]
-  },
-  {
-    rank: '#3',
-    name: 'Salesforce',
-    Mark: SalesforceMark,
-    paragraph: [
-      { t: 'Salesforce is built for founders who want a ' },
-      { t: 'streamlined CRM without the usual bloat', h: 'yel' },
-      { t: '. It focuses on speed, simplicity, and essential deal tracking while still offering automation and integrations with tools like Google Workspace, Slack, and Zapier.' }
-    ],
-    tags: [
-      { k: 'Company Size', v: 'Startup', hue: '#a78bfa' },
-      { k: 'Industry', v: 'Saas', hue: '#60a5fa' },
-      { k: 'Use Case', v: 'CRM', hue: '#34d399' },
-      { k: 'Buyer Persona', v: 'Founder', hue: '#fb7185' }
-    ]
-  }
+const BP_REGIONS = [
+  // Each region is positioned as a percent of the underlying picture.
+  // Values were sampled from /home/brand-perception.png (1834×961).
+  // The overlay covers the underlying text until the reveal animation
+  // collapses it horizontally from left to right.
+  { key: 'prompt', top: 4.2, left: 3.4, width: 33, height: 7 },
+  { key: 'monday', top: 23.5, left: 3.4, width: 64, height: 21 },
+  { key: 'pipedrive', top: 44.5, left: 3.4, width: 64, height: 21 },
+  { key: 'salesforce', top: 67.5, left: 3.4, width: 64, height: 17 }
 ]
 
-const BP_DRIVERS = [
-  { label: 'Easy to use', pct: '38%' },
-  { label: 'Fast implementation', pct: '31%' },
-  { label: 'Good support', pct: '24%' },
-  { label: 'Affordable', pct: '22%' },
-  { label: 'Scalable', pct: '18%' }
-]
+const BP_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
 
-const BP_GAPS = [
-  { label: 'Enterprise-focused', you: '5%', leader: '31%' },
-  { label: 'Most secure', you: '6%', leader: '28%' },
-  { label: 'Scalable', you: '7%', leader: '28%' },
-  { label: 'Advanced reporting', you: '8%', leader: '22%' },
-  { label: 'Integrations', you: '9%', leader: '25%' }
-]
+function MockPerception() {
+  const [stage, setStage] = useState(-1)
+  const [pulse, setPulse] = useState(false)
+  const [reduce, setReduce] = useState(false)
 
-const BP_PROMPT = 'What is the best CRM for a growing SaaS company with 50 employees?'
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+    }
+  }, [])
 
-// Hue → pill colors (background tint + ink color)
-const HUE_BG: Record<Hue, string> = {
-  pos: 'rgba(52,211,153,0.18)',
-  yel: 'rgba(251,191,36,0.20)',
-  neg: 'rgba(248,113,113,0.18)'
-}
-const HUE_FG: Record<Hue, string> = {
-  pos: '#047857',
-  yel: '#92400e',
-  neg: '#991b1b'
-}
-
-// ── Brand wordmark glyphs ──
-function MondayMark() {
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-      <span style={{ width: 7, height: 7, borderRadius: 2, background: '#FF3D57' }} />
-      <span style={{ width: 7, height: 7, borderRadius: 2, background: '#FFCB00' }} />
-      <span style={{ width: 7, height: 7, borderRadius: 2, background: '#00CA72' }} />
-    </span>
-  )
-}
-function PipedriveMark() {
-  return (
-    <span
-      style={{
-        width: 14,
-        height: 14,
-        borderRadius: 999,
-        background: '#017737',
-        color: '#fff',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'var(--font-display)',
-        fontWeight: 700,
-        fontSize: 9,
-        lineHeight: 1
-      }}
-    >
-      p
-    </span>
-  )
-}
-function SalesforceMark() {
-  return (
-    <svg viewBox="0 0 24 16" width="18" height="12" aria-hidden style={{ display: 'inline-block' }}>
-      <path
-        fill="#00A1E0"
-        d="M9.6 3.4c.7-.7 1.7-1.2 2.8-1.2 1.5 0 2.8.8 3.4 2 .6-.3 1.2-.4 1.9-.4 2.4 0 4.3 1.9 4.3 4.3s-1.9 4.3-4.3 4.3c-.3 0-.6 0-.8-.1-.5 1-1.6 1.6-2.8 1.6-.5 0-1-.1-1.4-.3-.6 1.4-2 2.4-3.7 2.4-1.8 0-3.3-1.1-3.8-2.7-.3.1-.6.1-.9.1-1.9 0-3.4-1.5-3.4-3.4 0-1.3.7-2.4 1.8-3-.2-.5-.4-1.1-.4-1.7C2.3 2.4 4.1.6 6.4.6c1.3 0 2.4.6 3.2 1.5z"
-      />
-    </svg>
-  )
-}
-
-// Renders the paragraph as a sequence of text + (highlightable) pill
-// segments. The typewriter index is mapped through the segments: each
-// segment renders only the portion of its text revealed so far. Once
-// highlightsOn flips true, segments with a hue gain a tinted bg.
-function HighlightedParagraph({
-  segs,
-  upto,
-  highlightsOn,
-  baseDelayMs
-}: {
-  segs: Seg[]
-  upto: number
-  highlightsOn: boolean
-  baseDelayMs: number
-}) {
-  // Walk segments, peeling characters off `remaining` until exhausted.
-  let consumed = 0
-  let hueIdx = 0
-  const parts: ReactElement[] = []
-  segs.forEach((seg, i) => {
-    const segLen = seg.t.length
-    const start = consumed
-    const segVisible = Math.max(0, Math.min(segLen, upto - start))
-    consumed += segLen
-    if (segVisible === 0) return
-    const shown = seg.t.slice(0, segVisible)
-    if (!seg.h) {
-      parts.push(<span key={i}>{shown}</span>)
+  useEffect(() => {
+    if (reduce) {
+      setStage(BP_REGIONS.length - 1)
+      setPulse(false)
       return
     }
-    const hue = seg.h
-    const thisHueIdx = hueIdx++
-    const stagger = baseDelayMs + thisHueIdx * 80
-    // Pill bg sweeps in via opacity + width transition. We use a thin
-    // pseudo-equivalent: a span with an inner bg layer that animates.
-    parts.push(
-      <span
-        key={i}
-        style={{
-          position: 'relative',
-          borderRadius: 4,
-          padding: '0 3px',
-          color: highlightsOn ? HUE_FG[hue] : 'var(--ink)',
-          transition: `color 0.3s ease ${highlightsOn ? stagger : 0}ms`,
-          whiteSpace: 'normal'
-        }}
-      >
-        <span
+    const timers: ReturnType<typeof setTimeout>[] = []
+    const steps = [320, 1900, 4000, 6100, 8200, 9400]
+    steps.forEach((ms, i) => {
+      timers.push(
+        setTimeout(() => {
+          if (i < BP_REGIONS.length) setStage(i)
+          else if (i === BP_REGIONS.length) setPulse(true)
+          else setPulse(false)
+        }, ms)
+      )
+    })
+    return () => { timers.forEach(clearTimeout) }
+  }, [reduce])
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        <Image
+          src="/home/brand-perception.png"
+          alt="Brand Perception — how AI describes your brand across audiences, industries, and use cases"
+          width={1834}
+          height={961}
+          priority={false}
+          loading="lazy"
+          quality={95}
+          sizes="(max-width: 1000px) 100vw, 60vw"
+          unoptimized
+          style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+        />
+        {BP_REGIONS.map((r, i) => (
+          <div
+            key={r.key}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: `${r.top}%`,
+              left: `${r.left}%`,
+              width: `${r.width}%`,
+              height: `${r.height}%`,
+              background: '#ffffff',
+              transformOrigin: 'right center',
+              transform: stage >= i ? 'scaleX(0)' : 'scaleX(1)',
+              transition: reduce ? 'none' : `transform 0.95s ${BP_EASE}`,
+              pointerEvents: 'none'
+            }}
+          />
+        ))}
+        <div
           aria-hidden
           style={{
             position: 'absolute',
             inset: 0,
-            background: HUE_BG[hue],
-            borderRadius: 4,
-            opacity: highlightsOn ? 1 : 0,
-            transform: highlightsOn ? 'scaleX(1)' : 'scaleX(0)',
-            transformOrigin: 'left center',
-            transition: `opacity 0.35s ease ${highlightsOn ? stagger : 0}ms, transform 0.45s var(--ease-out-expo) ${highlightsOn ? stagger : 0}ms`,
-            zIndex: 0
+            pointerEvents: 'none',
+            opacity: pulse ? 1 : 0,
+            transition: reduce ? 'none' : 'opacity 0.6s ease',
+            background:
+              'radial-gradient(circle at 18% 38%, rgba(34,197,94,0.25) 0, transparent 9%),' +
+              'radial-gradient(circle at 52% 40%, rgba(34,197,94,0.22) 0, transparent 8%),' +
+              'radial-gradient(circle at 33% 56%, rgba(245,158,11,0.22) 0, transparent 9%),' +
+              'radial-gradient(circle at 28% 73%, rgba(245,158,11,0.22) 0, transparent 9%),' +
+              'radial-gradient(circle at 38% 42%, rgba(239,68,68,0.20) 0, transparent 10%)',
+            mixBlendMode: 'multiply'
           }}
         />
-        <span style={{ position: 'relative', zIndex: 1 }}>{shown}</span>
-      </span>
-    )
-  })
-  return <>{parts}</>
-}
-
-function MockPerception() {
-  const [reduce, setReduce] = useState(false)
-  // Typing state per stage
-  const [promptChars, setPromptChars] = useState(0)
-  const [respShown, setRespShown] = useState(false)
-  // Per-card: 0 = hidden, 1 = card visible (slid in), 2 = typing in progress (chars > 0), 3 = tags visible
-  const [card1Chars, setCard1Chars] = useState(0)
-  const [card2Chars, setCard2Chars] = useState(0)
-  const [card3Chars, setCard3Chars] = useState(0)
-  const [card1Show, setCard1Show] = useState(false)
-  const [card2Show, setCard2Show] = useState(false)
-  const [card3Show, setCard3Show] = useState(false)
-  const [card1Tags, setCard1Tags] = useState(false)
-  const [card2Tags, setCard2Tags] = useState(false)
-  const [card3Tags, setCard3Tags] = useState(false)
-  const [highlightsOn, setHighlightsOn] = useState(false)
-  const [sidebarShow, setSidebarShow] = useState(false)
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    setReduce(reducedMotion)
-
-    if (reducedMotion) {
-      // Jump to final state — everything visible.
-      setPromptChars(BP_PROMPT.length)
-      setRespShown(true)
-      setCard1Show(true)
-      setCard2Show(true)
-      setCard3Show(true)
-      setCard1Chars(BP_CARDS[0].paragraph.reduce((n, s) => n + s.t.length, 0))
-      setCard2Chars(BP_CARDS[1].paragraph.reduce((n, s) => n + s.t.length, 0))
-      setCard3Chars(BP_CARDS[2].paragraph.reduce((n, s) => n + s.t.length, 0))
-      setCard1Tags(true)
-      setCard2Tags(true)
-      setCard3Tags(true)
-      setHighlightsOn(true)
-      setSidebarShow(true)
-      return
-    }
-
-    const timers: Array<ReturnType<typeof setTimeout>> = []
-    const schedule = (fn: () => void, ms: number) => timers.push(setTimeout(fn, ms))
-
-    // Sidebar fades in at 300ms.
-    schedule(() => setSidebarShow(true), 300)
-
-    // Stage 1: prompt types in (~30ms/char). Start at 0, finish ~1800ms.
-    const PROMPT_PER_CHAR = 26
-    for (let i = 1; i <= BP_PROMPT.length; i++) {
-      schedule(() => setPromptChars(i), i * PROMPT_PER_CHAR)
-    }
-    const promptDoneAt = BP_PROMPT.length * PROMPT_PER_CHAR
-
-    // Stage 2: response placeholder fades in 400ms after prompt done.
-    schedule(() => setRespShown(true), promptDoneAt + 400)
-
-    // Helper to schedule a card's full reveal (card-slide → type → tags).
-    const PARA_PER_CHAR = 13
-    const TAG_DELAY = 220
-    const CARD_SLIDE = 280
-    const cardStarts: number[] = []
-    let cursor = promptDoneAt + 700
-
-    BP_CARDS.forEach((c, idx) => {
-      const totalChars = c.paragraph.reduce((n, s) => n + s.t.length, 0)
-      const startAt = cursor
-      cardStarts.push(startAt)
-      // Card slide-in
-      schedule(() => {
-        if (idx === 0) setCard1Show(true)
-        if (idx === 1) setCard2Show(true)
-        if (idx === 2) setCard3Show(true)
-      }, startAt)
-      // Type out paragraph after slide settles
-      const typeStart = startAt + CARD_SLIDE
-      for (let i = 1; i <= totalChars; i++) {
-        const at = typeStart + i * PARA_PER_CHAR
-        schedule(() => {
-          if (idx === 0) setCard1Chars(i)
-          if (idx === 1) setCard2Chars(i)
-          if (idx === 2) setCard3Chars(i)
-        }, at)
-      }
-      const typeDoneAt = typeStart + totalChars * PARA_PER_CHAR
-      // Tags after typing done
-      schedule(() => {
-        if (idx === 0) setCard1Tags(true)
-        if (idx === 1) setCard2Tags(true)
-        if (idx === 2) setCard3Tags(true)
-      }, typeDoneAt + TAG_DELAY)
-      // Next card starts a bit after this one's tags appear
-      cursor = typeDoneAt + TAG_DELAY + 320
-    })
-
-    // Highlights sweep on after final card's tags.
-    schedule(() => setHighlightsOn(true), cursor + 240)
-
-    return () => {
-      timers.forEach((t) => clearTimeout(t))
-    }
-  }, [])
-
-  const cardStates = [
-    { show: card1Show, chars: card1Chars, tags: card1Tags },
-    { show: card2Show, chars: card2Chars, tags: card2Tags },
-    { show: card3Show, chars: card3Chars, tags: card3Tags }
-  ]
-
-  return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        background: 'var(--white)',
-        padding: '14px 16px',
-        display: 'grid',
-        gridTemplateRows: 'auto 1fr',
-        gap: 12,
-        overflow: 'hidden',
-        fontFamily: 'var(--font-display)'
-      }}
-    >
-      {/* Header strip */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <span style={{ height: 22, width: 22, borderRadius: 6, background: '#ecfdf5', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            <Glyph d={G.face} color="#047857" />
-          </span>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em', lineHeight: 1.1 }}>Brand Perception</div>
-            <div style={{ fontSize: '0.62rem', color: 'var(--ink-60)', lineHeight: 1.3, marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              Understand how AI perceives your brand across audiences, industries, and use cases.
-            </div>
-          </div>
-        </div>
-        <div style={{ display: 'inline-flex', alignItems: 'center', background: 'var(--ink-04)', borderRadius: 999, padding: 2, flexShrink: 0, border: '1px solid var(--line)' }}>
-          {['7d', '30d', '90d'].map((p) => {
-            const active = p === '30d'
-            return (
-              <span
-                key={p}
-                style={{
-                  padding: '4px 9px',
-                  borderRadius: 999,
-                  fontSize: '0.66rem',
-                  fontWeight: 600,
-                  color: active ? 'var(--on-ink, #fff)' : 'var(--ink-60)',
-                  background: active ? 'var(--ink)' : 'transparent',
-                  fontFamily: 'var(--font-mono)'
-                }}
-              >
-                {p}
-              </span>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* 2-col grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.45fr 1fr', gap: 12, minHeight: 0, overflow: 'hidden' }}>
-        {/* LEFT */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minWidth: 0, overflow: 'hidden' }}>
-          {/* Prompt box */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 10px', borderRadius: 10, background: 'var(--subtle)', border: '1px solid var(--line)' }}>
-            <span style={{ height: 18, width: 18, borderRadius: 999, background: 'var(--ink)', color: 'var(--on-ink, #fff)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '0.55rem', fontWeight: 700 }}>
-              U
-            </span>
-            <span style={{ fontSize: '0.72rem', color: 'var(--ink)', lineHeight: 1.35, fontWeight: 500, minHeight: '0.95rem' }}>
-              {BP_PROMPT.slice(0, promptChars)}
-              {!reduce && promptChars < BP_PROMPT.length && (
-                <span style={{ display: 'inline-block', width: 1, marginLeft: 1, background: 'var(--ink)', animation: 'clv-blink 1s steps(1) infinite' }}>&nbsp;</span>
-              )}
-            </span>
-          </div>
-          {/* ChatGPT response indicator */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              opacity: respShown ? 1 : 0,
-              transform: respShown ? 'none' : 'translateY(4px)',
-              transition: 'opacity 0.35s ease, transform 0.35s ease'
-            }}
-          >
-            <span
-              style={{
-                height: 18,
-                width: 18,
-                borderRadius: 999,
-                background: '#10a37f',
-                color: '#fff',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.5rem',
-                fontWeight: 700,
-                letterSpacing: '-0.03em'
-              }}
-            >
-              GPT
-            </span>
-            <span style={{ fontSize: '0.62rem', color: 'var(--ink-50)', fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-              ChatGPT response
-            </span>
-          </div>
-
-          {/* Brand cards */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, minHeight: 0, overflow: 'hidden' }}>
-            {BP_CARDS.map((c, idx) => {
-              const st = cardStates[idx]
-              const totalChars = c.paragraph.reduce((n, s) => n + s.t.length, 0)
-              const baseDelayMs = idx === 0 ? 0 : idx === 1 ? 240 : 480
-              return (
-                <div
-                  key={c.name}
-                  style={{
-                    borderRadius: 10,
-                    border: '1px solid var(--line)',
-                    background: 'var(--white)',
-                    padding: '8px 10px',
-                    opacity: st.show ? 1 : 0,
-                    transform: st.show ? 'none' : 'translateY(10px)',
-                    transition: 'opacity 0.4s ease, transform 0.45s var(--ease-out-expo)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 6
-                  }}
-                >
-                  {/* Header row */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--ink-50)', fontWeight: 600 }}>{c.rank}</span>
-                    <c.Mark />
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.8rem', fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.01em' }}>
-                      {c.name}
-                    </span>
-                  </div>
-                  {/* Paragraph */}
-                  <div style={{ fontSize: '0.67rem', lineHeight: 1.45, color: 'var(--ink-70)', fontWeight: 400, fontFamily: 'var(--font-body-reg, var(--font-display))' }}>
-                    <HighlightedParagraph segs={c.paragraph} upto={st.chars} highlightsOn={highlightsOn} baseDelayMs={baseDelayMs} />
-                    {!reduce && st.show && st.chars < totalChars && (
-                      <span style={{ display: 'inline-block', width: 1, marginLeft: 1, background: 'var(--ink-50)', animation: 'clv-blink 1s steps(1) infinite' }}>&nbsp;</span>
-                    )}
-                  </div>
-                  {/* Tags */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexWrap: 'wrap',
-                      gap: 4,
-                      opacity: st.tags ? 1 : 0,
-                      transition: 'opacity 0.3s ease'
-                    }}
-                  >
-                    {c.tags.map((tag, ti) => (
-                      <span
-                        key={tag.k + tag.v}
-                        style={{
-                          fontSize: '0.55rem',
-                          fontWeight: 500,
-                          padding: '2px 6px',
-                          borderRadius: 4,
-                          background: `${tag.hue}1f`,
-                          border: `1px solid ${tag.hue}55`,
-                          color: 'var(--ink-70)',
-                          whiteSpace: 'nowrap',
-                          opacity: st.tags ? 1 : 0,
-                          transform: st.tags ? 'none' : 'translateY(3px)',
-                          transition: `opacity 0.3s ease ${ti * 40}ms, transform 0.3s ease ${ti * 40}ms`
-                        }}
-                      >
-                        <span style={{ color: 'var(--ink-50)' }}>{tag.k}: </span>
-                        <span style={{ color: 'var(--ink)', fontWeight: 600 }}>{tag.v}</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* RIGHT */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-            minWidth: 0,
-            opacity: sidebarShow ? 1 : 0,
-            transform: sidebarShow ? 'none' : 'translateY(8px)',
-            transition: 'opacity 0.45s ease, transform 0.45s var(--ease-out-expo)',
-            overflow: 'hidden'
-          }}
-        >
-          <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', fontWeight: 600 }}>
-              AI Visibility Insights
-            </div>
-            <div style={{ fontSize: '0.6rem', color: 'var(--ink-50)', marginTop: 3, lineHeight: 1.3 }}>
-              Insights based on 12,540 prompts across 6 AI engines
-            </div>
-          </div>
-
-          {/* Top Perception Drivers */}
-          <div style={{ borderRadius: 10, border: '1px solid var(--line)', background: 'var(--white)', padding: '9px 10px' }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', fontWeight: 600, marginBottom: 6 }}>
-              Top Perception Drivers
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {BP_DRIVERS.map((d, i) => (
-                <div
-                  key={d.label}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 6,
-                    opacity: sidebarShow ? 1 : 0,
-                    transition: `opacity 0.3s ease ${300 + i * 50}ms`
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '0.62rem',
-                      fontWeight: 500,
-                      padding: '2px 7px',
-                      borderRadius: 4,
-                      background: 'rgba(52,211,153,0.16)',
-                      color: '#047857',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    {d.label}
-                  </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: 'var(--ink-70)', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                    {d.pct}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Perception Gaps */}
-          <div style={{ borderRadius: 10, border: '1px solid var(--line)', background: 'var(--white)', padding: '9px 10px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 6, marginBottom: 6 }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 0 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', fontWeight: 600 }}>
-                  Perception Gaps
-                </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--ink-40)' }}>
-                  (vs category leaders)
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: 18, fontFamily: 'var(--font-mono)', fontSize: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-40)', fontWeight: 600 }}>
-                <span>You</span>
-                <span>Leader</span>
-              </div>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {BP_GAPS.map((g, i) => (
-                <div
-                  key={g.label}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 6,
-                    opacity: sidebarShow ? 1 : 0,
-                    transition: `opacity 0.3s ease ${400 + i * 50}ms`
-                  }}
-                >
-                  <span
-                    style={{
-                      fontSize: '0.62rem',
-                      fontWeight: 500,
-                      padding: '2px 7px',
-                      borderRadius: 4,
-                      background: 'rgba(248,113,113,0.16)',
-                      color: '#991b1b',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    {g.label}
-                  </span>
-                  <div style={{ display: 'flex', gap: 14, fontFamily: 'var(--font-mono)', fontSize: '0.62rem', fontWeight: 600, fontVariantNumeric: 'tabular-nums' }}>
-                    <span style={{ color: 'var(--ink-70)', minWidth: 22, textAlign: 'right' }}>{g.you}</span>
-                    <span style={{ color: 'var(--ink)', minWidth: 24, textAlign: 'right' }}>{g.leader}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )
