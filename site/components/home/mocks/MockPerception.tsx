@@ -4,7 +4,7 @@
 // Left feed (prompt -> thinking -> 3 ranked brand cards with brush-paint
 // highlights) + right insights sidebar.
 
-import { type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger, useTypewriter } from './motion'
 import { MondayGlyph, PipedriveGlyph, ChatGptGlyph, UserGlyph } from './glyphs'
 import { LIGHT, TAG_COLORS, HL } from './palette'
@@ -73,22 +73,80 @@ const GAPS1 = [
 ]
 
 // Total highlight count across all cards, for sequential brush stagger.
-const HL_TOTAL = CARDS.reduce((n, c) => n + c.hl.length, 0)
 const HL_OFFSET = CARDS.map((_, i) => CARDS.slice(0, i).reduce((n, c) => n + c.hl.length, 0))
+
+// Small sentiment note per highlight (global order: Monday 0-3, Pipedrive 4-6).
+const NOTES: { tone: Tint; score: number; desc: string }[] = [
+  { tone: 'pos', score: 95, desc: 'Generous free tier — a key strength for early teams.' },
+  { tone: 'neu', score: 78, desc: 'Broad integration ecosystem noted as flexible.' },
+  { tone: 'pos', score: 88, desc: 'Scales smoothly into Sales, Marketing & Service.' },
+  { tone: 'neg', score: 32, desc: 'Pricing & feature-gating flagged as the drawback.' },
+  { tone: 'pos', score: 84, desc: 'Flexible, modern, pipeline-first CRM.' },
+  { tone: 'pos', score: 86, desc: 'Strong customization across pipelines & views.' },
+  { tone: 'neu', score: 75, desc: 'Power and flexibility without heavy complexity.' }
+]
 
 export function MockPerception({ show }: { show: boolean }) {
   const play = useReveal(show)
   const reduced = useReducedMotion()
   const typed = useTypewriter('What is the best CRM for a growing SaaS company with 50 employees?', play, 38)
   const cards = useStagger(CARDS.length, play, 180, 1100)
-  const brush = useStagger(HL_TOTAL, play, 150, 1500)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [noteIdx, setNoteIdx] = useState(0)
+  const [notePos, setNotePos] = useState<{ left: number; top: number } | null>(null)
+  const noteTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Cycle a small sentiment note across the highlights, never stopping.
+  useEffect(() => {
+    if (!play || reduced) {
+      setNotePos(null)
+      return
+    }
+    let i = 0
+    setNoteIdx(0)
+    const startT = setTimeout(() => {
+      noteTimer.current = setInterval(() => {
+        i = (i + 1) % NOTES.length
+        setNoteIdx(i)
+      }, 2800)
+    }, 1200)
+    return () => {
+      clearTimeout(startT)
+      if (noteTimer.current) clearInterval(noteTimer.current)
+    }
+  }, [play, reduced])
+
+  // Anchor the small note to its highlight — placed ABOVE it (fallback below),
+  // clamped inside the dashboard, so it sits in line-gap whitespace and never
+  // blankets the paragraph.
+  useEffect(() => {
+    if (!play || reduced) return
+    const root = rootRef.current
+    if (!root) return
+    const el = root.querySelector(`[data-note-idx="${noteIdx}"]`) as HTMLElement | null
+    if (!el) {
+      setNotePos(null)
+      return
+    }
+    const rr = root.getBoundingClientRect()
+    const hr = el.getBoundingClientRect()
+    const noteW = Math.min(260, rr.width * 0.26)
+    const noteH = rr.width * 0.105
+    let left = hr.left - rr.left + hr.width / 2 - noteW / 2
+    left = Math.max(6, Math.min(left, rr.width - noteW - 6))
+    let top = hr.top - rr.top - noteH - 7
+    if (top < 6) top = hr.bottom - rr.top + 7
+    setNotePos({ left, top })
+  }, [noteIdx, play, reduced])
 
   return (
     <div
+      ref={rootRef}
       style={{
         width: '100%',
         height: '100%',
         ...LIGHT,
+        position: 'relative',
         containerType: 'size',
         background: 'var(--white)',
         color: 'var(--ink)',
@@ -146,7 +204,7 @@ export function MockPerception({ show }: { show: boolean }) {
                 <span style={{ fontSize: '1.35cqw', fontWeight: 700 }}>{c.name}</span>
               </div>
               <p style={{ margin: 0, fontSize: '1.05cqw', lineHeight: 1.5, color: 'var(--ink-80, var(--ink))' }}>
-                <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} brush={brush} />
+                <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} />
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5cqw', marginTop: '0.8cqw' }}>
                 {TAGS.map((t) => {
@@ -201,11 +259,45 @@ export function MockPerception({ show }: { show: boolean }) {
           </SideCard>
         </div>
       </div>
+      {notePos && play && !reduced && <SentimentNote key={noteIdx} idx={noteIdx} left={notePos.left} top={notePos.top} />}
     </div>
   )
 }
 
-function Highlighted({ body, hl, baseIndex, brush }: { body: string; hl: { text: string; tint: Tint }[]; baseIndex: number; brush: boolean[] }) {
+function SentimentNote({ idx, left, top }: { idx: number; left: number; top: number }) {
+  const n = NOTES[idx]
+  const bar = n.tone === 'neg' ? '#f5616a' : n.tone === 'neu' ? '#f5a623' : '#3fcf6e'
+  const title = n.tone === 'neg' ? 'Negative' : n.tone === 'neu' ? 'Neutral' : 'Positive'
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        width: '26cqw',
+        maxWidth: 260,
+        zIndex: 30,
+        background: '#18181c',
+        color: '#fff',
+        borderRadius: '0.9cqw',
+        boxShadow: '0 10px 26px rgba(0,0,0,0.32)',
+        padding: '0.7cqw 0.9cqw',
+        pointerEvents: 'none',
+        animation: `clvNotePop 0.4s ${cb} both`
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6cqw' }}>
+        <span style={{ width: '0.35cqw', height: '1.2cqw', borderRadius: 2, background: bar }} />
+        <span style={{ fontSize: '0.95cqw', fontWeight: 600, letterSpacing: '0.02em' }}>{title} Sentiment</span>
+        <span style={{ marginLeft: 'auto', fontSize: '1.15cqw', fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}>{n.score}</span>
+      </div>
+      <p style={{ margin: '0.5cqw 0 0', fontSize: '0.88cqw', lineHeight: 1.4, color: 'rgba(255,255,255,0.7)' }}>{n.desc}</p>
+      <style>{'@keyframes clvNotePop{from{opacity:0;transform:translateY(0.7cqw) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}'}</style>
+    </div>
+  )
+}
+
+function Highlighted({ body, hl, baseIndex }: { body: string; hl: { text: string; tint: Tint }[]; baseIndex: number }) {
   const reduced = useReducedMotion()
   const segs: { t: string; tint?: Tint; gi?: number }[] = []
   let rest = body
@@ -224,9 +316,9 @@ function Highlighted({ body, hl, baseIndex, brush }: { body: string; hl: { text:
       {segs.map((s, i) => {
         if (!s.tint) return <span key={i}>{s.t}</span>
         const gi = s.gi as number
-        const painted = brush[gi]
+        const painted = true
         return (
-          <span key={i} style={{ position: 'relative', display: 'inline', borderRadius: '0.3cqw' }}>
+          <span key={i} data-note-idx={gi} style={{ position: 'relative', display: 'inline', borderRadius: '0.3cqw' }}>
             <span
               aria-hidden
               style={{
