@@ -13,6 +13,18 @@ export const metadata: Metadata = {
   },
 }
 
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Clovion AI — AI Visibility Tracking',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: 'https://www.clovion.ai/features/ai-visibility-tracking',
+  offers: { '@type': 'Offer', price: '79', priceCurrency: 'USD' },
+  description:
+    'Track brand mentions, citations, share of voice, and LLM rank across ChatGPT, Claude, Gemini, Perplexity, Grok, and Google AI Overviews. Daily refresh, one dashboard.'
+}
+
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -28,6 +40,10 @@ const faqJsonLd = {
 export default function AIVisibilityTrackingPage() {
   return (
     <div className="clv-dark clv-ai-vis-page">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
