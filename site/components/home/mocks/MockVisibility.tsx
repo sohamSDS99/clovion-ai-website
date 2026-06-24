@@ -147,9 +147,9 @@ function EngineChip({ name }: { name: string }) {
   return (
     <span
       style={{
-        width: '2.6cqw',
-        height: '2.6cqw',
-        borderRadius: '0.7cqw',
+        width: '2.2cqw',
+        height: '2.2cqw',
+        borderRadius: '0.6cqw',
         background: color,
         display: 'flex',
         alignItems: 'center',
@@ -260,10 +260,10 @@ export function MockVisibility({ show }: { show: boolean }) {
     color: 'var(--ink)',
     fontFamily: 'var(--font-body-reg, var(--font-body))',
     overflow: 'hidden',
-    padding: '2.4cqw 2.8cqw',
+    padding: '2.2cqw 2.8cqw',
     display: 'flex',
     flexDirection: 'column',
-    gap: '1.7cqw'
+    gap: '1.2cqw'
   }
 
   return (
@@ -309,9 +309,9 @@ function Header() {
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.1cqw' }}>
         <span
           style={{
-            width: '3.2cqw',
-            height: '3.2cqw',
-            borderRadius: '0.85cqw',
+            width: '2.8cqw',
+            height: '2.8cqw',
+            borderRadius: '0.8cqw',
             background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
             display: 'flex',
             alignItems: 'center',
@@ -407,7 +407,7 @@ function Kpi({
   return (
     <div
       style={{
-        padding: '1.9cqw 2.2cqw',
+        padding: '1.4cqw 2.2cqw',
         borderLeft: divider ? '1px solid var(--line)' : 'none',
         display: 'flex',
         flexDirection: 'column',
@@ -462,7 +462,7 @@ function Kpi({
             {n.toFixed(decimals ?? 0)}
             {suffix && <span style={{ fontSize: '2.2cqw' }}>{suffix}</span>}
           </div>
-          <div style={{ marginTop: '1cqw', fontSize: '1.15cqw', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-50)' }}>{label}</div>
+          <div style={{ marginTop: '0.7cqw', fontSize: '1.15cqw', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-50)' }}>{label}</div>
         </>
       )}
     </div>
@@ -472,7 +472,7 @@ function Kpi({
 // ── Section heading ──────────────────────────────────────────────────
 function SectionHeading({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.5cqw', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink)', marginBottom: '1.2cqw' }}>
+    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.45cqw', fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink)', marginBottom: '0.8cqw' }}>
       {children}
     </div>
   )
@@ -489,7 +489,7 @@ function TabStrip({ active }: { active: number }) {
         borderRadius: '999px',
         background: 'var(--subtle)',
         border: '1px solid var(--line)',
-        marginBottom: '1.6cqw'
+        marginBottom: '1.1cqw'
       }}
     >
       <div
@@ -514,7 +514,7 @@ function TabStrip({ active }: { active: number }) {
             zIndex: 1,
             flex: 1,
             textAlign: 'center',
-            padding: '0.9cqw 0',
+            padding: '0.7cqw 0',
             fontSize: '1.35cqw',
             fontWeight: i === active ? 600 : 500,
             color: i === active ? '#fff' : 'var(--ink-50)',
@@ -550,7 +550,7 @@ function BarList({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: numbered ? '1cqw' : '1.5cqw',
+        gap: numbered ? '0.85cqw' : '1.15cqw',
         flex: grow ? 1 : 'none',
         justifyContent: grow || rows.length <= 2 ? 'center' : 'flex-start'
       }}
@@ -648,7 +648,8 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
   const toPath = (ys: number[]) => ys.map((v, i) => `${i === 0 ? 'M' : 'L'} ${px(i).toFixed(2)} ${py(v).toFixed(2)}`).join(' ')
   const toArea = (ys: number[]) => `M 0 ${H} L ${ys.map((v, i) => `${px(i).toFixed(2)} ${py(v).toFixed(2)}`).join(' L ')} L ${W} ${H} Z`
 
-  const yTicks = [40, 30, 20, 10, 0]
+  const yTicks = [40, 20, 0]
+  const gridTicks = [40, 30, 20, 10, 0]
   const xTicks = [
     { i: 0, label: 'May 23' },
     { i: 2.66, label: 'Jun 2' },
@@ -661,7 +662,7 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
   const dotY = mondayY[dotI]
 
   return (
-    <div style={{ position: 'relative', flex: 1, minHeight: 0, marginTop: '0.8cqw', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ position: 'relative', flex: 1, minHeight: 0, marginTop: '0.4cqw', display: 'flex', flexDirection: 'column' }}>
       <div style={{ position: 'relative', flex: 1, minHeight: 0, paddingLeft: '3.4cqw' }}>
         {yTicks.map((t) => (
           <span
@@ -679,7 +680,7 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
             </linearGradient>
           </defs>
           {/* gridlines */}
-          {yTicks.map((t) => (
+          {gridTicks.map((t) => (
             <line key={t} x1="0" y1={py(t)} x2={W} y2={py(t)} stroke="var(--line)" strokeWidth="0.4" vectorEffect="non-scaling-stroke" />
           ))}
           {/* Jun 12 reference line */}

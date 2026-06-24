@@ -433,6 +433,15 @@ export function PillarStepper() {
     )
   }
 
+  // Slot must preserve the active pillar's aspect even when maxHeight clamps it
+  // on short viewports. Without a matching maxWidth the box goes wide-and-short
+  // and the (cqw-sized) dashboards overflow — the chart crushes to a sliver and
+  // tall lists clip. Capping width to (clampedHeight × aspect) keeps it 1.5:1,
+  // shrinking + centering instead of distorting.
+  const activeAspect = PILLARS[active].mockAspect ?? '4 / 3'
+  const [aspW, aspH] = activeAspect.split('/').map((n) => parseFloat(n.trim()))
+  const slotMaxWidth = `calc((100vh - 300px) * ${aspW} / ${aspH})`
+
   return (
     <section style={{ position: 'relative' }}>
       <div ref={pinRef} style={{ position: 'relative', height: `${PILLARS.length * STEP_VH}vh` }}>
@@ -481,6 +490,7 @@ export function PillarStepper() {
                   width: '100%',
                   aspectRatio: PILLARS[active].mockAspect,
                   maxHeight: 'calc(100vh - 300px)',
+                  maxWidth: slotMaxWidth,
                   margin: '0 auto'
                 }}
               >
