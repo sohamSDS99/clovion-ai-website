@@ -295,7 +295,7 @@ export function MockVisibility({ show }: { show: boolean }) {
         aria-hidden={isTopic}
       >
         <SectionHeading>Visibility over time</SectionHeading>
-        <Chart morph={morph} flat={morphTarget === 0} reduced={reduced} play={reveal} />
+        <Chart morph={morph} flat={morphTarget === 0} reduced={reduced} />
         <ChartFooter />
       </div>
     </div>
@@ -638,7 +638,7 @@ function BarList({
 }
 
 // ── Line chart (HTML axis gutters + SVG plot) ────────────────────────
-function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; reduced: boolean; play: boolean }) {
+function Chart({ morph, flat, reduced }: { morph: number; flat: boolean; reduced: boolean }) {
   const W = 100
   const H = 100
   const lerp = (a: number, b: number) => a + (b - a) * morph
@@ -687,31 +687,39 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
           <line x1={px(jun12)} y1="0" x2={px(jun12)} y2={H} stroke="var(--ink-25)" strokeWidth="0.4" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
           {/* emphasis area fill */}
           <path d={toArea(mondayY)} fill="url(#clvMondayArea)" preserveAspectRatio="none" />
-          {/* lines */}
-          {SERIES_ORDER.map((key) => {
+          {/* Competitor lines first (muted, recede), then Monday on top (hero).
+             Always solid — the morph animates via the path data, and the pillar
+             fades in as a whole, so no per-line draw-in (a dash draw-in with
+             non-scaling-stroke measures in screen px and repeats → gaps). */}
+          {SERIES_ORDER.filter((k) => !SERIES_META[k].emphasis).map((key) => {
             const m = SERIES_META[key]
-            const ys = seriesY(key)
             return (
               <path
                 key={key}
-                d={toPath(ys)}
+                d={toPath(seriesY(key))}
                 fill="none"
                 stroke={m.color}
-                strokeWidth={m.emphasis ? 2.4 : 1.8}
+                strokeOpacity={0.45}
+                strokeWidth={1.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
-                style={
-                  reduced || morph !== 0
-                    ? undefined
-                    : { strokeDasharray: 260, strokeDashoffset: play ? 0 : 260, transition: `stroke-dashoffset 0.9s ${cb}` }
-                }
               />
             )
           })}
-          {/* data dots on the emphasis (Monday) line */}
+          {/* Monday — the hero line: brightest, thickest, drawn last (on top) */}
+          <path
+            d={toPath(mondayY)}
+            fill="none"
+            stroke={C_MONDAY}
+            strokeWidth={2.9}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          {/* solid hero data dots on Monday */}
           {mondayY.map((v, i) => (
-            <circle key={i} cx={px(i)} cy={py(v)} r="1.1" fill="#fff" stroke={C_MONDAY} strokeWidth="1.1" vectorEffect="non-scaling-stroke" />
+            <circle key={i} cx={px(i)} cy={py(v)} r="1.25" fill={C_MONDAY} stroke="#fff" strokeWidth="0.85" vectorEffect="non-scaling-stroke" />
           ))}
         </svg>
 
@@ -793,14 +801,21 @@ function ChartFooter() {
       <div style={{ display: 'flex', gap: '1.2cqw' }}>
         {(['monday', 'pipedrive', 'salesforce'] as SeriesKey[]).map((key) => {
           const m = SERIES_META[key]
+          const hero = !!m.emphasis
           return (
-            <span key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.6cqw', fontSize: '1.2cqw', color: 'var(--ink-70)', fontWeight: 500 }}>
-              <span style={{ width: '1.7cqw', height: '1.7cqw', borderRadius: '0.4cqw', background: m.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span
+              key={key}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.6cqw', fontSize: '1.2cqw', color: hero ? 'var(--ink)' : 'var(--ink-50)', fontWeight: hero ? 700 : 500, opacity: hero ? 1 : 0.8 }}
+            >
+              <span style={{ width: '1.7cqw', height: '1.7cqw', borderRadius: '0.4cqw', background: m.color, opacity: hero ? 1 : 0.55, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg viewBox="0 0 24 24" width="1.1cqw" height="1.1cqw" aria-hidden>
                   <path d="M5 12.5l4 4 10-10" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </span>
               {m.label}
+              {hero && (
+                <span style={{ marginLeft: '0.2cqw', padding: '0.1cqw 0.7cqw', borderRadius: '999px', background: 'var(--positive-bg)', color: POSITIVE, fontSize: '0.95cqw', fontWeight: 700, letterSpacing: '0.04em' }}>YOU</span>
+              )}
             </span>
           )
         })}

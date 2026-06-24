@@ -2,7 +2,7 @@
 
 // Pillar 3 — "Visibility Ranking by Topic" table dashboard. Coded (no raster).
 
-import { type CSSProperties, type ReactNode } from 'react'
+import { type CSSProperties, type ReactNode, useState, useEffect } from 'react'
 import { cb, useReducedMotion, useReveal, useStagger } from './motion'
 import { MondayGlyph, PipedriveGlyph, SalesforceGlyph, DiamondCheck } from './glyphs'
 import { LIGHT, BLUE } from './palette'
@@ -30,11 +30,23 @@ const ROWS: { topic: string; strong: boolean; rank: string; comps: Mark[]; share
 
 const COLS = '2.4fr 1fr 0.7fr 0.7fr 0.7fr 0.7fr 2.4fr'
 
+function rotate<T>(arr: T[], n: number): T[] {
+  const k = ((n % arr.length) + arr.length) % arr.length
+  return arr.slice(k).concat(arr.slice(0, k))
+}
+
 export function MockRankings({ show }: { show: boolean }) {
   const play = useReveal(show)
   const reduced = useReducedMotion()
   const rows = useStagger(ROWS.length, play, 70, 220)
   const cards = useStagger(3, play, 110, 220 + ROWS.length * 70 + 120)
+  // Competitor columns continuously re-shuffle (the landscape keeps shifting).
+  const [tick, setTick] = useState(0)
+  useEffect(() => {
+    if (!show || reduced) return
+    const id = setInterval(() => setTick((t) => t + 1), 2600)
+    return () => clearInterval(id)
+  }, [show, reduced])
   const shareMax = 30
 
   return (
@@ -54,7 +66,7 @@ export function MockRankings({ show }: { show: boolean }) {
         gap: '1.8cqw'
       }}
     >
-      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}'}</style>
+      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}@keyframes clvGlyphFlip{0%{opacity:0;transform:rotateY(85deg) scale(0.8)}55%{opacity:1}100%{opacity:1;transform:rotateY(0deg) scale(1)}}'}</style>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
         <div>
@@ -104,18 +116,24 @@ export function MockRankings({ show }: { show: boolean }) {
             <div style={{ textAlign: 'center' }}>
               <RankFlip rank={r.rank} play={rows[i]} />
             </div>
-            {r.comps.map((m, ci) => (
-              <div key={ci} style={{ display: 'flex', justifyContent: 'center' }}>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    transform: rows[i] ? 'scale(1)' : 'scale(0.6)',
-                    opacity: rows[i] ? 1 : 0,
-                    transition: reduced ? 'none' : `transform 0.4s ${cb} ${ci * 0.04}s, opacity 0.4s ${cb} ${ci * 0.04}s`
-                  }}
-                >
-                  <Glyph m={m} />
-                </span>
+            {rotate(r.comps, tick).map((m, ci) => (
+              <div key={ci} style={{ display: 'flex', justifyContent: 'center', perspective: '300px' }}>
+                {rows[i] ? (
+                  <span
+                    key={tick}
+                    style={{
+                      display: 'inline-flex',
+                      transformOrigin: 'center',
+                      animation: reduced ? 'none' : `clvGlyphFlip 0.6s ${cb} ${ci * 0.08}s both`
+                    }}
+                  >
+                    <Glyph m={m} />
+                  </span>
+                ) : (
+                  <span style={{ display: 'inline-flex', opacity: 0, transform: 'scale(0.6)' }}>
+                    <Glyph m={m} />
+                  </span>
+                )}
               </div>
             ))}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1cqw' }}>
