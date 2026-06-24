@@ -357,9 +357,15 @@ function MockPerception({ show = true }: { show?: boolean } = {}) {
 }
 
 // ── Mock 03 · Rankings by topic — static image of the design spec ───
+//
+// White wrapper background so when the dashboard image (1876×1226,
+// aspect ~1.53) sits inside a slightly wider mock-panel slot, the
+// letterbox bars at top/bottom blend seamlessly with the dashboard's
+// own white background — entire frame reads as one continuous surface.
+// Same pattern as MockRecommendations.
 function MockRankings() {
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ffffff' }}>
       <Image
         src="/home/visibility-ranking.png"
         alt="Visibility Ranking by Topic — SDS Manager rankings vs Chemical Compliance Software brands"
