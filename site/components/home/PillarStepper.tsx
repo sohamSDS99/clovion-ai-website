@@ -358,11 +358,11 @@ function MockPerception({ show = true }: { show?: boolean } = {}) {
 
 // ── Mock 03 · Rankings by topic — static image of the design spec ───
 //
-// White wrapper background so when the dashboard image (1876×1226,
-// aspect ~1.53) sits inside a slightly wider mock-panel slot, the
-// letterbox bars at top/bottom blend seamlessly with the dashboard's
-// own white background — entire frame reads as one continuous surface.
-// Same pattern as MockRecommendations.
+// CSS-zoom approach: the source PNG has natural white padding around its
+// content. Scale the image up 1.2× and use overflow:hidden on the wrapper
+// to crop the padding outward, so the dashboard content fills the panel
+// edge-to-edge with fonts/logos rendered larger. White wrapper background
+// blends seamlessly with any residual letterbox.
 function MockRankings() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ffffff' }}>
@@ -370,13 +370,13 @@ function MockRankings() {
         src="/home/visibility-ranking.png"
         alt="Visibility Ranking by Topic — SDS Manager rankings vs Chemical Compliance Software brands"
         width={1876}
-        height={1074}
+        height={1226}
         priority={false}
         loading="lazy"
         quality={95}
         sizes="(max-width: 1000px) 100vw, 60vw"
         unoptimized
-        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transform: 'scale(1.18)', transformOrigin: 'center center' }}
       />
     </div>
   )
@@ -384,10 +384,11 @@ function MockRankings() {
 
 // ── Mock 04 · Recommendations — static image of the Opportunities dashboard ─
 //
-// White background on the wrapper so when the dashboard image (1876×1226,
-// aspect ~1.53) sits inside a slightly wider mock-panel slot, the
-// horizontal letterbox blends seamlessly with the dashboard's own white
-// background — visually the whole frame reads as one continuous surface.
+// CSS-zoom approach (same as MockRankings): the source PNG has natural
+// white padding around its content. Scale up 1.18× and use overflow:hidden
+// on the wrapper to crop the padding outward, so the dashboard fills the
+// panel edge-to-edge with fonts/logos rendered larger. White wrapper
+// background blends seamlessly with any residual letterbox.
 function MockRecommendations() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ffffff' }}>
@@ -401,7 +402,7 @@ function MockRecommendations() {
         quality={95}
         sizes="(max-width: 1000px) 100vw, 60vw"
         unoptimized
-        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transform: 'scale(1.18)', transformOrigin: 'center center' }}
       />
     </div>
   )
@@ -461,7 +462,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bars,
     Mock: MockRankings,
-    mockAspect: '1876 / 1074'
+    mockAspect: '1876 / 1226'
   },
   {
     sku: '04 — Recommendations',
