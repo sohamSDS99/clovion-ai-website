@@ -53,10 +53,10 @@ export const nav = {
     },
     { label: 'Pricing', href: '/pricing' },
     { label: 'Customers', href: '/customers' },
-    { label: 'Blog', href: '/blog' },
     {
       label: 'Resources',
       children: [
+        { label: 'Blog', href: '/blog', desc: 'GEO, AI search, and SEO insights' },
         { label: 'News', href: '/news', desc: 'Product news and announcements' },
         { label: 'Webinars', href: '/webinars', desc: 'Live sessions and on-demand recordings' },
         { label: 'Guides & Downloads', href: '/resources', desc: 'Whitepapers, ebooks, and templates' },
