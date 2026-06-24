@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 //
 // Webhook payload contract (do not change keys without re-mapping the Make
 // scenario):
-//   [ { event: "trial_start", timestamp, data: {
+//   [ { event: "free_score", timestamp, data: {
 //         first_name, last_name, email, country,
 //         trial_start_date, trial_end_date,
 //         user_type: "trial", event: "email_verified_trial_started" } } ]
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   const payload = [
     {
-      event: 'trial_start',
+      event: 'free_score',
       timestamp: isoUtc(now),
       data: {
         first_name,
