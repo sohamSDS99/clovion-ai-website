@@ -846,11 +846,22 @@ export function PillarStepper() {
                   <PillarItem key={s.sku} s={s} i={i} active={active} prog={prog} onClick={() => goto(i)} />
                 ))}
               </div>
-              {/* Card height sized so the tallest pillar image (Competitive
-                  Positioning + Recommendations at 1.53 aspect) fills the slot
-                  at its natural width-driven height without letterbox.
-                  912-wide slot ÷ 1.53 = 596px required minimum. */}
-              <div style={{ position: 'relative', height: 'clamp(560px, 68vh, 760px)' }}>
+              {/* The slot tracks the ACTIVE pillar's image aspect ratio (same
+                  approach as the mobile branch) so each dashboard fills the
+                  frame edge-to-edge — no dark letterbox/gap — and stays fully
+                  visible (object-fit: contain on an aspect-matched box, so no
+                  crop). maxHeight keeps the slot inside the 100vh pin on short
+                  viewports; if it caps there, the image letterboxes against the
+                  white card surface, which is seamless (no black). */}
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  aspectRatio: PILLARS[active].mockAspect,
+                  maxHeight: 'calc(100vh - 300px)',
+                  margin: '0 auto'
+                }}
+              >
                 {PILLARS.map((s, i) => (
                   <MockPanel key={s.sku} s={s} show={i === active} />
                 ))}
