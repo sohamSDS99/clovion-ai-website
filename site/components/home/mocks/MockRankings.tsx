@@ -66,7 +66,7 @@ export function MockRankings({ show }: { show: boolean }) {
         gap: '1.8cqw'
       }}
     >
-      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}@keyframes clvGlyphFlip{0%{opacity:0;transform:rotateY(85deg) scale(0.8)}55%{opacity:1}100%{opacity:1;transform:rotateY(0deg) scale(1)}}'}</style>
+      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}@keyframes clvGlyphFlip{0%{opacity:0;transform:rotateY(85deg) scale(0.8)}55%{opacity:1}100%{opacity:1;transform:rotateY(0deg) scale(1)}}@keyframes clvGlyphBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-22%) scale(1.1)}}'}</style>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
         <div>
@@ -119,15 +119,19 @@ export function MockRankings({ show }: { show: boolean }) {
             {rotate(r.comps, tick).map((m, ci) => (
               <div key={ci} style={{ display: 'flex', justifyContent: 'center', perspective: '300px' }}>
                 {rows[i] ? (
+                  // Outer: flip-in on each re-shuffle. Inner: continuous bob so
+                  // the column is always visibly animating (never stops).
                   <span
                     key={tick}
                     style={{
                       display: 'inline-flex',
                       transformOrigin: 'center',
-                      animation: reduced ? 'none' : `clvGlyphFlip 0.6s ${cb} ${ci * 0.08}s both`
+                      animation: reduced ? 'none' : `clvGlyphFlip 0.55s ${cb} ${ci * 0.08}s both`
                     }}
                   >
-                    <Glyph m={m} />
+                    <span style={{ display: 'inline-flex', animation: reduced ? 'none' : `clvGlyphBob 2.4s ease-in-out ${ci * 0.22}s infinite` }}>
+                      <Glyph m={m} />
+                    </span>
                   </span>
                 ) : (
                   <span style={{ display: 'inline-flex', opacity: 0, transform: 'scale(0.6)' }}>
