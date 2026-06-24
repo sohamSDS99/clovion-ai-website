@@ -6,8 +6,9 @@ import { analytics } from '@/lib/analytics'
 
 // Fires a page_view on client-side route changes only.
 // GTM's container fires its own pageview on the initial load via gtm.js,
-// and the Meta Pixel bootstrap in app/layout.tsx fires its own PageView,
-// so we skip the first render to avoid double-counting both.
+// the Meta Pixel bootstrap fires its own PageView, and the LinkedIn
+// Insight Tag fires its own beacon when insight.min.js loads, so we
+// skip the first render to avoid triple-counting on initial load.
 export function RouteTracker() {
   const pathname = usePathname()
   const firstRender = useRef(true)
@@ -18,8 +19,12 @@ export function RouteTracker() {
       return
     }
     analytics.pageView(pathname)
-    const fbq = (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq
-    fbq?.('track', 'PageView')
+    const w = window as unknown as {
+      fbq?: (...args: unknown[]) => void
+      lintrk?: (...args: unknown[]) => void
+    }
+    w.fbq?.('track', 'PageView')
+    w.lintrk?.('track', { conversion_id: '' })
   }, [pathname])
 
   return null

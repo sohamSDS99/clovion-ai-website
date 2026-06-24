@@ -24,6 +24,13 @@ const clarityBootstrap = `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q
 // every client-side navigation also fires a Pixel PageView.
 const metaPixelBootstrap = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1059601186732604');fbq('track','PageView');`
 
+// LinkedIn Insight Tag — partner id 9552940. Sets up the lintrk queue,
+// pushes the partner id into window._linkedin_data_partner_ids, then
+// async-loads insight.min.js which fires the initial pageview beacon
+// to px.ads.linkedin.com/wa/. SPA route changes re-fire via
+// RouteTracker.tsx so client-side navs are tracked alongside fbq + GA4.
+const linkedInBootstrap = `_linkedin_partner_id="9552940";window._linkedin_data_partner_ids=window._linkedin_data_partner_ids||[];window._linkedin_data_partner_ids.push(_linkedin_partner_id);(function(l){if(!l){window.lintrk=function(a,b){window.lintrk.q.push([a,b])};window.lintrk.q=[]}var s=document.getElementsByTagName("script")[0];var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src="https://snap.licdn.com/li.lms-analytics/insight.min.js";s.parentNode.insertBefore(b,s);})(window.lintrk);`
+
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
   variable: '--font-saans',
@@ -78,6 +85,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: clarityBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: metaPixelBootstrap }} />
+        <script dangerouslySetInnerHTML={{ __html: linkedInBootstrap }} />
         <link
           rel="stylesheet"
           href="https://assets.calendly.com/assets/external/widget.css"
@@ -96,6 +104,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             style={{ display: 'none' }}
             alt=""
             src="https://www.facebook.com/tr?id=1059601186732604&ev=PageView&noscript=1"
+          />
+          <img
+            height="1"
+            width="1"
+            style={{ display: 'none' }}
+            alt=""
+            src="https://px.ads.linkedin.com/collect/?pid=9552940&fmt=gif"
           />
         </noscript>
         <ThemeShell />
