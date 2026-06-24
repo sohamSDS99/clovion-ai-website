@@ -4,7 +4,7 @@
 // Left feed (prompt -> thinking -> 3 ranked brand cards with brush-paint
 // highlights) + right insights sidebar.
 
-import { type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger, useTypewriter } from './motion'
 import { MondayGlyph, PipedriveGlyph, ChatGptGlyph, UserGlyph } from './glyphs'
 import { LIGHT, TAG_COLORS, HL } from './palette'
@@ -76,19 +76,77 @@ const GAPS1 = [
 const HL_TOTAL = CARDS.reduce((n, c) => n + c.hl.length, 0)
 const HL_OFFSET = CARDS.map((_, i) => CARDS.slice(0, i).reduce((n, c) => n + c.hl.length, 0))
 
+// Sentiment note per highlight (global order: Monday 0-3, Pipedrive 4-6).
+const NOTES: { tone: Tint; score: number; desc: string }[] = [
+  { tone: 'pos', score: 95, desc: 'Generous free tier called out as a key strength for early-stage teams.' },
+  { tone: 'pos', score: 90, desc: 'Broad integration ecosystem cited as a major advantage.' },
+  { tone: 'pos', score: 88, desc: 'Scales smoothly from CRM into Sales, Marketing, and Service hubs.' },
+  { tone: 'neg', score: 32, desc: 'Pricing and feature-gating flagged as the main drawback at higher tiers.' },
+  { tone: 'pos', score: 84, desc: 'Positioned as a flexible, modern, pipeline-first CRM.' },
+  { tone: 'pos', score: 86, desc: 'Strong customization across pipelines, views, and workflows.' },
+  { tone: 'pos', score: 82, desc: 'Balances power and flexibility without heavy complexity or cost.' }
+]
+
 export function MockPerception({ show }: { show: boolean }) {
   const play = useReveal(show)
   const reduced = useReducedMotion()
   const typed = useTypewriter('What is the best CRM for a growing SaaS company with 50 employees?', play, 38)
   const cards = useStagger(CARDS.length, play, 180, 1100)
   const brush = useStagger(HL_TOTAL, play, 150, 1500)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [noteIdx, setNoteIdx] = useState(0)
+  const [notePos, setNotePos] = useState<{ left: number; top: number } | null>(null)
+  const noteTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // After the highlights paint, cycle a sentiment note over each one.
+  useEffect(() => {
+    if (!play || reduced) {
+      setNotePos(null)
+      return
+    }
+    let i = 0
+    setNoteIdx(0)
+    const startT = setTimeout(() => {
+      noteTimer.current = setInterval(() => {
+        i = (i + 1) % NOTES.length
+        setNoteIdx(i)
+      }, 2600)
+    }, 2600)
+    return () => {
+      clearTimeout(startT)
+      if (noteTimer.current) clearInterval(noteTimer.current)
+    }
+  }, [play, reduced])
+
+  // Anchor the active note to its highlight, clamped inside the dashboard.
+  useEffect(() => {
+    if (!play || reduced) return
+    const root = rootRef.current
+    if (!root) return
+    const el = root.querySelector(`[data-note-idx="${noteIdx}"]`) as HTMLElement | null
+    if (!el) {
+      setNotePos(null)
+      return
+    }
+    const rr = root.getBoundingClientRect()
+    const hr = el.getBoundingClientRect()
+    const noteW = Math.min(360, rr.width * 0.38)
+    const noteH = rr.width * 0.14
+    let left = hr.left - rr.left + hr.width / 2 - noteW / 2
+    left = Math.max(8, Math.min(left, rr.width - noteW - 8))
+    let top = hr.bottom - rr.top + 8
+    if (top + noteH > rr.height - 8) top = Math.max(8, hr.top - rr.top - noteH - 8)
+    setNotePos({ left, top })
+  }, [noteIdx, play, reduced])
 
   return (
     <div
+      ref={rootRef}
       style={{
         width: '100%',
         height: '100%',
         ...LIGHT,
+        position: 'relative',
         containerType: 'size',
         background: 'var(--white)',
         color: 'var(--ink)',
@@ -201,6 +259,45 @@ export function MockPerception({ show }: { show: boolean }) {
           </SideCard>
         </div>
       </div>
+      {notePos && play && !reduced && <SentimentNote key={noteIdx} idx={noteIdx} left={notePos.left} top={notePos.top} />}
+    </div>
+  )
+}
+
+function SentimentNote({ idx, left, top }: { idx: number; left: number; top: number }) {
+  const n = NOTES[idx]
+  const bar = n.tone === 'neg' ? '#f5616a' : n.tone === 'neu' ? '#f5a623' : '#3fcf6e'
+  const title = n.tone === 'neg' ? 'Negative Sentiment' : n.tone === 'neu' ? 'Neutral Sentiment' : 'Positive Sentiment'
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left,
+        top,
+        width: '38cqw',
+        maxWidth: 360,
+        zIndex: 30,
+        background: '#18181c',
+        color: '#fff',
+        borderRadius: '1.2cqw',
+        boxShadow: '0 16px 40px rgba(0,0,0,0.34)',
+        padding: '1.2cqw 1.4cqw',
+        pointerEvents: 'none',
+        animation: `clvNotePop 0.42s ${cb} both`
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1cqw' }}>
+        <span style={{ fontSize: '1.2cqw', fontWeight: 600 }}>{title}</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="M12 5.4a3.2 3.2 0 015.6 2.1 3.2 3.2 0 011.4 5 3.2 3.2 0 01-3.4 4.6 3.2 3.2 0 01-5.6-.6 3.2 3.2 0 01-1.4-5A3.2 3.2 0 0112 5.4z" />
+        </svg>
+      </div>
+      <div style={{ marginTop: '0.9cqw', display: 'inline-flex', alignItems: 'center', gap: '0.7cqw', background: 'rgba(255,255,255,0.08)', borderRadius: '0.6cqw', padding: '0.35cqw 0.8cqw' }}>
+        <span style={{ width: '0.45cqw', height: '1.6cqw', borderRadius: 2, background: bar }} />
+        <span style={{ fontSize: '1.6cqw', fontWeight: 700, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>{n.score}</span>
+      </div>
+      <p style={{ margin: '0.9cqw 0 0', fontSize: '1.1cqw', lineHeight: 1.45, color: 'rgba(255,255,255,0.72)' }}>{n.desc}</p>
+      <style>{'@keyframes clvNotePop{from{opacity:0;transform:translateY(1cqw) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}'}</style>
     </div>
   )
 }
@@ -222,7 +319,7 @@ function Highlighted({ body, hl, baseIndex, brush }: { body: string; hl: { text:
     <>
       {segs.map((s, i) =>
         s.tint ? (
-          <span key={i} style={{ position: 'relative', display: 'inline', borderRadius: '0.3cqw' }}>
+          <span key={i} data-note-idx={s.gi} style={{ position: 'relative', display: 'inline', borderRadius: '0.3cqw' }}>
             <span
               aria-hidden
               style={{
