@@ -376,157 +376,26 @@ function MockRankings() {
   )
 }
 
-// ── Mock 04 · Recommendations ───────────────────────────────────────
-const REC_CATS = [
-  { n: 'AI Visibility', c: 15 },
-  { n: 'Brand Perception', c: 11 },
-  { n: 'Competitive', c: 12 },
-  { n: 'AEO / GEO Content', c: 6 },
-  { n: 'Technical & Authority', c: 4 }
-]
-const REC_ITEMS = [
-  { t: 'Win the citation for acs.org', c: 'AI Visibility', p: 'High' },
-  { t: 'Improve association with “enterprise”', c: 'Perception', p: 'High' },
-  { t: 'Close the gap on “SDS Management”', c: 'Competitive', p: 'High' },
-  { t: 'Create content for “regulatory compliance”', c: 'AEO/GEO', p: 'Med' },
-  { t: 'Get cited in AI Overviews', c: 'AI Visibility', p: 'Med' }
-]
-const REC_DO = [
-  'Publish an answer-first page targeting the cited prompts.',
-  'Match the cited source, then go deeper with specifics.',
-  'Add clear headings so engines can lift a clean quote.'
-]
-const REC_PRI_COLOR: Record<string, string> = { High: '#fb7185', Med: '#fbbf24', Low: 'var(--ink-50)' }
-const REC_PRI_BG: Record<string, string> = { High: 'rgba(251,113,133,0.12)', Med: 'rgba(251,191,36,0.12)', Low: 'var(--ink-04)' }
-
+// ── Mock 04 · Recommendations — static image of the Opportunities dashboard ─
 function MockRecommendations() {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '0.82fr 1.05fr 1.05fr', gap: 13, height: '100%', overflow: 'hidden' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', marginBottom: 8 }}>
-          48 recommendations
-        </div>
-        <div style={{ display: 'grid', gap: 5 }}>
-          {REC_CATS.map((cat, i) => (
-            <span
-              key={cat.n}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 6,
-                padding: '7px 9px',
-                borderRadius: 8,
-                background: i === 0 ? 'var(--positive-bg)' : 'var(--ink-04)',
-                border: `1px solid ${i === 0 ? 'var(--positive-border)' : 'var(--line)'}`
-              }}
-            >
-              <span style={{ fontSize: '0.74rem', fontWeight: 600, color: i === 0 ? 'var(--ink)' : 'var(--ink-70)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {cat.n}
-              </span>
-              <span style={{ flexShrink: 0, fontFamily: 'var(--font-mono)', fontSize: '0.64rem', fontWeight: 600, color: i === 0 ? 'var(--positive)' : 'var(--ink-50)' }}>
-                {cat.c}
-              </span>
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', padding: '0 2px 7px', fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', borderBottom: '1px solid var(--line)' }}>
-          <span>Recommendation</span>
-          <span>Priority</span>
-        </div>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {REC_ITEMS.map((r, i) => (
-            <div
-              key={r.t}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 9,
-                padding: '0 2px',
-                flex: 1,
-                borderBottom: i < REC_ITEMS.length - 1 ? '1px solid var(--line)' : 'none'
-              }}
-            >
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {r.t}
-                </span>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.58rem', color: 'var(--ink-50)' }}>{r.c}</span>
-              </span>
-              <span
-                style={{
-                  flexShrink: 0,
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.58rem',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  color: REC_PRI_COLOR[r.p],
-                  background: REC_PRI_BG[r.p],
-                  borderRadius: 999,
-                  padding: '3px 9px'
-                }}
-              >
-                {r.p}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', borderRadius: 12, border: '1px solid var(--line)', background: 'var(--white)', padding: 13, minWidth: 0, overflow: 'hidden' }}>
-        <span style={{ fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)', lineHeight: 1.2 }}>
-          Win the citation for acs.org
-        </span>
-        <span style={{ marginTop: 8, fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)' }}>
-          What to do
-        </span>
-        <div style={{ marginTop: 8, display: 'grid', gap: 6 }}>
-          {REC_DO.map((d, i) => (
-            <span key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-              <MiniCheck size={15} />
-              <span style={{ fontSize: '0.72rem', lineHeight: 1.35, color: 'var(--ink-70)' }}>{d}</span>
-            </span>
-          ))}
-        </div>
-        <div style={{ marginTop: 'auto', paddingTop: 11, display: 'flex', gap: 8 }}>
-          <div style={{ flex: 1, padding: '8px 10px', borderRadius: 9, background: 'var(--subtle)', border: '1px solid var(--line)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--positive)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-              +18.7%
-            </div>
-            <div style={{ marginTop: 4, fontSize: '0.6rem', color: 'var(--ink-60)' }}>Visibility gain</div>
-          </div>
-          <div style={{ flex: 1, padding: '8px 10px', borderRadius: 9, background: 'var(--subtle)', border: '1px solid var(--line)' }}>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1rem', fontWeight: 600, letterSpacing: '-0.02em', color: 'var(--ink)', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-              1.6x
-            </div>
-            <div style={{ marginTop: 4, fontSize: '0.6rem', color: 'var(--ink-60)' }}>More cited</div>
-          </div>
-        </div>
-        <span
-          style={{
-            marginTop: 9,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 6,
-            height: 30,
-            borderRadius: 999,
-            background: 'var(--ink-surface, var(--ink))',
-            color: 'var(--on-ink)',
-            fontSize: '0.74rem',
-            fontWeight: 600
-          }}
-        >
-          Write a page targeting this <ArrowRight />
-        </span>
-      </div>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      <Image
+        src="/home/opportunities.png"
+        alt="AEO/GEO Recommendations — prioritized opportunities across citations, alerts, on-page, crawl, and query signals"
+        width={1920}
+        height={1280}
+        priority={false}
+        loading="lazy"
+        quality={95}
+        sizes="(max-width: 1000px) 100vw, 60vw"
+        unoptimized
+        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+      />
     </div>
   )
 }
+
 
 // ── PILLARS data ────────────────────────────────────────────────────
 type Pillar = {
@@ -593,7 +462,8 @@ const PILLARS: Pillar[] = [
     tint: '#ecfdf5',
     fg: '#047857',
     glyph: G.bulb,
-    Mock: MockRecommendations
+    Mock: MockRecommendations,
+    mockAspect: '1920 / 1280'
   }
 ]
 
