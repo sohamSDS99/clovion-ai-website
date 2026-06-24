@@ -10,6 +10,13 @@ import { MockRecommendations } from './mocks/MockRecommendations'
 
 const STEP_VH = 60
 
+// Single shared frame aspect for ALL four pillar mocks. Previously each pillar
+// carried its own ratio (1.5 / 1.9 / 1.5 / 1.57), so the slot resized as you
+// scrolled between pillars — the frame visibly jumped/misaligned. One uniform
+// ratio keeps the frame box identical for every pillar; the cqw-fluid mocks
+// reflow to fill it.
+const FRAME_ASPECT = '16 / 10'
+
 // ── glyph paths ───────────────────────────────────────────────────────
 const G = {
   track: <path d="M12 4a8 8 0 100 16 8 8 0 000-16zm0 4a4 4 0 100 8 4 4 0 000-8zm0 3a1 1 0 100 2 1 1 0 000-2z" />,
@@ -53,10 +60,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.track,
     Mock: MockVisibility,
-    // ~1.5:1 (matches the reference dashboard proportions) — the stacked,
-    // self-cycling dashboard needs the extra height so the chart isn't crushed
-    // on the chart tabs and the 9-row Topic list isn't clipped.
-    mockAspect: '1920 / 1280'
+    mockAspect: FRAME_ASPECT
   },
   {
     sku: '02 — Perception',
@@ -69,7 +73,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.face,
     Mock: MockPerception,
-    mockAspect: '1834 / 961'
+    mockAspect: FRAME_ASPECT
   },
   {
     sku: '03 — Competitive',
@@ -82,7 +86,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bars,
     Mock: MockRankings,
-    mockAspect: '1920 / 1280'
+    mockAspect: FRAME_ASPECT
   },
   {
     sku: '04 — Recommendations',
@@ -95,7 +99,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bulb,
     Mock: MockRecommendations,
-    mockAspect: '1876 / 1192'
+    mockAspect: FRAME_ASPECT
   }
 ]
 
