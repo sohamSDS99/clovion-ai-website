@@ -178,8 +178,8 @@ export default function AboutPage() {
               <li
                 key={r.title}
                 className={`grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 py-10 ${
-                  i > 0 ? 'border-t border-line' : 'border-t border-line'
-                } ${i === research.length - 1 ? 'border-b border-line' : ''}`}
+                  i > 0 ? 'border-t border-[var(--line)]' : 'border-t border-[var(--line)]'
+                } ${i === research.length - 1 ? 'border-b border-[var(--line)]' : ''}`}
               >
                 <div className="md:col-span-3">
                   <div className="font-mono text-[0.78rem] uppercase tracking-[0.14em] text-[var(--ink)]">

@@ -173,7 +173,7 @@ export default function ComparePage() {
                         <span
                           className={[
                             'h-1 w-1 rounded-full',
-                            isLive ? 'bg-white' : 'bg-[rgb(var(--ink-rgb)/40%)]'
+                            isLive ? 'bg-[var(--white)]' : 'bg-[rgb(var(--ink-rgb)/40%)]'
                           ].join(' ')}
                         />
                         {c.status}

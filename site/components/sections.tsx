@@ -20,13 +20,13 @@ export function LogoMarquee({
   return (
     <section className={cn('section-y-tight', className)}>
       <Container>
-        <p className="text-center text-[0.82rem] uppercase tracking-[0.14em] text-ink-50 mb-10">{eyebrow}</p>
+        <p className="text-center text-[0.82rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/50%)] mb-10">{eyebrow}</p>
         <div className="overflow-hidden gradient-mask-edges">
           <div className="flex items-center gap-14 animate-marquee w-[300%]">
             {doubled.map((name, i) => (
               <div
                 key={`${name}-${i}`}
-                className="font-display text-2xl md:text-[1.7rem] tracking-[-0.02em] text-ink-40 hover:text-ink-80 transition-colors whitespace-nowrap"
+                className="font-display text-2xl md:text-[1.7rem] tracking-[-0.02em] text-[rgb(var(--ink-rgb)/40%)] hover:text-[rgb(var(--ink-rgb)/80%)] transition-colors whitespace-nowrap"
               >
                 {name}
               </div>
@@ -44,7 +44,7 @@ export function AIEngineStrip({ className }: { className?: string }) {
       {aiEngines.map((engine) => (
         <span
           key={engine}
-          className="inline-flex h-8 items-center px-3 rounded-pill bg-[var(--white)] border border-[var(--line)] text-[0.82rem] text-ink-70 font-semibold"
+          className="inline-flex h-8 items-center px-3 rounded-pill bg-[var(--white)] border border-[var(--line)] text-[0.82rem] text-[rgb(var(--ink-rgb)/70%)] font-semibold"
         >
           {engine}
         </span>
@@ -97,7 +97,7 @@ export function FAQ({
                     <span
                       className={cn(
                         'mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--line)] transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                        isOpen ? 'bg-ink text-white rotate-45 border-ink' : 'group-hover:border-[rgb(var(--ink-rgb)/20%)]'
+                        isOpen ? 'bg-ink text-white rotate-45 border-[var(--ink)]' : 'group-hover:border-[rgb(var(--ink-rgb)/20%)]'
                       )}
                       aria-hidden
                     >
@@ -113,7 +113,7 @@ export function FAQ({
                     )}
                   >
                     <div className="overflow-hidden">
-                      <p className="pb-7 pr-12 text-[1rem] leading-relaxed text-ink-70">{item.a}</p>
+                      <p className="pb-7 pr-12 text-[1rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)]">{item.a}</p>
                     </div>
                   </div>
                 </li>
@@ -220,7 +220,7 @@ export function StatStrip({
           <h2 className="display-md mt-4 text-balance">{heading}</h2>
           {sub && <p className="lead mt-5 text-balance">{sub}</p>}
         </div>
-        <ul className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line border border-[var(--line)] rounded-card overflow-hidden">
+        <ul className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[var(--line)] border border-[var(--line)] rounded-card overflow-hidden">
           {items.map((m) => (
             <li
               key={m.label}
@@ -229,7 +229,7 @@ export function StatStrip({
               <div className="display-lg metric-glow inline-block font-display text-[var(--ink)]">
                 {m.value}
               </div>
-              <p className="mt-5 text-[0.95rem] leading-relaxed text-ink-70 max-w-[28ch]">{m.label}</p>
+              <p className="mt-5 text-[0.95rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)] max-w-[28ch]">{m.label}</p>
             </li>
           ))}
         </ul>
@@ -264,7 +264,7 @@ export function FeatureGrid({
             {it.icon ?? <span className="text-[0.78rem] font-semibold">{String(i + 1).padStart(2, '0')}</span>}
           </div>
           <h3 className="font-display text-[1.1rem] font-semibold tracking-[-0.02em]">{it.name}</h3>
-          <p className="mt-2.5 text-[0.94rem] leading-relaxed text-ink-70">{it.description}</p>
+          <p className="mt-2.5 text-[0.94rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)]">{it.description}</p>
         </li>
       ))}
     </ul>
@@ -302,7 +302,7 @@ export function TestimonialPullQuote({
             />
             <div className="text-left">
               <div className="font-semibold text-[0.95rem]">{author}</div>
-              <div className="text-[0.85rem] text-ink-60">
+              <div className="text-[0.85rem] text-[rgb(var(--ink-rgb)/60%)]">
                 {role} · {company}
               </div>
             </div>
@@ -387,19 +387,19 @@ export function TestimonialRail({
                   <path d="M9 0C4.5 1 .5 5 .5 10v14h11V10H5C5 7 7.5 4 11 3L9 0zm14 0c-4.5 1-8.5 5-8.5 10v14h11V10H19c0-3 2.5-6 6-7L23 0z" />
                 </svg>
               </div>
-              <blockquote className="mt-5 text-[1rem] md:text-[1.05rem] leading-relaxed text-ink-80 flex-1 text-balance">
+              <blockquote className="mt-5 text-[1rem] md:text-[1.05rem] leading-relaxed text-[rgb(var(--ink-rgb)/80%)] flex-1 text-balance">
                 {t.quote}
               </blockquote>
               <div className="mt-6 pt-6 border-t border-[var(--line)] flex items-center gap-3">
                 <div
                   aria-hidden
-                  className="h-10 w-10 rounded-full bg-[rgb(var(--ink-rgb)/10%)] shrink-0 flex items-center justify-center text-[0.78rem] font-semibold text-ink-60"
+                  className="h-10 w-10 rounded-full bg-[rgb(var(--ink-rgb)/10%)] shrink-0 flex items-center justify-center text-[0.78rem] font-semibold text-[rgb(var(--ink-rgb)/60%)]"
                 >
                   {t.author.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                 </div>
                 <div className="min-w-0">
                   <div className="font-semibold text-[0.92rem] truncate">{t.author}</div>
-                  <div className="text-[0.82rem] text-ink-60 truncate">{t.role} · {t.company}</div>
+                  <div className="text-[0.82rem] text-[rgb(var(--ink-rgb)/60%)] truncate">{t.role} · {t.company}</div>
                 </div>
               </div>
             </article>

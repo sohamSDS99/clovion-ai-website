@@ -189,7 +189,7 @@ const categories: { label: string; type?: EntryType }[] = [
 function Avatar({ initials }: { initials: string }) {
   return (
     <span
-      className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-ink text-white text-[10px] font-semibold tracking-tight ring-2 ring-bg"
+      className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-ink text-white text-[10px] font-semibold tracking-tight ring-2 ring-[var(--bg)]"
       aria-label={`Contributor ${initials}`}
     >
       {initials}
@@ -214,7 +214,7 @@ function ContributorRow({ initials }: { initials: string[] }) {
 
 function StatBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="my-6 border border-[var(--line)] bg-subtle/60 rounded-lg overflow-hidden">
+    <div className="my-6 border border-[var(--line)] bg-[var(--subtle)] rounded-lg overflow-hidden">
       <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-[var(--line)]">
         <div className="px-4 py-3 text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)] font-mono">
           {label}
@@ -317,7 +317,7 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
           <span className="ml-auto font-mono text-[10px] text-[rgb(var(--ink-rgb)/60%)]">4,812 rows</span>
         </div>
         <div className="font-mono text-xs">
-          <div className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-[var(--line)] text-[rgb(var(--ink-rgb)/50%)] uppercase text-[10px] tracking-wider bg-subtle/60">
+          <div className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-[var(--line)] text-[rgb(var(--ink-rgb)/50%)] uppercase text-[10px] tracking-wider bg-[var(--subtle)]">
             <span>prompt</span>
             <span>locale</span>
             <span>intent</span>
@@ -331,7 +331,7 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
           ].map((r, i) => (
             <div
               key={i}
-              className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-line/60 last:border-0 text-[rgb(var(--ink-rgb)/80%)]"
+              className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-[var(--line)] last:border-0 text-[rgb(var(--ink-rgb)/80%)]"
             >
               <span className="truncate">{r[0]}</span>
               <span className="text-[rgb(var(--ink-rgb)/50%)]">{r[1]}</span>
@@ -377,7 +377,7 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
           <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">POST /hooks/clovion</span>
           <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded bg-ink text-white">200 OK</span>
         </div>
-        <div className="p-5 font-mono text-xs leading-relaxed text-[rgb(var(--ink-rgb)/80%)] bg-subtle/40">
+        <div className="p-5 font-mono text-xs leading-relaxed text-[rgb(var(--ink-rgb)/80%)] bg-[var(--subtle)]">
           <div className="text-[rgb(var(--ink-rgb)/40%)]">{'// suggestion.shipped'}</div>
           <div>{'{'}</div>
           <div className="pl-3">{'"event":'} <span className="text-[var(--ink)]">"suggestion.shipped"</span>,</div>
@@ -450,7 +450,7 @@ function EntryBlock({ entry }: { entry: ChangelogEntry }) {
   return (
     <article id={entry.id} className="relative scroll-mt-28">
       {/* Date header — sticky within the entry */}
-      <div className="sticky top-20 z-10 -mx-4 px-4 py-3 bg-bg/85 backdrop-blur-md flex items-center justify-between border-b border-line/60 mb-7">
+      <div className="sticky top-20 z-10 -mx-4 px-4 py-3 bg-[var(--bg)] backdrop-blur-md flex items-center justify-between border-b border-[var(--line)] mb-7">
         <div className="font-mono text-xs uppercase tracking-wider text-[rgb(var(--ink-rgb)/60%)]">{entry.dateLabel}</div>
         <Tag>{entry.type}</Tag>
       </div>
@@ -623,11 +623,11 @@ export default function ChangelogPage() {
                     <EntryBlock entry={entry} />
                     {idx < entries.length - 1 && (
                       <div className="mt-20 flex items-center gap-4" aria-hidden>
-                        <div className="h-px flex-1 bg-line" />
+                        <div className="h-px flex-1 bg-[var(--line)]" />
                         <span className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/30%)]">
                           ·
                         </span>
-                        <div className="h-px flex-1 bg-line" />
+                        <div className="h-px flex-1 bg-[var(--line)]" />
                       </div>
                     )}
                   </div>

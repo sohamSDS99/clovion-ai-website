@@ -39,7 +39,7 @@ export function Section({
       id={id}
       className={cn(
         tight ? 'section-y-tight' : 'section-y',
-        bg === 'subtle' && 'bg-subtle',
+        bg === 'subtle' && 'bg-[var(--subtle)]',
         bg === 'ink' && 'bg-ink text-white',
         bg === 'gradient' && 'relative overflow-hidden',
         className

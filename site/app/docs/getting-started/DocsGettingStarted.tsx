@@ -95,7 +95,7 @@ export default function DocsGettingStarted() {
       </Section>
 
       {/* 3-pane layout */}
-      <Section tight className="!py-0 bg-bg">
+      <Section tight className="!py-0 bg-[var(--bg)]">
         <Container>
           <div className="lg:hidden border-b border-[var(--line)] py-4">
             <button
@@ -238,7 +238,7 @@ export default function DocsGettingStarted() {
                       <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/50%)] block mb-2">
                         Brand name
                       </label>
-                      <div className="border border-[rgb(var(--ink-rgb)/15%)] rounded-md px-4 py-3 text-[14px] text-[var(--ink)] bg-bg">
+                      <div className="border border-[rgb(var(--ink-rgb)/15%)] rounded-md px-4 py-3 text-[14px] text-[var(--ink)] bg-[var(--bg)]">
                         Clovion AI
                       </div>
                     </div>
@@ -246,7 +246,7 @@ export default function DocsGettingStarted() {
                       <label className="font-mono text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/50%)] block mb-2">
                         Primary domain
                       </label>
-                      <div className="border border-[rgb(var(--ink-rgb)/15%)] rounded-md px-4 py-3 text-[14px] text-[rgb(var(--ink-rgb)/70%)] bg-bg font-mono">
+                      <div className="border border-[rgb(var(--ink-rgb)/15%)] rounded-md px-4 py-3 text-[14px] text-[rgb(var(--ink-rgb)/70%)] bg-[var(--bg)] font-mono">
                         clovion.ai
                       </div>
                     </div>

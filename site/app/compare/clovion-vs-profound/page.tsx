@@ -120,11 +120,11 @@ function Cell({ value }: { value: string | boolean }) {
     )
   }
   if (value === false) {
-    return <span className="text-ink-40 text-lg leading-none">—</span>
+    return <span className="text-[rgb(var(--ink-rgb)/40%)] text-lg leading-none">—</span>
   }
   const isNumeric = /^[\d.]+/.test(value)
   return (
-    <span className={isNumeric ? 'font-mono text-[0.95rem] tracking-tight' : 'text-[0.95rem] text-ink-80'}>
+    <span className={isNumeric ? 'font-mono text-[0.95rem] tracking-tight' : 'text-[0.95rem] text-[rgb(var(--ink-rgb)/80%)]'}>
       {value}
     </span>
   )
@@ -145,8 +145,8 @@ export default function ClovionVsProfoundPage() {
           <div className="max-w-4xl">
             <div className="flex items-center gap-3">
               <Eyebrow>Compare</Eyebrow>
-              <span className="text-ink-40">/</span>
-              <span className="text-sm uppercase tracking-[0.18em] text-ink-60 font-semibold">
+              <span className="text-[rgb(var(--ink-rgb)/40%)]">/</span>
+              <span className="text-sm uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/60%)] font-semibold">
                 Clovion vs Profound
               </span>
             </div>
@@ -164,7 +164,7 @@ export default function ClovionVsProfoundPage() {
                 Get Free Score
               </Button>
             </div>
-            <p className="mt-6 text-sm text-ink-50">
+            <p className="mt-6 text-sm text-[rgb(var(--ink-rgb)/50%)]">
               Side-by-side comparison. Updated November 2026.
             </p>
           </div>
@@ -175,14 +175,14 @@ export default function ClovionVsProfoundPage() {
       <Section tight className="border-y border-[var(--line)]">
         <Container>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <p className="text-sm uppercase tracking-[0.18em] text-ink-60 font-semibold">
+            <p className="text-sm uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/60%)] font-semibold">
               Teams that switched
             </p>
             <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
               {switchers.map((name) => (
                 <span
                   key={name}
-                  className="font-semibold text-ink-70 text-[1.15rem] tracking-tight"
+                  className="font-semibold text-[rgb(var(--ink-rgb)/70%)] text-[1.15rem] tracking-tight"
                 >
                   {name}
                 </span>
@@ -200,7 +200,7 @@ export default function ClovionVsProfoundPage() {
             <h2 className="display-md mt-5 text-balance">
               The hard parts most comparison pages skip.
             </h2>
-            <p className="lead mt-5 text-ink-70">
+            <p className="lead mt-5 text-[rgb(var(--ink-rgb)/70%)]">
               Engine counts and pricing matter, but the real distance is in how each tool sees, refreshes, and acts on what AI is saying.
             </p>
           </div>
@@ -236,7 +236,7 @@ export default function ClovionVsProfoundPage() {
                     <h3 className="display-sm text-[1.6rem] md:text-[1.85rem] font-semibold leading-tight tracking-[-0.02em]">
                       {d.title}
                     </h3>
-                    <p className="mt-5 text-[1.02rem] leading-relaxed text-ink-70">
+                    <p className="mt-5 text-[1.02rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)]">
                       {d.body}
                     </p>
                   </div>
@@ -255,7 +255,7 @@ export default function ClovionVsProfoundPage() {
             <h2 className="display-md mt-5 text-balance">
               The whole picture, one table.
             </h2>
-            <p className="lead mt-5 text-ink-70">
+            <p className="lead mt-5 text-[rgb(var(--ink-rgb)/70%)]">
               Eighteen dimensions teams actually weigh when they evaluate. Sourced from sales conversations with customers who ran both tools.
             </p>
           </div>
@@ -263,14 +263,14 @@ export default function ClovionVsProfoundPage() {
           <div className="mt-14 -mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
             <div className="min-w-[640px] md:min-w-0 px-4 md:px-0">
               <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--white)]">
-                <div className="grid grid-cols-[1.6fr_1fr_1fr] border-b border-[var(--line)] bg-bg">
-                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] text-ink-60 font-semibold">
+                <div className="grid grid-cols-[1.6fr_1fr_1fr] border-b border-[var(--line)] bg-[var(--bg)]">
+                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/60%)] font-semibold">
                     Dimension
                   </div>
                   <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-[var(--ink)]">
                     Clovion AI
                   </div>
-                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink-60">
+                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-[rgb(var(--ink-rgb)/60%)]">
                     Profound
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export default function ClovionVsProfoundPage() {
                       key={row.dim}
                       className={
                         'grid grid-cols-[1.6fr_1fr_1fr] items-center border-b border-[var(--line)] last:border-b-0' +
-                        (idx % 2 === 1 ? ' bg-bg/40' : '')
+                        (idx % 2 === 1 ? ' bg-[var(--bg)]' : '')
                       }
                     >
                       <div className="px-6 py-5 text-[0.95rem] text-[var(--ink)] font-semibold">
@@ -299,7 +299,7 @@ export default function ClovionVsProfoundPage() {
             </div>
           </div>
 
-          <p className="mt-8 text-sm text-ink-50 max-w-2xl">
+          <p className="mt-8 text-sm text-[rgb(var(--ink-rgb)/50%)] max-w-2xl">
             Notes verified November 2026 from public docs, support transcripts, and a 12-month-old Profound contract reviewed with permission. If anything here is out of date, <Link href="/contact" className="underline underline-offset-2 hover:text-[var(--ink)]">tell us</Link>.
           </p>
         </Container>
@@ -319,9 +319,9 @@ export default function ClovionVsProfoundPage() {
             <div className="mt-10 flex flex-col md:flex-row md:items-center md:justify-center gap-3 md:gap-4 text-sm">
               <div className="font-semibold text-[var(--ink)]">Marcus Webb</div>
               <span className="hidden md:inline text-[rgb(var(--ink-rgb)/30%)]">&middot;</span>
-              <div className="text-ink-70">Head of Growth, Notion</div>
+              <div className="text-[rgb(var(--ink-rgb)/70%)]">Head of Growth, Notion</div>
               <span className="hidden md:inline text-[rgb(var(--ink-rgb)/30%)]">&middot;</span>
-              <div className="text-ink-50">Switched from Profound, Q1 2026</div>
+              <div className="text-[rgb(var(--ink-rgb)/50%)]">Switched from Profound, Q1 2026</div>
             </div>
             <div className="mt-10 inline-flex">
               <Button href="/customers" variant="secondary" size="sm">

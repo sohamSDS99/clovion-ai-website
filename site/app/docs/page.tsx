@@ -284,7 +284,7 @@ export default function DocsPage() {
               <li key={entry.version}>
                 <Link
                   href="/blog"
-                  className="group grid grid-cols-12 items-center gap-4 py-5 hover:bg-subtle/50 -mx-4 px-4 transition-colors"
+                  className="group grid grid-cols-12 items-center gap-4 py-5 hover:bg-[var(--subtle)] -mx-4 px-4 transition-colors"
                 >
                   <div className="col-span-12 sm:col-span-3 font-mono text-[12px] text-[rgb(var(--ink-rgb)/50%)] tabular-nums">
                     {entry.date} · v{entry.version}

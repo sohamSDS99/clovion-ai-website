@@ -54,21 +54,21 @@ export function WalkthroughSection() {
             <div ref={ref0} className="min-h-[40vh]">
               <StageNumber active={stage === 0} num="01" />
               <h3 className="display-sm mt-4 font-semibold">Detected</h3>
-              <p className="mt-3 text-ink-70 leading-relaxed max-w-md">
+              <p className="mt-3 text-[rgb(var(--ink-rgb)/70%)] leading-relaxed max-w-md">
                 Our crawler reads /pricing daily. Today, it noticed no JSON-LD in the head. Severity HIGH because the page drives 41% of your buyer-intent queries. Estimated lift: +6 visibility points.
               </p>
             </div>
             <div ref={ref1} className="min-h-[40vh]">
               <StageNumber active={stage === 1} num="02" />
               <h3 className="display-sm mt-4 font-semibold">Suggested fix</h3>
-              <p className="mt-3 text-ink-70 leading-relaxed max-w-md">
+              <p className="mt-3 text-[rgb(var(--ink-rgb)/70%)] leading-relaxed max-w-md">
                 We draft the JSON-LD using the schema your category cites most. Product, Offer, and AggregateRating wired with your actual pricing tiers. Copy, paste, ship.
               </p>
             </div>
             <div ref={ref2} className="min-h-[40vh]">
               <StageNumber active={stage === 2} num="03" />
               <h3 className="display-sm mt-4 font-semibold">Resolved</h3>
-              <p className="mt-3 text-ink-70 leading-relaxed max-w-md">
+              <p className="mt-3 text-[rgb(var(--ink-rgb)/70%)] leading-relaxed max-w-md">
                 Once the fix ships, our crawler verifies the markup, the score recomputes against the next refresh of tracked prompts, and the suggestion closes itself. Score moves from 67 to 73.
               </p>
             </div>
@@ -89,7 +89,7 @@ function StageNumber({ active, num }: { active: boolean; num: string }) {
       <span
         className={
           'inline-flex h-7 w-7 items-center justify-center rounded-full border font-mono text-[0.7rem] transition-all duration-500 ' +
-          (active ? 'bg-ink text-white border-ink' : 'bg-[var(--white)] text-ink-50 border-line')
+          (active ? 'bg-ink text-white border-[var(--ink)]' : 'bg-[var(--white)] text-[rgb(var(--ink-rgb)/50%)] border-[var(--line)]')
         }
       >
         {num}
@@ -97,7 +97,7 @@ function StageNumber({ active, num }: { active: boolean; num: string }) {
       <span
         className={
           'font-mono text-[0.7rem] uppercase tracking-[0.18em] transition-colors duration-500 ' +
-          (active ? 'text-ink' : 'text-ink-40')
+          (active ? 'text-[var(--ink)]' : 'text-[rgb(var(--ink-rgb)/40%)]')
         }
       >
         {active ? 'In view' : 'Up next'}
@@ -116,8 +116,8 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
             <span className="inline-block h-2 w-2 rounded-full bg-[rgb(var(--ink-rgb)/30%)]" />
             <span className="inline-block h-2 w-2 rounded-full bg-[rgb(var(--ink-rgb)/30%)]" />
           </div>
-          <div className="font-mono text-[0.7rem] text-ink-50">suggestion://geo-0421</div>
-          <div className="font-mono text-[0.7rem] text-ink-50">
+          <div className="font-mono text-[0.7rem] text-[rgb(var(--ink-rgb)/50%)]">suggestion://geo-0421</div>
+          <div className="font-mono text-[0.7rem] text-[rgb(var(--ink-rgb)/50%)]">
             {stage === 0 && 'OPEN'}
             {stage === 1 && 'IN PROGRESS'}
             {stage === 2 && 'RESOLVED'}
@@ -139,18 +139,18 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
                 <div className="font-display text-[1.2rem] font-semibold tracking-[-0.02em] leading-snug">
                   No JSON-LD on /pricing
                 </div>
-                <div className="font-mono text-[0.72rem] text-ink-50 mt-2">
+                <div className="font-mono text-[0.72rem] text-[rgb(var(--ink-rgb)/50%)] mt-2">
                   /pricing · last crawled 11m ago
                 </div>
               </div>
             </div>
-            <ul className="mt-7 space-y-3 text-[0.9rem] text-ink-70">
-              <li className="flex gap-3"><span className="text-ink-40">•</span> Drives 41% of buyer-intent queries</li>
-              <li className="flex gap-3"><span className="text-ink-40">•</span> Competitor pages all carry Product + Offer markup</li>
-              <li className="flex gap-3"><span className="text-ink-40">•</span> Estimated lift: <span className="font-semibold text-[var(--ink)]">+6 visibility points</span></li>
-              <li className="flex gap-3"><span className="text-ink-40">•</span> Effort: 12 minutes</li>
+            <ul className="mt-7 space-y-3 text-[0.9rem] text-[rgb(var(--ink-rgb)/70%)]">
+              <li className="flex gap-3"><span className="text-[rgb(var(--ink-rgb)/40%)]">•</span> Drives 41% of buyer-intent queries</li>
+              <li className="flex gap-3"><span className="text-[rgb(var(--ink-rgb)/40%)]">•</span> Competitor pages all carry Product + Offer markup</li>
+              <li className="flex gap-3"><span className="text-[rgb(var(--ink-rgb)/40%)]">•</span> Estimated lift: <span className="font-semibold text-[var(--ink)]">+6 visibility points</span></li>
+              <li className="flex gap-3"><span className="text-[rgb(var(--ink-rgb)/40%)]">•</span> Effort: 12 minutes</li>
             </ul>
-            <div className="mt-7 inline-flex items-center gap-2 text-[0.78rem] text-ink-60 font-mono">
+            <div className="mt-7 inline-flex items-center gap-2 text-[0.78rem] text-[rgb(var(--ink-rgb)/60%)] font-mono">
               Δshare × promptVolume × engineWeight / effortHours = <span className="text-[var(--ink)]">+6.0</span>
             </div>
           </div>
@@ -161,7 +161,7 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
               (stage === 1 ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-7')
             }
           >
-            <div className="font-mono text-[0.7rem] uppercase tracking-wider text-ink-50">
+            <div className="font-mono text-[0.7rem] uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)]">
               Generated JSON-LD · Product + Offer
             </div>
             <div className="mt-3 code-block text-[0.78rem] leading-relaxed">
@@ -177,7 +177,7 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
   ]
 }`}</pre>
             </div>
-            <div className="mt-5 flex items-center gap-2 text-[0.82rem] text-ink-60">
+            <div className="mt-5 flex items-center gap-2 text-[0.82rem] text-[rgb(var(--ink-rgb)/60%)]">
               <Check className="text-[var(--ink)]" /> Validated against Schema.org · 1.2 KB minified
             </div>
           </div>
@@ -192,16 +192,16 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
               <Check /> RESOLVED
             </div>
             <div className="mt-6">
-              <div className="font-mono text-[0.72rem] uppercase tracking-wider text-ink-50">
+              <div className="font-mono text-[0.72rem] uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)]">
                 Visibility score
               </div>
               <ScoreTick stage={stage} />
-              <div className="mt-3 text-[0.82rem] text-ink-60">
+              <div className="mt-3 text-[0.82rem] text-[rgb(var(--ink-rgb)/60%)]">
                 Recomputed against today&rsquo;s prompt refresh.
               </div>
             </div>
             <div className="mt-7 hairline w-full" />
-            <ul className="mt-5 space-y-2 text-[0.9rem] text-ink-70">
+            <ul className="mt-5 space-y-2 text-[0.9rem] text-[rgb(var(--ink-rgb)/70%)]">
               <li className="flex gap-3 items-center"><Check className="text-[var(--ink)]" /> Markup verified by crawler</li>
               <li className="flex gap-3 items-center"><Check className="text-[var(--ink)]" /> 3 engines re-cited /pricing within 48h</li>
               <li className="flex gap-3 items-center"><Check className="text-[var(--ink)]" /> Logged to changelog · GEO-0421</li>
@@ -237,7 +237,7 @@ function ScoreTick({ stage }: { stage: number }) {
       <div className="font-display text-[3.2rem] font-semibold tracking-[-0.04em] leading-none tabular-nums">
         {value}
       </div>
-      <div className="font-mono text-[0.78rem] text-ink-60">
+      <div className="font-mono text-[0.78rem] text-[rgb(var(--ink-rgb)/60%)]">
         from 67 · +{Math.max(0, value - 67)}
       </div>
     </div>

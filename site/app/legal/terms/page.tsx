@@ -62,7 +62,7 @@ export default function TermsPage() {
   return (
     <>
       {/* Section 1 — Hero strip */}
-      <section className="section-y-sm bg-bg border-b border-[var(--line)] relative overflow-hidden">
+      <section className="section-y-sm bg-[var(--bg)] border-b border-[var(--line)] relative overflow-hidden">
         <HeroShade />
         <Container>
           <div className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/50%)]">
@@ -101,7 +101,7 @@ export default function TermsPage() {
               <a
                 key={item.num}
                 href={item.href}
-                className="group flex items-baseline gap-5 border-b border-[var(--line)] py-3.5 hover:bg-subtle/60 transition-colors"
+                className="group flex items-baseline gap-5 border-b border-[var(--line)] py-3.5 hover:bg-[var(--subtle)] transition-colors"
               >
                 <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/40%)] w-6 shrink-0">
                   {item.num}
@@ -146,7 +146,7 @@ export default function TermsPage() {
       </Section>
 
       {/* Section 4 — Full terms */}
-      <section className="bg-bg">
+      <section className="bg-[var(--bg)]">
         <Container>
           <div className="section-y max-w-[860px] mx-auto">
 
@@ -277,7 +277,7 @@ export default function TermsPage() {
 
                 {/* Examples table */}
                 <div className="my-7 overflow-hidden rounded-lg border border-[rgb(var(--ink-rgb)/12%)] bg-[var(--white)]">
-                  <div className="grid grid-cols-[1fr_auto] gap-4 border-b border-[rgb(var(--ink-rgb)/10%)] bg-subtle/60 px-5 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/60%)]">
+                  <div className="grid grid-cols-[1fr_auto] gap-4 border-b border-[rgb(var(--ink-rgb)/10%)] bg-[var(--subtle)] px-5 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/60%)]">
                     <div>Scenario</div>
                     <div className="text-right">Billed?</div>
                   </div>
@@ -465,7 +465,7 @@ export default function TermsPage() {
               </p>
             </div>
             <div className="lg:col-span-7">
-              <div className="rounded-2xl border border-[rgb(var(--ink-rgb)/15%)] bg-bg p-8 md:p-10">
+              <div className="rounded-2xl border border-[rgb(var(--ink-rgb)/15%)] bg-[var(--bg)] p-8 md:p-10">
                 <p className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/55%)]">
                   The clause, in full
                 </p>
