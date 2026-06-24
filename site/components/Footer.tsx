@@ -11,7 +11,8 @@ const groups = [
       { label: 'Fanout Query', href: '/features/fanout-query' },
       { label: 'AI Crawlability', href: '/features/ai-crawlability' },
       { label: 'Platform Coverage', href: '/features/platform-coverage' },
-      { label: 'Brand Perception', href: '/features/sentiment-analysis' },
+      { label: 'Sentiment Analysis', href: '/features/sentiment-analysis' },
+      { label: 'Brand Perception', href: '/features/brand-perception' },
       { label: 'Pricing', href: '/pricing' },
       { label: 'Free AI Visibility Score', href: '/free-ai-visibility-score' }
     ]
