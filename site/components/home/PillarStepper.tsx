@@ -377,14 +377,19 @@ function MockRankings() {
 }
 
 // ── Mock 04 · Recommendations — static image of the Opportunities dashboard ─
+//
+// White background on the wrapper so when the dashboard image (1876×1226,
+// aspect ~1.53) sits inside a slightly wider mock-panel slot, the
+// horizontal letterbox blends seamlessly with the dashboard's own white
+// background — visually the whole frame reads as one continuous surface.
 function MockRecommendations() {
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ffffff' }}>
       <Image
         src="/home/opportunities.png"
         alt="AEO/GEO Recommendations — prioritized opportunities across citations, alerts, on-page, crawl, and query signals"
-        width={1920}
-        height={1280}
+        width={1876}
+        height={1226}
         priority={false}
         loading="lazy"
         quality={95}
@@ -463,7 +468,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bulb,
     Mock: MockRecommendations,
-    mockAspect: '1920 / 1280'
+    mockAspect: '1876 / 1226'
   }
 ]
 
