@@ -4,7 +4,7 @@
 // Left feed (prompt -> thinking -> 3 ranked brand cards with brush-paint
 // highlights) + right insights sidebar.
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger, useTypewriter } from './motion'
 import { MondayGlyph, PipedriveGlyph, ChatGptGlyph, UserGlyph } from './glyphs'
 import { LIGHT, TAG_COLORS, HL } from './palette'
@@ -18,6 +18,16 @@ function paint(tint: Tint): string {
   if (tint === 'neg') return HL.neg
   return HL.neu
 }
+
+// Lighter band colour for the sweeping sheen on each highlight.
+function sheen(tint: Tint): string {
+  if (tint === 'pos') return '#eafbf1'
+  if (tint === 'neg') return '#fdeaea'
+  return '#fef8d2'
+}
+
+const INTRO =
+  "Choosing the right CRM really comes down to how your startup sells, grows, and automates. Here's a curated breakdown of the top CRM platforms for startups in 2025."
 
 type Card = { rank: string; name: string; Glyph: (p: { size?: number; style?: React.CSSProperties }) => ReactNode; body: string; hl: { text: string; tint: Tint }[] }
 const CARDS: Card[] = [
@@ -91,6 +101,7 @@ export function MockPerception({ show }: { show: boolean }) {
   const reduced = useReducedMotion()
   const typed = useTypewriter('What is the best CRM for a growing SaaS company with 50 employees?', play, 38)
   const cards = useStagger(CARDS.length, play, 180, 1100)
+  const answer = useTypewriter(INTRO, cards[0], 55)
   const rootRef = useRef<HTMLDivElement>(null)
   const [noteIdx, setNoteIdx] = useState(0)
   const [notePos, setNotePos] = useState<{ left: number; top: number } | null>(null)
@@ -180,10 +191,17 @@ export function MockPerception({ show }: { show: boolean }) {
               {!typed.done && !reduced && <Caret />}
             </span>
           </div>
-          {/* Thinking card */}
-          <div style={{ display: 'flex', gap: '0.8cqw', alignItems: 'center', border: '1px solid var(--line)', borderRadius: '1cqw', padding: '1cqw 1.2cqw', minHeight: '3.4cqw' }}>
-            <ChatGptGlyph size={15} style={{ color: 'var(--ink-70)' }} />
-            {!cards[0] && !reduced && <ThinkingDots />}
+          {/* AI response card — thinks, then types the answer */}
+          <div style={{ display: 'flex', gap: '0.8cqw', alignItems: 'flex-start', border: '1px solid var(--line)', borderRadius: '1cqw', padding: '1cqw 1.2cqw', minHeight: '3.4cqw' }}>
+            <ChatGptGlyph size={15} style={{ marginTop: '0.2cqw', flexShrink: 0 }} />
+            {cards[0] || reduced ? (
+              <span style={{ fontSize: '1.1cqw', lineHeight: 1.5, color: 'var(--ink-80, var(--ink))' }}>
+                {answer.text}
+                {!answer.done && !reduced && <Caret />}
+              </span>
+            ) : (
+              <ThinkingDots />
+            )}
           </div>
           {/* Brand cards */}
           {CARDS.map((c, ci) => (
@@ -312,43 +330,32 @@ function Highlighted({ body, hl, baseIndex }: { body: string; hl: { text: string
   if (rest) segs.push({ t: rest })
   return (
     <>
-      <style>{'@keyframes clvSheen{0%{transform:translateX(-170%)}55%{transform:translateX(170%)}100%{transform:translateX(170%)}}'}</style>
+      {/* Sweeping sheen across the highlight fill — uses background-position so
+          it works across line wraps (box-decoration-break: clone). Never stops. */}
+      <style>{'@keyframes clvSheenBg{0%{background-position:125% 0}55%{background-position:-25% 0}100%{background-position:-25% 0}}'}</style>
       {segs.map((s, i) => {
         if (!s.tint) return <span key={i}>{s.t}</span>
         const gi = s.gi as number
-        const painted = true
+        // Highlight is painted directly on the inline text (not an absolute
+        // overlay) so it covers EVERY line fragment when the phrase wraps.
+        const style: CSSProperties = {
+          color: 'inherit',
+          borderRadius: '0.35cqw',
+          padding: '0.04em 0.18em',
+          WebkitBoxDecorationBreak: 'clone',
+          boxDecorationBreak: 'clone',
+          ...(reduced
+            ? { backgroundColor: paint(s.tint) }
+            : {
+                backgroundImage: `linear-gradient(110deg, ${paint(s.tint)} 38%, ${sheen(s.tint)} 50%, ${paint(s.tint)} 62%)`,
+                backgroundSize: '250% 100%',
+                backgroundRepeat: 'no-repeat',
+                animation: `clvSheenBg 3.2s ease-in-out ${(gi % 7) * 0.45}s infinite`
+              })
+        }
         return (
-          <span key={i} data-note-idx={gi} style={{ position: 'relative', display: 'inline', borderRadius: '0.3cqw' }}>
-            <span
-              aria-hidden
-              style={{
-                position: 'absolute',
-                inset: '-0.1cqw -0.2cqw',
-                background: paint(s.tint),
-                borderRadius: '0.3cqw',
-                overflow: 'hidden',
-                clipPath: painted ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)',
-                transition: reduced ? 'none' : `clip-path 0.4s ${cb}`,
-                zIndex: 0
-              }}
-            >
-              {/* Constant buttery sheen sweeping behind the text — never stops. */}
-              {!reduced && painted && (
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    width: '55%',
-                    background: 'linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%)',
-                    animation: `clvSheen 3s ease-in-out ${(gi % 7) * 0.4}s infinite`,
-                    willChange: 'transform'
-                  }}
-                />
-              )}
-            </span>
-            <span style={{ position: 'relative', zIndex: 1 }}>{s.t}</span>
+          <span key={i} data-note-idx={gi} style={style}>
+            {s.t}
           </span>
         )
       })}
