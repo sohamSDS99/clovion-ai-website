@@ -370,7 +370,7 @@ function MockRankings() {
         src="/home/visibility-ranking.png"
         alt="Visibility Ranking by Topic — SDS Manager rankings vs Chemical Compliance Software brands"
         width={1876}
-        height={1226}
+        height={926}
         priority={false}
         loading="lazy"
         quality={95}
@@ -394,7 +394,7 @@ function MockRecommendations() {
         src="/home/opportunities.png"
         alt="AEO/GEO Recommendations — prioritized opportunities across citations, alerts, on-page, crawl, and query signals"
         width={1876}
-        height={1226}
+        height={1192}
         priority={false}
         loading="lazy"
         quality={95}
@@ -460,7 +460,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bars,
     Mock: MockRankings,
-    mockAspect: '1876 / 1226'
+    mockAspect: '1876 / 926'
   },
   {
     sku: '04 — Recommendations',
@@ -473,7 +473,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bulb,
     Mock: MockRecommendations,
-    mockAspect: '1876 / 1226'
+    mockAspect: '1876 / 1192'
   }
 ]
 
