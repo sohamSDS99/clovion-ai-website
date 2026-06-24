@@ -13,6 +13,26 @@ export const metadata: Metadata = {
   },
 }
 
+// Prices mirror the live tiers in components/pricing/PricingTiers.tsx
+// (Starter $79/mo, Growth $229/mo, Enterprise custom). Update both together.
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Clovion',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: 'https://www.clovion.ai/pricing',
+  description:
+    'AI visibility, sentiment, and GEO tracking across ChatGPT, Claude, Gemini, Perplexity, Grok, and AI Overviews. Starter, Growth, and Enterprise plans.',
+  offers: {
+    '@type': 'AggregateOffer',
+    priceCurrency: 'USD',
+    lowPrice: '79',
+    highPrice: '229',
+    offerCount: '3'
+  }
+}
+
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -35,6 +55,7 @@ const faqJsonLd = {
 export default function PricingPage() {
   return (
     <div className="clv-dark clv-ai-vis-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <FeatureContent />
     </div>
