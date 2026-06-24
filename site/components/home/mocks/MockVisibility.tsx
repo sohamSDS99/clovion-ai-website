@@ -111,6 +111,9 @@ function EngineMark() {
 }
 
 // rAF tween toward a target value (0=flat, 1=volatile). Snaps under reduced.
+// A setTimeout fallback guarantees the final value lands even if rAF frames are
+// starved (proven rAF + timeout pattern used across the mocks), so the morph
+// never gets stuck mid-shape.
 function useTween(target: number, durationMs: number, reduced: boolean): number {
   const [val, setVal] = useState(target)
   const fromRef = useRef(target)
@@ -135,8 +138,13 @@ function useTween(target: number, durationMs: number, reduced: boolean): number 
       else fromRef.current = target
     }
     raf.current = requestAnimationFrame(step)
+    const settle = setTimeout(() => {
+      setVal(target)
+      fromRef.current = target
+    }, durationMs + 80)
     return () => {
       if (raf.current) cancelAnimationFrame(raf.current)
+      clearTimeout(settle)
     }
   }, [target, durationMs, reduced])
   return val
@@ -171,15 +179,19 @@ export function MockVisibility({ show }: { show: boolean }) {
     setBarsIn(false)
     let r1 = 0
     let r2 = 0
+    let fallback: ReturnType<typeof setTimeout>
     const t = setTimeout(() => {
       setShownTab(active)
       // double-rAF so the new rows paint hidden once before transitioning in
       r1 = requestAnimationFrame(() => {
         r2 = requestAnimationFrame(() => setBarsIn(true))
       })
+      // guaranteed reveal even if rAF is starved (backgrounded tab, etc.)
+      fallback = setTimeout(() => setBarsIn(true), 80)
     }, BARS_OUT_MS)
     return () => {
       clearTimeout(t)
+      clearTimeout(fallback)
       if (r1) cancelAnimationFrame(r1)
       if (r2) cancelAnimationFrame(r2)
     }

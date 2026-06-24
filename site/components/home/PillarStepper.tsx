@@ -53,7 +53,10 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.track,
     Mock: MockVisibility,
-    mockAspect: '1864 / 1075'
+    // ~1.5:1 (matches the reference dashboard proportions) — the stacked,
+    // self-cycling dashboard needs the extra height so the chart isn't crushed
+    // on the chart tabs and the 9-row Topic list isn't clipped.
+    mockAspect: '1920 / 1280'
   },
   {
     sku: '02 — Perception',
