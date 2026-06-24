@@ -101,7 +101,7 @@ export function MockRecommendations({ show }: { show: boolean }) {
                 }}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.6cqw', fontSize: '1.15cqw', fontWeight: 600 }}>
-                  <Dot color={NEG} /> High
+                  <PulseDot color={NEG} delay={i * 0.12} /> High
                 </span>
                 <span style={{ minWidth: 0, paddingRight: '1.6cqw' }}>
                   <span style={{ display: 'block', fontSize: '1.2cqw', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.title}</span>
@@ -119,7 +119,7 @@ export function MockRecommendations({ show }: { show: boolean }) {
                   )}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.7cqw', fontSize: '1.15cqw', fontWeight: 600 }}>
-                  <Dot color={NEG} /> High
+                  <PulseDot color={NEG} delay={i * 0.12} /> High
                   <NewPill play={play} />
                 </span>
                 <span style={{ color: 'var(--ink-40)', fontSize: '1.4cqw', textAlign: 'right' }}>›</span>
@@ -161,6 +161,29 @@ export function MockRecommendations({ show }: { show: boolean }) {
 
 function Dot({ color }: { color: string }) {
   return <span style={{ width: '0.9cqw', height: '0.9cqw', borderRadius: '999px', background: color, flexShrink: 0 }} />
+}
+
+// "High" priority/impact indicator — a continuously pulsing alert dot
+// (expanding ring + soft core pulse). Never stops.
+function PulseDot({ color, delay = 0 }: { color: string; delay?: number }) {
+  const reduced = useReducedMotion()
+  return (
+    <span style={{ position: 'relative', width: '0.9cqw', height: '0.9cqw', flexShrink: 0, display: 'inline-block' }}>
+      {!reduced && (
+        <span style={{ position: 'absolute', inset: 0, borderRadius: '999px', background: color, animation: `clvPulseRing 1.8s ease-out ${delay}s infinite` }} />
+      )}
+      <span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '999px',
+          background: color,
+          animation: reduced ? 'none' : `clvPulseCore 1.8s ease-in-out ${delay}s infinite`
+        }}
+      />
+      <style>{'@keyframes clvPulseRing{0%{transform:scale(1);opacity:0.5}70%{opacity:0}100%{transform:scale(3.2);opacity:0}}@keyframes clvPulseCore{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.25);opacity:0.85}}'}</style>
+    </span>
+  )
 }
 
 function Num({ children }: { children: ReactNode }) {
