@@ -205,7 +205,7 @@ function ContributorRow({ initials }: { initials: string[] }) {
           <Avatar key={i} initials={i} />
         ))}
       </div>
-      <span className="text-xs text-ink/50 font-mono uppercase tracking-wider">
+      <span className="text-xs text-[rgb(var(--ink-rgb)/50%)] font-mono uppercase tracking-wider">
         {initials.length} {initials.length === 1 ? 'contributor' : 'contributors'}
       </span>
     </div>
@@ -214,12 +214,12 @@ function ContributorRow({ initials }: { initials: string[] }) {
 
 function StatBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="my-6 border border-line bg-subtle/60 rounded-lg overflow-hidden">
-      <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-line">
-        <div className="px-4 py-3 text-[11px] uppercase tracking-wider text-ink/50 font-mono">
+    <div className="my-6 border border-[var(--line)] bg-subtle/60 rounded-lg overflow-hidden">
+      <div className="grid grid-cols-1 sm:grid-cols-[180px_1fr] divide-y sm:divide-y-0 sm:divide-x divide-[var(--line)]">
+        <div className="px-4 py-3 text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)] font-mono">
           {label}
         </div>
-        <div className="px-4 py-3 font-mono text-sm text-ink">{value}</div>
+        <div className="px-4 py-3 font-mono text-sm text-[var(--ink)]">{value}</div>
       </div>
     </div>
   )
@@ -228,16 +228,16 @@ function StatBlock({ label, value }: { label: string; value: string }) {
 // Typographic mock hero — no images, no color, just type and structure.
 function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   const base =
-    'mb-7 relative overflow-hidden rounded-xl border border-line bg-white shadow-[0_1px_0_rgba(0,0,0,0.03),0_18px_36px_-22px_rgba(0,0,0,0.18)]'
+    'mb-7 relative overflow-hidden rounded-xl border border-[var(--line)] bg-[var(--white)] shadow-[0_1px_0_rgba(0,0,0,0.03),0_18px_36px_-22px_rgba(0,0,0,0.18)]'
 
   if (kind === 'daily-refresh') {
     const bars = [38, 52, 41, 67, 49, 73, 81]
     const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
     return (
       <div className={base}>
-        <div className="flex items-center justify-between px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">Refresh status</span>
-          <span className="font-mono text-[11px] text-ink flex items-center gap-1.5">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">Refresh status</span>
+          <span className="font-mono text-[11px] text-[var(--ink)] flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-ink inline-block" /> Live · every 24h
           </span>
         </div>
@@ -249,13 +249,13 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
                   className="w-full bg-ink rounded-sm"
                   style={{ height: `${h}%` }}
                 />
-                <span className="font-mono text-[10px] text-ink/40">{days[i]}</span>
+                <span className="font-mono text-[10px] text-[rgb(var(--ink-rgb)/40%)]">{days[i]}</span>
               </div>
             ))}
           </div>
-          <div className="font-mono text-xs text-ink/60 flex justify-between border-t border-line pt-3">
+          <div className="font-mono text-xs text-[rgb(var(--ink-rgb)/60%)] flex justify-between border-t border-[var(--line)] pt-3">
             <span>Citations / week</span>
-            <span className="text-ink">+24%</span>
+            <span className="text-[var(--ink)]">+24%</span>
           </div>
         </div>
       </div>
@@ -265,22 +265,22 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   if (kind === 'auto-apply') {
     return (
       <div className={base}>
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">WordPress draft</span>
-          <span className="ml-auto font-mono text-[10px] px-2 py-0.5 rounded bg-ink/5 text-ink/70">/wp-admin</span>
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">WordPress draft</span>
+          <span className="ml-auto font-mono text-[10px] px-2 py-0.5 rounded bg-[rgb(var(--ink-rgb)/5%)] text-[rgb(var(--ink-rgb)/70%)]">/wp-admin</span>
         </div>
         <div className="px-5 py-5 space-y-3">
-          <div className="font-mono text-[11px] text-ink/40 uppercase tracking-wider">Suggested edit · schema</div>
-          <div className="bg-subtle border border-line rounded-md p-3 font-mono text-xs leading-relaxed text-ink/80">
-            <div className="text-ink/40 mb-1">@@ -12,4 +12,8 @@</div>
-            <div><span className="text-ink/40">  </span>{'"@context":'} <span>{'"https://schema.org"'}</span>,</div>
-            <div><span className="text-ink/40">  </span>{'"@type":'} <span>{'"Article"'}</span>,</div>
-            <div className="bg-ink/5 -mx-3 px-3"><span className="text-ink mr-1">+</span>{'"author":'} {'{ "@type": "Person", "name": "..." }'},</div>
-            <div className="bg-ink/5 -mx-3 px-3"><span className="text-ink mr-1">+</span>{'"datePublished":'} <span>{'"2026-10-30"'}</span></div>
+          <div className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/40%)] uppercase tracking-wider">Suggested edit · schema</div>
+          <div className="bg-[var(--subtle)] border border-[var(--line)] rounded-md p-3 font-mono text-xs leading-relaxed text-[rgb(var(--ink-rgb)/80%)]">
+            <div className="text-[rgb(var(--ink-rgb)/40%)] mb-1">@@ -12,4 +12,8 @@</div>
+            <div><span className="text-[rgb(var(--ink-rgb)/40%)]">  </span>{'"@context":'} <span>{'"https://schema.org"'}</span>,</div>
+            <div><span className="text-[rgb(var(--ink-rgb)/40%)]">  </span>{'"@type":'} <span>{'"Article"'}</span>,</div>
+            <div className="bg-[rgb(var(--ink-rgb)/5%)] -mx-3 px-3"><span className="text-[var(--ink)] mr-1">+</span>{'"author":'} {'{ "@type": "Person", "name": "..." }'},</div>
+            <div className="bg-[rgb(var(--ink-rgb)/5%)] -mx-3 px-3"><span className="text-[var(--ink)] mr-1">+</span>{'"datePublished":'} <span>{'"2026-10-30"'}</span></div>
           </div>
           <div className="flex items-center justify-between pt-1">
-            <span className="font-mono text-[11px] text-ink/50">Status: draft · awaiting approval</span>
-            <span className="font-mono text-[11px] text-ink">Approve →</span>
+            <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)]">Status: draft · awaiting approval</span>
+            <span className="font-mono text-[11px] text-[var(--ink)]">Approve →</span>
           </div>
         </div>
       </div>
@@ -291,15 +291,15 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
     const engines = ['ChatGPT', 'Claude 3.7', 'Claude 3.5', 'Gemini', 'Perplexity', 'DeepSeek', 'AI Mode', 'AI Overviews', 'Mistral', 'Grok']
     return (
       <div className={base}>
-        <div className="flex items-center justify-between px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">Engine coverage</span>
-          <span className="font-mono text-[11px] text-ink">10 of 10</span>
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">Engine coverage</span>
+          <span className="font-mono text-[11px] text-[var(--ink)]">10 of 10</span>
         </div>
         <div className="px-5 py-5 grid grid-cols-2 sm:grid-cols-5 gap-2">
           {engines.map((e) => (
             <div
               key={e}
-              className="border border-line rounded px-2 py-2 text-center font-mono text-[10px] text-ink/80 truncate"
+              className="border border-[var(--line)] rounded px-2 py-2 text-center font-mono text-[10px] text-[rgb(var(--ink-rgb)/80%)] truncate"
             >
               {e}
             </div>
@@ -312,12 +312,12 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   if (kind === 'csv') {
     return (
       <div className={base}>
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">prompts_import.csv</span>
-          <span className="ml-auto font-mono text-[10px] text-ink/60">4,812 rows</span>
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">prompts_import.csv</span>
+          <span className="ml-auto font-mono text-[10px] text-[rgb(var(--ink-rgb)/60%)]">4,812 rows</span>
         </div>
         <div className="font-mono text-xs">
-          <div className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-line text-ink/50 uppercase text-[10px] tracking-wider bg-subtle/60">
+          <div className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-[var(--line)] text-[rgb(var(--ink-rgb)/50%)] uppercase text-[10px] tracking-wider bg-subtle/60">
             <span>prompt</span>
             <span>locale</span>
             <span>intent</span>
@@ -331,15 +331,15 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
           ].map((r, i) => (
             <div
               key={i}
-              className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-line/60 last:border-0 text-ink/80"
+              className="grid grid-cols-[1.6fr_0.6fr_0.6fr_0.8fr] px-5 py-2 border-b border-line/60 last:border-0 text-[rgb(var(--ink-rgb)/80%)]"
             >
               <span className="truncate">{r[0]}</span>
-              <span className="text-ink/50">{r[1]}</span>
-              <span className="text-ink/50">{r[2]}</span>
-              <span className="text-ink/50">{r[3]}</span>
+              <span className="text-[rgb(var(--ink-rgb)/50%)]">{r[1]}</span>
+              <span className="text-[rgb(var(--ink-rgb)/50%)]">{r[2]}</span>
+              <span className="text-[rgb(var(--ink-rgb)/50%)]">{r[3]}</span>
             </div>
           ))}
-          <div className="px-5 py-2 text-ink/40 text-[11px]">+ 4,808 more</div>
+          <div className="px-5 py-2 text-[rgb(var(--ink-rgb)/40%)] text-[11px]">+ 4,808 more</div>
         </div>
       </div>
     )
@@ -348,20 +348,20 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   if (kind === 'mcp') {
     return (
       <div className={base}>
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">claude.ai · MCP client</span>
-          <span className="ml-auto font-mono text-[10px] text-ink/60">clovion.mcp.run</span>
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">claude.ai · MCP client</span>
+          <span className="ml-auto font-mono text-[10px] text-[rgb(var(--ink-rgb)/60%)]">clovion.mcp.run</span>
         </div>
         <div className="p-5 space-y-3 font-mono text-xs">
-          <div className="text-ink/60">$ list_prompts --workspace acme --status declining</div>
-          <div className="bg-subtle border border-line rounded p-3 text-ink/80 leading-relaxed">
-            <div className="text-ink/40 mb-1.5">Returned 12 prompts:</div>
+          <div className="text-[rgb(var(--ink-rgb)/60%)]">$ list_prompts --workspace acme --status declining</div>
+          <div className="bg-[var(--subtle)] border border-[var(--line)] rounded p-3 text-[rgb(var(--ink-rgb)/80%)] leading-relaxed">
+            <div className="text-[rgb(var(--ink-rgb)/40%)] mb-1.5">Returned 12 prompts:</div>
             <div>1. "best email marketing platform" — share -8%</div>
             <div>2. "alternatives to Mailchimp" — share -6%</div>
             <div>3. "ESP for small business" — share -5%</div>
-            <div className="text-ink/40 mt-1">…</div>
+            <div className="text-[rgb(var(--ink-rgb)/40%)] mt-1">…</div>
           </div>
-          <div className="flex items-center gap-2 text-ink/60">
+          <div className="flex items-center gap-2 text-[rgb(var(--ink-rgb)/60%)]">
             <span className="w-1.5 h-1.5 rounded-full bg-ink inline-block" />
             <span>14 tools available · 4 require write scope</span>
           </div>
@@ -373,18 +373,18 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   if (kind === 'webhook') {
     return (
       <div className={base}>
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">POST /hooks/clovion</span>
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">POST /hooks/clovion</span>
           <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded bg-ink text-white">200 OK</span>
         </div>
-        <div className="p-5 font-mono text-xs leading-relaxed text-ink/80 bg-subtle/40">
-          <div className="text-ink/40">{'// suggestion.shipped'}</div>
+        <div className="p-5 font-mono text-xs leading-relaxed text-[rgb(var(--ink-rgb)/80%)] bg-subtle/40">
+          <div className="text-[rgb(var(--ink-rgb)/40%)]">{'// suggestion.shipped'}</div>
           <div>{'{'}</div>
-          <div className="pl-3">{'"event":'} <span className="text-ink">"suggestion.shipped"</span>,</div>
-          <div className="pl-3">{'"id":'} <span className="text-ink">"sg_8aFv3kR2"</span>,</div>
-          <div className="pl-3">{'"prompt":'} <span className="text-ink">"best ESP 2026"</span>,</div>
-          <div className="pl-3">{'"engines":'} <span className="text-ink">["ChatGPT", "Perplexity"]</span>,</div>
-          <div className="pl-3">{'"shippedAt":'} <span className="text-ink">"2026-09-01T14:22:08Z"</span></div>
+          <div className="pl-3">{'"event":'} <span className="text-[var(--ink)]">"suggestion.shipped"</span>,</div>
+          <div className="pl-3">{'"id":'} <span className="text-[var(--ink)]">"sg_8aFv3kR2"</span>,</div>
+          <div className="pl-3">{'"prompt":'} <span className="text-[var(--ink)]">"best ESP 2026"</span>,</div>
+          <div className="pl-3">{'"engines":'} <span className="text-[var(--ink)]">["ChatGPT", "Perplexity"]</span>,</div>
+          <div className="pl-3">{'"shippedAt":'} <span className="text-[var(--ink)]">"2026-09-01T14:22:08Z"</span></div>
           <div>{'}'}</div>
         </div>
       </div>
@@ -394,8 +394,8 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   if (kind === 'citation') {
     return (
       <div className={base}>
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">Citation weighting · model v3</span>
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">Citation weighting · model v3</span>
         </div>
         <div className="p-5 space-y-2.5 font-mono text-xs">
           {[
@@ -405,14 +405,14 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
             { label: 'Source dropdown only', weight: 0.15 }
           ].map((row) => (
             <div key={row.label} className="flex items-center gap-3">
-              <span className="text-ink/70 w-56 truncate">{row.label}</span>
-              <div className="flex-1 h-1.5 bg-ink/10 rounded-full overflow-hidden">
+              <span className="text-[rgb(var(--ink-rgb)/70%)] w-56 truncate">{row.label}</span>
+              <div className="flex-1 h-1.5 bg-[rgb(var(--ink-rgb)/10%)] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-ink rounded-full"
                   style={{ width: `${row.weight * 100}%` }}
                 />
               </div>
-              <span className="text-ink w-12 text-right">{row.weight.toFixed(2)}</span>
+              <span className="text-[var(--ink)] w-12 text-right">{row.weight.toFixed(2)}</span>
             </div>
           ))}
         </div>
@@ -423,19 +423,19 @@ function Mock({ kind }: { kind: NonNullable<ChangelogEntry['mock']> }) {
   if (kind === 'soc2') {
     return (
       <div className={base}>
-        <div className="flex items-center gap-2 px-5 py-3 border-b border-line">
-          <span className="font-mono text-[11px] text-ink/50 uppercase tracking-wider">SOC 2 · Type II · Report</span>
-          <span className="ml-auto font-mono text-[10px] text-ink">Oct 2025 – Sep 2026</span>
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-[var(--line)]">
+          <span className="font-mono text-[11px] text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider">SOC 2 · Type II · Report</span>
+          <span className="ml-auto font-mono text-[10px] text-[var(--ink)]">Oct 2025 – Sep 2026</span>
         </div>
         <div className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono text-[11px]">
           {['Security', 'Availability', 'Confidentiality', 'Processing'].map((c) => (
             <div
               key={c}
-              className="border border-line rounded-md px-3 py-3 flex flex-col gap-2"
+              className="border border-[var(--line)] rounded-md px-3 py-3 flex flex-col gap-2"
             >
-              <span className="text-ink/50 uppercase tracking-wider text-[10px]">{c}</span>
-              <span className="text-ink text-base">0 exceptions</span>
-              <span className="text-ink/40 text-[10px]">✓ tested</span>
+              <span className="text-[rgb(var(--ink-rgb)/50%)] uppercase tracking-wider text-[10px]">{c}</span>
+              <span className="text-[var(--ink)] text-base">0 exceptions</span>
+              <span className="text-[rgb(var(--ink-rgb)/40%)] text-[10px]">✓ tested</span>
             </div>
           ))}
         </div>
@@ -451,15 +451,15 @@ function EntryBlock({ entry }: { entry: ChangelogEntry }) {
     <article id={entry.id} className="relative scroll-mt-28">
       {/* Date header — sticky within the entry */}
       <div className="sticky top-20 z-10 -mx-4 px-4 py-3 bg-bg/85 backdrop-blur-md flex items-center justify-between border-b border-line/60 mb-7">
-        <div className="font-mono text-xs uppercase tracking-wider text-ink/60">{entry.dateLabel}</div>
+        <div className="font-mono text-xs uppercase tracking-wider text-[rgb(var(--ink-rgb)/60%)]">{entry.dateLabel}</div>
         <Tag>{entry.type}</Tag>
       </div>
 
       <div className="space-y-1 mb-6">
-        <h2 className="display-md text-ink group flex items-start gap-3">
+        <h2 className="display-md text-[var(--ink)] group flex items-start gap-3">
           <Link
             href={`#${entry.id}`}
-            className="font-mono text-ink/20 hover:text-ink/60 text-base mt-3 transition opacity-0 group-hover:opacity-100"
+            className="font-mono text-[rgb(var(--ink-rgb)/20%)] hover:text-[rgb(var(--ink-rgb)/60%)] text-base mt-3 transition opacity-0 group-hover:opacity-100"
             aria-label={`Anchor link to ${entry.title}`}
           >
             #
@@ -470,19 +470,19 @@ function EntryBlock({ entry }: { entry: ChangelogEntry }) {
 
       {entry.mock && <Mock kind={entry.mock} />}
 
-      <p className="lead text-ink/70 mb-6">{entry.body}</p>
+      <p className="lead text-[rgb(var(--ink-rgb)/70%)] mb-6">{entry.body}</p>
 
       {entry.stat && <StatBlock label={entry.stat.label} value={entry.stat.value} />}
 
       {entry.improvements && entry.improvements.length > 0 && (
         <div className="mb-6">
-          <h3 className="font-mono text-[11px] uppercase tracking-wider text-ink/50 mb-3">
+          <h3 className="font-mono text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)] mb-3">
             Improvements
           </h3>
           <ul className="space-y-2.5">
             {entry.improvements.map((item, i) => (
-              <li key={i} className="flex gap-3 text-sm text-ink/80 leading-relaxed">
-                <Check className="w-4 h-4 mt-1 text-ink/60 shrink-0" />
+              <li key={i} className="flex gap-3 text-sm text-[rgb(var(--ink-rgb)/80%)] leading-relaxed">
+                <Check className="w-4 h-4 mt-1 text-[rgb(var(--ink-rgb)/60%)] shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -492,11 +492,11 @@ function EntryBlock({ entry }: { entry: ChangelogEntry }) {
 
       {entry.fixes && entry.fixes.length > 0 && (
         <div className="mb-6">
-          <h3 className="font-mono text-[11px] uppercase tracking-wider text-ink/50 mb-3">Fixes</h3>
+          <h3 className="font-mono text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)] mb-3">Fixes</h3>
           <ul className="space-y-2.5">
             {entry.fixes.map((item, i) => (
-              <li key={i} className="flex gap-3 text-sm text-ink/80 leading-relaxed">
-                <span className="font-mono text-ink/40 mt-0.5 select-none">—</span>
+              <li key={i} className="flex gap-3 text-sm text-[rgb(var(--ink-rgb)/80%)] leading-relaxed">
+                <span className="font-mono text-[rgb(var(--ink-rgb)/40%)] mt-0.5 select-none">—</span>
                 <span>{item}</span>
               </li>
             ))}
@@ -504,12 +504,12 @@ function EntryBlock({ entry }: { entry: ChangelogEntry }) {
         </div>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 mt-6 border-t border-line">
+      <div className="flex flex-wrap items-center justify-between gap-4 pt-6 mt-6 border-t border-[var(--line)]">
         <ContributorRow initials={entry.contributors} />
         {entry.learnMore && (
           <Link
             href={entry.learnMore}
-            className="inline-flex items-center gap-1.5 text-sm text-ink hover:text-ink/70 font-semibold transition"
+            className="inline-flex items-center gap-1.5 text-sm text-[var(--ink)] hover:text-[rgb(var(--ink-rgb)/70%)] font-semibold transition"
           >
             Learn more <ArrowRight className="w-3.5 h-3.5" />
           </Link>
@@ -523,13 +523,13 @@ export default function ChangelogPage() {
   return (
     <>
       {/* Hero band — compact, with inline subscribe */}
-      <Section tight className="relative overflow-hidden border-b border-line">
+      <Section tight className="relative overflow-hidden border-b border-[var(--line)]">
         <HeroShade />
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>Changelog</Eyebrow>
-            <h1 className="display-md text-ink mt-4 mb-5">Every change, dated.</h1>
-            <p className="lead text-ink/70 mb-7 max-w-2xl">
+            <h1 className="display-md text-[var(--ink)] mt-4 mb-5">Every change, dated.</h1>
+            <p className="lead text-[rgb(var(--ink-rgb)/70%)] mb-7 max-w-2xl">
               Real changes, weekly, with the data they affected. Subscribe to get them in your inbox.
             </p>
             <form
@@ -546,13 +546,13 @@ export default function ChangelogPage() {
                 type="email"
                 required
                 placeholder="you@company.com"
-                className="flex-1 px-4 py-2.5 rounded-md border border-line bg-white text-ink text-sm placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/15 focus:border-ink/40 transition"
+                className="flex-1 px-4 py-2.5 rounded-md border border-[var(--line)] bg-[var(--white)] text-[var(--ink)] text-sm placeholder:text-[rgb(var(--ink-rgb)/40%)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ink-rgb)/15%)] focus:border-[rgb(var(--ink-rgb)/40%)] transition"
               />
               <Button type="submit" size="md">
                 Subscribe
               </Button>
             </form>
-            <div className="mt-3 font-mono text-[11px] uppercase tracking-wider text-ink/40">
+            <div className="mt-3 font-mono text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/40%)]">
               Weekly · no spam · unsubscribe with one click
             </div>
           </div>
@@ -566,7 +566,7 @@ export default function ChangelogPage() {
             {/* Sidebar — desktop */}
             <aside className="hidden lg:block">
               <div className="sticky top-24">
-                <div className="font-mono text-[11px] uppercase tracking-wider text-ink/40 mb-4 px-3">
+                <div className="font-mono text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/40%)] mb-4 px-3">
                   Filter
                 </div>
                 <nav className="flex flex-col gap-0.5" aria-label="Category filter">
@@ -576,19 +576,19 @@ export default function ChangelogPage() {
                       href={c.type ? `#type-${c.type.toLowerCase()}` : '#top'}
                       className={
                         i === 0
-                          ? 'font-mono text-xs uppercase tracking-wider text-ink py-2 px-3 border-l-2 border-ink bg-ink/[0.03]'
-                          : 'font-mono text-xs uppercase tracking-wider text-ink/50 hover:text-ink py-2 px-3 border-l-2 border-transparent hover:border-ink/30 transition'
+                          ? 'font-mono text-xs uppercase tracking-wider text-[var(--ink)] py-2 px-3 border-l-2 border-[var(--ink)] bg-ink/[0.03]'
+                          : 'font-mono text-xs uppercase tracking-wider text-[rgb(var(--ink-rgb)/50%)] hover:text-[var(--ink)] py-2 px-3 border-l-2 border-transparent hover:border-[rgb(var(--ink-rgb)/30%)] transition'
                       }
                     >
                       {c.label}
                     </a>
                   ))}
                 </nav>
-                <div className="mt-8 px-3 border-t border-line pt-6">
-                  <div className="font-mono text-[11px] uppercase tracking-wider text-ink/40 mb-3">
+                <div className="mt-8 px-3 border-t border-[var(--line)] pt-6">
+                  <div className="font-mono text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/40%)] mb-3">
                     Releases
                   </div>
-                  <div className="font-mono text-xs text-ink/70 space-y-1.5">
+                  <div className="font-mono text-xs text-[rgb(var(--ink-rgb)/70%)] space-y-1.5">
                     <div>2026 · {entries.length} ship days</div>
                     <div>2025 · 48 ship days</div>
                   </div>
@@ -606,7 +606,7 @@ export default function ChangelogPage() {
                     className={
                       i === 0
                         ? 'shrink-0 font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full bg-ink text-white'
-                        : 'shrink-0 font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full bg-ink/[0.05] text-ink/70'
+                        : 'shrink-0 font-mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full bg-ink/[0.05] text-[rgb(var(--ink-rgb)/70%)]'
                     }
                   >
                     {c.label}
@@ -624,7 +624,7 @@ export default function ChangelogPage() {
                     {idx < entries.length - 1 && (
                       <div className="mt-20 flex items-center gap-4" aria-hidden>
                         <div className="h-px flex-1 bg-line" />
-                        <span className="font-mono text-[10px] uppercase tracking-wider text-ink/30">
+                        <span className="font-mono text-[10px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/30%)]">
                           ·
                         </span>
                         <div className="h-px flex-1 bg-line" />
@@ -635,11 +635,11 @@ export default function ChangelogPage() {
               </div>
 
               {/* End marker */}
-              <div className="mt-20 pt-10 border-t border-line">
-                <div className="font-mono text-xs uppercase tracking-wider text-ink/40 mb-3">
+              <div className="mt-20 pt-10 border-t border-[var(--line)]">
+                <div className="font-mono text-xs uppercase tracking-wider text-[rgb(var(--ink-rgb)/40%)] mb-3">
                   End of feed
                 </div>
-                <p className="text-sm text-ink/60 max-w-md">
+                <p className="text-sm text-[rgb(var(--ink-rgb)/60%)] max-w-md">
                   Older releases live in the API archive. Subscribers get the next entry the moment it ships.
                 </p>
               </div>
@@ -656,8 +656,8 @@ export default function ChangelogPage() {
         <Container>
           <div className="max-w-2xl mx-auto text-center">
             <Eyebrow>Subscribe</Eyebrow>
-            <h2 className="display-md text-ink mt-4 mb-4">The weekly Clovion digest.</h2>
-            <p className="lead text-ink/70 mb-7">
+            <h2 className="display-md text-[var(--ink)] mt-4 mb-4">The weekly Clovion digest.</h2>
+            <p className="lead text-[rgb(var(--ink-rgb)/70%)] mb-7">
               One email, every Friday. Just what shipped, what we learned, and the one chart from the data team we couldn't stop talking about.
             </p>
             <form
@@ -674,13 +674,13 @@ export default function ChangelogPage() {
                 type="email"
                 required
                 placeholder="you@company.com"
-                className="flex-1 px-4 py-2.5 rounded-md border border-line bg-white text-ink text-sm placeholder:text-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/15 focus:border-ink/40 transition"
+                className="flex-1 px-4 py-2.5 rounded-md border border-[var(--line)] bg-[var(--white)] text-[var(--ink)] text-sm placeholder:text-[rgb(var(--ink-rgb)/40%)] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ink-rgb)/15%)] focus:border-[rgb(var(--ink-rgb)/40%)] transition"
               />
               <Button type="submit" size="md">
                 Subscribe
               </Button>
             </form>
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-ink/40">
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-mono text-[11px] uppercase tracking-wider text-[rgb(var(--ink-rgb)/40%)]">
               <span>2,400+ subscribers</span>
               <span>·</span>
               <span>Avg read time: 4 min</span>

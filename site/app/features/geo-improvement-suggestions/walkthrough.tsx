@@ -89,7 +89,7 @@ function StageNumber({ active, num }: { active: boolean; num: string }) {
       <span
         className={
           'inline-flex h-7 w-7 items-center justify-center rounded-full border font-mono text-[0.7rem] transition-all duration-500 ' +
-          (active ? 'bg-ink text-white border-ink' : 'bg-white text-ink-50 border-line')
+          (active ? 'bg-ink text-white border-ink' : 'bg-[var(--white)] text-ink-50 border-line')
         }
       >
         {num}
@@ -110,11 +110,11 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
   return (
     <div className="relative">
       <div className="card overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-line bg-white">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--line)] bg-[var(--white)]">
           <div className="flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-ink/30" />
-            <span className="inline-block h-2 w-2 rounded-full bg-ink/30" />
-            <span className="inline-block h-2 w-2 rounded-full bg-ink/30" />
+            <span className="inline-block h-2 w-2 rounded-full bg-[rgb(var(--ink-rgb)/30%)]" />
+            <span className="inline-block h-2 w-2 rounded-full bg-[rgb(var(--ink-rgb)/30%)]" />
+            <span className="inline-block h-2 w-2 rounded-full bg-[rgb(var(--ink-rgb)/30%)]" />
           </div>
           <div className="font-mono text-[0.7rem] text-ink-50">suggestion://geo-0421</div>
           <div className="font-mono text-[0.7rem] text-ink-50">
@@ -147,11 +147,11 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
             <ul className="mt-7 space-y-3 text-[0.9rem] text-ink-70">
               <li className="flex gap-3"><span className="text-ink-40">•</span> Drives 41% of buyer-intent queries</li>
               <li className="flex gap-3"><span className="text-ink-40">•</span> Competitor pages all carry Product + Offer markup</li>
-              <li className="flex gap-3"><span className="text-ink-40">•</span> Estimated lift: <span className="font-semibold text-ink">+6 visibility points</span></li>
+              <li className="flex gap-3"><span className="text-ink-40">•</span> Estimated lift: <span className="font-semibold text-[var(--ink)]">+6 visibility points</span></li>
               <li className="flex gap-3"><span className="text-ink-40">•</span> Effort: 12 minutes</li>
             </ul>
             <div className="mt-7 inline-flex items-center gap-2 text-[0.78rem] text-ink-60 font-mono">
-              Δshare × promptVolume × engineWeight / effortHours = <span className="text-ink">+6.0</span>
+              Δshare × promptVolume × engineWeight / effortHours = <span className="text-[var(--ink)]">+6.0</span>
             </div>
           </div>
 
@@ -178,7 +178,7 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
 }`}</pre>
             </div>
             <div className="mt-5 flex items-center gap-2 text-[0.82rem] text-ink-60">
-              <Check className="text-ink" /> Validated against Schema.org · 1.2 KB minified
+              <Check className="text-[var(--ink)]" /> Validated against Schema.org · 1.2 KB minified
             </div>
           </div>
 
@@ -202,9 +202,9 @@ function WalkthroughCanvas({ stage }: { stage: number }) {
             </div>
             <div className="mt-7 hairline w-full" />
             <ul className="mt-5 space-y-2 text-[0.9rem] text-ink-70">
-              <li className="flex gap-3 items-center"><Check className="text-ink" /> Markup verified by crawler</li>
-              <li className="flex gap-3 items-center"><Check className="text-ink" /> 3 engines re-cited /pricing within 48h</li>
-              <li className="flex gap-3 items-center"><Check className="text-ink" /> Logged to changelog · GEO-0421</li>
+              <li className="flex gap-3 items-center"><Check className="text-[var(--ink)]" /> Markup verified by crawler</li>
+              <li className="flex gap-3 items-center"><Check className="text-[var(--ink)]" /> 3 engines re-cited /pricing within 48h</li>
+              <li className="flex gap-3 items-center"><Check className="text-[var(--ink)]" /> Logged to changelog · GEO-0421</li>
             </ul>
           </div>
         </div>

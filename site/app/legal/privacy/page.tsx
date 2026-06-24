@@ -257,22 +257,22 @@ export default function PrivacyPolicyPage() {
         <HeroShade />
         <Container>
           <div className="max-w-3xl">
-            <div className="font-mono text-xs uppercase tracking-[0.14em] text-ink/50">
-              <Link href="/legal" className="hover:text-ink transition-colors">
+            <div className="font-mono text-xs uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/50%)]">
+              <Link href="/legal" className="hover:text-[var(--ink)] transition-colors">
                 Legal
               </Link>
-              <span className="mx-2 text-ink/30">/</span>
-              <span className="text-ink/70">Privacy Policy</span>
+              <span className="mx-2 text-[rgb(var(--ink-rgb)/30%)]">/</span>
+              <span className="text-[rgb(var(--ink-rgb)/70%)]">Privacy Policy</span>
             </div>
-            <h1 className="display-md mt-6 text-ink">Privacy policy.</h1>
-            <p className="mt-5 font-mono text-[13px] leading-relaxed text-ink/60">
+            <h1 className="display-md mt-6 text-[var(--ink)]">Privacy policy.</h1>
+            <p className="mt-5 font-mono text-[13px] leading-relaxed text-[rgb(var(--ink-rgb)/60%)]">
               Effective November 1, 2026
-              <span className="mx-2 text-ink/30">·</span>
+              <span className="mx-2 text-[rgb(var(--ink-rgb)/30%)]">·</span>
               Version 4.2
-              <span className="mx-2 text-ink/30">·</span>
+              <span className="mx-2 text-[rgb(var(--ink-rgb)/30%)]">·</span>
               Last reviewed by legal counsel
-              <span className="mx-2 text-ink/30">·</span>
-              <a href="#" className="text-ink underline-offset-4 hover:underline">
+              <span className="mx-2 text-[rgb(var(--ink-rgb)/30%)]">·</span>
+              <a href="#" className="text-[var(--ink)] underline-offset-4 hover:underline">
                 Print PDF →
               </a>
             </p>
@@ -281,15 +281,15 @@ export default function PrivacyPolicyPage() {
       </Section>
 
       {/* Table of contents */}
-      <div className="border-t border-[var(--line)] bg-white">
+      <div className="border-t border-[var(--line)] bg-[var(--white)]">
         <Section tight>
           <Container>
             <div className="grid gap-10 md:grid-cols-12">
               <div className="md:col-span-4">
-                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/50">
+                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/50%)]">
                   Contents
                 </div>
-                <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink/60">
+                <p className="mt-4 max-w-xs text-sm leading-relaxed text-[rgb(var(--ink-rgb)/60%)]">
                   Fourteen sections. Read the plain-English summary first if you only have a minute.
                 </p>
               </div>
@@ -299,10 +299,10 @@ export default function PrivacyPolicyPage() {
                     <li key={item.id}>
                       <a
                         href={`#${item.id}`}
-                        className="flex items-center justify-between py-3 text-ink/70 transition-colors hover:text-ink"
+                        className="flex items-center justify-between py-3 text-[rgb(var(--ink-rgb)/70%)] transition-colors hover:text-[var(--ink)]"
                       >
                         <span>{item.label}</span>
-                        <span className="text-ink/30 group-hover:text-ink">→</span>
+                        <span className="text-[rgb(var(--ink-rgb)/30%)] group-hover:text-[var(--ink)]">→</span>
                       </a>
                     </li>
                   ))}
@@ -317,11 +317,11 @@ export default function PrivacyPolicyPage() {
       <Section bg="subtle" id="summary">
         <Container>
           <div className="mx-auto max-w-[720px]">
-            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/50">
+            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/50%)]">
               01 — Summary
             </div>
-            <h2 className="display-sm mt-4 text-ink">In short.</h2>
-            <div className="mt-8 space-y-5 text-[15.5px] leading-[1.7] text-ink/80">
+            <h2 className="display-sm mt-4 text-[var(--ink)]">In short.</h2>
+            <div className="mt-8 space-y-5 text-[15.5px] leading-[1.7] text-[rgb(var(--ink-rgb)/80%)]">
               <p>
                 Clovion AI runs visibility tracking against the AI engines your buyers use. To do that, we collect the
                 domains you want monitored, the prompts you care about, the competitors you track, and the account data
@@ -341,22 +341,22 @@ export default function PrivacyPolicyPage() {
                 text follows.
               </p>
             </div>
-            <ul className="mt-10 grid gap-3 border-t border-[var(--line)] pt-8 font-mono text-[12.5px] text-ink/70 sm:grid-cols-2">
+            <ul className="mt-10 grid gap-3 border-t border-[var(--line)] pt-8 font-mono text-[12.5px] text-[rgb(var(--ink-rgb)/70%)] sm:grid-cols-2">
               <li>
-                <span className="block text-ink/40">From whom</span>
-                <span className="mt-1 block text-ink">Business customers and their teammates</span>
+                <span className="block text-[rgb(var(--ink-rgb)/40%)]">From whom</span>
+                <span className="mt-1 block text-[var(--ink)]">Business customers and their teammates</span>
               </li>
               <li>
-                <span className="block text-ink/40">What we do with it</span>
-                <span className="mt-1 block text-ink">Run visibility scoring, deliver fixes, bill, support</span>
+                <span className="block text-[rgb(var(--ink-rgb)/40%)]">What we do with it</span>
+                <span className="mt-1 block text-[var(--ink)]">Run visibility scoring, deliver fixes, bill, support</span>
               </li>
               <li>
-                <span className="block text-ink/40">Who we share with</span>
-                <span className="mt-1 block text-ink">13 named subprocessors. No advertisers. No data brokers.</span>
+                <span className="block text-[rgb(var(--ink-rgb)/40%)]">Who we share with</span>
+                <span className="mt-1 block text-[var(--ink)]">13 named subprocessors. No advertisers. No data brokers.</span>
               </li>
               <li>
-                <span className="block text-ink/40">Your rights</span>
-                <span className="mt-1 block text-ink">Access, correct, delete, port, object, restrict.</span>
+                <span className="block text-[rgb(var(--ink-rgb)/40%)]">Your rights</span>
+                <span className="mt-1 block text-[var(--ink)]">Access, correct, delete, port, object, restrict.</span>
               </li>
             </ul>
           </div>
@@ -378,22 +378,22 @@ export default function PrivacyPolicyPage() {
                 }
               >
                 <div className="flex items-baseline gap-4">
-                  <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-ink/40">
+                  <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/40%)]">
                     § {section.number}
                   </span>
-                  <h3 className="font-mono text-[15px] uppercase tracking-[0.14em] text-ink">
+                  <h3 className="font-mono text-[15px] uppercase tracking-[0.14em] text-[var(--ink)]">
                     {section.title}
                   </h3>
                 </div>
-                <div className="mt-6 space-y-5 text-[15.5px] leading-[1.7] text-ink/80">
+                <div className="mt-6 space-y-5 text-[15.5px] leading-[1.7] text-[rgb(var(--ink-rgb)/80%)]">
                   {section.body.map((para, i) => (
                     <p key={i}>{para}</p>
                   ))}
                   {section.bullets && (
                     <ul className="mt-2 space-y-2.5 border-l border-[var(--line)] pl-5">
                       {section.bullets.map((b, i) => (
-                        <li key={i} className="text-[15px] text-ink/80">
-                          <span className="mr-3 font-mono text-[11px] text-ink/40">
+                        <li key={i} className="text-[15px] text-[rgb(var(--ink-rgb)/80%)]">
+                          <span className="mr-3 font-mono text-[11px] text-[rgb(var(--ink-rgb)/40%)]">
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           {b}
@@ -409,18 +409,18 @@ export default function PrivacyPolicyPage() {
       </Section>
 
       {/* Subprocessor list */}
-      <div className="border-t border-[var(--line)] bg-white" id="subprocessor-list">
+      <div className="border-t border-[var(--line)] bg-[var(--white)]" id="subprocessor-list">
         <Section>
           <Container>
             <div className="flex items-baseline gap-4">
-              <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-ink/40">
+              <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/40%)]">
                 § 14
               </span>
-              <h3 className="font-mono text-[15px] uppercase tracking-[0.14em] text-ink">
+              <h3 className="font-mono text-[15px] uppercase tracking-[0.14em] text-[var(--ink)]">
                 Subprocessor list — live
               </h3>
             </div>
-            <p className="mt-5 max-w-[720px] text-[15.5px] leading-[1.7] text-ink/70">
+            <p className="mt-5 max-w-[720px] text-[15.5px] leading-[1.7] text-[rgb(var(--ink-rgb)/70%)]">
               The thirteen subprocessors we engage to operate Clovion AI. Updated whenever we add, remove, or change a
               vendor. Enterprise customers can subscribe to a 30-day advance notification list by emailing
               <span className="whitespace-nowrap"> dpo@clovion.ai</span>.
@@ -429,7 +429,7 @@ export default function PrivacyPolicyPage() {
             <div className="mt-10 -mx-4 overflow-x-auto md:mx-0">
               <table className="w-full min-w-[800px] border-collapse px-4 md:px-0">
                 <thead>
-                  <tr className="border-y border-[var(--line)] font-mono text-[11px] uppercase tracking-[0.16em] text-ink/50">
+                  <tr className="border-y border-[var(--line)] font-mono text-[11px] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
                     <th className="py-3 pr-6 text-left font-semibold w-[28%]">Subprocessor</th>
                     <th className="py-3 pr-6 text-left font-semibold w-[42%]">Purpose</th>
                     <th className="py-3 pr-6 text-left font-semibold w-[18%]">Region</th>
@@ -439,13 +439,13 @@ export default function PrivacyPolicyPage() {
                 <tbody>
                   {subprocessors.map((sp) => (
                     <tr key={sp.name} className="border-b border-[var(--line)]">
-                      <td className="py-4 pr-6 align-top text-[14px] font-semibold text-ink">
+                      <td className="py-4 pr-6 align-top text-[14px] font-semibold text-[var(--ink)]">
                         {sp.name}
                       </td>
-                      <td className="py-4 pr-6 align-top text-[14px] leading-[1.55] text-ink/75">
+                      <td className="py-4 pr-6 align-top text-[14px] leading-[1.55] text-[rgb(var(--ink-rgb)/75%)]">
                         {sp.purpose}
                       </td>
-                      <td className="py-4 pr-6 align-top font-mono text-[12.5px] text-ink/65">
+                      <td className="py-4 pr-6 align-top font-mono text-[12.5px] text-[rgb(var(--ink-rgb)/65%)]">
                         {sp.region}
                       </td>
                       <td className="py-4 align-top font-mono text-[12.5px]">
@@ -453,7 +453,7 @@ export default function PrivacyPolicyPage() {
                           href={sp.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-ink underline-offset-4 hover:underline"
+                          className="text-[var(--ink)] underline-offset-4 hover:underline"
                         >
                           View ↗
                         </a>
@@ -464,7 +464,7 @@ export default function PrivacyPolicyPage() {
               </table>
             </div>
 
-            <p className="mt-8 font-mono text-[11.5px] uppercase tracking-[0.14em] text-ink/45">
+            <p className="mt-8 font-mono text-[11.5px] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/45%)]">
               Last revised — October 14, 2026
             </p>
           </Container>
@@ -475,18 +475,18 @@ export default function PrivacyPolicyPage() {
       <Section bg="subtle" tight>
         <Container>
           <div className="flex flex-col items-start justify-between gap-4 border-t border-[var(--line)] pt-10 md:flex-row md:items-center">
-            <p className="font-mono text-[13px] text-ink/75">
+            <p className="font-mono text-[13px] text-[rgb(var(--ink-rgb)/75%)]">
               Questions?{' '}
-              <a href="mailto:security@clovion.ai" className="text-ink underline-offset-4 hover:underline">
+              <a href="mailto:security@clovion.ai" className="text-[var(--ink)] underline-offset-4 hover:underline">
                 security@clovion.ai
               </a>
-              <span className="mx-2 text-ink/30">·</span>
+              <span className="mx-2 text-[rgb(var(--ink-rgb)/30%)]">·</span>
               DPO:{' '}
-              <a href="mailto:dpo@clovion.ai" className="text-ink underline-offset-4 hover:underline">
+              <a href="mailto:dpo@clovion.ai" className="text-[var(--ink)] underline-offset-4 hover:underline">
                 dpo@clovion.ai
               </a>
             </p>
-            <p className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-ink/45">
+            <p className="font-mono text-[11.5px] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/45%)]">
               Effective 2026-11-01 • v4.2
             </p>
           </div>

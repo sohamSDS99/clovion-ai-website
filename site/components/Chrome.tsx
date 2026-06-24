@@ -6,11 +6,10 @@ import { Footer } from './Footer'
 import { HomeHeader } from './HomeHeader'
 import { HomeFooter } from './HomeFooter'
 
-const HOME_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/pricing', '/affiliate', '/free-ai-visibility-score', '/customers', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
+const HOME_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/features/platform-coverage', '/pricing', '/affiliate', '/free-ai-visibility-score', '/customers', '/about', '/changelog', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
 
-// CMS sections (index + [slug] detail) that use the dark chrome. Prefix-matched
-// so /news, /news/some-post, etc. all get the dark HomeHeader/HomeFooter.
-const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq']
+// Prefix-matched dark-chrome sections — index + every nested/[slug] page.
+const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal']
 
 function isHomeChrome(pathname: string): boolean {
   if (HOME_ROUTES.has(pathname)) return true

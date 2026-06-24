@@ -6,6 +6,9 @@
   :root {
     --bg: #FAFAF7;
     --ink: #0a0a0f;
+    /* RGB channels for the ink color, so Tailwind opacity utilities converted
+       to rgb(var(--ink-rgb)/N%) flip with the theme. */
+    --ink-rgb: 10 10 15;
     --muted: #6b7280;
     --subtle: #F5F3EF;
     --line: #eceae5;
@@ -449,6 +452,7 @@
 .clv-dark {
   --bg: #08080b;
   --ink: #ffffff;
+  --ink-rgb: 255 255 255;
   --white: #161619;
   --subtle: #101013;
   --line: rgba(255, 255, 255, 0.12);
@@ -485,6 +489,7 @@
    glowing against the black section. */
 .clv-chat-island {
   --ink: #0a0a0f;
+  --ink-rgb: 10 10 15;
   --white: #ffffff;
   --subtle: #F5F3EF;
   --line: #eceae5;

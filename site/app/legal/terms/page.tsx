@@ -62,25 +62,25 @@ export default function TermsPage() {
   return (
     <>
       {/* Section 1 — Hero strip */}
-      <section className="section-y-sm bg-bg border-b border-line relative overflow-hidden">
+      <section className="section-y-sm bg-bg border-b border-[var(--line)] relative overflow-hidden">
         <HeroShade />
         <Container>
-          <div className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-ink/50">
-            <Link href="/legal" className="hover:text-ink transition-colors">Legal</Link>
-            <span className="mx-2 text-ink/30">/</span>
-            <span className="text-ink/80">Terms of Service</span>
+          <div className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/50%)]">
+            <Link href="/legal" className="hover:text-[var(--ink)] transition-colors">Legal</Link>
+            <span className="mx-2 text-[rgb(var(--ink-rgb)/30%)]">/</span>
+            <span className="text-[rgb(var(--ink-rgb)/80%)]">Terms of Service</span>
           </div>
           <h1 className="display-md mt-6 text-balance">Terms of service.</h1>
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/60">
+          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/60%)]">
             <span>Effective November 1, 2026</span>
-            <span className="h-3 w-px bg-ink/15" aria-hidden />
+            <span className="h-3 w-px bg-[rgb(var(--ink-rgb)/15%)]" aria-hidden />
             <span>Version 3.1</span>
-            <span className="h-3 w-px bg-ink/15" aria-hidden />
-            <a href="#acceptable-use" className="inline-flex items-center gap-1.5 text-ink/80 hover:text-ink transition-colors">
+            <span className="h-3 w-px bg-[rgb(var(--ink-rgb)/15%)]" aria-hidden />
+            <a href="#acceptable-use" className="inline-flex items-center gap-1.5 text-[rgb(var(--ink-rgb)/80%)] hover:text-[var(--ink)] transition-colors">
               Acceptable use policy <ArrowRight className="text-current" />
             </a>
-            <span className="h-3 w-px bg-ink/15" aria-hidden />
-            <Link href="/contact" className="inline-flex items-center gap-1.5 text-ink/80 hover:text-ink transition-colors">
+            <span className="h-3 w-px bg-[rgb(var(--ink-rgb)/15%)]" aria-hidden />
+            <Link href="/contact" className="inline-flex items-center gap-1.5 text-[rgb(var(--ink-rgb)/80%)] hover:text-[var(--ink)] transition-colors">
               Master Service Agreement (enterprise) <ArrowRight className="text-current" />
             </Link>
           </div>
@@ -88,12 +88,12 @@ export default function TermsPage() {
       </section>
 
       {/* Section 2 — Table of contents */}
-      <Section tight className="bg-white border-b border-line">
+      <Section tight className="bg-[var(--white)] border-b border-[var(--line)]">
         <Container>
           <div className="grid grid-cols-1 gap-x-12 gap-y-1 md:grid-cols-2 lg:grid-cols-2">
             <div className="mb-6 md:col-span-2">
               <Eyebrow>Contents</Eyebrow>
-              <p className="mt-3 font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/50">
+              <p className="mt-3 font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/50%)]">
                 14 sections · approx. 11 minute read
               </p>
             </div>
@@ -101,15 +101,15 @@ export default function TermsPage() {
               <a
                 key={item.num}
                 href={item.href}
-                className="group flex items-baseline gap-5 border-b border-line py-3.5 hover:bg-subtle/60 transition-colors"
+                className="group flex items-baseline gap-5 border-b border-[var(--line)] py-3.5 hover:bg-subtle/60 transition-colors"
               >
-                <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-ink/40 w-6 shrink-0">
+                <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/40%)] w-6 shrink-0">
                   {item.num}
                 </span>
-                <span className="text-ink/90 group-hover:text-ink font-semibold flex-1">
+                <span className="text-[rgb(var(--ink-rgb)/90%)] group-hover:text-[var(--ink)] font-semibold flex-1">
                   {item.label}
                 </span>
-                <ArrowRight className="text-ink/30 group-hover:text-ink transition-colors shrink-0" />
+                <ArrowRight className="text-[rgb(var(--ink-rgb)/30%)] group-hover:text-[var(--ink)] transition-colors shrink-0" />
               </a>
             ))}
           </div>
@@ -127,18 +127,18 @@ export default function TermsPage() {
                 The plain reading of what follows. The full terms govern, but here&rsquo;s the spirit.
               </p>
             </div>
-            <div className="lg:col-span-8 space-y-7 text-[1.0625rem] leading-[1.7] text-ink/80">
+            <div className="lg:col-span-8 space-y-7 text-[1.0625rem] leading-[1.7] text-[rgb(var(--ink-rgb)/80%)]">
               <p>
-                <span className="font-semibold text-ink">What we promise.</span> 99.9% uptime on paid plans, with credit if we miss it. SOC 2 Type II controls and encryption at rest and in transit. Your data stays yours — we don&rsquo;t train models on it, sell it, or hand it to third parties beyond the subprocessors listed in our DPA.
+                <span className="font-semibold text-[var(--ink)]">What we promise.</span> 99.9% uptime on paid plans, with credit if we miss it. SOC 2 Type II controls and encryption at rest and in transit. Your data stays yours — we don&rsquo;t train models on it, sell it, or hand it to third parties beyond the subprocessors listed in our DPA.
               </p>
               <p>
-                <span className="font-semibold text-ink">What we expect.</span> Don&rsquo;t resell the platform, reverse-engineer the agents, scrape the dashboards, or use Clovion AI to attack other systems. Use the API within your tier&rsquo;s rate limits. If you find a vulnerability, tell us before publishing it — we run a coordinated disclosure program and pay bounties.
+                <span className="font-semibold text-[var(--ink)]">What we expect.</span> Don&rsquo;t resell the platform, reverse-engineer the agents, scrape the dashboards, or use Clovion AI to attack other systems. Use the API within your tier&rsquo;s rate limits. If you find a vulnerability, tell us before publishing it — we run a coordinated disclosure program and pay bounties.
               </p>
               <p>
-                <span className="font-semibold text-ink">How billing works.</span> Self-serve plans bill monthly in advance, or annually with a 20% discount. Enterprise bills annually under a signed order form. Clovion Agents bill on outcomes — $0.89 per resolved conversation, never for escalations, deflections, or agent-assisted replies. We define &ldquo;resolved&rdquo; in section 06.
+                <span className="font-semibold text-[var(--ink)]">How billing works.</span> Self-serve plans bill monthly in advance, or annually with a 20% discount. Enterprise bills annually under a signed order form. Clovion Agents bill on outcomes — $0.89 per resolved conversation, never for escalations, deflections, or agent-assisted replies. We define &ldquo;resolved&rdquo; in section 06.
               </p>
               <p>
-                <span className="font-semibold text-ink">If we part ways.</span> Cancel any time from your workspace settings. We&rsquo;ll keep your data accessible for export for 30 days after termination, then delete it from primary systems within 60 days and from backups within 180. No clawback of usage already consumed; no refunds for partial months on monthly plans; pro-rata refunds on annual plans terminated for cause.
+                <span className="font-semibold text-[var(--ink)]">If we part ways.</span> Cancel any time from your workspace settings. We&rsquo;ll keep your data accessible for export for 30 days after termination, then delete it from primary systems within 60 days and from backups within 180. No clawback of usage already consumed; no refunds for partial months on monthly plans; pro-rata refunds on annual plans terminated for cause.
               </p>
             </div>
           </div>
@@ -199,7 +199,7 @@ export default function TermsPage() {
                     'Upload Customer Data containing protected health information, payment card data, or other regulated data classes without a separately signed BAA or PCI addendum.'
                   ].map((rule) => (
                     <li key={rule} className="flex gap-3">
-                      <span className="mt-2 h-px w-4 bg-ink/40 shrink-0" aria-hidden />
+                      <span className="mt-2 h-px w-4 bg-[rgb(var(--ink-rgb)/40%)] shrink-0" aria-hidden />
                       <span>{rule}</span>
                     </li>
                   ))}
@@ -250,7 +250,7 @@ export default function TermsPage() {
 
             {/* 06 — Outcome-priced agent billing (signature section) */}
             <article id="agent-billing" className="scroll-mt-24">
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-ink/15 bg-white px-3 py-1 font-mono text-[0.66rem] uppercase tracking-[0.16em] text-ink/70">
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[rgb(var(--ink-rgb)/15%)] bg-[var(--white)] px-3 py-1 font-mono text-[0.66rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/70%)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-ink" aria-hidden />
                 Material billing terms
               </div>
@@ -260,33 +260,33 @@ export default function TermsPage() {
                   Clovion Agents bill on outcomes, not on messages or seats. This section defines what we charge for, what we don&rsquo;t, and how we determine the boundary.
                 </p>
 
-                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/60 mt-10 mb-4">06.1 — Unit price</h3>
+                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/60%)] mt-10 mb-4">06.1 — Unit price</h3>
                 <p>
-                  The default rate is <span className="font-semibold text-ink">$0.89 per Resolved Conversation</span>. Volume tiers are documented in your Order Form. There is no minimum monthly resolution commitment on self-serve plans; Enterprise Order Forms may include committed volume.
+                  The default rate is <span className="font-semibold text-[var(--ink)]">$0.89 per Resolved Conversation</span>. Volume tiers are documented in your Order Form. There is no minimum monthly resolution commitment on self-serve plans; Enterprise Order Forms may include committed volume.
                 </p>
 
-                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/60 mt-10 mb-4">06.2 — What &ldquo;Resolved&rdquo; means</h3>
+                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/60%)] mt-10 mb-4">06.2 — What &ldquo;Resolved&rdquo; means</h3>
                 <p>
-                  A <span className="font-semibold text-ink">Resolved Conversation</span> is a continuous exchange between an end user and Clovion Agents where (a) the agent provided one or more substantive responses, (b) the conversation ended without a handoff to a human, and (c) the conversation did not end with the agent stating it could not help. A conversation is the set of messages between the same end user and the same workspace within a 24-hour rolling window on the same subject thread.
+                  A <span className="font-semibold text-[var(--ink)]">Resolved Conversation</span> is a continuous exchange between an end user and Clovion Agents where (a) the agent provided one or more substantive responses, (b) the conversation ended without a handoff to a human, and (c) the conversation did not end with the agent stating it could not help. A conversation is the set of messages between the same end user and the same workspace within a 24-hour rolling window on the same subject thread.
                 </p>
                 <p>
                   We do not require the end user to confirm resolution. We do not bill twice for the same end user returning later about a different issue; we do not bill twice for follow-up messages on the same issue inside the same window.
                 </p>
 
-                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/60 mt-10 mb-4">06.3 — Worked examples</h3>
+                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/60%)] mt-10 mb-4">06.3 — Worked examples</h3>
 
                 {/* Examples table */}
-                <div className="my-7 overflow-hidden rounded-lg border border-ink/12 bg-white">
-                  <div className="grid grid-cols-[1fr_auto] gap-4 border-b border-ink/10 bg-subtle/60 px-5 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-ink/60">
+                <div className="my-7 overflow-hidden rounded-lg border border-[rgb(var(--ink-rgb)/12%)] bg-[var(--white)]">
+                  <div className="grid grid-cols-[1fr_auto] gap-4 border-b border-[rgb(var(--ink-rgb)/10%)] bg-subtle/60 px-5 py-3 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/60%)]">
                     <div>Scenario</div>
                     <div className="text-right">Billed?</div>
                   </div>
-                  <ul className="divide-y divide-ink/8">
+                  <ul className="divide-y divide-[rgb(var(--ink-rgb)/8%)]">
                     {billingExamples.map((row, i) => (
                       <li key={i} className="grid grid-cols-[1fr_auto] items-start gap-4 px-5 py-4">
                         <div>
-                          <p className="text-ink/85 leading-relaxed">{row.scenario}</p>
-                          <p className="mt-1.5 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-ink/55">
+                          <p className="text-[rgb(var(--ink-rgb)/85%)] leading-relaxed">{row.scenario}</p>
+                          <p className="mt-1.5 font-mono text-[0.7rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/55%)]">
                             {row.outcome}
                           </p>
                         </div>
@@ -296,7 +296,7 @@ export default function TermsPage() {
                               <Check className="text-current" /> Billed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-ink/60">
+                            <span className="inline-flex items-center gap-1.5 rounded-full border border-[rgb(var(--ink-rgb)/15%)] px-2.5 py-1 font-mono text-[0.66rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/60%)]">
                               Free
                             </span>
                           )}
@@ -306,12 +306,12 @@ export default function TermsPage() {
                   </ul>
                 </div>
 
-                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/60 mt-10 mb-4">06.4 — Performance Guarantee</h3>
+                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/60%)] mt-10 mb-4">06.4 — Performance Guarantee</h3>
                 <p>
                   If Clovion Agents do not exceed your pre-deployment resolution rate within 90 days of go-live on a Production deployment, we will refund 100% of agent fees paid during that period, provided you have (a) shared the baseline metric in writing before go-live, (b) given us at least 60 days under stable knowledge base configuration, and (c) maintained the recommended training cadence. The guarantee is per deployment and is the exclusive remedy for missed performance targets.
                 </p>
 
-                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-ink/60 mt-10 mb-4">06.5 — Dispute window</h3>
+                <h3 className="font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/60%)] mt-10 mb-4">06.5 — Dispute window</h3>
                 <p>
                   You have 30 days from receipt of an invoice to dispute resolution counts. Each billing record links to the underlying conversation transcript; disputes referencing specific conversations are resolved in your favor unless we present transcript evidence to the contrary within 10 business days.
                 </p>
@@ -452,7 +452,7 @@ export default function TermsPage() {
       </section>
 
       {/* Section 5 — Performance Guarantee band */}
-      <section className="bg-white border-y border-line">
+      <section className="bg-[var(--white)] border-y border-[var(--line)]">
         <Container>
           <div className="section-y grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14 items-center">
             <div className="lg:col-span-5">
@@ -465,18 +465,18 @@ export default function TermsPage() {
               </p>
             </div>
             <div className="lg:col-span-7">
-              <div className="rounded-2xl border border-ink/15 bg-bg p-8 md:p-10">
-                <p className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-ink/55">
+              <div className="rounded-2xl border border-[rgb(var(--ink-rgb)/15%)] bg-bg p-8 md:p-10">
+                <p className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/55%)]">
                   The clause, in full
                 </p>
-                <p className="mt-5 text-[1.125rem] leading-[1.65] text-ink/90">
+                <p className="mt-5 text-[1.125rem] leading-[1.65] text-[rgb(var(--ink-rgb)/90%)]">
                   &ldquo;If Clovion Agents do not beat your current resolution rate within 90 days of go-live, we refund 100% of agent fees paid in the period.&rdquo;
                 </p>
                 <div className="mt-7 flex flex-wrap items-center gap-3">
-                  <a href="#agent-billing" className="inline-flex items-center gap-2 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-ink hover:underline">
+                  <a href="#agent-billing" className="inline-flex items-center gap-2 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[var(--ink)] hover:underline">
                     Read section 06 in full <ArrowRight />
                   </a>
-                  <span className="h-3 w-px bg-ink/15" aria-hidden />
+                  <span className="h-3 w-px bg-[rgb(var(--ink-rgb)/15%)]" aria-hidden />
                   <Tag>Per deployment</Tag>
                   <Tag>90-day window</Tag>
                   <Tag>Exclusive remedy</Tag>
@@ -493,14 +493,14 @@ export default function TermsPage() {
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
               <Eyebrow>Questions?</Eyebrow>
-              <p className="mt-4 font-mono text-[0.85rem] uppercase tracking-[0.12em] text-ink/75">
-                <span className="text-ink/55">Legal · </span>
-                <a href="mailto:legal@clovion.ai" className="text-ink hover:underline">legal@clovion.ai</a>
-                <span className="mx-3 text-ink/30">·</span>
-                <span className="text-ink/55">Procurement · </span>
-                <a href="mailto:procurement@clovion.ai" className="text-ink hover:underline">procurement@clovion.ai</a>
+              <p className="mt-4 font-mono text-[0.85rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/75%)]">
+                <span className="text-[rgb(var(--ink-rgb)/55%)]">Legal · </span>
+                <a href="mailto:legal@clovion.ai" className="text-[var(--ink)] hover:underline">legal@clovion.ai</a>
+                <span className="mx-3 text-[rgb(var(--ink-rgb)/30%)]">·</span>
+                <span className="text-[rgb(var(--ink-rgb)/55%)]">Procurement · </span>
+                <a href="mailto:procurement@clovion.ai" className="text-[var(--ink)] hover:underline">procurement@clovion.ai</a>
               </p>
-              <p className="mt-3 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-ink/45">
+              <p className="mt-3 font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/45%)]">
                 We reply to legal queue within two business days.
               </p>
             </div>
@@ -519,11 +519,11 @@ export default function TermsPage() {
 
 function SectionHead({ num, title }: { num: string; title: string }) {
   return (
-    <header className="mb-7 flex items-baseline gap-6 border-b border-ink/10 pb-5">
-      <span className="font-mono text-[0.78rem] uppercase tracking-[0.16em] text-ink/45">
+    <header className="mb-7 flex items-baseline gap-6 border-b border-[rgb(var(--ink-rgb)/10%)] pb-5">
+      <span className="font-mono text-[0.78rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/45%)]">
         {num}
       </span>
-      <h2 className="text-[1.625rem] md:text-[1.875rem] font-display font-semibold tracking-[-0.02em] text-ink">
+      <h2 className="text-[1.625rem] md:text-[1.875rem] font-display font-semibold tracking-[-0.02em] text-[var(--ink)]">
         {title}
       </h2>
     </header>
@@ -532,7 +532,7 @@ function SectionHead({ num, title }: { num: string; title: string }) {
 
 function Prose({ children }: { children: React.ReactNode }) {
   return (
-    <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-ink/80 [&_p_strong]:text-ink [&_p_strong]:font-semibold">
+    <div className="space-y-5 text-[1.0625rem] leading-[1.75] text-[rgb(var(--ink-rgb)/80%)] [&_p_strong]:text-[var(--ink)] [&_p_strong]:font-semibold">
       {children}
     </div>
   )
@@ -540,7 +540,7 @@ function Prose({ children }: { children: React.ReactNode }) {
 
 function Mail({ addr }: { addr: string }) {
   return (
-    <a href={`mailto:${addr}`} className="font-mono text-[0.95em] text-ink hover:underline">
+    <a href={`mailto:${addr}`} className="font-mono text-[0.95em] text-[var(--ink)] hover:underline">
       {addr}
     </a>
   )

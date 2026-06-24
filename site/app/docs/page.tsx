@@ -125,7 +125,7 @@ export default function DocsPage() {
           <div className="max-w-3xl">
             <Eyebrow>DOCS</Eyebrow>
             <h1 className="display-md mt-5">Docs for builders.</h1>
-            <p className="lead mt-6 text-ink/70">
+            <p className="lead mt-6 text-[rgb(var(--ink-rgb)/70%)]">
               Set up your workspace, connect your data, ship custom dashboards, and integrate with your stack.
               Designed for engineering teams.
             </p>
@@ -151,7 +151,7 @@ export default function DocsPage() {
             </div>
             <Link
               href="/docs/getting-started"
-              className="hidden md:inline-flex items-center gap-2 text-sm text-ink/70 hover:text-ink transition-colors"
+              className="hidden md:inline-flex items-center gap-2 text-sm text-[rgb(var(--ink-rgb)/70%)] hover:text-[var(--ink)] transition-colors"
             >
               All guides <ArrowRight />
             </Link>
@@ -160,14 +160,14 @@ export default function DocsPage() {
           <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-5 lg:grid-cols-4">
             {quickStart.map((q) => (
               <Link key={q.sku} href={q.href} className="group block">
-                <Card className="bg-white h-full flex flex-col">
+                <Card className="bg-[var(--white)] h-full flex flex-col">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] tracking-wider text-ink/50">{q.sku}</span>
-                    <span className="font-mono text-[11px] tracking-wider text-ink/40">{q.time}</span>
+                    <span className="font-mono text-[11px] tracking-wider text-[rgb(var(--ink-rgb)/50%)]">{q.sku}</span>
+                    <span className="font-mono text-[11px] tracking-wider text-[rgb(var(--ink-rgb)/40%)]">{q.time}</span>
                   </div>
-                  <h3 className="mt-5 text-lg font-semibold tracking-[-0.01em] text-ink">{q.title}</h3>
-                  <p className="mt-3 text-sm text-ink/65 leading-relaxed">{q.desc}</p>
-                  <div className="mt-6 flex items-center gap-1.5 text-sm text-ink group-hover:gap-2.5 transition-all">
+                  <h3 className="mt-5 text-lg font-semibold tracking-[-0.01em] text-[var(--ink)]">{q.title}</h3>
+                  <p className="mt-3 text-sm text-[rgb(var(--ink-rgb)/65%)] leading-relaxed">{q.desc}</p>
+                  <div className="mt-6 flex items-center gap-1.5 text-sm text-[var(--ink)] group-hover:gap-2.5 transition-all">
                     Begin <ArrowRight />
                   </div>
                 </Card>
@@ -184,7 +184,7 @@ export default function DocsPage() {
             <div className="max-w-2xl">
               <Eyebrow>BROWSE BY SURFACE</Eyebrow>
               <h2 className="display-sm mt-4">Every part of the product, indexed.</h2>
-              <p className="lead mt-4 text-ink/70 text-base">
+              <p className="lead mt-4 text-[rgb(var(--ink-rgb)/70%)] text-base">
                 Thirty pages across six surfaces. Pick the one that matches what you are wiring up.
               </p>
             </div>
@@ -193,11 +193,11 @@ export default function DocsPage() {
           <div className="mt-12 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 md:gap-x-10 md:gap-y-12 lg:grid-cols-3">
             {browseSurfaces.map((group, i) => (
               <div key={group.title}>
-                <div className="flex items-center gap-3 pb-4 border-b border-line">
-                  <span className="font-mono text-[11px] tracking-wider text-ink/40">
+                <div className="flex items-center gap-3 pb-4 border-b border-[var(--line)]">
+                  <span className="font-mono text-[11px] tracking-wider text-[rgb(var(--ink-rgb)/40%)]">
                     {String(i + 1).padStart(2, '0')}
                   </span>
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-ink">
+                  <h3 className="text-sm font-semibold uppercase tracking-wider text-[var(--ink)]">
                     {group.title}
                   </h3>
                 </div>
@@ -206,9 +206,9 @@ export default function DocsPage() {
                     <li key={item}>
                       <Link
                         href="/docs/getting-started"
-                        className="group flex items-baseline gap-3 py-2 text-sm text-ink/75 hover:text-ink transition-colors"
+                        className="group flex items-baseline gap-3 py-2 text-sm text-[rgb(var(--ink-rgb)/75%)] hover:text-[var(--ink)] transition-colors"
                       >
-                        <span className="font-mono text-[10px] text-ink/30 group-hover:text-ink/50 transition-colors">
+                        <span className="font-mono text-[10px] text-[rgb(var(--ink-rgb)/30%)] group-hover:text-[rgb(var(--ink-rgb)/50%)] transition-colors">
                           {String(j + 1).padStart(2, '0')}
                         </span>
                         <span className="flex-1">{item}</span>
@@ -230,13 +230,13 @@ export default function DocsPage() {
             <div className="max-w-2xl">
               <Eyebrow>QUICKSTARTS</Eyebrow>
               <h2 className="display-sm mt-4">One package away.</h2>
-              <p className="lead mt-4 text-ink/70 text-base">
+              <p className="lead mt-4 text-[rgb(var(--ink-rgb)/70%)] text-base">
                 Pick a language. Install. You are pulling visibility data inside of a minute.
               </p>
             </div>
             <Link
               href="/docs/getting-started"
-              className="hidden md:inline-flex items-center gap-2 text-sm text-ink/70 hover:text-ink transition-colors"
+              className="hidden md:inline-flex items-center gap-2 text-sm text-[rgb(var(--ink-rgb)/70%)] hover:text-[var(--ink)] transition-colors"
             >
               API reference <ArrowRight />
             </Link>
@@ -245,17 +245,17 @@ export default function DocsPage() {
           <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3">
             {frameworkQuickstarts.map((fw) => (
               <Link key={fw.name} href={fw.href} className="group block">
-                <Card className="bg-white h-full flex flex-col p-6">
+                <Card className="bg-[var(--white)] h-full flex flex-col p-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-semibold text-ink">{fw.name}</h3>
-                    <ArrowRight className="text-ink/40 group-hover:text-ink group-hover:translate-x-0.5 transition-all" />
+                    <h3 className="text-base font-semibold text-[var(--ink)]">{fw.name}</h3>
+                    <ArrowRight className="text-[rgb(var(--ink-rgb)/40%)] group-hover:text-[var(--ink)] group-hover:translate-x-0.5 transition-all" />
                   </div>
-                  <div className="mt-4 rounded-lg bg-ink/[0.04] border border-line px-3.5 py-2.5">
-                    <code className="font-mono text-[12.5px] text-ink/85 leading-relaxed break-all">
+                  <div className="mt-4 rounded-lg bg-ink/[0.04] border border-[var(--line)] px-3.5 py-2.5">
+                    <code className="font-mono text-[12.5px] text-[rgb(var(--ink-rgb)/85%)] leading-relaxed break-all">
                       {fw.snippet}
                     </code>
                   </div>
-                  <p className="mt-4 text-sm text-ink/65 leading-relaxed">{fw.desc}</p>
+                  <p className="mt-4 text-sm text-[rgb(var(--ink-rgb)/65%)] leading-relaxed">{fw.desc}</p>
                 </Card>
               </Link>
             ))}
@@ -273,28 +273,28 @@ export default function DocsPage() {
             </div>
             <Link
               href="/blog"
-              className="inline-flex items-center gap-2 text-sm text-ink/70 hover:text-ink transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-[rgb(var(--ink-rgb)/70%)] hover:text-[var(--ink)] transition-colors"
             >
               Full changelog <ArrowRight />
             </Link>
           </div>
 
-          <ul className="mt-10 divide-y divide-line border-y border-line">
+          <ul className="mt-10 divide-y divide-[var(--line)] border-y border-[var(--line)]">
             {recentlyShipped.map((entry) => (
               <li key={entry.version}>
                 <Link
                   href="/blog"
                   className="group grid grid-cols-12 items-center gap-4 py-5 hover:bg-subtle/50 -mx-4 px-4 transition-colors"
                 >
-                  <div className="col-span-12 sm:col-span-3 font-mono text-[12px] text-ink/50 tabular-nums">
+                  <div className="col-span-12 sm:col-span-3 font-mono text-[12px] text-[rgb(var(--ink-rgb)/50%)] tabular-nums">
                     {entry.date} · v{entry.version}
                   </div>
                   <div className="col-span-12 sm:col-span-7">
-                    <h3 className="text-base font-semibold text-ink">{entry.title}</h3>
-                    <p className="mt-1 text-sm text-ink/60 line-clamp-1">{entry.description}</p>
+                    <h3 className="text-base font-semibold text-[var(--ink)]">{entry.title}</h3>
+                    <p className="mt-1 text-sm text-[rgb(var(--ink-rgb)/60%)] line-clamp-1">{entry.description}</p>
                   </div>
                   <div className="col-span-12 sm:col-span-2 sm:text-right">
-                    <span className="inline-flex items-center gap-1 text-sm text-ink/70 group-hover:gap-2 transition-all">
+                    <span className="inline-flex items-center gap-1 text-sm text-[rgb(var(--ink-rgb)/70%)] group-hover:gap-2 transition-all">
                       Learn more <ArrowRight />
                     </span>
                   </div>
@@ -330,8 +330,8 @@ export default function DocsPage() {
                 className="mt-1.5 inline-flex items-center gap-2 text-sm text-white hover:text-white/80 transition-colors"
               >
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-70" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--white)] opacity-70" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--white)]" />
                 </span>
                 status.clovion.ai
               </a>

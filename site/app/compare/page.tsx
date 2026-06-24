@@ -119,7 +119,7 @@ export default function ComparePage() {
             <h1 className="display-lg mt-5">
               Compare every GEO tool.
             </h1>
-            <p className="lead mt-6 text-ink/70 max-w-2xl">
+            <p className="lead mt-6 text-[rgb(var(--ink-rgb)/70%)] max-w-2xl">
               Honest comparisons against every major AI visibility tool. Feature parity, where we win, where they win, and what to ask in a demo.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
@@ -137,11 +137,11 @@ export default function ComparePage() {
       {/* -----------------------------------------------------------------
           SECTION 2 — COMPARISON GRID
           ----------------------------------------------------------------- */}
-      <Section className="bg-white border-y border-[#eceae5]">
+      <Section className="bg-[var(--white)] border-y border-[#eceae5]">
         <Container>
           <div className="max-w-2xl mb-12">
             <h2 className="display-md">Four head-to-head comparisons.</h2>
-            <p className="lead mt-5 text-ink/70">
+            <p className="lead mt-5 text-[rgb(var(--ink-rgb)/70%)]">
               Each comparison runs the same fixture: real prompts, current pricing, and the workflow you would actually run on a Tuesday.
             </p>
           </div>
@@ -156,24 +156,24 @@ export default function ComparePage() {
                   className="group relative block"
                   aria-label={`Compare Clovion AI vs ${c.name}`}
                 >
-                  <Card className="h-full flex flex-col gap-6 p-5 md:p-8 transition-colors duration-200 group-hover:border-ink/30">
+                  <Card className="h-full flex flex-col gap-6 p-5 md:p-8 transition-colors duration-200 group-hover:border-[rgb(var(--ink-rgb)/30%)]">
                     {/* status pill */}
                     <div className="flex items-center justify-between">
-                      <div className="text-xs font-mono uppercase tracking-[0.2em] text-ink/50">
-                        Clovion AI <span className="text-ink/30 mx-1.5">vs</span> {c.name}
+                      <div className="text-xs font-mono uppercase tracking-[0.2em] text-[rgb(var(--ink-rgb)/50%)]">
+                        Clovion AI <span className="text-[rgb(var(--ink-rgb)/30%)] mx-1.5">vs</span> {c.name}
                       </div>
                       <span
                         className={[
                           'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-mono uppercase tracking-[0.18em]',
                           isLive
-                            ? 'border-ink/20 bg-ink text-white'
-                            : 'border-ink/15 bg-[#F5F3EF] text-ink/60'
+                            ? 'border-[rgb(var(--ink-rgb)/20%)] bg-ink text-white'
+                            : 'border-[rgb(var(--ink-rgb)/15%)] bg-[#F5F3EF] text-[rgb(var(--ink-rgb)/60%)]'
                         ].join(' ')}
                       >
                         <span
                           className={[
                             'h-1 w-1 rounded-full',
-                            isLive ? 'bg-white' : 'bg-ink/40'
+                            isLive ? 'bg-white' : 'bg-[rgb(var(--ink-rgb)/40%)]'
                           ].join(' ')}
                         />
                         {c.status}
@@ -183,17 +183,17 @@ export default function ComparePage() {
                     {/* Name + positioning */}
                     <div>
                       <div className="display-sm">
-                        <span className="text-ink/40">vs.</span>{' '}
-                        <span className="text-ink">{c.name}</span>
+                        <span className="text-[rgb(var(--ink-rgb)/40%)]">vs.</span>{' '}
+                        <span className="text-[var(--ink)]">{c.name}</span>
                       </div>
-                      <p className="mt-4 text-ink/70 leading-relaxed">{c.positioning}</p>
+                      <p className="mt-4 text-[rgb(var(--ink-rgb)/70%)] leading-relaxed">{c.positioning}</p>
                     </div>
 
                     {/* Bullets */}
                     <ul className="space-y-2.5 mt-auto">
                       {c.bullets.map((b) => (
-                        <li key={b} className="flex gap-3 text-sm text-ink/80">
-                          <Check className="mt-0.5 shrink-0 text-ink" />
+                        <li key={b} className="flex gap-3 text-sm text-[rgb(var(--ink-rgb)/80%)]">
+                          <Check className="mt-0.5 shrink-0 text-[var(--ink)]" />
                           <span>{b}</span>
                         </li>
                       ))}
@@ -201,10 +201,10 @@ export default function ComparePage() {
 
                     {/* CTA row */}
                     <div className="pt-2 mt-2 border-t border-[#eceae5] flex items-center justify-between">
-                      <span className="text-sm font-semibold text-ink">
+                      <span className="text-sm font-semibold text-[var(--ink)]">
                         {isLive ? 'See full comparison' : 'Notify me when live'}
                       </span>
-                      <span className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-[#eceae5] text-ink transition-colors group-hover:border-ink group-hover:bg-ink group-hover:text-white">
+                      <span className="inline-flex items-center justify-center h-9 w-9 rounded-full border border-[#eceae5] text-[var(--ink)] transition-colors group-hover:border-[var(--ink)] group-hover:bg-ink group-hover:text-white">
                         <ArrowRight />
                       </span>
                     </div>
@@ -224,7 +224,7 @@ export default function ComparePage() {
           <div className="max-w-2xl mb-12">
             <Eyebrow>SWITCHING</Eyebrow>
             <h2 className="display-md mt-5">Migrating is the smaller worry.</h2>
-            <p className="lead mt-5 text-ink/70">
+            <p className="lead mt-5 text-[rgb(var(--ink-rgb)/70%)]">
               Most teams overestimate the cost of switching. Three guardrails make the move boring on purpose.
             </p>
           </div>
@@ -233,23 +233,23 @@ export default function ComparePage() {
             {switchingCosts.map((s, i) => (
               <div
                 key={s.numeral}
-                className="card bg-white p-5 md:p-8 flex flex-col gap-4"
+                className="card bg-[var(--white)] p-5 md:p-8 flex flex-col gap-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-sm tracking-[0.2em] text-ink/40">
+                  <span className="font-mono text-sm tracking-[0.2em] text-[rgb(var(--ink-rgb)/40%)]">
                     {s.numeral}
                   </span>
                   {i < switchingCosts.length - 1 && (
-                    <span className="hidden md:block font-mono text-xs text-ink/30">
+                    <span className="hidden md:block font-mono text-xs text-[rgb(var(--ink-rgb)/30%)]">
                       step
                     </span>
                   )}
                 </div>
                 <HairlineDivider />
-                <h3 className="text-lg font-semibold text-ink leading-snug tracking-[-0.01em]">
+                <h3 className="text-lg font-semibold text-[var(--ink)] leading-snug tracking-[-0.01em]">
                   {s.title}
                 </h3>
-                <p className="text-ink/65 text-[15px] leading-relaxed">{s.body}</p>
+                <p className="text-[rgb(var(--ink-rgb)/65%)] text-[15px] leading-relaxed">{s.body}</p>
               </div>
             ))}
           </div>
@@ -259,33 +259,33 @@ export default function ComparePage() {
       {/* -----------------------------------------------------------------
           SECTION 4 — ALTERNATIVES STRIP
           ----------------------------------------------------------------- */}
-      <Section tight className="bg-white">
+      <Section tight className="bg-[var(--white)]">
         <Container>
           <Link
             href="/alternatives/profound"
             className="group block"
             aria-label="Read the Profound alternative guide"
           >
-            <Card className="flex flex-col md:flex-row items-stretch gap-6 md:gap-10 p-7 md:p-9 transition-colors duration-200 group-hover:border-ink/30">
+            <Card className="flex flex-col md:flex-row items-stretch gap-6 md:gap-10 p-7 md:p-9 transition-colors duration-200 group-hover:border-[rgb(var(--ink-rgb)/30%)]">
               <div className="flex md:items-center">
-                <div className="inline-flex items-center gap-2 rounded-full border border-ink/15 bg-[#F5F3EF] px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.22em] text-ink/60">
-                  <span className="h-1 w-1 rounded-full bg-ink/50" />
+                <div className="inline-flex items-center gap-2 rounded-full border border-[rgb(var(--ink-rgb)/15%)] bg-[#F5F3EF] px-3 py-1.5 text-[10px] font-mono uppercase tracking-[0.22em] text-[rgb(var(--ink-rgb)/60%)]">
+                  <span className="h-1 w-1 rounded-full bg-[rgb(var(--ink-rgb)/50%)]" />
                   Alternative
                 </div>
               </div>
 
               <div className="flex-1 flex flex-col md:flex-row md:items-center gap-6 md:gap-8">
                 <div className="flex-1">
-                  <h3 className="text-xl md:text-2xl font-semibold text-ink tracking-[-0.02em] leading-tight">
+                  <h3 className="text-xl md:text-2xl font-semibold text-[var(--ink)] tracking-[-0.02em] leading-tight">
                     Looking specifically for a Profound alternative? Read our complete guide.
                   </h3>
-                  <p className="mt-3 text-ink/65 max-w-2xl text-[15px] leading-relaxed">
+                  <p className="mt-3 text-[rgb(var(--ink-rgb)/65%)] max-w-2xl text-[15px] leading-relaxed">
                     A longer-form walkthrough: migration path, contract comparison, the parts of Profound we respect, and the parts we built around.
                   </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
-                  <span className="text-sm font-semibold text-ink">Read the guide</span>
-                  <span className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#eceae5] text-ink transition-colors group-hover:border-ink group-hover:bg-ink group-hover:text-white">
+                  <span className="text-sm font-semibold text-[var(--ink)]">Read the guide</span>
+                  <span className="inline-flex items-center justify-center h-10 w-10 rounded-full border border-[#eceae5] text-[var(--ink)] transition-colors group-hover:border-[var(--ink)] group-hover:bg-ink group-hover:text-white">
                     <ArrowRight />
                   </span>
                 </div>
@@ -298,22 +298,22 @@ export default function ComparePage() {
       {/* -----------------------------------------------------------------
           SECTION 5 — METHODOLOGY
           ----------------------------------------------------------------- */}
-      <Section className="bg-white border-t border-[#eceae5]">
+      <Section className="bg-[var(--white)] border-t border-[#eceae5]">
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
             <div className="lg:col-span-5">
               <Eyebrow>METHODOLOGY</Eyebrow>
               <h2 className="display-md mt-5">How we wrote these comparisons.</h2>
-              <p className="lead mt-5 text-ink/70">
+              <p className="lead mt-5 text-[rgb(var(--ink-rgb)/70%)]">
                 Most comparison pages quietly stack the deck. Ours show the work.
               </p>
             </div>
 
             <div className="lg:col-span-7 space-y-6">
-              <p className="text-ink/75 text-[17px] leading-relaxed">
+              <p className="text-[rgb(var(--ink-rgb)/75%)] text-[17px] leading-relaxed">
                 We compare against the version of each competitor that exists on the day we publish, not the one in their last fundraising deck. Pricing is pulled from the live page. Features are read from public docs. The recommendation quality is judged from a real test run on the same 50-prompt fixture we use for our own QA.
               </p>
-              <p className="text-ink/75 text-[17px] leading-relaxed">
+              <p className="text-[rgb(var(--ink-rgb)/75%)] text-[17px] leading-relaxed">
                 Where they win, we say so. Profound has a longer track record in finance and pharma. Otterly has a friendlier onboarding for a first-time user. Calling that out is what makes the rest of the comparison worth reading.
               </p>
 
@@ -321,9 +321,9 @@ export default function ComparePage() {
                 {methodologyPoints.map((p) => (
                   <li
                     key={p}
-                    className="flex gap-3 rounded-lg border border-[#eceae5] bg-[#FAFAF7] px-4 py-3.5 text-sm text-ink/75"
+                    className="flex gap-3 rounded-lg border border-[#eceae5] bg-[#FAFAF7] px-4 py-3.5 text-sm text-[rgb(var(--ink-rgb)/75%)]"
                   >
-                    <Check className="mt-0.5 shrink-0 text-ink" />
+                    <Check className="mt-0.5 shrink-0 text-[var(--ink)]" />
                     <span className="leading-snug">{p}</span>
                   </li>
                 ))}
@@ -333,7 +333,7 @@ export default function ComparePage() {
                 <Button href="/about" variant="secondary" size="md">
                   Read full methodology
                 </Button>
-                <span className="text-xs font-mono uppercase tracking-[0.18em] text-ink/40">
+                <span className="text-xs font-mono uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/40%)]">
                   Have a correction? hello@clovion.ai
                 </span>
               </div>
@@ -353,7 +353,7 @@ export default function ComparePage() {
               <h3 className="display-sm mt-4">
                 One comparison a quarter, in your inbox.
               </h3>
-              <p className="mt-4 text-ink/70 max-w-xl leading-relaxed">
+              <p className="mt-4 text-[rgb(var(--ink-rgb)/70%)] max-w-xl leading-relaxed">
                 Each issue is a single competitor teardown — feature delta, pricing changes, and the one workflow that shifted. No drip sequence. No upsell. Unsubscribe in a click.
               </p>
             </div>
@@ -372,11 +372,11 @@ export default function ComparePage() {
                 name="email"
                 placeholder="you@company.com"
                 required
-                className="flex-1 h-12 rounded-full border border-[#eceae5] bg-white px-5 text-sm text-ink placeholder:text-ink/40 focus:outline-none focus:border-ink transition-colors"
+                className="flex-1 h-12 rounded-full border border-[#eceae5] bg-[var(--white)] px-5 text-sm text-[var(--ink)] placeholder:text-[rgb(var(--ink-rgb)/40%)] focus:outline-none focus:border-[var(--ink)] transition-colors"
               />
               <button
                 type="submit"
-                className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-ink text-white text-sm font-semibold hover:bg-ink/90 transition-colors"
+                className="inline-flex items-center justify-center h-12 px-6 rounded-full bg-ink text-white text-sm font-semibold hover:bg-[rgb(var(--ink-rgb)/90%)] transition-colors"
               >
                 Subscribe
               </button>

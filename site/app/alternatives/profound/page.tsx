@@ -126,7 +126,7 @@ export default function ProfoundAlternativePage() {
       </Section>
 
       {/* Section 2 — Why teams switch */}
-      <Section className="border-t border-line">
+      <Section className="border-t border-[var(--line)]">
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>Why teams switch</Eyebrow>
@@ -139,7 +139,7 @@ export default function ProfoundAlternativePage() {
             </p>
           </div>
 
-          <ul className="mt-16 divide-y divide-line border-y border-line">
+          <ul className="mt-16 divide-y divide-[var(--line)] border-y border-[var(--line)]">
             {switchReasons.map((r) => (
               <li key={r.n} className="py-8 md:py-10 grid grid-cols-1 md:grid-cols-[120px_1fr] gap-6 md:gap-12">
                 <div className="font-mono text-sm text-ink-50 tracking-tight">{r.n}</div>
@@ -171,11 +171,11 @@ export default function ProfoundAlternativePage() {
 
           <div className="mt-14 -mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
             <div className="min-w-[640px] md:min-w-0 px-4 md:px-0">
-              <div className="overflow-hidden rounded-2xl border border-line bg-white">
-                <div className="grid grid-cols-[1.5fr_1fr_1fr] text-sm font-semibold text-ink-60 border-b border-line">
+              <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--white)]">
+                <div className="grid grid-cols-[1.5fr_1fr_1fr] text-sm font-semibold text-ink-60 border-b border-[var(--line)]">
                   <div className="px-6 py-4">Dimension</div>
-                  <div className="px-6 py-4 border-l border-line bg-ink/[0.02]">Clovion AI</div>
-                  <div className="px-6 py-4 border-l border-line">Profound</div>
+                  <div className="px-6 py-4 border-l border-[var(--line)] bg-ink/[0.02]">Clovion AI</div>
+                  <div className="px-6 py-4 border-l border-[var(--line)]">Profound</div>
                 </div>
                 <ul>
                   {sideBySide.map((row, i) => (
@@ -185,9 +185,9 @@ export default function ProfoundAlternativePage() {
                         i !== sideBySide.length - 1 ? 'border-b border-line' : ''
                       }`}
                     >
-                      <div className="px-6 py-5 text-ink font-semibold">{row.dim}</div>
-                      <div className="px-6 py-5 border-l border-line bg-ink/[0.02] text-ink-80">{row.us}</div>
-                      <div className="px-6 py-5 border-l border-line text-ink-70">{row.them}</div>
+                      <div className="px-6 py-5 text-[var(--ink)] font-semibold">{row.dim}</div>
+                      <div className="px-6 py-5 border-l border-[var(--line)] bg-ink/[0.02] text-ink-80">{row.us}</div>
+                      <div className="px-6 py-5 border-l border-[var(--line)] text-ink-70">{row.them}</div>
                     </li>
                   ))}
                 </ul>
@@ -199,7 +199,7 @@ export default function ProfoundAlternativePage() {
             Want every row? Read the full{' '}
             <Link
               href="/compare/clovion-vs-profound"
-              className="text-ink underline underline-offset-4 decoration-ink/20 hover:decoration-ink/60"
+              className="text-[var(--ink)] underline underline-offset-4 decoration-ink/20 hover:decoration-ink/60"
             >
               Clovion vs Profound comparison
             </Link>
@@ -232,9 +232,9 @@ export default function ProfoundAlternativePage() {
                   {c.title}
                 </h3>
                 <p className="mt-4 text-ink-70 leading-relaxed">{c.body}</p>
-                <div className="mt-7 pt-5 border-t border-line">
+                <div className="mt-7 pt-5 border-t border-[var(--line)]">
                   <span className="inline-flex items-center gap-2 text-sm text-ink-70">
-                    <Check className="h-4 w-4 text-ink" />
+                    <Check className="h-4 w-4 text-[var(--ink)]" />
                     Free during migration
                   </span>
                 </div>
@@ -254,7 +254,7 @@ export default function ProfoundAlternativePage() {
       </Section>
 
       {/* Section 5 — Customer testimonial */}
-      <Section className="bg-white border-t border-line">
+      <Section className="bg-[var(--white)] border-t border-[var(--line)]">
         <Container>
           <div className="max-w-3xl mx-auto text-center">
             <Tag className="bg-ink/[0.04] text-ink-70">Switched from Profound</Tag>
@@ -269,7 +269,7 @@ export default function ProfoundAlternativePage() {
                   .join('')}
               </div>
               <div className="text-left">
-                <div className="font-semibold text-ink">{switcherTestimonial.author}</div>
+                <div className="font-semibold text-[var(--ink)]">{switcherTestimonial.author}</div>
                 <div className="text-ink-60">
                   {switcherTestimonial.role}, {switcherTestimonial.company}
                 </div>

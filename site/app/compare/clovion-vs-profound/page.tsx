@@ -172,7 +172,7 @@ export default function ClovionVsProfoundPage() {
       </Section>
 
       {/* SWITCHERS LOGO STRIP ---------------------------------------------- */}
-      <Section tight className="border-y border-line">
+      <Section tight className="border-y border-[var(--line)]">
         <Container>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <p className="text-sm uppercase tracking-[0.18em] text-ink-60 font-semibold">
@@ -193,7 +193,7 @@ export default function ClovionVsProfoundPage() {
       </Section>
 
       {/* NARRATIVE DIFFERENTIATORS ---------------------------------------- */}
-      <Section className="bg-white">
+      <Section className="bg-[var(--white)]">
         <Container>
           <div className="max-w-2xl">
             <Eyebrow>The four real differences</Eyebrow>
@@ -222,7 +222,7 @@ export default function ClovionVsProfoundPage() {
                         : 'md:col-span-5'
                     }
                   >
-                    <div className="font-mono text-[clamp(5rem,12vw,9rem)] leading-none text-ink/10 select-none">
+                    <div className="font-mono text-[clamp(5rem,12vw,9rem)] leading-none text-[rgb(var(--ink-rgb)/10%)] select-none">
                       {d.n}
                     </div>
                   </div>
@@ -262,12 +262,12 @@ export default function ClovionVsProfoundPage() {
 
           <div className="mt-14 -mx-4 overflow-x-auto md:mx-0 md:overflow-visible">
             <div className="min-w-[640px] md:min-w-0 px-4 md:px-0">
-              <div className="overflow-hidden rounded-2xl border border-line bg-white">
-                <div className="grid grid-cols-[1.6fr_1fr_1fr] border-b border-line bg-bg">
+              <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--white)]">
+                <div className="grid grid-cols-[1.6fr_1fr_1fr] border-b border-[var(--line)] bg-bg">
                   <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] text-ink-60 font-semibold">
                     Dimension
                   </div>
-                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink">
+                  <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-[var(--ink)]">
                     Clovion AI
                   </div>
                   <div className="px-6 py-5 text-sm uppercase tracking-[0.16em] font-semibold text-ink-60">
@@ -279,11 +279,11 @@ export default function ClovionVsProfoundPage() {
                     <li
                       key={row.dim}
                       className={
-                        'grid grid-cols-[1.6fr_1fr_1fr] items-center border-b border-line last:border-b-0' +
+                        'grid grid-cols-[1.6fr_1fr_1fr] items-center border-b border-[var(--line)] last:border-b-0' +
                         (idx % 2 === 1 ? ' bg-bg/40' : '')
                       }
                     >
-                      <div className="px-6 py-5 text-[0.95rem] text-ink font-semibold">
+                      <div className="px-6 py-5 text-[0.95rem] text-[var(--ink)] font-semibold">
                         {row.dim}
                       </div>
                       <div className="px-6 py-5">
@@ -300,7 +300,7 @@ export default function ClovionVsProfoundPage() {
           </div>
 
           <p className="mt-8 text-sm text-ink-50 max-w-2xl">
-            Notes verified November 2026 from public docs, support transcripts, and a 12-month-old Profound contract reviewed with permission. If anything here is out of date, <Link href="/contact" className="underline underline-offset-2 hover:text-ink">tell us</Link>.
+            Notes verified November 2026 from public docs, support transcripts, and a 12-month-old Profound contract reviewed with permission. If anything here is out of date, <Link href="/contact" className="underline underline-offset-2 hover:text-[var(--ink)]">tell us</Link>.
           </p>
         </Container>
       </Section>
@@ -317,10 +317,10 @@ export default function ClovionVsProfoundPage() {
               </p>
             </blockquote>
             <div className="mt-10 flex flex-col md:flex-row md:items-center md:justify-center gap-3 md:gap-4 text-sm">
-              <div className="font-semibold text-ink">Marcus Webb</div>
-              <span className="hidden md:inline text-ink/30">&middot;</span>
+              <div className="font-semibold text-[var(--ink)]">Marcus Webb</div>
+              <span className="hidden md:inline text-[rgb(var(--ink-rgb)/30%)]">&middot;</span>
               <div className="text-ink-70">Head of Growth, Notion</div>
-              <span className="hidden md:inline text-ink/30">&middot;</span>
+              <span className="hidden md:inline text-[rgb(var(--ink-rgb)/30%)]">&middot;</span>
               <div className="text-ink-50">Switched from Profound, Q1 2026</div>
             </div>
             <div className="mt-10 inline-flex">
@@ -334,7 +334,7 @@ export default function ClovionVsProfoundPage() {
 
       {/* MIGRATION FAQ ----------------------------------------------------- */}
       <FAQ
-        className="bg-white"
+        className="bg-[var(--white)]"
         items={migrationFaqs.map((f) => ({ q: f.q, a: f.a }))}
         heading="Switching from Profound"
         sub="Eight questions teams ask on almost every migration call. If we missed yours, we have a switcher specialist on most demos."

@@ -295,16 +295,16 @@ export default function PlatformCoveragePage() {
           </div>
 
           {/* Engine grid: 5x2 desktop, 2x5 mobile */}
-          <div className="mt-16 grid grid-cols-2 md:grid-cols-5 gap-px bg-line border border-line rounded-xl overflow-hidden">
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-5 gap-px bg-line border border-[var(--line)] rounded-xl overflow-hidden">
             {engines.map((engine) => (
               <div
                 key={engine.name}
-                className="group bg-white p-5 md:p-6 transition-colors duration-300 hover:bg-subtle relative"
+                className="group bg-[var(--white)] p-5 md:p-6 transition-colors duration-300 hover:bg-[var(--subtle)] relative"
               >
                 <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink-50">
                   {engine.status}
                 </div>
-                <div className="mt-3 font-mono text-sm uppercase tracking-[0.04em] text-ink">
+                <div className="mt-3 font-mono text-sm uppercase tracking-[0.04em] text-[var(--ink)]">
                   {engine.name}
                 </div>
                 <div className="mt-6 text-[11px] font-mono text-ink-60 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -317,7 +317,7 @@ export default function PlatformCoveragePage() {
       </Section>
 
       {/* SECTION 2 — Engines, expanded ----------------------------------- */}
-      <Section bg="subtle" className="bg-white">
+      <Section bg="subtle" className="bg-[var(--white)]">
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>The ten engines</Eyebrow>
@@ -330,7 +330,7 @@ export default function PlatformCoveragePage() {
             </p>
           </div>
 
-          <div className="mt-14 border-y border-line">
+          <div className="mt-14 border-y border-[var(--line)]">
             {engines.map((engine, idx) => (
               <div
                 key={engine.name}
@@ -350,7 +350,7 @@ export default function PlatformCoveragePage() {
                     <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-50">
                       Cadence
                     </div>
-                    <div className="mt-1.5 text-ink">{engine.cadence}</div>
+                    <div className="mt-1.5 text-[var(--ink)]">{engine.cadence}</div>
                   </div>
                   <div>
                     <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-50">
@@ -368,7 +368,7 @@ export default function PlatformCoveragePage() {
                     <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink-50">
                       Languages
                     </div>
-                    <div className="mt-1.5 text-ink">{engine.languages}</div>
+                    <div className="mt-1.5 text-[var(--ink)]">{engine.languages}</div>
                   </div>
                 </div>
 
@@ -376,7 +376,7 @@ export default function PlatformCoveragePage() {
                   <p className="text-ink-70 leading-relaxed">{engine.description}</p>
                   <Link
                     href="/resources#research"
-                    className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink hover:text-ink-70 transition-colors"
+                    className="mt-4 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--ink)] hover:text-ink-70 transition-colors"
                   >
                     Methodology <ArrowRight className="w-3 h-3" />
                   </Link>
@@ -401,14 +401,14 @@ export default function PlatformCoveragePage() {
             </p>
           </div>
 
-          <div className="mt-14 grid md:grid-cols-3 gap-px bg-line border border-line">
+          <div className="mt-14 grid md:grid-cols-3 gap-px bg-line border border-[var(--line)]">
             {methodology.map((m) => (
-              <div key={m.title} className="bg-white p-8 md:p-10">
+              <div key={m.title} className="bg-[var(--white)] p-8 md:p-10">
                 <h3 className="display-sm font-semibold text-balance">{m.title}</h3>
                 <p className="mt-4 text-ink-70 leading-relaxed">{m.body}</p>
                 <Link
                   href={m.href}
-                  className="mt-6 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink hover:text-ink-70 transition-colors"
+                  className="mt-6 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--ink)] hover:text-ink-70 transition-colors"
                 >
                   {m.ref} <ArrowRight className="w-3 h-3" />
                 </Link>
@@ -431,7 +431,7 @@ export default function PlatformCoveragePage() {
           <div className="mt-14 grid lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Languages */}
             <div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-50 pb-4 border-b border-line">
+              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-50 pb-4 border-b border-[var(--line)]">
                 Supported languages — {supportedLanguages.length}
               </div>
               <ul className="mt-6 grid grid-cols-3 gap-y-2.5 gap-x-4 font-mono text-[12px] uppercase tracking-[0.04em] text-ink-70">
@@ -443,13 +443,13 @@ export default function PlatformCoveragePage() {
 
             {/* Region matrix */}
             <div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-50 pb-4 border-b border-line">
+              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-50 pb-4 border-b border-[var(--line)]">
                 Region availability matrix
               </div>
               <div className="mt-6 overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-line">
+                    <tr className="border-b border-[var(--line)]">
                       <th className="text-left font-mono text-[10px] uppercase tracking-[0.16em] text-ink-50 pb-3 pr-2 font-semibold">
                         Engine
                       </th>
@@ -467,13 +467,13 @@ export default function PlatformCoveragePage() {
                   <tbody>
                     {engines.map((e) => (
                       <tr key={e.name} className="border-b border-line/60">
-                        <td className="py-3 pr-2 font-mono text-[12px] uppercase tracking-[0.04em] text-ink">
+                        <td className="py-3 pr-2 font-mono text-[12px] uppercase tracking-[0.04em] text-[var(--ink)]">
                           {e.name}
                         </td>
                         {(['US', 'EU', 'APAC'] as const).map((r) => (
                           <td key={r} className="py-3 px-3 text-center">
                             {e.regions.includes(r) ? (
-                              <Check className="inline-block w-4 h-4 text-ink" />
+                              <Check className="inline-block w-4 h-4 text-[var(--ink)]" />
                             ) : (
                               <span className="text-ink-20">—</span>
                             )}
@@ -532,7 +532,7 @@ export default function PlatformCoveragePage() {
                 {/* Sweep marker */}
                 <div
                   aria-hidden
-                  className="absolute -top-3 h-7 w-px bg-white pointer-events-none"
+                  className="absolute -top-3 h-7 w-px bg-[var(--white)] pointer-events-none"
                   style={{
                     animation: 'coverageSweep 30s linear infinite'
                   }}
@@ -613,15 +613,15 @@ export default function PlatformCoveragePage() {
             </p>
           </div>
 
-          <div className="mt-14 grid md:grid-cols-2 gap-px bg-line border border-line">
+          <div className="mt-14 grid md:grid-cols-2 gap-px bg-line border border-[var(--line)]">
             {roadmap.map((col) => (
-              <div key={col.label} className="bg-white p-8 md:p-10">
+              <div key={col.label} className="bg-[var(--white)] p-8 md:p-10">
                 <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-50">
                   {col.label}
                 </div>
                 <ul className="mt-7 space-y-4">
                   {col.items.map((item) => (
-                    <li key={item} className="flex items-start gap-3 text-ink">
+                    <li key={item} className="flex items-start gap-3 text-[var(--ink)]">
                       <span className="mt-2 h-px w-4 shrink-0 bg-ink-40" aria-hidden />
                       <span className="leading-relaxed">{item}</span>
                     </li>
@@ -650,11 +650,11 @@ export default function PlatformCoveragePage() {
           <div className="mt-14 max-w-3xl space-y-7">
             {compareData.map((row) => (
               <div key={row.name} className="grid grid-cols-12 items-center gap-4">
-                <div className="col-span-3 md:col-span-2 font-mono text-sm uppercase tracking-[0.04em] text-ink">
+                <div className="col-span-3 md:col-span-2 font-mono text-sm uppercase tracking-[0.04em] text-[var(--ink)]">
                   {row.name}
                 </div>
                 <div className="col-span-7 md:col-span-8">
-                  <div className="relative h-7 bg-subtle border border-line rounded-sm overflow-hidden">
+                  <div className="relative h-7 bg-[var(--subtle)] border border-[var(--line)] rounded-sm overflow-hidden">
                     <div
                       className={`absolute inset-y-0 left-0 ${
                         row.highlight ? 'bg-ink' : 'bg-ink-40'
@@ -663,7 +663,7 @@ export default function PlatformCoveragePage() {
                     />
                   </div>
                 </div>
-                <div className="col-span-2 font-mono text-sm text-ink text-right tabular-nums">
+                <div className="col-span-2 font-mono text-sm text-[var(--ink)] text-right tabular-nums">
                   {row.engines}
                 </div>
               </div>
@@ -673,7 +673,7 @@ export default function PlatformCoveragePage() {
           <div className="mt-12">
             <Link
               href="/compare/clovion-vs-profound"
-              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-ink hover:text-ink-70 transition-colors"
+              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--ink)] hover:text-ink-70 transition-colors"
             >
               Full comparison with Profound <ArrowRight className="w-3 h-3" />
             </Link>

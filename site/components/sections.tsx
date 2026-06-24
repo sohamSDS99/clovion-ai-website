@@ -44,7 +44,7 @@ export function AIEngineStrip({ className }: { className?: string }) {
       {aiEngines.map((engine) => (
         <span
           key={engine}
-          className="inline-flex h-8 items-center px-3 rounded-pill bg-white border border-line text-[0.82rem] text-ink-70 font-semibold"
+          className="inline-flex h-8 items-center px-3 rounded-pill bg-[var(--white)] border border-[var(--line)] text-[0.82rem] text-ink-70 font-semibold"
         >
           {engine}
         </span>
@@ -81,7 +81,7 @@ export function FAQ({
             </div>
           </div>
 
-          <ul className="mt-16 divide-y divide-line border-y border-line">
+          <ul className="mt-16 divide-y divide-[var(--line)] border-y border-[var(--line)]">
             {items.map((item, idx) => {
               const isOpen = open === idx
               return (
@@ -96,8 +96,8 @@ export function FAQ({
                     </span>
                     <span
                       className={cn(
-                        'mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-line transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                        isOpen ? 'bg-ink text-white rotate-45 border-ink' : 'group-hover:border-ink/20'
+                        'mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--line)] transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                        isOpen ? 'bg-ink text-white rotate-45 border-ink' : 'group-hover:border-[rgb(var(--ink-rgb)/20%)]'
                       )}
                       aria-hidden
                     >
@@ -220,13 +220,13 @@ export function StatStrip({
           <h2 className="display-md mt-4 text-balance">{heading}</h2>
           {sub && <p className="lead mt-5 text-balance">{sub}</p>}
         </div>
-        <ul className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line border border-line rounded-card overflow-hidden">
+        <ul className="grid grid-cols-2 md:grid-cols-4 gap-px bg-line border border-[var(--line)] rounded-card overflow-hidden">
           {items.map((m) => (
             <li
               key={m.label}
-              className="bg-white p-7 md:p-9 group transition-colors hover:bg-gradient-to-br hover:from-subtle/60 hover:to-white"
+              className="bg-[var(--white)] p-7 md:p-9 group transition-colors hover:bg-gradient-to-br hover:from-subtle/60 hover:to-white"
             >
-              <div className="display-lg metric-glow inline-block font-display text-ink">
+              <div className="display-lg metric-glow inline-block font-display text-[var(--ink)]">
                 {m.value}
               </div>
               <p className="mt-5 text-[0.95rem] leading-relaxed text-ink-70 max-w-[28ch]">{m.label}</p>
@@ -255,12 +255,12 @@ export function FeatureGrid({
           key={it.name}
           className={cn(
             'p-7 rounded-card border transition-all duration-300 group',
-            variant === 'bordered' ? 'bg-white border-line hover:border-ink/20 hover:shadow-soft hover:-translate-y-0.5' : '',
-            variant === 'subtle' ? 'bg-subtle border-transparent hover:bg-white hover:border-line hover:shadow-soft hover:-translate-y-0.5' : '',
-            variant === 'default' ? 'bg-white border-line hover:border-ink/20 hover:shadow-soft hover:-translate-y-0.5' : ''
+            variant === 'bordered' ? 'bg-[var(--white)] border-[var(--line)] hover:border-[rgb(var(--ink-rgb)/20%)] hover:shadow-soft hover:-translate-y-0.5' : '',
+            variant === 'subtle' ? 'bg-[var(--subtle)] border-transparent hover:bg-[var(--white)] hover:border-[var(--line)] hover:shadow-soft hover:-translate-y-0.5' : '',
+            variant === 'default' ? 'bg-[var(--white)] border-[var(--line)] hover:border-[rgb(var(--ink-rgb)/20%)] hover:shadow-soft hover:-translate-y-0.5' : ''
           )}
         >
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-subtle text-ink border border-line mb-5 transition-transform group-hover:scale-105">
+          <div className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--subtle)] text-[var(--ink)] border border-[var(--line)] mb-5 transition-transform group-hover:scale-105">
             {it.icon ?? <span className="text-[0.78rem] font-semibold">{String(i + 1).padStart(2, '0')}</span>}
           </div>
           <h3 className="font-display text-[1.1rem] font-semibold tracking-[-0.02em]">{it.name}</h3>
@@ -290,7 +290,7 @@ export function TestimonialPullQuote({
         <div className="max-w-4xl mx-auto text-center">
           <Tag>Customer story · {company}</Tag>
           <div className="relative">
-            <span aria-hidden className="absolute -top-12 left-1/2 -translate-x-1/2 font-display text-[12rem] leading-none text-ink/10 select-none pointer-events-none">&ldquo;</span>
+            <span aria-hidden className="absolute -top-12 left-1/2 -translate-x-1/2 font-display text-[12rem] leading-none text-[rgb(var(--ink-rgb)/10%)] select-none pointer-events-none">&ldquo;</span>
             <blockquote className="display-lg relative mt-8 text-balance leading-[1.1] font-semibold italic">
               &ldquo;{quote}&rdquo;
             </blockquote>
@@ -382,7 +382,7 @@ export function TestimonialRail({
               }}
               className="card snap-start shrink-0 w-[calc(100vw-3rem)] sm:w-[320px] md:w-[380px] p-7 md:p-8 flex flex-col"
             >
-              <div className="text-ink/15" aria-hidden>
+              <div className="text-[rgb(var(--ink-rgb)/15%)]" aria-hidden>
                 <svg width="28" height="22" viewBox="0 0 32 24" fill="currentColor">
                   <path d="M9 0C4.5 1 .5 5 .5 10v14h11V10H5C5 7 7.5 4 11 3L9 0zm14 0c-4.5 1-8.5 5-8.5 10v14h11V10H19c0-3 2.5-6 6-7L23 0z" />
                 </svg>
@@ -390,10 +390,10 @@ export function TestimonialRail({
               <blockquote className="mt-5 text-[1rem] md:text-[1.05rem] leading-relaxed text-ink-80 flex-1 text-balance">
                 {t.quote}
               </blockquote>
-              <div className="mt-6 pt-6 border-t border-line flex items-center gap-3">
+              <div className="mt-6 pt-6 border-t border-[var(--line)] flex items-center gap-3">
                 <div
                   aria-hidden
-                  className="h-10 w-10 rounded-full bg-ink/10 shrink-0 flex items-center justify-center text-[0.78rem] font-semibold text-ink-60"
+                  className="h-10 w-10 rounded-full bg-[rgb(var(--ink-rgb)/10%)] shrink-0 flex items-center justify-center text-[0.78rem] font-semibold text-ink-60"
                 >
                   {t.author.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                 </div>
@@ -428,7 +428,7 @@ export function TestimonialRail({
                   'h-1.5 rounded-full transition-all duration-300 ease-out',
                   isActive
                     ? 'w-8 bg-ink'
-                    : 'w-1.5 bg-ink/20 hover:bg-ink/40'
+                    : 'w-1.5 bg-[rgb(var(--ink-rgb)/20%)] hover:bg-[rgb(var(--ink-rgb)/40%)]'
                 )}
               />
             )
