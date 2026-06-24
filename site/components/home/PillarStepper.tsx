@@ -358,11 +358,11 @@ function MockPerception({ show = true }: { show?: boolean } = {}) {
 
 // ── Mock 03 · Rankings by topic — static image of the design spec ───
 //
-// CSS-zoom approach: the source PNG has natural white padding around its
-// content. Scale the image up 1.2× and use overflow:hidden on the wrapper
-// to crop the padding outward, so the dashboard content fills the panel
-// edge-to-edge with fonts/logos rendered larger. White wrapper background
-// blends seamlessly with any residual letterbox.
+// White wrapper background absorbs any letterbox so it blends with the
+// dashboard's own white. objectFit: contain ensures the FULL picture is
+// always visible — no crop, no cutoff, no missing content. The panel
+// slot's height is sized to match the 1.53 image aspect so the image
+// fills the slot at its natural proportions.
 function MockRankings() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ffffff' }}>
@@ -376,7 +376,7 @@ function MockRankings() {
         quality={95}
         sizes="(max-width: 1000px) 100vw, 60vw"
         unoptimized
-        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transform: 'scale(1.18)', transformOrigin: 'center center' }}
+        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
       />
     </div>
   )
@@ -384,11 +384,9 @@ function MockRankings() {
 
 // ── Mock 04 · Recommendations — static image of the Opportunities dashboard ─
 //
-// CSS-zoom approach (same as MockRankings): the source PNG has natural
-// white padding around its content. Scale up 1.18× and use overflow:hidden
-// on the wrapper to crop the padding outward, so the dashboard fills the
-// panel edge-to-edge with fonts/logos rendered larger. White wrapper
-// background blends seamlessly with any residual letterbox.
+// Same pattern as MockRankings. White wrapper bg + objectFit:contain so
+// the FULL picture is always visible — no crop. Panel slot height is
+// sized to match the 1.53 image aspect so the image fills naturally.
 function MockRecommendations() {
   return (
     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', background: '#ffffff' }}>
@@ -402,7 +400,7 @@ function MockRecommendations() {
         quality={95}
         sizes="(max-width: 1000px) 100vw, 60vw"
         unoptimized
-        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center', transform: 'scale(1.18)', transformOrigin: 'center center' }}
+        style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
       />
     </div>
   )
@@ -848,9 +846,11 @@ export function PillarStepper() {
                   <PillarItem key={s.sku} s={s} i={i} active={active} prog={prog} onClick={() => goto(i)} />
                 ))}
               </div>
-              {/* Card height bumped so the visibility-insights slideshow can
-                  display the dashboard frames at a usable size. */}
-              <div style={{ position: 'relative', height: 'clamp(480px, 58vh, 680px)' }}>
+              {/* Card height sized so the tallest pillar image (Competitive
+                  Positioning + Recommendations at 1.53 aspect) fills the slot
+                  at its natural width-driven height without letterbox.
+                  912-wide slot ÷ 1.53 = 596px required minimum. */}
+              <div style={{ position: 'relative', height: 'clamp(560px, 68vh, 760px)' }}>
                 {PILLARS.map((s, i) => (
                   <MockPanel key={s.sku} s={s} show={i === active} />
                 ))}
