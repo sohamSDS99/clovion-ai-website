@@ -16,6 +16,34 @@ export const metadata: Metadata = {
     'See how ChatGPT, Claude, Gemini, Perplexity, Grok, and Google AI Overviews describe your brand. Clovion tracks visibility daily, benchmarks against competitors, and ships the GEO fixes that move citation share.'
 }
 
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Clovion',
+  alternateName: 'Clovion AI',
+  url: 'https://www.clovion.ai',
+  logo: 'https://www.clovion.ai/icon.svg',
+  description:
+    'AI search visibility platform tracking brand citations across 10 AI engines including ChatGPT, Claude, Perplexity, and Gemini.',
+  sameAs: [
+    'https://www.linkedin.com/company/clovion',
+    'https://twitter.com/clovionai',
+    'https://www.g2.com/products/clovion'
+  ]
+}
+
+const softwareJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Clovion',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'Web',
+  url: 'https://www.clovion.ai',
+  description:
+    "Track and improve your brand's visibility across 10 AI search engines. Get a free AI visibility score in 60 seconds.",
+  offers: { '@type': 'Offer', price: '79', priceCurrency: 'USD' }
+}
+
 const homeFaqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -33,6 +61,8 @@ export default function HomePage() {
   // first frame (see app/layout.tsx).
   return (
     <div className="clv-dark" style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homeFaqJsonLd) }} />
       <HomeHero />
       <PillarStepper />
