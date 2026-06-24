@@ -6,7 +6,7 @@
 
 import { type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger, useTypewriter } from './motion'
-import { MondayGlyph, PipedriveGlyph, SalesforceGlyph, ChatGptGlyph, UserGlyph } from './glyphs'
+import { MondayGlyph, PipedriveGlyph, ChatGptGlyph, UserGlyph } from './glyphs'
 import { LIGHT, TAG_COLORS, HL } from './palette'
 
 const POSITIVE = 'var(--positive)'
@@ -45,14 +45,6 @@ const CARDS: Card[] = [
       { text: 'highly customizable', tint: 'neu' },
       { text: 'power and flexibility', tint: 'neu' }
     ]
-  },
-  {
-    rank: '#3',
-    name: 'Salesforce',
-    Glyph: SalesforceGlyph,
-    body:
-      'Salesforce is built for founders who want a streamlined CRM without the usual bloat. It focuses on speed, simplicity, and essential deal tracking while still offering automation and integrations with tools like Google Workspace, Slack, and Zapier.',
-    hl: [{ text: 'streamlined CRM without the usual bloat', tint: 'neu' }]
   }
 ]
 
