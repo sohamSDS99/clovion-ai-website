@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Section, Container, Card, Eyebrow, ArrowRight, HeroShade } from '@/components/ui'
+import { Section, Container, Card, Eyebrow, ArrowRight } from '@/components/ui'
 import { listContent } from '@/lib/cms'
 import type { CmsSummary } from '@/lib/cms-types'
 
@@ -23,14 +23,13 @@ export default async function WebinarsPage() {
   const { items } = await listContent('WEBINAR', { limit: 100 })
 
   return (
-    <>
+    <div className="clv-dark clv-ai-vis-page">
       <Section className="relative overflow-hidden">
-        <HeroShade />
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>WEBINARS</Eyebrow>
             <h1 className="display-md mt-5">Watch and learn.</h1>
-            <p className="lead mt-6 text-ink/70">
+            <p className="lead mt-6">
               Live sessions and on-demand recordings on AI visibility, generative engine
               optimization, and how the best brands earn AI recommendations.
             </p>
@@ -41,9 +40,9 @@ export default async function WebinarsPage() {
       <Section tight className="relative overflow-hidden">
         <Container>
           {items.length === 0 ? (
-            <div className="rounded-2xl border border-line bg-white p-12 text-center">
+            <div className="card p-12 text-center">
               <h2 className="display-sm">Nothing published yet.</h2>
-              <p className="lead mt-4 text-ink/60">
+              <p className="lead mt-4">
                 We&rsquo;re lining up our next sessions. Check back soon.
               </p>
             </div>
@@ -56,7 +55,7 @@ export default async function WebinarsPage() {
           )}
         </Container>
       </Section>
-    </>
+    </div>
   )
 }
 
@@ -65,12 +64,12 @@ function WebinarCard({ item }: { item: CmsSummary }) {
   return (
     <Card as="article" className="group flex flex-col">
       <Link href={`/webinars/${item.slug}`} className="flex flex-1 flex-col">
-        {date && <span className="eyebrow text-ink/50">{date}</span>}
+        {date && <span className="eyebrow text-[var(--ink-50)]">{date}</span>}
         <h2 className="display-sm mt-3 text-balance">{item.title}</h2>
         {item.excerpt && (
-          <p className="mt-3 line-clamp-3 text-ink/70">{item.excerpt}</p>
+          <p className="mt-3 line-clamp-3 text-[var(--ink-70)]">{item.excerpt}</p>
         )}
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-ink transition-colors group-hover:text-ink/60">
+        <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm text-[var(--ink)] transition-colors group-hover:text-[var(--ink-60)]">
           View webinar
           <ArrowRight className="transition-transform group-hover:translate-x-0.5" />
         </span>

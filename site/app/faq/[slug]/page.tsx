@@ -57,7 +57,7 @@ export default async function FaqDetailPage({
   const hasIntro = item.bodyHtml && item.bodyHtml.trim().length > 0
 
   return (
-    <>
+    <div className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
 
       <Section className="relative overflow-hidden">
@@ -66,7 +66,7 @@ export default async function FaqDetailPage({
             <Eyebrow>FAQ</Eyebrow>
             <h1 className="display-md mt-5">{item.title}</h1>
             {item.excerpt ? (
-              <p className="lead mt-6 text-ink/70">{item.excerpt}</p>
+              <p className="lead mt-6 text-[var(--ink-70)]">{item.excerpt}</p>
             ) : null}
           </div>
         </Container>
@@ -84,11 +84,11 @@ export default async function FaqDetailPage({
             {faqItems.length > 0 ? (
               <FaqAccordion items={faqItems} />
             ) : !hasIntro ? (
-              <p className="text-ink/70">No questions have been added yet.</p>
+              <p className="text-[var(--ink-70)]">No questions have been added yet.</p>
             ) : null}
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }

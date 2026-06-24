@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { Section, Container, Button, Eyebrow, HeroShade } from '@/components/ui'
+import { Section, Container, Button, Eyebrow } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { getContent, listSlugs } from '@/lib/cms'
@@ -102,33 +102,32 @@ export default async function WebinarDetailPage({
   const ctaLabel = showRecording ? 'Watch the recording' : 'Register'
 
   return (
-    <>
+    <div className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
 
       <Section className="relative overflow-hidden">
-        <HeroShade />
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>{recorded ? 'ON-DEMAND WEBINAR' : 'LIVE WEBINAR'}</Eyebrow>
             <h1 className="display-md mt-5 text-balance">{item.title}</h1>
-            {item.excerpt && <p className="lead mt-6 text-ink/70">{item.excerpt}</p>}
+            {item.excerpt && <p className="lead mt-6 text-[var(--ink-70)]">{item.excerpt}</p>}
           </div>
 
           {/* Event details block — foregrounded */}
-          <div className="mt-10 max-w-3xl rounded-2xl border border-line bg-white p-7 shadow-card">
+          <div className="mt-10 max-w-3xl rounded-2xl border border-[var(--line)] bg-[var(--white)] p-7 shadow-card">
             <dl className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {when && (
                 <div>
-                  <dt className="eyebrow text-ink/50">When</dt>
-                  <dd className="mt-2 text-ink">{when}</dd>
+                  <dt className="eyebrow text-[var(--ink-50)]">When</dt>
+                  <dd className="mt-2 text-[var(--ink)]">{when}</dd>
                 </div>
               )}
               {speakers.length > 0 && (
                 <div>
-                  <dt className="eyebrow text-ink/50">
+                  <dt className="eyebrow text-[var(--ink-50)]">
                     {speakers.length > 1 ? 'Speakers' : 'Speaker'}
                   </dt>
-                  <dd className="mt-2 text-ink">{speakers.join(', ')}</dd>
+                  <dd className="mt-2 text-[var(--ink)]">{speakers.join(', ')}</dd>
                 </div>
               )}
             </dl>
@@ -152,7 +151,7 @@ export default async function WebinarDetailPage({
       {item.coverImageUrl && (
         <Section tight className="relative overflow-hidden">
           <Container>
-            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-line bg-subtle">
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--subtle)]">
               <Image
                 src={item.coverImageUrl}
                 alt={item.title}
@@ -173,6 +172,6 @@ export default async function WebinarDetailPage({
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }

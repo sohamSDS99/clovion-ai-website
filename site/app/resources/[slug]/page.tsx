@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { Section, Container, Eyebrow, Tag, HeroShade } from '@/components/ui'
+import { Section, Container, Eyebrow, Tag } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { getResource, listSlugs } from '@/lib/cms'
@@ -62,20 +62,19 @@ export default async function ResourceDetailPage({
   const fields = item.leadForm?.fields ?? []
 
   return (
-    <>
+    <div className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
 
       <Section className="relative overflow-hidden">
-        <HeroShade />
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>RESOURCE</Eyebrow>
             <div className="mt-5 flex flex-wrap items-center gap-2">
               {kind ? <Tag>{kind}</Tag> : null}
-              {date ? <span className="text-sm text-ink/50">{date}</span> : null}
+              {date ? <span className="text-sm text-[var(--ink-50)]">{date}</span> : null}
             </div>
             <h1 className="display-md mt-5">{item.title}</h1>
-            {item.excerpt ? <p className="lead mt-6 text-ink/70">{item.excerpt}</p> : null}
+            {item.excerpt ? <p className="lead mt-6 text-[var(--ink-70)]">{item.excerpt}</p> : null}
           </div>
         </Container>
       </Section>
@@ -85,7 +84,7 @@ export default async function ResourceDetailPage({
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[7fr_5fr] lg:gap-16">
             <div>
               {item.coverImageUrl ? (
-                <div className="mb-10 overflow-hidden rounded-card border border-line bg-subtle">
+                <div className="mb-10 overflow-hidden rounded-card border border-[var(--line)] bg-[var(--subtle)]">
                   <Image
                     src={item.coverImageUrl}
                     alt={item.title}
@@ -112,6 +111,6 @@ export default async function ResourceDetailPage({
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }

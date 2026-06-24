@@ -15,13 +15,13 @@ export default async function FaqListPage() {
   const { items } = await listContent('FAQ')
 
   return (
-    <>
+    <div className="clv-dark clv-ai-vis-page">
       <Section className="relative overflow-hidden">
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>FAQ</Eyebrow>
             <h1 className="display-md mt-5">Questions, answered.</h1>
-            <p className="lead mt-6 text-ink/70">
+            <p className="lead mt-6">
               Clear answers on AI visibility, GEO, and how Clovion measures the
               way AI engines see and recommend your brand.
             </p>
@@ -32,9 +32,9 @@ export default async function FaqListPage() {
       <Section tight className="pt-0">
         <Container>
           {items.length === 0 ? (
-            <div className="rounded-2xl border border-line bg-white px-8 py-16 text-center">
+            <div className="card px-8 py-16 text-center">
               <h2 className="display-sm">Nothing published yet.</h2>
-              <p className="lead mx-auto mt-4 max-w-xl text-ink/70">
+              <p className="lead mx-auto mt-4 max-w-xl">
                 We&rsquo;re putting our answers together. Check back soon.
               </p>
             </div>
@@ -45,17 +45,17 @@ export default async function FaqListPage() {
                   <h2 className="text-lg leading-snug">
                     <Link
                       href={`/faq/${item.slug}`}
-                      className="after:absolute after:inset-0 hover:text-ink/70"
+                      className="after:absolute after:inset-0 hover:text-[var(--ink-70)]"
                     >
                       {item.title}
                     </Link>
                   </h2>
                   {item.excerpt ? (
-                    <p className="mt-3 text-sm leading-relaxed text-ink/70">
+                    <p className="mt-3 text-sm leading-relaxed text-[var(--ink-70)]">
                       {item.excerpt}
                     </p>
                   ) : null}
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm text-ink/60">
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm text-[var(--ink-60)]">
                     Read answers <ArrowRight />
                   </span>
                 </Card>
@@ -64,6 +64,6 @@ export default async function FaqListPage() {
           )}
         </Container>
       </Section>
-    </>
+    </div>
   )
 }

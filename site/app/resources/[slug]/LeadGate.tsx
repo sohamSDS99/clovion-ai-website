@@ -118,10 +118,10 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
   // Success: the only place a download URL is ever exposed.
   if (downloadUrl) {
     return (
-      <div className="rounded-card border border-line bg-subtle p-7">
-        <p className="eyebrow eyebrow-dot text-ink/60">READY</p>
-        <h3 className="display-sm mt-4 text-ink">Your download is ready.</h3>
-        <p className="mt-3 text-ink/70">Thanks. The link below opens your copy of {resourceTitle}.</p>
+      <div className="rounded-card border border-[var(--line)] bg-[var(--subtle)] p-7">
+        <p className="eyebrow eyebrow-dot text-[var(--ink-60)]">READY</p>
+        <h3 className="display-sm mt-4 text-[var(--ink)]">Your download is ready.</h3>
+        <p className="mt-3 text-[var(--ink-70)]">Thanks. The link below opens your copy of {resourceTitle}.</p>
         <div className="mt-6">
           <Button
             href={downloadUrl}
@@ -138,12 +138,12 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="rounded-card border border-line bg-white p-7">
-      <p className="eyebrow eyebrow-dot text-ink/60">{gated ? 'GET THE DOWNLOAD' : 'DOWNLOAD'}</p>
-      <h3 className="display-sm mt-4 text-ink">
+    <form onSubmit={handleSubmit} noValidate className="rounded-card border border-[var(--line)] bg-[var(--white)] p-7">
+      <p className="eyebrow eyebrow-dot text-[var(--ink-60)]">{gated ? 'GET THE DOWNLOAD' : 'DOWNLOAD'}</p>
+      <h3 className="display-sm mt-4 text-[var(--ink)]">
         {gated ? 'Tell us where to send it.' : 'Get your copy.'}
       </h3>
-      <p className="mt-3 text-ink/70">
+      <p className="mt-3 text-[var(--ink-70)]">
         {gated
           ? 'Fill in the form and we’ll unlock your download right away.'
           : 'Enter your email and we’ll unlock the download.'}
@@ -157,9 +157,9 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
           const fieldId = `lead-${f.name}`
           return (
             <div key={f.name}>
-              <label htmlFor={fieldId} className="block text-sm font-semibold text-ink">
+              <label htmlFor={fieldId} className="block text-sm font-semibold text-[var(--ink)]">
                 {f.label}
-                {required ? <span className="text-ink/40"> *</span> : null}
+                {required ? <span className="text-[var(--ink-40)]"> *</span> : null}
               </label>
               {f.type === 'select' && f.options?.length ? (
                 <select
@@ -168,7 +168,7 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
                   onChange={(e) => setField(f.name, e.target.value)}
                   aria-invalid={!!err}
                   aria-describedby={err ? `${fieldId}-err` : undefined}
-                  className="mt-2 h-11 w-full rounded-lg border border-line bg-white px-3.5 text-ink outline-none focus:border-ink/40 focus:ring-2 focus:ring-ink/10"
+                  className="mt-2 h-11 w-full rounded-lg border border-[var(--line)] bg-[var(--white)] px-3.5 text-[var(--ink)] outline-none focus:border-[var(--ink-40)] focus:ring-2 focus:ring-[var(--ink-10)]"
                 >
                   <option value="" disabled>
                     Select…
@@ -187,7 +187,7 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
                   rows={3}
                   aria-invalid={!!err}
                   aria-describedby={err ? `${fieldId}-err` : undefined}
-                  className="mt-2 w-full rounded-lg border border-line bg-white px-3.5 py-2.5 text-ink outline-none focus:border-ink/40 focus:ring-2 focus:ring-ink/10"
+                  className="mt-2 w-full rounded-lg border border-[var(--line)] bg-[var(--white)] px-3.5 py-2.5 text-[var(--ink)] outline-none focus:border-[var(--ink-40)] focus:ring-2 focus:ring-[var(--ink-10)]"
                 />
               ) : (
                 <input
@@ -199,11 +199,11 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
                   onChange={(e) => setField(f.name, e.target.value)}
                   aria-invalid={!!err}
                   aria-describedby={err ? `${fieldId}-err` : undefined}
-                  className="mt-2 h-11 w-full rounded-lg border border-line bg-white px-3.5 text-ink outline-none focus:border-ink/40 focus:ring-2 focus:ring-ink/10"
+                  className="mt-2 h-11 w-full rounded-lg border border-[var(--line)] bg-[var(--white)] px-3.5 text-[var(--ink)] outline-none focus:border-[var(--ink-40)] focus:ring-2 focus:ring-[var(--ink-10)]"
                 />
               )}
               {err ? (
-                <p id={`${fieldId}-err`} role="alert" className="mt-1.5 text-sm text-ink/70">
+                <p id={`${fieldId}-err`} role="alert" className="mt-1.5 text-sm text-[var(--ink-70)]">
                   {err}
                 </p>
               ) : null}
@@ -213,7 +213,7 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
       </div>
 
       {submitError ? (
-        <p role="alert" className="mt-5 rounded-lg border border-line bg-subtle px-3.5 py-3 text-sm text-ink">
+        <p role="alert" className="mt-5 rounded-lg border border-[var(--line)] bg-[var(--subtle)] px-3.5 py-3 text-sm text-[var(--ink)]">
           {submitError}
         </p>
       ) : null}
