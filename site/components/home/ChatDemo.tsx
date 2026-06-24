@@ -611,6 +611,36 @@ export function ChatDemo() {
       >
         <FloatingField />
 
+        {/* Edge fades — blend the floating cards into the body tone so the
+            seam with the section above (PillarStepper) and below isn't a hard
+            clipped edge. Same var(--bg) fade approach used across the homepage. */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '22vh',
+            background: 'linear-gradient(to bottom, var(--bg) 12%, transparent)',
+            zIndex: 4,
+            pointerEvents: 'none'
+          }}
+        />
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: '18vh',
+            background: 'linear-gradient(to top, var(--bg) 12%, transparent)',
+            zIndex: 4,
+            pointerEvents: 'none'
+          }}
+        />
+
         {/* Headline above the floating field */}
         <div
           style={
