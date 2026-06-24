@@ -14,6 +14,11 @@ import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 // ThemeShell's useEffect runs. Mirrors ThemeShell's DARK_ROUTES set.
 const themeBootstrap = `(function(){try{var p=location.pathname;var pre=['/news','/webinars','/resources','/faq'];var darkPre=pre.some(function(x){return p===x||p.indexOf(x+'/')===0;});if(p==='/'||p==='/features/ai-visibility-tracking'||p==='/features/geo-improvement-suggestions'||p==='/features/sentiment-analysis'||p==='/features/fanout-query'||p==='/features/ai-crawlability'||p==='/pricing'||p==='/affiliate'||p==='/free-ai-visibility-score'||p==='/customers'||p==='/blog'||p==='/blog/category/geo'||p==='/blog/category/ai-search'||p==='/blog/category/seo'||darkPre)document.documentElement.classList.add('clv-dark');}catch(_){}})();`
 
+// Microsoft Clarity — session recordings + heatmaps. Project x8d3ot6py2.
+// Loads asynchronously; the snippet queues calls until the remote script
+// (https://www.clarity.ms/tag/x8d3ot6py2) loads and replays them.
+const clarityBootstrap = `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, "clarity", "script", "x8d3ot6py2");`
+
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
   variable: '--font-saans',
@@ -66,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        <script dangerouslySetInnerHTML={{ __html: clarityBootstrap }} />
         <link
           rel="stylesheet"
           href="https://assets.calendly.com/assets/external/widget.css"
