@@ -57,26 +57,26 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   ].filter(Boolean) as string[]
 
   return (
-    <article>
+    <article className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
 
       <Section className="relative overflow-hidden">
         <Container>
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 text-sm text-ink/60 hover:text-ink transition-colors"
+            className="inline-flex items-center gap-1.5 text-sm text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors"
           >
             <ArrowRight className="rotate-180" /> Back to blog
           </Link>
           <div className="mt-8 max-w-3xl">
             <Eyebrow>Blog</Eyebrow>
             <h1 className="display-md mt-5 text-balance">{item.title}</h1>
-            {item.excerpt && <p className="lead mt-6 text-ink/70">{item.excerpt}</p>}
+            {item.excerpt && <p className="lead mt-6 text-[var(--ink-70)]">{item.excerpt}</p>}
             {meta.length > 0 && (
-              <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink/60">
+              <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--ink-60)]">
                 {meta.map((part, i) => (
                   <span key={i} className="inline-flex items-center gap-3">
-                    {i > 0 && <span aria-hidden className="text-ink/30">·</span>}
+                    {i > 0 && <span aria-hidden className="text-[var(--ink-30)]">·</span>}
                     <span>{part}</span>
                   </span>
                 ))}
@@ -89,7 +89,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       {item.coverImageUrl && (
         <Section tight className="!pt-0">
           <Container>
-            <div className="overflow-hidden rounded-[24px] border border-line">
+            <div className="overflow-hidden rounded-[24px] border border-[var(--line)]">
               {/* CMS-hosted cover image; external host, so plain <img>. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

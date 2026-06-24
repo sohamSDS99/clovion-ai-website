@@ -10,7 +10,7 @@ const HOME_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/
 
 // CMS sections (index + [slug] detail) that use the dark chrome. Prefix-matched
 // so /news, /news/some-post, etc. all get the dark HomeHeader/HomeFooter.
-const HOME_PREFIXES = ['/news', '/webinars', '/resources', '/faq']
+const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq']
 
 function isHomeChrome(pathname: string): boolean {
   if (HOME_ROUTES.has(pathname)) return true

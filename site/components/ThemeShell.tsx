@@ -7,7 +7,7 @@ const DARK_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/
 
 // CMS sections whose index AND [slug] detail pages are dark. Matched by
 // prefix (not exact) so /news, /news/some-post, etc. all resolve to dark.
-const DARK_PREFIXES = ['/news', '/webinars', '/resources', '/faq']
+const DARK_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq']
 
 function isDarkRoute(pathname: string): boolean {
   if (DARK_ROUTES.has(pathname)) return true
