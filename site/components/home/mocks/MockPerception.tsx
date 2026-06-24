@@ -7,15 +7,16 @@
 import { type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger, useTypewriter } from './motion'
 import { MondayGlyph, PipedriveGlyph, SalesforceGlyph, ChatGptGlyph, UserGlyph } from './glyphs'
+import { LIGHT, TAG_COLORS, HL } from './palette'
 
 const POSITIVE = 'var(--positive)'
 const NEG = '#e5484d'
 type Tint = 'pos' | 'neg' | 'neu'
 
 function paint(tint: Tint): string {
-  if (tint === 'pos') return 'var(--positive-bg)'
-  if (tint === 'neg') return 'rgba(229,72,77,0.18)'
-  return 'var(--ink-10, rgba(255,255,255,0.12))'
+  if (tint === 'pos') return HL.pos
+  if (tint === 'neg') return HL.neg
+  return HL.neu
 }
 
 type Card = { rank: string; name: string; Glyph: (p: { size?: number; style?: React.CSSProperties }) => ReactNode; body: string; hl: { text: string; tint: Tint }[] }
@@ -95,6 +96,7 @@ export function MockPerception({ show }: { show: boolean }) {
       style={{
         width: '100%',
         height: '100%',
+        ...LIGHT,
         containerType: 'size',
         background: 'var(--white)',
         color: 'var(--ink)',
@@ -155,11 +157,14 @@ export function MockPerception({ show }: { show: boolean }) {
                 <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} brush={brush} />
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5cqw', marginTop: '0.8cqw' }}>
-                {TAGS.map((t) => (
-                  <span key={t} style={{ fontSize: '0.9cqw', color: 'var(--ink-60)', background: 'var(--subtle)', border: '1px solid var(--line)', borderRadius: '0.5cqw', padding: '0.15cqw 0.6cqw' }}>
-                    {t}
-                  </span>
-                ))}
+                {TAGS.map((t) => {
+                  const c = TAG_COLORS[t] || { bg: 'var(--subtle)', fg: 'var(--ink-60)' }
+                  return (
+                    <span key={t} style={{ fontSize: '0.9cqw', color: c.fg, background: c.bg, borderRadius: '0.5cqw', padding: '0.15cqw 0.6cqw' }}>
+                      {t}
+                    </span>
+                  )
+                })}
               </div>
             </div>
           ))}

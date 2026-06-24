@@ -5,6 +5,7 @@
 import { type CSSProperties, type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useStagger } from './motion'
 import { MondayGlyph, PipedriveGlyph, SalesforceGlyph, DiamondCheck } from './glyphs'
+import { LIGHT, BLUE } from './palette'
 
 const POSITIVE = 'var(--positive)'
 const NEG = '#e5484d'
@@ -39,6 +40,7 @@ export function MockRankings({ show }: { show: boolean }) {
   return (
     <div
       style={{
+        ...LIGHT,
         width: '100%',
         height: '100%',
         containerType: 'size',
@@ -138,13 +140,13 @@ export function MockRankings({ show }: { show: boolean }) {
 
       {/* Insight cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.4cqw', flex: 1, minHeight: 0 }}>
-        <InsightCard shown={cards[0]} icon={<StarIcon />} iconColor="var(--ink)" title="WHERE YOU WIN">
+        <InsightCard shown={cards[0]} icon={<StarIcon />} iconColor={BLUE} title="WHERE YOU WIN" titleColor={BLUE}>
           Strong visibility in &ldquo;Centralized SDS Repository&rdquo; and &ldquo;SDS Management&rdquo; with top 2 positions.
         </InsightCard>
         <InsightCard shown={cards[1]} icon={<ArrowIcon up />} iconColor={POSITIVE} title="TOP OPPORTUNITY" titleColor={POSITIVE}>
           Improve content and authority around Audit Readiness to close the visibility gap.
         </InsightCard>
-        <InsightCard shown={cards[2]} icon={<ArrowIcon />} iconColor={NEG} title="WHERE YOU LOSE">
+        <InsightCard shown={cards[2]} icon={<ArrowIcon />} iconColor={NEG} title="WHERE YOU LOSE" titleColor={NEG}>
           Competitors dominate &ldquo;Audit Readiness&rdquo; and &ldquo;Compliance Reporting&rdquo;.
         </InsightCard>
       </div>

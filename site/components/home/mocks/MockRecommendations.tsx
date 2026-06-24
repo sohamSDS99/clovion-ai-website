@@ -4,6 +4,7 @@
 
 import { type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger } from './motion'
+import { LIGHT } from './palette'
 
 const POSITIVE = 'var(--positive)'
 const NEG = '#e5484d'
@@ -35,6 +36,7 @@ export function MockRecommendations({ show }: { show: boolean }) {
   return (
     <div
       style={{
+        ...LIGHT,
         width: '100%',
         height: '100%',
         containerType: 'size',

@@ -7,6 +7,7 @@
 import { type CSSProperties } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger } from './motion'
 import { EngineGlyph } from './glyphs'
+import { LIGHT } from './palette'
 
 const POSITIVE = 'var(--positive)'
 
@@ -95,6 +96,7 @@ export function MockVisibility({ show }: { show: boolean }) {
   const bars = useStagger(ENGINES.length, play, 80, 360)
 
   const root: CSSProperties = {
+    ...LIGHT,
     width: '100%',
     height: '100%',
     containerType: 'size',
