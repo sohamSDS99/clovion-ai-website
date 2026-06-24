@@ -315,6 +315,7 @@ export function ChatDemo() {
     if (reduce) {
       sticky.style.setProperty('--pa', '1')
       sticky.style.setProperty('--cardin', '1')
+      sticky.style.setProperty('--copyout', '1')
       setStep(6)
       setWords(RESPONSE_WORDS.length)
       return
@@ -329,8 +330,13 @@ export function ChatDemo() {
       const p = travel > 0 ? clamp01(-rect.top / travel) : 0
 
       const pa = clamp01(p / 0.5)
-      const cardin = clamp01((p - 0.36) / 0.2)
+      // Sequenced handoff (not a cross-fade): the intro copy fully fades out
+      // first (copyout 0.30→0.37), THEN the chat card fades in (cardin 0.39→
+      // 0.54). The ~0.02 gap means the copy is gone the instant the box pops.
+      const copyout = clamp01((p - 0.3) / 0.07)
+      const cardin = clamp01((p - 0.39) / 0.15)
       sticky.style.setProperty('--pa', pa.toFixed(4))
+      sticky.style.setProperty('--copyout', copyout.toFixed(4))
       sticky.style.setProperty('--cardin', cardin.toFixed(4))
 
       const pb = clamp01((p - 0.54) / 0.46)
@@ -616,8 +622,8 @@ export function ChatDemo() {
               padding: '0 2rem',
               marginTop: 400,
               marginBottom: 28,
-              opacity: 'calc(1 - var(--cardin, 0))',
-              transform: 'translateY(calc(var(--cardin, 0) * -44px))',
+              opacity: 'calc(1 - var(--copyout, 0))',
+              transform: 'translateY(calc(var(--copyout, 0) * -44px))',
               willChange: 'opacity, transform'
             } as CSSProperties
           }
