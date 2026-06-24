@@ -54,6 +54,7 @@ export function MockRankings({ show }: { show: boolean }) {
         gap: '1.8cqw'
       }}
     >
+      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}'}</style>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
         <div>
@@ -124,11 +125,16 @@ export function MockRankings({ show }: { show: boolean }) {
                     display: 'block',
                     height: '100%',
                     width: `${(r.share / shareMax) * 100}%`,
-                    background: 'var(--ink)',
+                    backgroundColor: 'var(--ink)',
+                    backgroundImage: reduced ? undefined : 'linear-gradient(100deg, var(--ink) 38%, rgba(255,255,255,0.55) 50%, var(--ink) 62%)',
+                    backgroundSize: '250% 100%',
+                    backgroundRepeat: 'no-repeat',
                     borderRadius: '999px',
                     transformOrigin: 'left center',
                     transform: rows[i] ? 'scaleX(1)' : 'scaleX(0)',
-                    transition: reduced ? 'none' : `transform 0.6s ${cb} 0.12s`
+                    transition: reduced ? 'none' : `transform 0.6s ${cb} 0.12s`,
+                    // Constant sheen sweep — the graph keeps animating, never stops.
+                    animation: reduced ? 'none' : `clvBarSheen 2.6s ease-in-out ${i * 0.22}s infinite`
                   }}
                 />
               </span>
