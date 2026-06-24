@@ -191,41 +191,51 @@ function MockVisibility() {
 }
 
 
-// ── Mock 02 · Brand Perception — picture + animated reveal ─────────
+// ── Mock 02 · Brand Perception — typing + sequential highlighting ──
 //
-// Three-phase reveal over the design-spec PNG. Animation gates on `show`
-// so the sequence fires when the pillar becomes active, not on page mount.
+// Two-phase reveal over the design-spec PNG.
 //
-//   Phase 1 — Prompt typing. The image starts with a clip-path that
-//     reveals only the header + prompt area at the top. A white overlay
-//     covering the prompt input wipes left→right at constant velocity,
-//     with a blinking ink caret riding the leading edge — simulating
-//     someone typing the question.
-//   Phase 2 — Content reveal. The image's clip-path bottom inset
-//     smoothly decreases, unfurling the rest of the image top→down in
-//     one continuous motion (header → monday → pipedrive → salesforce
-//     → sidebar). One coherent reveal — no separate per-card overlays
-//     fading out.
-//   Phase 3 — Color bloom. Filter interpolates grayscale → full color
-//     over 2s with a long smooth curve. Overlaps with the tail of the
-//     content reveal so colors blend in continuously rather than
-//     snapping after everything is exposed.
+//   Phase 1 — Typing. Every text section types in. The image is
+//     fully covered by 6 horizontal white strips matching the
+//     content rows (header → prompt + insights header → response +
+//     drivers → monday + drivers tail → pipedrive + gaps1 → salesforce
+//     + gaps2). Each strip scaleX-wipes left→right with `linear`
+//     easing at constant velocity, staggered top→bottom — reads as
+//     someone typing line by line. As wipes complete, the grayscale
+//     image is exposed beneath.
+//   Phase 2 — Highlights light up sequentially. A second image layer
+//     (full color, identical position) sits above the grayscale base
+//     with a clip-path that initially hides it. The clip-path's
+//     bottom inset decreases in 6 discrete steps — each step uncovers
+//     one strip's worth of color, making the highlighted text pills
+//     "light up" section by section in reading order.
 //
 // Honors prefers-reduced-motion by jumping to the final state.
 
-// Bottom-inset percentages keyed to stage (-1 → 4). Each value clips
-// the image so only the top (100 − inset)% is visible.
-const BP_INSETS = [100, 78, 55, 33, 12, 0]
+const BP_STRIPS = [
+  // Horizontal rows that together cover the entire image (top + height in %).
+  { top: 0,  height: 10 },  // Brand Perception header + subtitle
+  { top: 10, height: 15 },  // Prompt input  |  AI VISIBILITY INSIGHTS header
+  { top: 25, height: 19 },  // Response area |  TOP PERCEPTION DRIVERS
+  { top: 44, height: 18 },  // Monday card   |  drivers tail / gaps top
+  { top: 62, height: 15 },  // Pipedrive     |  PERCEPTION GAPS (vs leaders) 1
+  { top: 77, height: 23 }   // Salesforce    |  PERCEPTION GAPS (vs leaders) 2
+]
 
-const BP_PROMPT_MS = 1400
-const BP_REVEAL_MS = 950
-const BP_COLOR_MS = 2000
-const BP_REVEAL_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
+// Bottom-inset % per colorStage (-1 → 5). Each step uncovers one strip
+// of the color layer from the top, so highlights light up top→down.
+const BP_COLOR_INSETS = [100, 90, 75, 56, 38, 23, 0]
+
+const BP_TYPING_MS = 700
+const BP_TYPING_STAGGER_MS = 220
+const BP_PHASE_GAP_MS = 320
+const BP_COLOR_MS = 360
+const BP_COLOR_STAGGER_MS = 240
 const BP_COLOR_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 function MockPerception({ show = true }: { show?: boolean } = {}) {
-  const [stage, setStage] = useState(-1)
-  const [colored, setColored] = useState(false)
+  const [typingStage, setTypingStage] = useState(-1)
+  const [colorStage, setColorStage] = useState(-1)
   const [reduce, setReduce] = useState(false)
 
   useEffect(() => {
@@ -236,36 +246,38 @@ function MockPerception({ show = true }: { show?: boolean } = {}) {
 
   useEffect(() => {
     if (!show) {
-      setStage(-1)
-      setColored(false)
+      setTypingStage(-1)
+      setColorStage(-1)
       return
     }
     if (reduce) {
-      setStage(4)
-      setColored(true)
+      setTypingStage(BP_STRIPS.length - 1)
+      setColorStage(BP_STRIPS.length - 1)
       return
     }
     const timers: ReturnType<typeof setTimeout>[] = []
-    // Phase 1: unfurl header + prompt; horizontal wipe types the prompt.
-    timers.push(setTimeout(() => setStage(0), 220))
-    // Phase 2: continuous downward reveal — monday → pipedrive → salesforce → sidebar.
-    //   600ms stagger with 950ms transition = each section's tail overlaps the next's head,
-    //   producing one continuous flow rather than discrete steps.
-    timers.push(setTimeout(() => setStage(1), 1750))
-    timers.push(setTimeout(() => setStage(2), 2350))
-    timers.push(setTimeout(() => setStage(3), 2950))
-    timers.push(setTimeout(() => setStage(4), 3550))
-    // Phase 3: colors bloom in starting mid-reveal so saturation feels woven into the unfurl.
-    timers.push(setTimeout(() => setColored(true), 2200))
+    // Phase 1 — typing wipes, staggered top→bottom.
+    const phase1Start = 200
+    for (let i = 0; i < BP_STRIPS.length; i++) {
+      timers.push(setTimeout(() => setTypingStage(i), phase1Start + i * BP_TYPING_STAGGER_MS))
+    }
+    // Phase 2 — color strips light up sequentially after a brief gap.
+    const phase1End = phase1Start + (BP_STRIPS.length - 1) * BP_TYPING_STAGGER_MS + BP_TYPING_MS
+    const phase2Start = phase1End + BP_PHASE_GAP_MS
+    for (let i = 0; i < BP_STRIPS.length; i++) {
+      timers.push(setTimeout(() => setColorStage(i), phase2Start + i * BP_COLOR_STAGGER_MS))
+    }
     return () => { timers.forEach(clearTimeout) }
   }, [show, reduce])
 
   const animate = !reduce
-  const bottomInset = BP_INSETS[stage + 1]
+  const colorBottomInset = BP_COLOR_INSETS[colorStage + 1]
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+        {/* Layer A — grayscale base. Always rendered; exposed as the
+            phase-1 wipes peel back. */}
         <Image
           src="/home/brand-perception.png"
           alt="Brand Perception — how AI describes your brand across audiences, industries, and use cases"
@@ -277,84 +289,68 @@ function MockPerception({ show = true }: { show?: boolean } = {}) {
           sizes="(max-width: 1000px) 100vw, 60vw"
           unoptimized
           style={{
+            position: 'absolute',
+            inset: 0,
             width: '100%',
             height: '100%',
             objectFit: 'contain',
             objectPosition: 'center',
-            clipPath: `inset(0 0 ${bottomInset}% 0)`,
-            WebkitClipPath: `inset(0 0 ${bottomInset}% 0)`,
-            filter: colored ? 'grayscale(0%) saturate(1)' : 'grayscale(100%) saturate(0)',
-            transition: animate
-              ? `clip-path ${BP_REVEAL_MS}ms ${BP_REVEAL_EASE}, -webkit-clip-path ${BP_REVEAL_MS}ms ${BP_REVEAL_EASE}, filter ${BP_COLOR_MS}ms ${BP_COLOR_EASE}`
-              : 'none',
-            willChange: animate ? 'clip-path, filter' : 'auto',
-            backfaceVisibility: 'hidden'
+            filter: animate ? 'grayscale(100%) saturate(0)' : 'none'
           }}
         />
+
+        {/* Layer B — full-color overlay, clipped from the top so it
+            lights up the highlights one strip at a time in phase 2. */}
         {animate && (
-          <>
-            {/* Phase 1 typing overlay — covers the prompt input box,
-                wipes left→right at constant velocity. */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: '4.2%',
-                left: '3.4%',
-                width: '33%',
-                height: '7%',
-                background: '#ffffff',
-                transformOrigin: 'right center',
-                transform: stage >= 0 ? 'scaleX(0)' : 'scaleX(1)',
-                transition: `transform ${BP_PROMPT_MS}ms linear`,
-                willChange: 'transform',
-                backfaceVisibility: 'hidden',
-                pointerEvents: 'none'
-              }}
-            />
-            {/* Caret track — a zero-width invisible track that grows to
-                full width at the same constant velocity as the wipe.
-                The ink caret bar sits at the track's right edge so it
-                rides the leading edge of the wipe. */}
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                top: '5.6%',
-                left: '3.4%',
-                width: '33%',
-                height: '4.2%',
-                pointerEvents: 'none'
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  height: '100%',
-                  width: stage >= 0 ? '100%' : '0%',
-                  transition: `width ${BP_PROMPT_MS}ms linear`,
-                  willChange: 'width'
-                }}
-              >
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '10%',
-                    right: 0,
-                    width: 2,
-                    height: '80%',
-                    background: '#0a0a0f',
-                    opacity: stage === 0 ? 1 : 0,
-                    transition: 'opacity 0.3s ease-out',
-                    animation: stage === 0 ? 'clv-blink 0.65s infinite step-end' : 'none'
-                  }}
-                />
-              </div>
-            </div>
-          </>
+          <Image
+            src="/home/brand-perception.png"
+            alt=""
+            aria-hidden
+            width={1834}
+            height={961}
+            priority={false}
+            loading="lazy"
+            quality={95}
+            sizes="(max-width: 1000px) 100vw, 60vw"
+            unoptimized
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
+              objectPosition: 'center',
+              clipPath: `inset(0 0 ${colorBottomInset}% 0)`,
+              WebkitClipPath: `inset(0 0 ${colorBottomInset}% 0)`,
+              transition: `clip-path ${BP_COLOR_MS}ms ${BP_COLOR_EASE}, -webkit-clip-path ${BP_COLOR_MS}ms ${BP_COLOR_EASE}`,
+              willChange: 'clip-path',
+              backfaceVisibility: 'hidden'
+            }}
+          />
         )}
+
+        {/* Phase 1 — typing strips. One white overlay per content row,
+            each wipes scaleX(1→0) right-anchored at constant velocity. */}
+        {animate && BP_STRIPS.map((s, i) => (
+          <div
+            key={i}
+            aria-hidden
+            style={{
+              position: 'absolute',
+              top: `${s.top}%`,
+              left: 0,
+              width: '100%',
+              height: `${s.height}%`,
+              background: '#ffffff',
+              transformOrigin: 'right center',
+              transform: typingStage >= i ? 'scaleX(0)' : 'scaleX(1)',
+              transition: `transform ${BP_TYPING_MS}ms linear`,
+              willChange: 'transform',
+              backfaceVisibility: 'hidden',
+              pointerEvents: 'none'
+            }}
+          />
+        ))}
       </div>
     </div>
   )
