@@ -538,7 +538,6 @@ function Hero() {
       <div style={{ ...S_CONTAINER, padding: '3.5rem 2rem 5rem' }}>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
           <div>
-            <MonoEyebrow>01 — BRAND PERCEPTION</MonoEyebrow>
             <TypingHeadline
               as="h1"
               text="Know what AI says about your brand."
@@ -609,7 +608,6 @@ function FourDimensions() {
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={S_CONTAINER}>
         <div style={{ maxWidth: 820 }}>
-          <MonoEyebrow>AI PERCEPTION ANALYSIS</MonoEyebrow>
           <h2 style={{ ...S_DISPLAY_MD, margin: '18px 0 0' }}>AI does not just mention your brand. It shapes it.</h2>
           <p style={{ ...S_LEAD, margin: '24px 0 0' }}>
             Your brand may appear in AI answers, but the way it is described can influence how buyers understand you
@@ -635,7 +633,6 @@ function PerceptionAttributes() {
     <section style={{ padding: 'var(--section) 0', background: 'var(--subtle)' }}>
       <div style={S_CONTAINER}>
         <div style={{ maxWidth: 820 }}>
-          <MonoEyebrow>PERCEPTION ATTRIBUTES</MonoEyebrow>
           <p
             style={{
               margin: '18px 0 0',
@@ -896,7 +893,6 @@ function FAQ() {
       <div style={S_CONTAINER}>
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
           <div className="lg:sticky lg:top-24">
-            <MonoEyebrow>✦</MonoEyebrow>
             <h2 style={{ ...S_DISPLAY_MD, margin: '16px 0 0' }}>Questions about sentiment.</h2>
             <a
               style={{
