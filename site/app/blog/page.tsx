@@ -3,7 +3,7 @@ import FeatureContent, { type Post } from '@/components/blog/FeatureContent'
 import { listContent } from '@/lib/cms'
 import type { CmsSummary } from '@/lib/cms-types'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Blog | Clovion AI',

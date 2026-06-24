@@ -3,7 +3,7 @@ import FeatureContent from '@/components/blog/FeatureContent'
 import { listContent } from '@/lib/cms'
 import { toPost } from '@/app/blog/page'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'GEO — Generative Engine Optimization | Clovion AI',

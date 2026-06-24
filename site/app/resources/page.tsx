@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Section, Container, Eyebrow, Card, Tag, ArrowRight } from '@/components/ui'
 import { listContent } from '@/lib/cms'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Resources | Clovion AI',

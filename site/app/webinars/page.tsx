@@ -4,7 +4,7 @@ import { Section, Container, Card, Eyebrow, ArrowRight } from '@/components/ui'
 import { listContent } from '@/lib/cms'
 import type { CmsSummary } from '@/lib/cms-types'
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Webinars | Clovion AI',
