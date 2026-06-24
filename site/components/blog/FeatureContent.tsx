@@ -160,7 +160,20 @@ function ChipRail({
   )
 }
 
-type Post = (typeof blogPosts)[number]
+// Card shape the composer renders. CMS posts are mapped into this shape and
+// merged with the curated blogPosts; tag/readTime/role are optional because
+// CMS summaries may not carry them.
+export type Post = {
+  slug: string
+  title: string
+  excerpt: string
+  category: string
+  author: string
+  date: string
+  readTime?: string
+  tag?: string
+  role?: string
+}
 
 function FeaturedCard({ post }: { post: Post }) {
   const { ref, seen } = useReveal<HTMLDivElement>()
@@ -256,8 +269,12 @@ function FeaturedCard({ post }: { post: Post }) {
                   <span style={{ color: 'var(--ink)' }}>{post.author}</span>
                   <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
                   <span>{formatDate(post.date)}</span>
-                  <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
-                  <span>{post.readTime}</span>
+                  {post.readTime && (
+                    <>
+                      <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
+                      <span>{post.readTime}</span>
+                    </>
+                  )}
                 </div>
                 <span
                   style={{
@@ -396,8 +413,12 @@ function PostCard({ post, index }: { post: Post; index: number }) {
         }}
       >
         <span style={{ color: 'var(--ink-70)' }}>{categoryLabel(post.category)}</span>
-        <span style={{ opacity: 0.4 }}>·</span>
-        <span>{post.tag}</span>
+        {post.tag && (
+          <>
+            <span style={{ opacity: 0.4 }}>·</span>
+            <span>{post.tag}</span>
+          </>
+        )}
       </div>
       <h3 style={{ ...DISPLAY_SM, fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)', margin: 0 }}>{post.title}</h3>
       <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--ink-70)', margin: 0 }}>{post.excerpt}</p>
@@ -438,7 +459,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
               color: 'var(--ink-50)'
             }}
           >
-            {formatDate(post.date)} · {post.readTime}
+            {formatDate(post.date)}{post.readTime ? ` · ${post.readTime}` : ''}
           </span>
         </div>
         <span style={{ marginLeft: 'auto', color: 'var(--ink-60)', display: 'inline-flex' }}>
@@ -756,12 +777,41 @@ function FinalCTA() {
   )
 }
 
-export default function FeatureContent({ initialCategory = 'all' }: { initialCategory?: Category }) {
+// Curated editorial posts, projected into the shared Post shape.
+const CURATED: Post[] = blogPosts.map((p) => ({
+  slug: p.slug,
+  title: p.title,
+  excerpt: p.excerpt,
+  category: p.category,
+  author: p.author,
+  date: p.date,
+  readTime: p.readTime,
+  tag: p.tag,
+  role: p.role
+}))
+
+export default function FeatureContent({
+  initialCategory = 'all',
+  cmsPosts = []
+}: {
+  initialCategory?: Category
+  cmsPosts?: Post[]
+}) {
   const [active, setActive] = useState<Category>(initialCategory)
 
-  const sorted = useMemo(() => {
-    return [...blogPosts].sort((a, b) => (a.date < b.date ? 1 : -1))
-  }, [])
+  // CMS-published posts take precedence (newest content surfaces first), then
+  // the curated editorial posts. De-dupe by slug so a CMS post that shares a
+  // slug with a curated one wins. Final list is sorted newest-first by date.
+  const sorted = useMemo<Post[]>(() => {
+    const seen = new Set<string>()
+    const merged: Post[] = []
+    for (const p of [...cmsPosts, ...CURATED]) {
+      if (seen.has(p.slug)) continue
+      seen.add(p.slug)
+      merged.push(p)
+    }
+    return merged.sort((a, b) => (a.date < b.date ? 1 : -1))
+  }, [cmsPosts])
 
   const featured = sorted[0]
   const rest = sorted.slice(1)
@@ -780,6 +830,32 @@ export default function FeatureContent({ initialCategory = 'all' }: { initialCat
     if (active === 'all') return rest
     return rest.filter((p) => p.category === active)
   }, [active, rest])
+
+  if (!featured) {
+    return (
+      <>
+        <Hero />
+        <section style={{ padding: '1rem 0 var(--section)' }}>
+          <div style={CONTAINER}>
+            <div
+              style={{
+                padding: '4rem 2rem',
+                textAlign: 'center',
+                border: '1px dashed var(--line)',
+                borderRadius: 22,
+                color: 'var(--ink-60)'
+              }}
+            >
+              Nothing published yet. Check back soon.
+            </div>
+          </div>
+        </section>
+        <NewsletterBand />
+        <FAQ />
+        <FinalCTA />
+      </>
+    )
+  }
 
   return (
     <>

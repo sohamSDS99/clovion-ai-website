@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
-import FeatureContent from '@/components/blog/FeatureContent'
+import FeatureContent, { type Post } from '@/components/blog/FeatureContent'
+import { listContent } from '@/lib/cms'
+import type { CmsSummary } from '@/lib/cms-types'
+
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Blog | Clovion AI',
@@ -54,14 +58,33 @@ const faqJsonLd = {
   ]
 }
 
-export default function BlogPage() {
+// Map a CMS blog summary into the composer's card shape. publishedAt is
+// guarded (falls back to "" so sorting puts undated items last); category
+// passes through as the CMS slug — the composer's categoryLabel handles any
+// value gracefully and the ChipRail filter matches geo/ai-search/seo.
+function toPost(item: CmsSummary): Post {
+  return {
+    slug: item.slug,
+    title: item.title,
+    excerpt: item.excerpt ?? '',
+    category: item.category?.slug ?? 'geo',
+    author: item.author?.displayName ?? 'Clovion AI',
+    date: item.publishedAt ?? '',
+    tag: item.tags?.[0]?.name
+  }
+}
+
+export default async function BlogPage() {
+  const { items } = await listContent('BLOG', { limit: 100 })
+  const cmsPosts = items.map(toPost)
+
   return (
     <div className="clv-dark clv-ai-vis-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <FeatureContent />
+      <FeatureContent cmsPosts={cmsPosts} />
     </div>
   )
 }
