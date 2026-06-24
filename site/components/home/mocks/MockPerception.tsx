@@ -74,14 +74,6 @@ const GAPS2 = [
   { label: 'Advanced reporting', you: 8, leader: 22 },
   { label: 'Integrations', you: 9, leader: 25 }
 ]
-const GAPS1 = [
-  { label: 'Enterprise-focused', pct: 42 },
-  { label: 'Most secure', pct: 28 },
-  { label: 'Scalable', pct: 22 },
-  { label: 'Advanced reporting', pct: 20 },
-  { label: 'Integrations', pct: 18 }
-]
-
 // Total highlight count across all cards, for sequential brush stagger.
 const HL_OFFSET = CARDS.map((_, i) => CARDS.slice(0, i).reduce((n, c) => n + c.hl.length, 0))
 
@@ -172,8 +164,8 @@ export function MockPerception({ show }: { show: boolean }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.9cqw', fontWeight: 600, letterSpacing: '0.02em' }}>Brand Perception</div>
-          <div style={{ marginTop: '0.5cqw', fontSize: '1.05cqw', color: 'var(--ink-60)', maxWidth: '70cqw' }}>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2.2cqw', fontWeight: 600, letterSpacing: '0.02em' }}>Brand Perception</div>
+          <div style={{ marginTop: '0.6cqw', fontSize: '1.25cqw', color: 'var(--ink-60)', maxWidth: '70cqw' }}>
             Understand how AI perceives your brand across audiences, industries, and use cases — and uncover the drivers shaping that perception.
           </div>
         </div>
@@ -186,7 +178,7 @@ export function MockPerception({ show }: { show: boolean }) {
           {/* Prompt card */}
           <div style={{ display: 'flex', gap: '0.8cqw', alignItems: 'flex-start', background: 'var(--subtle)', border: '1px solid var(--line)', borderRadius: '1cqw', padding: '1cqw 1.2cqw' }}>
             <UserGlyph size={14} style={{ color: 'var(--ink-60)', marginTop: '0.2cqw' }} />
-            <span style={{ fontSize: '1.25cqw', fontWeight: 600, lineHeight: 1.4 }}>
+            <span style={{ fontSize: '1.5cqw', fontWeight: 600, lineHeight: 1.45 }}>
               {typed.text}
               {!typed.done && !reduced && <Caret />}
             </span>
@@ -195,7 +187,7 @@ export function MockPerception({ show }: { show: boolean }) {
           <div style={{ display: 'flex', gap: '0.8cqw', alignItems: 'flex-start', border: '1px solid var(--line)', borderRadius: '1cqw', padding: '1cqw 1.2cqw', minHeight: '3.4cqw' }}>
             <ChatGptGlyph size={15} style={{ marginTop: '0.2cqw', flexShrink: 0 }} />
             {cards[0] || reduced ? (
-              <span style={{ fontSize: '1.1cqw', lineHeight: 1.5, color: 'var(--ink-80, var(--ink))' }}>
+              <span style={{ fontSize: '1.35cqw', lineHeight: 1.5, color: 'var(--ink-80, var(--ink))' }}>
                 {answer.text}
                 {!answer.done && !reduced && <Caret />}
               </span>
@@ -217,18 +209,18 @@ export function MockPerception({ show }: { show: boolean }) {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.7cqw', marginBottom: '0.6cqw' }}>
-                <span style={{ fontSize: '0.95cqw', fontWeight: 600, color: 'var(--ink-50)', padding: '0.15cqw 0.6cqw', border: '1px solid var(--line)', borderRadius: '0.5cqw' }}>{c.rank}</span>
-                <c.Glyph size={15} style={{ color: 'var(--ink-70)' }} />
-                <span style={{ fontSize: '1.35cqw', fontWeight: 700 }}>{c.name}</span>
+                <span style={{ fontSize: '1.15cqw', fontWeight: 600, color: 'var(--ink-50)', padding: '0.15cqw 0.6cqw', border: '1px solid var(--line)', borderRadius: '0.5cqw' }}>{c.rank}</span>
+                <c.Glyph size={18} style={{ color: 'var(--ink-70)' }} />
+                <span style={{ fontSize: '1.6cqw', fontWeight: 700 }}>{c.name}</span>
               </div>
-              <p style={{ margin: 0, fontSize: '1.05cqw', lineHeight: 1.5, color: 'var(--ink-80, var(--ink))' }}>
+              <p style={{ margin: 0, fontSize: '1.3cqw', lineHeight: 1.55, color: 'var(--ink-80, var(--ink))' }}>
                 <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} />
               </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5cqw', marginTop: '0.8cqw' }}>
                 {TAGS.map((t) => {
                   const c = TAG_COLORS[t] || { bg: 'var(--subtle)', fg: 'var(--ink-60)' }
                   return (
-                    <span key={t} style={{ fontSize: '0.9cqw', color: c.fg, background: c.bg, borderRadius: '0.5cqw', padding: '0.15cqw 0.6cqw' }}>
+                    <span key={t} style={{ fontSize: '1.05cqw', color: c.fg, background: c.bg, borderRadius: '0.5cqw', padding: '0.2cqw 0.7cqw' }}>
                       {t}
                     </span>
                   )
@@ -241,8 +233,8 @@ export function MockPerception({ show }: { show: boolean }) {
         {/* RIGHT sidebar */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1cqw', minHeight: 0, overflow: 'hidden' }}>
           <div>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.5cqw', fontWeight: 700, letterSpacing: '0.1em' }}>AI VISIBILITY INSIGHTS</div>
-            <div style={{ marginTop: '0.4cqw', fontSize: '1cqw', color: 'var(--ink-60)' }}>Insights based on 12,540 prompts across 6 AI engines</div>
+            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.75cqw', fontWeight: 700, letterSpacing: '0.1em' }}>AI VISIBILITY INSIGHTS</div>
+            <div style={{ marginTop: '0.5cqw', fontSize: '1.2cqw', color: 'var(--ink-60)' }}>Insights based on 12,540 prompts across 6 AI engines</div>
           </div>
 
           <SideCard title="TOP PERCEPTION DRIVERS">
@@ -252,29 +244,21 @@ export function MockPerception({ show }: { show: boolean }) {
           </SideCard>
 
           <SideCard title="PERCEPTION GAPS" sub="(vs category leaders)" cols>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2.2cqw', fontSize: '0.9cqw', color: 'var(--ink-50)', marginBottom: '0.4cqw' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '2.2cqw', fontSize: '1.05cqw', color: 'var(--ink-50)', marginBottom: '0.5cqw' }}>
               <span>You</span>
               <span>Leader</span>
             </div>
             {GAPS2.map((g) => (
-              <div key={g.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '1cqw', padding: '0.25cqw 0' }}>
-                <span style={{ color: NEG, background: 'rgba(229,72,77,0.12)', borderRadius: '0.4cqw', padding: '0.1cqw 0.5cqw' }}>{g.label}</span>
+              <div key={g.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '1.2cqw', padding: '0.35cqw 0' }}>
+                <span style={{ color: NEG, background: 'rgba(229,72,77,0.12)', borderRadius: '0.4cqw', padding: '0.15cqw 0.6cqw' }}>{g.label}</span>
                 <span style={{ display: 'flex', gap: '2.2cqw', fontVariantNumeric: 'tabular-nums' }}>
-                  <span style={{ width: '3cqw', textAlign: 'right', color: 'var(--ink-70)' }}>{g.you}%</span>
-                  <span style={{ width: '3cqw', textAlign: 'right', fontWeight: 600 }}>{g.leader}%</span>
+                  <span style={{ width: '3.4cqw', textAlign: 'right', color: 'var(--ink-70)' }}>{g.you}%</span>
+                  <span style={{ width: '3.4cqw', textAlign: 'right', fontWeight: 600 }}>{g.leader}%</span>
                 </span>
               </div>
             ))}
           </SideCard>
 
-          <SideCard title="PERCEPTION GAPS" sub="(vs category leaders)">
-            {GAPS1.map((g) => (
-              <div key={g.label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '1cqw', padding: '0.25cqw 0' }}>
-                <span style={{ color: 'var(--ink-70)' }}>{g.label}</span>
-                <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>{g.pct}%</span>
-              </div>
-            ))}
-          </SideCard>
         </div>
       </div>
       {notePos && play && !reduced && <SentimentNote key={noteIdx} idx={noteIdx} left={notePos.left} top={notePos.top} />}
@@ -368,7 +352,7 @@ function DriverRow({ label, pct, play, delay, positive }: { label: string; pct: 
   const n = useCountUp(pct, play, { durationMs: 700, startMs: 1500 + delay * 80 })
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1cqw', padding: '0.3cqw 0' }}>
-      <span style={{ fontSize: '1cqw', color: positive ? POSITIVE : 'var(--ink-70)', background: positive ? 'var(--positive-bg)' : 'transparent', borderRadius: '0.4cqw', padding: positive ? '0.1cqw 0.5cqw' : 0 }}>{label}</span>
+      <span style={{ fontSize: '1.2cqw', color: positive ? POSITIVE : 'var(--ink-70)', background: positive ? 'var(--positive-bg)' : 'transparent', borderRadius: '0.4cqw', padding: positive ? '0.15cqw 0.6cqw' : 0 }}>{label}</span>
       <span style={{ flex: 1, height: '0.8cqw', borderRadius: '999px', background: 'var(--ink-10, rgba(255,255,255,0.1))', overflow: 'hidden', maxWidth: '12cqw' }}>
         <span
           style={{
@@ -382,7 +366,7 @@ function DriverRow({ label, pct, play, delay, positive }: { label: string; pct: 
           }}
         />
       </span>
-      <span style={{ fontSize: '1cqw', fontVariantNumeric: 'tabular-nums', width: '3cqw', textAlign: 'right' }}>{n}%</span>
+      <span style={{ fontSize: '1.2cqw', fontVariantNumeric: 'tabular-nums', width: '3.4cqw', textAlign: 'right' }}>{n}%</span>
     </div>
   )
 }
@@ -391,8 +375,8 @@ function SideCard({ title, sub, children, cols }: { title: string; sub?: string;
   return (
     <div style={{ border: '1px solid var(--line)', borderRadius: '1cqw', padding: '1cqw 1.2cqw' }}>
       <div style={{ marginBottom: '0.6cqw' }}>
-        <span style={{ fontSize: '1.1cqw', fontWeight: 700, color: 'var(--ink)' }}>{title}</span>
-        {sub && <span style={{ fontSize: '0.9cqw', color: 'var(--ink-50)', marginLeft: '0.5cqw' }}>{sub}</span>}
+        <span style={{ fontSize: '1.35cqw', fontWeight: 700, color: 'var(--ink)' }}>{title}</span>
+        {sub && <span style={{ fontSize: '1.05cqw', color: 'var(--ink-50)', marginLeft: '0.5cqw' }}>{sub}</span>}
       </div>
       {children}
     </div>
