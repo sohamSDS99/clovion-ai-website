@@ -213,9 +213,9 @@ function HeroBento() {
         {/* App chrome top bar */}
         <div style={{ height: 48, borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12 }}>
           <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ height: 10, width: 10, borderRadius: 999, background: '#fecdd3' }} />
-            <span style={{ height: 10, width: 10, borderRadius: 999, background: '#fde68a' }} />
-            <span style={{ height: 10, width: 10, borderRadius: 999, background: '#a7f3d0' }} />
+            <span style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
+            <span style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
+            <span style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
           </div>
           <div style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--ink-50)' }}>
             Workspaces / Clovion AI / Visibility
@@ -309,9 +309,9 @@ function HeroBento() {
                   gap: 4,
                   padding: '2px 8px',
                   borderRadius: 999,
-                  background: 'rgba(16,185,129,0.12)',
-                  border: '1px solid rgba(16,185,129,0.30)',
-                  color: '#047857',
+                  background: 'var(--positive-bg)',
+                  border: '1px solid var(--positive-border)',
+                  color: 'var(--positive)',
                   fontSize: '0.74rem',
                   fontWeight: 600
                 }}

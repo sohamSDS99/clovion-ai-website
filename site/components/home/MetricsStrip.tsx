@@ -111,6 +111,7 @@ export function MetricsStrip() {
           .metrics-cell { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
           @media (max-width: 767px) {
             .metrics-cell:nth-child(2n) { border-right: none; }
+            .metrics-cell[data-last="true"] { border-right: none; }
             .metrics-cell[data-last="true"] { border-bottom: none; }
           }
           @media (min-width: 768px) {

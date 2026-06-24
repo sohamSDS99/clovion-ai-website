@@ -48,7 +48,6 @@ export function HomeCTA() {
                 lineHeight: 1.02,
                 margin: '20px 0 0',
                 textWrap: 'balance',
-                minHeight: '2.1em',
                 color: 'var(--on-ink)'
               }}
             />

@@ -369,8 +369,8 @@ function MockRankings() {
       <Image
         src="/home/visibility-ranking.png"
         alt="Visibility Ranking by Topic — SDS Manager rankings vs Chemical Compliance Software brands"
-        width={1876}
-        height={926}
+        width={1920}
+        height={1280}
         priority={false}
         loading="lazy"
         quality={95}
@@ -460,7 +460,7 @@ const PILLARS: Pillar[] = [
     fg: '#047857',
     glyph: G.bars,
     Mock: MockRankings,
-    mockAspect: '1876 / 926'
+    mockAspect: '1920 / 1280'
   },
   {
     sku: '04 — Recommendations',
@@ -800,7 +800,7 @@ export function PillarStepper() {
                     {s.name}
                   </span>
                 </div>
-                <div style={{ position: 'relative', height: 564 }}>
+                <div style={{ position: 'relative', aspectRatio: s.mockAspect ?? '4 / 3' }}>
                   <MockPanel s={s} show={true} />
                 </div>
               </div>

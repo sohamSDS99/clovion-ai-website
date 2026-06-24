@@ -58,7 +58,7 @@ function FAQItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
           <PlusIcon size={18} />
         </span>
       </button>
-      <div style={{ overflow: 'hidden', maxHeight: open ? 320 : 0, transition: 'max-height .35s var(--ease-out-expo)' }}>
+      <div style={{ overflow: 'hidden', maxHeight: open ? 480 : 0, transition: 'max-height .35s var(--ease-out-expo)' }}>
         <p style={{ margin: 0, padding: '0 48px 26px 0', fontSize: '1rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>{a}</p>
       </div>
     </div>

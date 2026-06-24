@@ -59,8 +59,7 @@ export function Loop() {
               lineHeight: 1.02,
               margin: '28px 0 0',
               textWrap: 'balance',
-              color: 'var(--on-ink)',
-              minHeight: '2.1em'
+              color: 'var(--on-ink)'
             }}
           />
           <p
