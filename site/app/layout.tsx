@@ -19,6 +19,11 @@ const themeBootstrap = `(function(){try{var p=location.pathname;var pre=['/blog'
 // (https://www.clarity.ms/tag/x8d3ot6py2) loads and replays them.
 const clarityBootstrap = `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, "clarity", "script", "x8d3ot6py2");`
 
+// Meta Pixel — pixel id 1059601186732604. Fires initial PageView from the
+// bootstrap; SPA route changes are picked up by RouteTracker.tsx so
+// every client-side navigation also fires a Pixel PageView.
+const metaPixelBootstrap = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','1059601186732604');fbq('track','PageView');`
+
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
   variable: '--font-saans',
@@ -72,6 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: clarityBootstrap }} />
+        <script dangerouslySetInnerHTML={{ __html: metaPixelBootstrap }} />
         <link
           rel="stylesheet"
           href="https://assets.calendly.com/assets/external/widget.css"
@@ -83,6 +89,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: 'none' }}
+            alt=""
+            src="https://www.facebook.com/tr?id=1059601186732604&ev=PageView&noscript=1"
+          />
+        </noscript>
         <ThemeShell />
         <RouteTracker />
         <ChromeHeader />
