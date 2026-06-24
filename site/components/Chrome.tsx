@@ -8,12 +8,21 @@ import { HomeFooter } from './HomeFooter'
 
 const HOME_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/pricing', '/affiliate', '/free-ai-visibility-score', '/customers', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
 
+// CMS sections (index + [slug] detail) that use the dark chrome. Prefix-matched
+// so /news, /news/some-post, etc. all get the dark HomeHeader/HomeFooter.
+const HOME_PREFIXES = ['/news', '/webinars', '/resources', '/faq']
+
+function isHomeChrome(pathname: string): boolean {
+  if (HOME_ROUTES.has(pathname)) return true
+  return HOME_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
+}
+
 export function ChromeHeader() {
   const pathname = usePathname()
-  return pathname && HOME_ROUTES.has(pathname) ? <HomeHeader /> : <Header />
+  return pathname && isHomeChrome(pathname) ? <HomeHeader /> : <Header />
 }
 
 export function ChromeFooter() {
   const pathname = usePathname()
-  return pathname && HOME_ROUTES.has(pathname) ? <HomeFooter /> : <Footer />
+  return pathname && isHomeChrome(pathname) ? <HomeFooter /> : <Footer />
 }

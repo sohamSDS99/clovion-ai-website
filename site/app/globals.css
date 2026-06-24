@@ -599,6 +599,47 @@
   color: #0a0a0f;
 }
 
+/* ── Light-primitive overrides inside .clv-dark ───────────────────────
+   The CMS-driven sections (/blog, /news, /webinars, /resources, /faq)
+   reuse the light components/ui primitives (.card, .lead, .tag), whose
+   colors are hardcoded for the cream theme and don't auto-flip. Map them
+   onto the dark surface tokens so those pages read correctly on black.
+   Existing bespoke dark pages don't use these classes, so this is safe. */
+.clv-dark .lead {
+  color: var(--ink-70);
+}
+.clv-dark .card {
+  background: var(--white);
+  border-color: var(--line);
+}
+.clv-dark .card:hover {
+  border-color: var(--ink-20);
+}
+.clv-dark .tag {
+  background: var(--ink-10);
+  color: var(--ink-70);
+}
+
+/* CMS article body on dark routes. Headings/text/links already use var(--ink)
+   and flip; these elements hardcode cream-ink values, so remap them. */
+.clv-dark .cms-prose blockquote {
+  color: var(--ink-70);
+}
+.clv-dark .cms-prose hr {
+  border-top-color: var(--line);
+}
+.clv-dark .cms-prose code {
+  background: var(--ink-07);
+  border-color: var(--ink-10);
+}
+.clv-dark .cms-prose th,
+.clv-dark .cms-prose td {
+  border-color: var(--line);
+}
+.clv-dark .cms-prose th {
+  background: var(--ink-05);
+}
+
 /* AI Visibility Tracking page — Hanken Grotesk paragraphs (Saans ships only SemiBold) */
 .clv-ai-vis-page p {
   font-family: var(--font-body-reg, 'Hanken Grotesk', system-ui, -apple-system, sans-serif);
