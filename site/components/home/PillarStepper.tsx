@@ -193,26 +193,37 @@ function MockVisibility() {
 
 // ── Mock 02 · Brand Perception — picture + animated reveal ─────────
 //
-// Renders the design-spec PNG as the visual base. Four white overlay
-// rectangles cover the prompt + 3 brand-card text regions and collapse
-// horizontally from left to right in sequence, simulating a typing
-// reveal on the underlying text. The picture starts fully grayscale so
-// the colored highlight pills are invisible; once all four text reveals
-// complete, the picture animates from grayscale → full color, making
-// the highlights "light up" after the text is written. Honors
-// prefers-reduced-motion by jumping to the final state.
+// Three-phase reveal over the design-spec PNG. Animation gates on `show`
+// so the sequence fires when the pillar becomes active, not on page mount.
+//
+//   Phase 1 — Prompt typing. The image starts with a clip-path that
+//     reveals only the header + prompt area at the top. A white overlay
+//     covering the prompt input wipes left→right at constant velocity,
+//     with a blinking ink caret riding the leading edge — simulating
+//     someone typing the question.
+//   Phase 2 — Content reveal. The image's clip-path bottom inset
+//     smoothly decreases, unfurling the rest of the image top→down in
+//     one continuous motion (header → monday → pipedrive → salesforce
+//     → sidebar). One coherent reveal — no separate per-card overlays
+//     fading out.
+//   Phase 3 — Color bloom. Filter interpolates grayscale → full color
+//     over 2s with a long smooth curve. Overlaps with the tail of the
+//     content reveal so colors blend in continuously rather than
+//     snapping after everything is exposed.
+//
+// Honors prefers-reduced-motion by jumping to the final state.
 
-const BP_REGIONS = [
-  // Position is in percent of the underlying picture (1834 × 961).
-  { key: 'prompt', top: 4.2, left: 3.4, width: 33, height: 7 },
-  { key: 'monday', top: 23.5, left: 3.4, width: 64, height: 21 },
-  { key: 'pipedrive', top: 44.5, left: 3.4, width: 64, height: 21 },
-  { key: 'salesforce', top: 67.5, left: 3.4, width: 64, height: 17 }
-]
+// Bottom-inset percentages keyed to stage (-1 → 4). Each value clips
+// the image so only the top (100 − inset)% is visible.
+const BP_INSETS = [100, 78, 55, 33, 12, 0]
 
-const BP_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const BP_PROMPT_MS = 1400
+const BP_REVEAL_MS = 950
+const BP_COLOR_MS = 2000
+const BP_REVEAL_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)'
+const BP_COLOR_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
-function MockPerception() {
+function MockPerception({ show = true }: { show?: boolean } = {}) {
   const [stage, setStage] = useState(-1)
   const [colored, setColored] = useState(false)
   const [reduce, setReduce] = useState(false)
@@ -224,19 +235,33 @@ function MockPerception() {
   }, [])
 
   useEffect(() => {
+    if (!show) {
+      setStage(-1)
+      setColored(false)
+      return
+    }
     if (reduce) {
-      setStage(BP_REGIONS.length - 1)
+      setStage(4)
       setColored(true)
       return
     }
     const timers: ReturnType<typeof setTimeout>[] = []
-    const steps = [320, 1900, 4000, 6100]
-    steps.forEach((ms, i) => {
-      timers.push(setTimeout(() => setStage(i), ms))
-    })
-    timers.push(setTimeout(() => setColored(true), 8200))
+    // Phase 1: unfurl header + prompt; horizontal wipe types the prompt.
+    timers.push(setTimeout(() => setStage(0), 220))
+    // Phase 2: continuous downward reveal — monday → pipedrive → salesforce → sidebar.
+    //   600ms stagger with 950ms transition = each section's tail overlaps the next's head,
+    //   producing one continuous flow rather than discrete steps.
+    timers.push(setTimeout(() => setStage(1), 1750))
+    timers.push(setTimeout(() => setStage(2), 2350))
+    timers.push(setTimeout(() => setStage(3), 2950))
+    timers.push(setTimeout(() => setStage(4), 3550))
+    // Phase 3: colors bloom in starting mid-reveal so saturation feels woven into the unfurl.
+    timers.push(setTimeout(() => setColored(true), 2200))
     return () => { timers.forEach(clearTimeout) }
-  }, [reduce])
+  }, [show, reduce])
+
+  const animate = !reduce
+  const bottomInset = BP_INSETS[stage + 1]
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
@@ -256,28 +281,80 @@ function MockPerception() {
             height: '100%',
             objectFit: 'contain',
             objectPosition: 'center',
+            clipPath: `inset(0 0 ${bottomInset}% 0)`,
+            WebkitClipPath: `inset(0 0 ${bottomInset}% 0)`,
             filter: colored ? 'grayscale(0%) saturate(1)' : 'grayscale(100%) saturate(0)',
-            transition: reduce ? 'none' : 'filter 1.4s ease-out'
+            transition: animate
+              ? `clip-path ${BP_REVEAL_MS}ms ${BP_REVEAL_EASE}, -webkit-clip-path ${BP_REVEAL_MS}ms ${BP_REVEAL_EASE}, filter ${BP_COLOR_MS}ms ${BP_COLOR_EASE}`
+              : 'none',
+            willChange: animate ? 'clip-path, filter' : 'auto',
+            backfaceVisibility: 'hidden'
           }}
         />
-        {BP_REGIONS.map((r, i) => (
-          <div
-            key={r.key}
-            aria-hidden
-            style={{
-              position: 'absolute',
-              top: `${r.top}%`,
-              left: `${r.left}%`,
-              width: `${r.width}%`,
-              height: `${r.height}%`,
-              background: '#ffffff',
-              transformOrigin: 'right center',
-              transform: stage >= i ? 'scaleX(0)' : 'scaleX(1)',
-              transition: reduce ? 'none' : `transform 0.95s ${BP_EASE}`,
-              pointerEvents: 'none'
-            }}
-          />
-        ))}
+        {animate && (
+          <>
+            {/* Phase 1 typing overlay — covers the prompt input box,
+                wipes left→right at constant velocity. */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: '4.2%',
+                left: '3.4%',
+                width: '33%',
+                height: '7%',
+                background: '#ffffff',
+                transformOrigin: 'right center',
+                transform: stage >= 0 ? 'scaleX(0)' : 'scaleX(1)',
+                transition: `transform ${BP_PROMPT_MS}ms linear`,
+                willChange: 'transform',
+                backfaceVisibility: 'hidden',
+                pointerEvents: 'none'
+              }}
+            />
+            {/* Caret track — a zero-width invisible track that grows to
+                full width at the same constant velocity as the wipe.
+                The ink caret bar sits at the track's right edge so it
+                rides the leading edge of the wipe. */}
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                top: '5.6%',
+                left: '3.4%',
+                width: '33%',
+                height: '4.2%',
+                pointerEvents: 'none'
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  height: '100%',
+                  width: stage >= 0 ? '100%' : '0%',
+                  transition: `width ${BP_PROMPT_MS}ms linear`,
+                  willChange: 'width'
+                }}
+              >
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '10%',
+                    right: 0,
+                    width: 2,
+                    height: '80%',
+                    background: '#0a0a0f',
+                    opacity: stage === 0 ? 1 : 0,
+                    transition: 'opacity 0.3s ease-out',
+                    animation: stage === 0 ? 'clv-blink 0.65s infinite step-end' : 'none'
+                  }}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
@@ -466,7 +543,7 @@ type Pillar = {
   tint: string
   fg: string
   glyph: ReactElement
-  Mock: () => ReactElement
+  Mock: (props?: { show?: boolean }) => ReactElement
   mockAspect?: string
 }
 
@@ -630,7 +707,7 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
       >
         {isFullBleed ? (
           <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
-            <Mock />
+            <Mock show={show} />
           </div>
         ) : (
           <>
@@ -672,7 +749,7 @@ function MockPanel({ s, show }: { s: Pillar; show: boolean }) {
                 overflow: 'hidden'
               }}
             >
-              <Mock />
+              <Mock show={show} />
             </div>
           </>
         )}
