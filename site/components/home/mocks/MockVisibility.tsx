@@ -1,10 +1,10 @@
 'use client'
 
 // Pillar 1 — "AI Visibility Insights" dashboard. Fully coded (JSX + CSS + SVG,
-// zero raster). White surface, strict B&W product chrome + a single emerald
-// affordance for the Δ chip. The three chart lines carry their reference brand
-// colours (Pipedrive sky / Salesforce violet / Monday green) — treated like
-// --positive: colour confined to inside the mock, never bleeds to brand chrome.
+// zero raster). White surface, vibrant colour system: per-engine brand-coloured
+// icon chips, a multi-hue bar ramp with a constant sheen sweep, and vibrant
+// chart lines (Pipedrive sky / Salesforce violet / Monday emerald) with a
+// gradient area fill, animated data dots and a pulsing endpoint.
 //
 // The dashboard runs a continuous, self-driving loop: the segmented tab pill
 // slides AI Engine → Audience → Intent → Topic → … forever. Each tab change
@@ -16,7 +16,7 @@
 //     of frame entirely on Topic so the 9-row list takes the space.
 //
 // Honors prefers-reduced-motion: snaps to the AI Engine tab, no cycle, no
-// transitions. Scales via container-query units (cqw) inside its aspect box.
+// transitions/sheen. Scales via container-query units (cqw) inside its box.
 //
 // FOOTGUN (enforced): never put var(--*) inside a `transition` shorthand —
 // React drops it on serialization and the transition silently never fires.
@@ -28,17 +28,28 @@ import { LIGHT } from './palette'
 
 const POSITIVE = 'var(--positive)'
 
-// Chart line colours — reference brand hues, inside-mock only.
-const C_PIPE = '#38bdf8' // Pipedrive — sky
-const C_SALES = '#8b5cf6' // Salesforce — violet
-const C_MONDAY = '#16a34a' // Monday — green
-const BAR_FILL = 'linear-gradient(90deg, #4b4b54, #0a0a0f)'
+// Vibrant chart line colours (inside-mock only).
+const C_PIPE = '#0ea5e9' // Pipedrive — vivid sky
+const C_SALES = '#8b5cf6' // Salesforce — vivid violet
+const C_MONDAY = '#10b981' // Monday — vivid emerald (emphasis)
+
+// Per-engine brand colours for the icon chips + bars.
+const ENGINE_COLOR: Record<string, string> = {
+  ChatGPT: '#10a37f',
+  Perplexity: '#1fb8cd',
+  Claude: '#d97757',
+  Gemini: '#4285f4'
+}
+
+// Cool→warm vibrant ramp for non-engine bars / numbered badges (designed
+// spectrum, not random rainbow). Index 0 = highest-ranked row.
+const RAMP = ['#8b5cf6', '#7c3aed', '#6366f1', '#3b82f6', '#0ea5e9', '#06b6d4', '#14b8a6', '#10b981', '#22c55e']
 
 // ── Loop pacing ──────────────────────────────────────────────────────
-const HOLD_MS = 3200 // dwell on a tab
-const TRANS_MS = 500 // morph window
-const TICK_MS = HOLD_MS + TRANS_MS // 3.7s full step
-const BARS_OUT_MS = 260 // fade/collapse current rows before swap
+const HOLD_MS = 3200
+const TRANS_MS = 500
+const TICK_MS = HOLD_MS + TRANS_MS
+const BARS_OUT_MS = 260
 const ROW_STAGGER_MS = 70
 
 // ── Tabs ─────────────────────────────────────────────────────────────
@@ -68,9 +79,9 @@ const ROWS: Record<TabKey, Row[]> = {
     { name: 'Time Tracking Software', pct: 18.3 },
     { name: 'Project Management', pct: 17 },
     { name: 'Productivity Software', pct: 13.7 },
-    { name: 'Workflows and Automation', pct: 12 },
+    { name: 'Workflows & Automation', pct: 12 },
     { name: 'Collaboration Tools', pct: 10.2 },
-    { name: 'Integrations with Tools', pct: 8.1 },
+    { name: 'Integrations', pct: 8.1 },
     { name: 'Digital Workspaces', pct: 3.4 },
     { name: 'User Experience', pct: 3.4 },
     { name: 'AI in the Workplace', pct: 0.9 }
@@ -78,8 +89,6 @@ const ROWS: Record<TabKey, Row[]> = {
 }
 
 // ── Chart shapes ─────────────────────────────────────────────────────
-// 8 points, May 23 → Jun 22; index 4 ≈ Jun 12. Same point count in both
-// shapes so we can lerp point-for-point during the morph.
 const Y_MAX = 46
 const SERIES_ORDER = ['pipedrive', 'salesforce', 'monday'] as const
 type SeriesKey = (typeof SERIES_ORDER)[number]
@@ -94,26 +103,70 @@ const VOLATILE: Record<SeriesKey, number[]> = {
   salesforce: [36.0, 35.4, 34.0, 33.5, 31.0, 34.0, 35.0, 35.0],
   monday: [26.5, 27.2, 27.8, 35.0, 38.5, 42.0, 38.8, 43.5]
 }
-
 const SERIES_META: Record<SeriesKey, { label: string; color: string; emphasis?: boolean }> = {
   pipedrive: { label: 'Pipedrive', color: C_PIPE },
   salesforce: { label: 'Salesforce', color: C_SALES },
   monday: { label: 'Monday', color: C_MONDAY, emphasis: true }
 }
 
-// ── Engine mark (neutral monochrome glyph; brand-safe) ───────────────
-function EngineMark() {
+// Shared keyframes (constant sheen on bars, pulsing chart endpoint).
+const KEYFRAMES =
+  '@keyframes clvBarSheen{0%{background-position:140% 0}55%{background-position:-40% 0}100%{background-position:-40% 0}}' +
+  '@keyframes clvDotPing{0%{transform:scale(1);opacity:.5}70%,100%{transform:scale(2.6);opacity:0}}' +
+  '@keyframes clvDotCore{0%,100%{opacity:1}50%{opacity:.65}}'
+
+// ── Brand engine icon chips (white glyph on brand-coloured chip) ─────
+function EngineChip({ name }: { name: string }) {
+  const color = ENGINE_COLOR[name] ?? '#0a0a0f'
+  const glyph = (() => {
+    switch (name) {
+      case 'ChatGPT': // knot-ish sparkle
+        return <path d="M12 4.5l1.4 4.6 4.6 1.4-4.6 1.4L12 16.5l-1.4-4.6L6 10.5l4.6-1.4L12 4.5z" fill="#fff" />
+      case 'Claude': // sunburst
+        return (
+          <g stroke="#fff" strokeWidth="1.6" strokeLinecap="round">
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((a) => {
+              const r = (a * Math.PI) / 180
+              return <line key={a} x1={12 + Math.cos(r) * 2.4} y1={12 + Math.sin(r) * 2.4} x2={12 + Math.cos(r) * 5.4} y2={12 + Math.sin(r) * 5.4} />
+            })}
+          </g>
+        )
+      case 'Gemini': // 4-point spark
+        return <path d="M12 4c.5 3.6 1.4 4.5 5 5-3.6.5-4.5 1.4-5 5-.5-3.6-1.4-4.5-5-5 3.6-.5 4.5-1.4 5-5z" fill="#fff" />
+      case 'Perplexity': // concentric arcs
+        return (
+          <g fill="none" stroke="#fff" strokeWidth="1.5">
+            <circle cx="12" cy="12" r="2.2" />
+            <path d="M12 5.5v13M6 9.5l12 5M18 9.5l-12 5" strokeWidth="1.2" />
+          </g>
+        )
+      default:
+        return <circle cx="12" cy="12" r="4" fill="#fff" />
+    }
+  })()
   return (
-    <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden style={{ flex: 'none', color: 'var(--ink-40)' }}>
-      <path fill="currentColor" d="M12 3l1.9 5.6L19.5 10l-5.6 1.4L12 17l-1.9-5.6L4.5 10l5.6-1.4L12 3z" />
-    </svg>
+    <span
+      style={{
+        width: '2.6cqw',
+        height: '2.6cqw',
+        borderRadius: '0.7cqw',
+        background: color,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 'none',
+        boxShadow: `0 0.3cqw 0.9cqw ${color}55`
+      }}
+    >
+      <svg viewBox="0 0 24 24" width="70%" height="70%" aria-hidden>
+        {glyph}
+      </svg>
+    </span>
   )
 }
 
-// rAF tween toward a target value (0=flat, 1=volatile). Snaps under reduced.
-// A setTimeout fallback guarantees the final value lands even if rAF frames are
-// starved (proven rAF + timeout pattern used across the mocks), so the morph
-// never gets stuck mid-shape.
+// rAF tween toward a target (0=flat, 1=volatile), with a setTimeout fallback so
+// the final value always lands even if rAF frames are starved.
 function useTween(target: number, durationMs: number, reduced: boolean): number {
   const [val, setVal] = useState(target)
   const fromRef = useRef(target)
@@ -154,8 +207,6 @@ export function MockVisibility({ show }: { show: boolean }) {
   const reduced = useReducedMotion()
   const reveal = useReveal(show)
 
-  // active = tab the pill points at (drives chart morph + pill position).
-  // shownTab = tab whose rows are currently rendered (lags during the swap).
   const [active, setActive] = useState(0)
   const [shownTab, setShownTab] = useState(0)
   const [barsIn, setBarsIn] = useState(false)
@@ -182,11 +233,9 @@ export function MockVisibility({ show }: { show: boolean }) {
     let fallback: ReturnType<typeof setTimeout>
     const t = setTimeout(() => {
       setShownTab(active)
-      // double-rAF so the new rows paint hidden once before transitioning in
       r1 = requestAnimationFrame(() => {
         r2 = requestAnimationFrame(() => setBarsIn(true))
       })
-      // guaranteed reveal even if rAF is starved (backgrounded tab, etc.)
       fallback = setTimeout(() => setBarsIn(true), 80)
     }, BARS_OUT_MS)
     return () => {
@@ -199,9 +248,6 @@ export function MockVisibility({ show }: { show: boolean }) {
 
   const activeKey = TABS[active].key
   const isTopic = activeKey === 'topic'
-  // chart morph target: flat (0) for engine/audience, volatile (1) for intent.
-  // On Topic the chart collapses out of frame, so its underlying shape (0) is
-  // moot — we just let it settle back to flat behind the collapse.
   const morphTarget = activeKey === 'intent' ? 1 : 0
   const morph = useTween(morphTarget, TRANS_MS + 100, reduced)
 
@@ -217,11 +263,12 @@ export function MockVisibility({ show }: { show: boolean }) {
     padding: '2.4cqw 2.8cqw',
     display: 'flex',
     flexDirection: 'column',
-    gap: '1.8cqw'
+    gap: '1.7cqw'
   }
 
   return (
     <div style={root}>
+      <style>{KEYFRAMES}</style>
       <Header />
       <KpiStrip play={reveal} />
 
@@ -259,20 +306,21 @@ export function MockVisibility({ show }: { show: boolean }) {
 function Header() {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1cqw' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1.1cqw' }}>
         <span
           style={{
-            width: '3cqw',
-            height: '3cqw',
-            borderRadius: '0.7cqw',
-            background: 'var(--ink)',
+            width: '3.2cqw',
+            height: '3.2cqw',
+            borderRadius: '0.85cqw',
+            background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            flex: 'none'
+            flex: 'none',
+            boxShadow: '0 0.4cqw 1.1cqw rgba(139,92,246,0.45)'
           }}
         >
-          <svg viewBox="0 0 24 24" width="1.7cqw" height="1.7cqw" aria-hidden>
+          <svg viewBox="0 0 24 24" width="1.8cqw" height="1.8cqw" aria-hidden>
             <rect x="4" y="13" width="3.4" height="7" rx="1" fill="#fff" />
             <rect x="10.3" y="9" width="3.4" height="11" rx="1" fill="#fff" />
             <rect x="16.6" y="5" width="3.4" height="15" rx="1" fill="#fff" />
@@ -322,12 +370,13 @@ function KpiStrip({ play }: { play: boolean }) {
         border: '1px solid var(--line)',
         borderRadius: '1.6cqw',
         background: 'var(--white)',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxShadow: '0 0.5cqw 1.6cqw rgba(10,10,15,0.05)'
       }}
     >
-      <Kpi label="Total mentions" value={87} play={play} />
-      <Kpi label="Visibility share" value={9.7} suffix="%" decimals={1} play={play} divider />
-      <Kpi label="Avg. position" value={3.5} prefix="#" decimals={1} play={play} divider />
+      <Kpi label="Total mentions" value={87} accent="#6366f1" play={play} />
+      <Kpi label="Visibility share" value={9.7} suffix="%" decimals={1} accent="#0ea5e9" play={play} divider />
+      <Kpi label="Avg. position" value={3.5} prefix="#" decimals={1} accent="#8b5cf6" play={play} divider />
       <Kpi label="Δ vs prev. period" value={76} suffix="%" delta play={play} divider />
     </div>
   )
@@ -341,6 +390,7 @@ function Kpi({
   decimals,
   delta,
   divider,
+  accent,
   play
 }: {
   label: string
@@ -350,43 +400,70 @@ function Kpi({
   decimals?: number
   delta?: boolean
   divider?: boolean
+  accent?: string
   play: boolean
 }) {
-  const n = useCountUp(value, play, { decimals: decimals ?? 0, durationMs: 760 })
+  const n = useCountUp(value, play, { decimals: decimals ?? 0, durationMs: 820 })
   return (
     <div
       style={{
-        padding: '2cqw 2.2cqw',
+        padding: '1.9cqw 2.2cqw',
         borderLeft: divider ? '1px solid var(--line)' : 'none',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: delta ? 'center' : 'flex-start',
-        minWidth: 0
+        minWidth: 0,
+        position: 'relative'
       }}
     >
-      <div
-        style={{
-          fontFamily: 'var(--font-display)',
-          fontSize: delta ? '3.6cqw' : '3.4cqw',
-          fontWeight: 600,
-          lineHeight: 1,
-          letterSpacing: '-0.02em',
-          color: delta ? POSITIVE : 'var(--ink)',
-          fontVariantNumeric: 'tabular-nums',
-          display: 'flex',
-          alignItems: 'baseline',
-          gap: '0.4cqw'
-        }}
-      >
-        {prefix}
-        {n.toFixed(decimals ?? 0)}
-        {suffix && <span style={{ fontSize: delta ? '3cqw' : '2.2cqw' }}>{suffix}</span>}
-        {delta && <span style={{ fontSize: '2.6cqw', marginLeft: '0.6cqw' }}>Δ</span>}
-        {delta && <span style={{ fontSize: '2.4cqw' }}>↑</span>}
-      </div>
-      {!delta && (
-        <div style={{ marginTop: '1cqw', fontSize: '1.15cqw', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-50)' }}>{label}</div>
+      {!delta && accent && (
+        <span style={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', width: '0.45cqw', height: '52%', borderRadius: '999px', background: accent }} />
+      )}
+      {delta ? (
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'baseline',
+            gap: '0.5cqw',
+            padding: '0.9cqw 1.6cqw',
+            borderRadius: '999px',
+            background: 'rgba(16,185,129,0.12)',
+            border: '1px solid rgba(16,185,129,0.32)',
+            color: POSITIVE,
+            fontFamily: 'var(--font-display)',
+            fontWeight: 600,
+            letterSpacing: '-0.02em',
+            fontVariantNumeric: 'tabular-nums'
+          }}
+        >
+          <span style={{ fontSize: '3.4cqw', lineHeight: 1 }}>{n.toFixed(0)}</span>
+          <span style={{ fontSize: '2.6cqw' }}>%</span>
+          <span style={{ fontSize: '2.2cqw', marginLeft: '0.3cqw' }}>Δ</span>
+          <span style={{ fontSize: '2.2cqw' }}>↑</span>
+        </span>
+      ) : (
+        <>
+          <div
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '3.4cqw',
+              fontWeight: 600,
+              lineHeight: 1,
+              letterSpacing: '-0.02em',
+              color: 'var(--ink)',
+              fontVariantNumeric: 'tabular-nums',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: '0.3cqw'
+            }}
+          >
+            {prefix}
+            {n.toFixed(decimals ?? 0)}
+            {suffix && <span style={{ fontSize: '2.2cqw' }}>{suffix}</span>}
+          </div>
+          <div style={{ marginTop: '1cqw', fontSize: '1.15cqw', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--ink-50)' }}>{label}</div>
+        </>
       )}
     </div>
   )
@@ -401,7 +478,7 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
   )
 }
 
-// ── Segmented tab strip with the sliding black pill ──────────────────
+// ── Segmented tab strip with the sliding pill ────────────────────────
 function TabStrip({ active }: { active: number }) {
   return (
     <div
@@ -415,7 +492,6 @@ function TabStrip({ active }: { active: number }) {
         marginBottom: '1.6cqw'
       }}
     >
-      {/* sliding pill */}
       <div
         style={{
           position: 'absolute',
@@ -424,8 +500,8 @@ function TabStrip({ active }: { active: number }) {
           left: '0.55cqw',
           width: `calc((100% - 1.1cqw) / ${TABS.length})`,
           borderRadius: '999px',
-          background: 'var(--ink)',
-          boxShadow: '0 1px 3px rgba(10,10,15,0.18)',
+          background: 'linear-gradient(135deg, #1b1b22, #0a0a0f)',
+          boxShadow: '0 0.3cqw 0.9cqw rgba(10,10,15,0.28)',
           transform: `translateX(${active * 100}%)`,
           transition: `transform 0.45s ${cb}`
         }}
@@ -480,17 +556,18 @@ function BarList({
       }}
     >
       {rows.map((r, i) => {
-        const w = Math.max(2, (r.pct / max) * 94)
+        const w = Math.max(3, (r.pct / max) * 94)
         const visible = reduced || barsIn
         const delay = reduced ? 0 : i * ROW_STAGGER_MS
+        const color = r.engine ? ENGINE_COLOR[r.name] : RAMP[i % RAMP.length]
         return (
           <div
             key={`${tabKey}-${i}`}
             style={{
               display: 'grid',
-              gridTemplateColumns: numbered ? '2.6cqw 13cqw 1fr 6cqw' : '15cqw 1fr 6cqw',
+              gridTemplateColumns: numbered ? '2.6cqw 14cqw 1fr 5cqw' : '15.5cqw 1fr 5cqw',
               alignItems: 'center',
-              gap: '1cqw',
+              gap: '1.1cqw',
               opacity: visible ? 1 : 0,
               transform: visible ? 'none' : 'translateY(0.8cqw)',
               transition: reduced ? 'none' : `opacity 0.4s ${cb} ${delay}ms, transform 0.4s ${cb} ${delay}ms`
@@ -501,15 +578,17 @@ function BarList({
                 style={{
                   width: '2.4cqw',
                   height: '2.4cqw',
-                  borderRadius: '999px',
-                  border: '1px solid var(--ink-25)',
+                  borderRadius: '0.65cqw',
+                  background: color,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.1cqw',
+                  fontSize: '1.2cqw',
+                  fontWeight: 700,
                   fontVariantNumeric: 'tabular-nums',
-                  color: 'var(--ink-60)',
-                  flex: 'none'
+                  color: '#fff',
+                  flex: 'none',
+                  boxShadow: `0 0.25cqw 0.7cqw ${color}55`
                 }}
               >
                 {i + 1}
@@ -522,32 +601,35 @@ function BarList({
                 color: 'var(--ink)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '0.7cqw',
+                gap: '0.8cqw',
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis'
               }}
             >
-              {r.engine && <EngineMark />}
+              {r.engine && <EngineChip name={r.name} />}
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{r.name}</span>
             </span>
-            <span style={{ height: '1.4cqw', borderRadius: '999px', background: 'var(--subtle)', overflow: 'hidden' }}>
+            <span style={{ height: '1.5cqw', borderRadius: '999px', background: 'var(--subtle)', overflow: 'hidden' }}>
               <span
                 style={{
                   display: 'block',
                   height: '100%',
                   width: `${w}%`,
-                  background: BAR_FILL,
+                  backgroundColor: color,
+                  backgroundImage: reduced ? undefined : `linear-gradient(100deg, ${color} 36%, rgba(255,255,255,0.7) 50%, ${color} 64%)`,
+                  backgroundSize: '250% 100%',
+                  backgroundRepeat: 'no-repeat',
                   borderRadius: '999px',
                   transformOrigin: 'left center',
                   transform: visible ? 'scaleX(1)' : 'scaleX(0)',
-                  transition: reduced ? 'none' : `transform 0.55s ${cb} ${delay + 60}ms`
+                  transition: reduced ? 'none' : `transform 0.55s ${cb} ${delay + 60}ms`,
+                  animation: reduced ? 'none' : `clvBarSheen 2.8s ease-in-out ${i * 0.2}s infinite`,
+                  boxShadow: `0 0.2cqw 0.7cqw ${color}40`
                 }}
               />
             </span>
-            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.6cqw', fontSize: '1.4cqw', fontVariantNumeric: 'tabular-nums', color: 'var(--ink)' }}>
-              {r.pct}%<span style={{ color: 'var(--ink-40)' }}>–</span>
-            </span>
+            <span style={{ fontSize: '1.4cqw', fontWeight: 600, fontVariantNumeric: 'tabular-nums', color: 'var(--ink)', textAlign: 'right' }}>{r.pct}%</span>
           </div>
         )
       })}
@@ -564,6 +646,7 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
   const px = (i: number) => (i / 7) * W
   const py = (v: number) => H - (v / Y_MAX) * H
   const toPath = (ys: number[]) => ys.map((v, i) => `${i === 0 ? 'M' : 'L'} ${px(i).toFixed(2)} ${py(v).toFixed(2)}`).join(' ')
+  const toArea = (ys: number[]) => `M 0 ${H} L ${ys.map((v, i) => `${px(i).toFixed(2)} ${py(v).toFixed(2)}`).join(' L ')} L ${W} ${H} Z`
 
   const yTicks = [40, 30, 20, 10, 0]
   const xTicks = [
@@ -573,34 +656,37 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
     { i: 7, label: 'Jun 22' }
   ]
   const jun12 = 5.33
+  const mondayY = seriesY('monday')
+  const dotI = 5 // pulse sits mid-chart (Jun 12 region) — never clips at the edge
+  const dotY = mondayY[dotI]
 
   return (
     <div style={{ position: 'relative', flex: 1, minHeight: 0, marginTop: '0.8cqw', display: 'flex', flexDirection: 'column' }}>
       <div style={{ position: 'relative', flex: 1, minHeight: 0, paddingLeft: '3.4cqw' }}>
-        {/* y-axis labels */}
         {yTicks.map((t) => (
           <span
             key={t}
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: `${(1 - t / Y_MAX) * 100}%`,
-              transform: 'translateY(-50%)',
-              fontSize: '1.05cqw',
-              color: 'var(--ink-40)',
-              fontVariantNumeric: 'tabular-nums'
-            }}
+            style={{ position: 'absolute', left: 0, top: `${(1 - t / Y_MAX) * 100}%`, transform: 'translateY(-50%)', fontSize: '1.05cqw', color: 'var(--ink-40)', fontVariantNumeric: 'tabular-nums' }}
           >
             {t}%
           </span>
         ))}
         <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={{ width: '100%', height: '100%', overflow: 'visible', display: 'block' }} aria-hidden>
+          <defs>
+            <linearGradient id="clvMondayArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={C_MONDAY} stopOpacity="0.28" />
+              <stop offset="100%" stopColor={C_MONDAY} stopOpacity="0" />
+            </linearGradient>
+          </defs>
           {/* gridlines */}
           {yTicks.map((t) => (
             <line key={t} x1="0" y1={py(t)} x2={W} y2={py(t)} stroke="var(--line)" strokeWidth="0.4" vectorEffect="non-scaling-stroke" />
           ))}
           {/* Jun 12 reference line */}
           <line x1={px(jun12)} y1="0" x2={px(jun12)} y2={H} stroke="var(--ink-25)" strokeWidth="0.4" strokeDasharray="2 2" vectorEffect="non-scaling-stroke" />
+          {/* emphasis area fill */}
+          <path d={toArea(mondayY)} fill="url(#clvMondayArea)" preserveAspectRatio="none" />
+          {/* lines */}
           {SERIES_ORDER.map((key) => {
             const m = SERIES_META[key]
             const ys = seriesY(key)
@@ -610,27 +696,40 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
                 d={toPath(ys)}
                 fill="none"
                 stroke={m.color}
-                strokeWidth={m.emphasis ? 1.8 : 1.4}
+                strokeWidth={m.emphasis ? 2.4 : 1.8}
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 vectorEffect="non-scaling-stroke"
                 style={
-                  reduced || morph !== 0 // only run the draw-in on first reveal (flat), morph handles the rest
+                  reduced || morph !== 0
                     ? undefined
-                    : {
-                        strokeDasharray: 260,
-                        strokeDashoffset: play ? 0 : 260,
-                        transition: `stroke-dashoffset 0.9s ${cb}`
-                      }
+                    : { strokeDasharray: 260, strokeDashoffset: play ? 0 : 260, transition: `stroke-dashoffset 0.9s ${cb}` }
                 }
               />
             )
           })}
-          {/* Jun 12 marker on Monday line */}
-          <circle cx={px(jun12)} cy={py(seriesY('monday')[5])} r="1.6" fill={C_MONDAY} vectorEffect="non-scaling-stroke" />
+          {/* data dots on the emphasis (Monday) line */}
+          {mondayY.map((v, i) => (
+            <circle key={i} cx={px(i)} cy={py(v)} r="1.1" fill="#fff" stroke={C_MONDAY} strokeWidth="1.1" vectorEffect="non-scaling-stroke" />
+          ))}
         </svg>
 
-        {/* Jun 12 tooltip — flat mode only */}
+        {/* pulsing endpoint on the Monday line (HTML, percentage-positioned) */}
+        <span
+          style={{
+            position: 'absolute',
+            left: `calc(3.4cqw + (100% - 3.4cqw) * ${dotI / 7})`,
+            top: `${(1 - dotY / Y_MAX) * 100}%`,
+            width: 0,
+            height: 0,
+            transform: 'translate(-50%, -50%)',
+            pointerEvents: 'none'
+          }}
+        >
+          <span style={{ position: 'absolute', left: '-1.1cqw', top: '-1.1cqw', width: '2.2cqw', height: '2.2cqw', borderRadius: '999px', background: C_MONDAY, opacity: 0.5, animation: reduced ? 'none' : 'clvDotPing 2s ease-out infinite' }} />
+          <span style={{ position: 'absolute', left: '-0.65cqw', top: '-0.65cqw', width: '1.3cqw', height: '1.3cqw', borderRadius: '999px', background: C_MONDAY, boxShadow: `0 0 1.2cqw ${C_MONDAY}`, animation: reduced ? 'none' : 'clvDotCore 2s ease-in-out infinite' }} />
+        </span>
+
         <Tooltip jun12x={(jun12 / 7) * 100} show={flat} reduced={reduced} />
       </div>
 
@@ -639,14 +738,7 @@ function Chart({ morph, flat, reduced, play }: { morph: number; flat: boolean; r
         {xTicks.map((t) => (
           <span
             key={t.label}
-            style={{
-              position: 'absolute',
-              left: `${(t.i / 7) * 100}%`,
-              transform: t.i === 0 ? 'none' : t.i === 7 ? 'translateX(-100%)' : 'translateX(-50%)',
-              fontSize: '1.05cqw',
-              color: 'var(--ink-40)',
-              whiteSpace: 'nowrap'
-            }}
+            style={{ position: 'absolute', left: `${(t.i / 7) * 100}%`, transform: t.i === 0 ? 'none' : t.i === 7 ? 'translateX(-100%)' : 'translateX(-50%)', fontSize: '1.05cqw', color: 'var(--ink-40)', whiteSpace: 'nowrap' }}
           >
             {t.label}
           </span>
@@ -666,12 +758,12 @@ function Tooltip({ jun12x, show, reduced }: { jun12x: number; show: boolean; red
     <div
       style={{
         position: 'absolute',
-        left: `calc(${jun12x}% + 1.2cqw)`,
+        left: `calc(3.4cqw + (100% - 3.4cqw) * ${jun12x / 100} + 1.2cqw)`,
         top: '2%',
         borderRadius: '1cqw',
         background: 'var(--white)',
         border: '1px solid var(--line)',
-        boxShadow: '0 6px 20px rgba(10,10,15,0.12)',
+        boxShadow: '0 0.8cqw 2.4cqw rgba(10,10,15,0.14)',
         padding: '1cqw 1.2cqw',
         minWidth: '15cqw',
         opacity: show ? 1 : 0,
@@ -702,17 +794,7 @@ function ChartFooter() {
           const m = SERIES_META[key]
           return (
             <span key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.6cqw', fontSize: '1.2cqw', color: 'var(--ink-70)', fontWeight: 500 }}>
-              <span
-                style={{
-                  width: '1.7cqw',
-                  height: '1.7cqw',
-                  borderRadius: '0.4cqw',
-                  background: m.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
+              <span style={{ width: '1.7cqw', height: '1.7cqw', borderRadius: '0.4cqw', background: m.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <svg viewBox="0 0 24 24" width="1.1cqw" height="1.1cqw" aria-hidden>
                   <path d="M5 12.5l4 4 10-10" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -723,7 +805,7 @@ function ChartFooter() {
         })}
       </div>
       <span style={{ display: 'flex', alignItems: 'center', gap: '0.7cqw', fontSize: '1.2cqw', color: 'var(--ink-70)', fontWeight: 500 }}>
-        <span style={{ width: '2.8cqw', height: '1.5cqw', borderRadius: '999px', background: 'var(--ink)', position: 'relative', flex: 'none' }}>
+        <span style={{ width: '2.8cqw', height: '1.5cqw', borderRadius: '999px', background: C_MONDAY, position: 'relative', flex: 'none' }}>
           <span style={{ position: 'absolute', top: '50%', right: '0.2cqw', transform: 'translateY(-50%)', width: '1.1cqw', height: '1.1cqw', borderRadius: '999px', background: '#fff' }} />
         </span>
         Compare competitors
