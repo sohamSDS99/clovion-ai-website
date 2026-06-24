@@ -27,7 +27,7 @@ const G = {
 
 function Glyph({ d, color }: { d: ReactElement; color: string }) {
   return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill={color} stroke="none" aria-hidden>
+    <svg viewBox="0 0 24 24" width="18" height="18" fill={color} stroke="none" aria-hidden>
       {d}
     </svg>
   )
@@ -121,31 +121,28 @@ function PillarItem({
     <button
       onClick={onClick}
       style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
+        display: 'block',
         width: '100%',
         textAlign: 'left',
         background: 'none',
         border: 'none',
         borderTop: i === 0 ? 'none' : '1px solid var(--line)',
-        padding: '20px 0',
+        padding: '16px 0',
         cursor: 'pointer',
         font: 'inherit',
         color: 'inherit'
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 18, opacity: isActive ? 1 : 0.45, transition: 'opacity 0.35s ease' }}>
-        <span style={{ height: 44, width: 44, flexShrink: 0, borderRadius: 12, background: s.tint, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14, opacity: isActive ? 1 : 0.45, transition: 'opacity 0.35s ease' }}>
+        <span style={{ height: 34, width: 34, flexShrink: 0, borderRadius: 9, background: s.tint, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Glyph d={s.glyph} color={s.fg} />
         </span>
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--ink-40)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.64rem', color: 'var(--ink-40)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
               {s.sku.split(' — ')[0]}
             </span>
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.45rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.12rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
               {s.name}
             </span>
           </span>
@@ -157,7 +154,7 @@ function PillarItem({
             }}
           >
             <span style={{ overflow: 'hidden' }}>
-              <span style={{ display: 'block', marginTop: 10, fontSize: '1.05rem', fontWeight: 400, lineHeight: 1.5, color: 'var(--ink-70)' }}>
+              <span style={{ display: 'block', marginTop: 8, fontSize: '0.9rem', fontWeight: 400, lineHeight: 1.5, color: 'var(--ink-70)' }}>
                 {s.short}
               </span>
             </span>
@@ -473,10 +470,11 @@ export function PillarStepper() {
                   // Right column widened (Option A) so the visibility-insights
                   // slideshow has more room. Pillars list keeps a comfortable
                   // minimum of 220px to stay readable.
-                  gridTemplateColumns: 'minmax(240px, 0.34fr) 1.66fr',
+                  gridTemplateColumns: 'minmax(220px, 0.32fr) 1.68fr',
                   gap: 44,
                   // Stretch so the pillar list matches the mock frame's height —
-                  // the 4 pillars distribute evenly down the full column.
+                  // the 4 natural-height pillars distribute evenly via
+                  // space-between (font sizes stay as-is; only the gaps grow).
                   alignItems: 'stretch'
                 } as CSSProperties
               }
