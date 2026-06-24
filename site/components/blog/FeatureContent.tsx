@@ -3,7 +3,6 @@
 import { useMemo, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
 import { TypingHeadline } from '@/components/home/TypingHeadline'
-import { blogPosts } from '@/lib/content'
 import {
   CONTAINER,
   DISPLAY_LG,
@@ -777,19 +776,6 @@ function FinalCTA() {
   )
 }
 
-// Curated editorial posts, projected into the shared Post shape.
-const CURATED: Post[] = blogPosts.map((p) => ({
-  slug: p.slug,
-  title: p.title,
-  excerpt: p.excerpt,
-  category: p.category,
-  author: p.author,
-  date: p.date,
-  readTime: p.readTime,
-  tag: p.tag,
-  role: p.role
-}))
-
 export default function FeatureContent({
   initialCategory = 'all',
   cmsPosts = []
@@ -799,13 +785,13 @@ export default function FeatureContent({
 }) {
   const [active, setActive] = useState<Category>(initialCategory)
 
-  // CMS-published posts take precedence (newest content surfaces first), then
-  // the curated editorial posts. De-dupe by slug so a CMS post that shares a
-  // slug with a curated one wins. Final list is sorted newest-first by date.
+  // Only CMS-published posts are shown — each one maps to a real
+  // /blog/[slug] detail page. (The old curated/demo posts were dropped: they
+  // had no detail page and 404'd on click.) De-duped by slug, newest first.
   const sorted = useMemo<Post[]>(() => {
     const seen = new Set<string>()
     const merged: Post[] = []
-    for (const p of [...cmsPosts, ...CURATED]) {
+    for (const p of cmsPosts) {
       if (seen.has(p.slug)) continue
       seen.add(p.slug)
       merged.push(p)

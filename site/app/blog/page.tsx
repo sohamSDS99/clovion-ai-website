@@ -62,7 +62,7 @@ const faqJsonLd = {
 // guarded (falls back to "" so sorting puts undated items last); category
 // passes through as the CMS slug — the composer's categoryLabel handles any
 // value gracefully and the ChipRail filter matches geo/ai-search/seo.
-function toPost(item: CmsSummary): Post {
+export function toPost(item: CmsSummary): Post {
   return {
     slug: item.slug,
     title: item.title,
