@@ -8,7 +8,7 @@
 import { useEffect, useState, type ReactNode, type CSSProperties } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useTypewriter } from './motion'
 import { MondayGlyph, PipedriveGlyph, UserGlyph } from './glyphs'
-import { LIGHT, TAG_COLORS, HL } from './palette'
+import { LIGHT, HL } from './palette'
 
 const POSITIVE = 'var(--positive)'
 const NEG = '#e5484d'
@@ -51,8 +51,8 @@ const CARDS: Card[] = [
   }
 ]
 
-// 4 attribute notes that pop up once after the highlights.
-const NOTE_TAGS = ['Company Size: Startup', 'Industry: SaaS', 'Use Case: CRM', 'Buyer Persona: Founder']
+// One black attribute note per card (Monday, Pipedrive), pops once.
+const CARD_NOTE = ['Industry: SaaS', 'Buyer Persona: Founder']
 
 const DRIVERS = [
   { label: 'Easy to use', pct: 38 },
@@ -159,7 +159,7 @@ export function MockPerception({ show }: { show: boolean }) {
             </span>
           </div>
 
-          {/* Brand cards */}
+          {/* Brand cards — each with one black attribute note */}
           {CARDS.map((c, ci) => (
             <div
               key={c.name}
@@ -167,6 +167,7 @@ export function MockPerception({ show }: { show: boolean }) {
                 border: '1px solid var(--line)',
                 borderRadius: '1cqw',
                 padding: '1.1cqw 1.3cqw',
+                marginTop: ci === 1 ? '1cqw' : 0,
                 opacity: cardShown[ci] || reduced ? 1 : 0,
                 transform: cardShown[ci] || reduced ? 'none' : 'translateY(1cqw)',
                 transition: reduced ? 'none' : `opacity 0.45s ${cb}, transform 0.45s ${cb}`
@@ -187,33 +188,31 @@ export function MockPerception({ show }: { show: boolean }) {
                   </>
                 )}
               </p>
-            </div>
-          ))}
-
-          {/* Attribute notes — pop up once after the highlights */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6cqw', marginTop: '0.2cqw' }}>
-            {NOTE_TAGS.map((t, i) => {
-              const tc = TAG_COLORS[t] || { bg: 'var(--subtle)', fg: 'var(--ink-60)' }
-              return (
+              {/* Black attribute note — pops once */}
+              <div style={{ marginTop: '0.9cqw' }}>
                 <span
-                  key={t}
                   style={{
-                    fontSize: '1.15cqw',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.6cqw',
+                    background: '#18181c',
+                    color: '#fff',
+                    fontSize: '1.1cqw',
                     fontWeight: 600,
-                    color: tc.fg,
-                    background: tc.bg,
-                    borderRadius: '0.6cqw',
-                    padding: '0.4cqw 0.9cqw',
+                    borderRadius: '0.7cqw',
+                    padding: '0.5cqw 0.95cqw',
+                    boxShadow: '0 6px 16px rgba(0,0,0,0.22)',
                     opacity: notesOn || reduced ? 1 : 0,
-                    transform: notesOn || reduced ? 'none' : 'scale(0.8)',
-                    transition: reduced ? 'none' : `opacity 0.4s ${cb} ${i * 0.13}s, transform 0.5s cubic-bezier(0.34, 1.55, 0.5, 1) ${i * 0.13}s`
+                    transform: notesOn || reduced ? 'none' : 'scale(0.85) translateY(0.5cqw)',
+                    transition: reduced ? 'none' : `opacity 0.4s ${cb} ${ci * 0.14}s, transform 0.5s cubic-bezier(0.34, 1.55, 0.5, 1) ${ci * 0.14}s`
                   }}
                 >
-                  {t}
+                  <span style={{ width: '0.7cqw', height: '0.7cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
+                  {CARD_NOTE[ci]}
                 </span>
-              )
-            })}
-          </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* RIGHT sidebar — a faint skeleton reserves the space during the

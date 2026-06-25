@@ -2,7 +2,7 @@
 
 // Pillar 3 — "Visibility Ranking by Topic" table dashboard. Coded (no raster).
 
-import { type CSSProperties, type ReactNode, useState, useEffect } from 'react'
+import { type CSSProperties, type ReactNode } from 'react'
 import { cb, useReducedMotion, useReveal, useStagger } from './motion'
 import { MondayGlyph, PipedriveGlyph, SalesforceGlyph, DiamondCheck } from './glyphs'
 import { LIGHT, BLUE } from './palette'
@@ -30,23 +30,11 @@ const ROWS: { topic: string; strong: boolean; rank: string; comps: Mark[]; share
 
 const COLS = '2.4fr 1fr 0.7fr 0.7fr 0.7fr 0.7fr 2.4fr'
 
-function rotate<T>(arr: T[], n: number): T[] {
-  const k = ((n % arr.length) + arr.length) % arr.length
-  return arr.slice(k).concat(arr.slice(0, k))
-}
-
 export function MockRankings({ show }: { show: boolean }) {
   const play = useReveal(show)
   const reduced = useReducedMotion()
   const rows = useStagger(ROWS.length, play, 70, 220)
   const cards = useStagger(3, play, 110, 220 + ROWS.length * 70 + 120)
-  // Competitor columns continuously re-shuffle (the landscape keeps shifting).
-  const [tick, setTick] = useState(0)
-  useEffect(() => {
-    if (!show || reduced) return
-    const id = setInterval(() => setTick((t) => t + 1), 2600)
-    return () => clearInterval(id)
-  }, [show, reduced])
   const shareMax = 30
 
   return (
@@ -66,7 +54,7 @@ export function MockRankings({ show }: { show: boolean }) {
         gap: '1.8cqw'
       }}
     >
-      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}@keyframes clvGlyphFlip{0%{opacity:0;transform:rotateY(85deg) scale(0.8)}55%{opacity:1}100%{opacity:1;transform:rotateY(0deg) scale(1)}}@keyframes clvGlyphBob{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-22%) scale(1.1)}}'}</style>
+      <style>{'@keyframes clvBarSheen{0%{background-position:130% 0}55%{background-position:-30% 0}100%{background-position:-30% 0}}@keyframes clvGlyphFlip{0%{opacity:0;transform:rotateY(85deg) scale(0.8)}55%{opacity:1}100%{opacity:1;transform:rotateY(0deg) scale(1)}}'}</style>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
         <div>
@@ -116,28 +104,19 @@ export function MockRankings({ show }: { show: boolean }) {
             <div style={{ textAlign: 'center' }}>
               <RankFlip rank={r.rank} play={rows[i]} />
             </div>
-            {rotate(r.comps, tick).map((m, ci) => (
+            {r.comps.map((m, ci) => (
               <div key={ci} style={{ display: 'flex', justifyContent: 'center', perspective: '300px' }}>
-                {rows[i] ? (
-                  // Outer: flip-in on each re-shuffle. Inner: continuous bob so
-                  // the column is always visibly animating (never stops).
-                  <span
-                    key={tick}
-                    style={{
-                      display: 'inline-flex',
-                      transformOrigin: 'center',
-                      animation: reduced ? 'none' : `clvGlyphFlip 0.55s ${cb} ${ci * 0.08}s both`
-                    }}
-                  >
-                    <span style={{ display: 'inline-flex', animation: reduced ? 'none' : `clvGlyphBob 2.4s ease-in-out ${ci * 0.22}s infinite` }}>
-                      <Glyph m={m} />
-                    </span>
-                  </span>
-                ) : (
-                  <span style={{ display: 'inline-flex', opacity: 0, transform: 'scale(0.6)' }}>
-                    <Glyph m={m} />
-                  </span>
-                )}
+                {/* Logo flips in ONCE on row reveal, then stays static. */}
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    transformOrigin: 'center',
+                    opacity: rows[i] || reduced ? 1 : 0,
+                    animation: reduced || !rows[i] ? 'none' : `clvGlyphFlip 0.55s ${cb} ${0.15 + ci * 0.08}s both`
+                  }}
+                >
+                  <Glyph m={m} />
+                </span>
               </div>
             ))}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1cqw' }}>
