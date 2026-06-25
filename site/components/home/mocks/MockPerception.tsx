@@ -51,8 +51,21 @@ const CARDS: Card[] = [
   }
 ]
 
-// One black attribute note per card (Monday, Pipedrive), pops once.
-const CARD_NOTE = ['Industry: SaaS', 'Buyer Persona: Founder']
+// Black attribute notes per card, each anchored beside a highlight (by local
+// highlight index) and placed above/below it. Pop once.
+type CardNote = { text: string; hl: number; place: 'above' | 'below' }
+const CARD_NOTES: CardNote[][] = [
+  // Monday — hl: 0 strong free tier · 1 integrations · 2 easily expands · 3 Paid plans…locked
+  [
+    { text: 'Industry: SaaS', hl: 0, place: 'above' },
+    { text: 'Buyer Persona: Founder', hl: 3, place: 'below' }
+  ],
+  // Pipedrive — hl: 0 flexible modern CRM · 1 highly customizable · 2 power and flexibility
+  [
+    { text: 'Buyer Persona: Founder', hl: 0, place: 'above' },
+    { text: 'Perception: Easy to use', hl: 2, place: 'below' }
+  ]
+]
 
 const DRIVERS = [
   { label: 'Easy to use', pct: 38 },
@@ -180,7 +193,7 @@ export function MockPerception({ show }: { show: boolean }) {
               </div>
               <p style={{ margin: 0, fontSize: '1.3cqw', lineHeight: 1.6, color: 'var(--ink-80, var(--ink))' }}>
                 {bodyDone[ci] || reduced ? (
-                  <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} hlOn={hlOn} reduced={reduced} note={CARD_NOTE[ci]} noteOn={notesOn} />
+                  <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} hlOn={hlOn} reduced={reduced} notes={CARD_NOTES[ci]} noteOn={notesOn} />
                 ) : (
                   <>
                     {bodyText[ci]}
@@ -247,7 +260,7 @@ export function MockPerception({ show }: { show: boolean }) {
   )
 }
 
-function Highlighted({ body, hl, baseIndex, hlOn, reduced, note, noteOn }: { body: string; hl: { text: string; tint: Tint }[]; baseIndex: number; hlOn: boolean; reduced: boolean; note?: string; noteOn?: boolean }) {
+function Highlighted({ body, hl, baseIndex, hlOn, reduced, notes, noteOn }: { body: string; hl: { text: string; tint: Tint }[]; baseIndex: number; hlOn: boolean; reduced: boolean; notes?: CardNote[]; noteOn?: boolean }) {
   const segs: { t: string; tint?: Tint; gi?: number }[] = []
   let rest = body
   let gi = baseIndex
@@ -264,9 +277,10 @@ function Highlighted({ body, hl, baseIndex, hlOn, reduced, note, noteOn }: { bod
       {segs.map((s, i) => {
         if (!s.tint) return <span key={i}>{s.t}</span>
         const g = s.gi as number
-        const anchored = note != null && g === baseIndex
+        const localIdx = g - baseIndex
+        const spanNotes = (notes || []).filter((n) => n.hl === localIdx)
         const style: CSSProperties = {
-          position: anchored ? 'relative' : undefined,
+          position: spanNotes.length ? 'relative' : undefined,
           color: 'inherit',
           borderRadius: '0.35cqw',
           padding: '0.04em 0.18em',
@@ -278,35 +292,42 @@ function Highlighted({ body, hl, baseIndex, hlOn, reduced, note, noteOn }: { bod
         return (
           <span key={i} style={style}>
             {s.t}
-            {anchored && (
-              <span
-                aria-hidden
-                style={{
-                  position: 'absolute',
-                  left: 0,
-                  bottom: 'calc(100% + 0.55cqw)',
-                  whiteSpace: 'nowrap',
-                  zIndex: 20,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5cqw',
-                  background: '#18181c',
-                  color: '#fff',
-                  fontSize: '1cqw',
-                  fontWeight: 600,
-                  borderRadius: '0.6cqw',
-                  padding: '0.4cqw 0.8cqw',
-                  boxShadow: '0 6px 16px rgba(0,0,0,0.28)',
-                  pointerEvents: 'none',
-                  opacity: noteOn || reduced ? 1 : 0,
-                  transform: noteOn || reduced ? 'translateY(0) scale(1)' : 'translateY(0.5cqw) scale(0.9)',
-                  transition: reduced ? 'none' : `opacity 0.35s ${cb}, transform 0.45s cubic-bezier(0.34, 1.55, 0.5, 1)`
-                }}
-              >
-                <span style={{ width: '0.6cqw', height: '0.6cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
-                {note}
-              </span>
-            )}
+            {spanNotes.map((n, ni) => {
+              const delay = n.hl * 0.1
+              return (
+                <span
+                  key={ni}
+                  aria-hidden
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    ...(n.place === 'above' ? { bottom: 'calc(100% + 0.55cqw)' } : { top: 'calc(100% + 0.55cqw)' }),
+                    whiteSpace: 'nowrap',
+                    zIndex: 20,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.5cqw',
+                    background: '#18181c',
+                    color: '#fff',
+                    fontSize: '1cqw',
+                    fontWeight: 600,
+                    borderRadius: '0.6cqw',
+                    padding: '0.4cqw 0.8cqw',
+                    boxShadow: '0 6px 16px rgba(0,0,0,0.28)',
+                    pointerEvents: 'none',
+                    opacity: noteOn || reduced ? 1 : 0,
+                    transform:
+                      noteOn || reduced
+                        ? 'translateY(0) scale(1)'
+                        : `translateY(${n.place === 'above' ? '0.5cqw' : '-0.5cqw'}) scale(0.9)`,
+                    transition: reduced ? 'none' : `opacity 0.35s ${cb} ${delay}s, transform 0.45s cubic-bezier(0.34, 1.55, 0.5, 1) ${delay}s`
+                  }}
+                >
+                  <span style={{ width: '0.6cqw', height: '0.6cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
+                  {n.text}
+                </span>
+              )
+            })}
           </span>
         )
       })}
