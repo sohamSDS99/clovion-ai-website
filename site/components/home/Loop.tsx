@@ -64,10 +64,11 @@ export function Loop() {
           />
           <p
             style={{
-              fontSize: 'var(--text-lead)',
-              lineHeight: 1.55,
+              fontSize: '1.0625rem',
+              lineHeight: 1.5,
               color: 'var(--on-ink-60)',
-              marginTop: 24,
+              maxWidth: 600,
+              margin: '18px auto 0',
               textWrap: 'balance'
             }}
           >
