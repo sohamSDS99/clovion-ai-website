@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { Button, Container, ArrowRight } from '@/components/ui'
+import { LIGHT } from './mocks/palette'
 
 const HERO_LOGOS = [
   { src: '/logos/chatgpt.svg', alt: 'ChatGPT' },
@@ -239,10 +240,11 @@ function HeroBento() {
     <div ref={rootRef} style={{ position: 'relative' }}>
       <div
         style={{
+          ...LIGHT,
           borderRadius: 24,
           border: '1px solid var(--line)',
           background: 'var(--white)',
-          boxShadow: 'var(--shadow-card)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.35)',
           overflow: 'hidden'
         }}
       >
