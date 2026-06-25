@@ -47,18 +47,18 @@ export function Loop() {
         }}
       />
       <Container className="relative">
-        <div className="mb-12 md:mb-20" style={{ maxWidth: 768, margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', marginBottom: 'clamp(2.25rem, 5vw, 3.25rem)', textAlign: 'center' }}>
           <TypingHeadline
-            text="Tracking. Intelligence. Improvement. One loop."
+            text={'Tracking. Intelligence.\nImprovement. One loop.'}
             caretColor="var(--on-ink)"
             style={{
               fontFamily: 'var(--font-display)',
               fontSize: 'var(--display-lg)',
               fontWeight: 600,
               letterSpacing: 'var(--track-display-lg)',
-              lineHeight: 1.02,
+              lineHeight: 1.1,
               margin: '28px 0 0',
-              textWrap: 'balance',
+              whiteSpace: 'pre-line',
               color: 'var(--on-ink)'
             }}
           />
@@ -68,7 +68,7 @@ export function Loop() {
               lineHeight: 1.5,
               color: 'var(--on-ink-60)',
               maxWidth: 600,
-              margin: '18px auto 0',
+              margin: 'clamp(2.25rem, 5vw, 3.25rem) auto 0',
               textWrap: 'balance'
             }}
           >
