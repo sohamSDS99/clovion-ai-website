@@ -180,7 +180,7 @@ export function MockPerception({ show }: { show: boolean }) {
               </div>
               <p style={{ margin: 0, fontSize: '1.3cqw', lineHeight: 1.6, color: 'var(--ink-80, var(--ink))' }}>
                 {bodyDone[ci] || reduced ? (
-                  <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} hlOn={hlOn} reduced={reduced} />
+                  <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} hlOn={hlOn} reduced={reduced} note={CARD_NOTE[ci]} noteOn={notesOn} />
                 ) : (
                   <>
                     {bodyText[ci]}
@@ -188,29 +188,6 @@ export function MockPerception({ show }: { show: boolean }) {
                   </>
                 )}
               </p>
-              {/* Black attribute note — pops once */}
-              <div style={{ marginTop: '0.9cqw' }}>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '0.6cqw',
-                    background: '#18181c',
-                    color: '#fff',
-                    fontSize: '1.1cqw',
-                    fontWeight: 600,
-                    borderRadius: '0.7cqw',
-                    padding: '0.5cqw 0.95cqw',
-                    boxShadow: '0 6px 16px rgba(0,0,0,0.22)',
-                    opacity: notesOn || reduced ? 1 : 0,
-                    transform: notesOn || reduced ? 'none' : 'scale(0.85) translateY(0.5cqw)',
-                    transition: reduced ? 'none' : `opacity 0.4s ${cb} ${ci * 0.14}s, transform 0.5s cubic-bezier(0.34, 1.55, 0.5, 1) ${ci * 0.14}s`
-                  }}
-                >
-                  <span style={{ width: '0.7cqw', height: '0.7cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
-                  {CARD_NOTE[ci]}
-                </span>
-              </div>
             </div>
           ))}
         </div>
@@ -270,7 +247,7 @@ export function MockPerception({ show }: { show: boolean }) {
   )
 }
 
-function Highlighted({ body, hl, baseIndex, hlOn, reduced }: { body: string; hl: { text: string; tint: Tint }[]; baseIndex: number; hlOn: boolean; reduced: boolean }) {
+function Highlighted({ body, hl, baseIndex, hlOn, reduced, note, noteOn }: { body: string; hl: { text: string; tint: Tint }[]; baseIndex: number; hlOn: boolean; reduced: boolean; note?: string; noteOn?: boolean }) {
   const segs: { t: string; tint?: Tint; gi?: number }[] = []
   let rest = body
   let gi = baseIndex
@@ -287,7 +264,9 @@ function Highlighted({ body, hl, baseIndex, hlOn, reduced }: { body: string; hl:
       {segs.map((s, i) => {
         if (!s.tint) return <span key={i}>{s.t}</span>
         const g = s.gi as number
+        const anchored = note != null && g === baseIndex
         const style: CSSProperties = {
+          position: anchored ? 'relative' : undefined,
           color: 'inherit',
           borderRadius: '0.35cqw',
           padding: '0.04em 0.18em',
@@ -299,6 +278,35 @@ function Highlighted({ body, hl, baseIndex, hlOn, reduced }: { body: string; hl:
         return (
           <span key={i} style={style}>
             {s.t}
+            {anchored && (
+              <span
+                aria-hidden
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  bottom: 'calc(100% + 0.55cqw)',
+                  whiteSpace: 'nowrap',
+                  zIndex: 20,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5cqw',
+                  background: '#18181c',
+                  color: '#fff',
+                  fontSize: '1cqw',
+                  fontWeight: 600,
+                  borderRadius: '0.6cqw',
+                  padding: '0.4cqw 0.8cqw',
+                  boxShadow: '0 6px 16px rgba(0,0,0,0.28)',
+                  pointerEvents: 'none',
+                  opacity: noteOn || reduced ? 1 : 0,
+                  transform: noteOn || reduced ? 'translateY(0) scale(1)' : 'translateY(0.5cqw) scale(0.9)',
+                  transition: reduced ? 'none' : `opacity 0.35s ${cb}, transform 0.45s cubic-bezier(0.34, 1.55, 0.5, 1)`
+                }}
+              >
+                <span style={{ width: '0.6cqw', height: '0.6cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
+                {note}
+              </span>
+            )}
           </span>
         )
       })}
