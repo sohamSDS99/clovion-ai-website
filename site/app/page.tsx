@@ -60,7 +60,7 @@ export default function HomePage() {
   // class to <html> on initial load so the body bg paints black from the
   // first frame (see app/layout.tsx).
   return (
-    <div className="clv-dark" style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
+    <div className="clv-dark clv-home" style={{ background: 'var(--bg)', color: 'var(--ink)' }}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homeFaqJsonLd) }} />

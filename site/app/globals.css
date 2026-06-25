@@ -720,3 +720,11 @@
   vertical-align: top;
 }
 .cms-prose th { background: rgba(10, 10, 15, 0.04); font-weight: 600; }
+
+/* Homepage: force every text — including the coded mock labels (mono) and
+   any body-reg/Hanken — to Saans SemiBold. !important beats the inline
+   font-family set on the mock elements. Scoped to the homepage only. */
+.clv-home,
+.clv-home * {
+  font-family: var(--font-saans), 'Inter', system-ui, sans-serif !important;
+}
