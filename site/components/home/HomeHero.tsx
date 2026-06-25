@@ -269,13 +269,15 @@ function HeroBento() {
           </div>
         </div>
 
-        {/* Dim the dashboard's lower area behind the floating composer */}
+        {/* Fade the dashboard to white around the floating composer, so the
+            card emerges from a bright mist (whiter shade, not a dark dim). */}
         <div
           aria-hidden
           style={{
             position: 'absolute',
             inset: 0,
-            background: 'linear-gradient(to bottom, transparent 42%, rgba(10,10,15,0.09) 78%, rgba(10,10,15,0.13))',
+            background:
+              'radial-gradient(72% 52% at 50% 110%, rgba(255,255,255,0.97) 0%, rgba(255,255,255,0.72) 40%, rgba(255,255,255,0) 72%)',
             opacity: on ? 1 : 0,
             transition: reduced ? 'none' : `opacity 0.6s ${EASE} 1.1s`,
             pointerEvents: 'none',
