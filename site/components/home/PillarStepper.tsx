@@ -18,16 +18,70 @@ const STEP_VH = 60
 const FRAME_ASPECT = '16 / 10'
 
 // ── glyph paths ───────────────────────────────────────────────────────
+// Pillar glyphs — green line/fill icons (rendered on a white chip). Use
+// currentColor so the chip's `color` (s.fg) drives them.
 const G = {
-  track: <path d="M12 4a8 8 0 100 16 8 8 0 000-16zm0 4a4 4 0 100 8 4 4 0 000-8zm0 3a1 1 0 100 2 1 1 0 000-2z" />,
-  bulb: <path d="M9 18h6v1.5a1.5 1.5 0 01-1.5 1.5h-3A1.5 1.5 0 019 19.5V18zm3-15a6 6 0 00-3.6 10.8c.4.3.6.7.6 1.2v.5h6v-.5c0-.5.2-.9.6-1.2A6 6 0 0012 3z" />,
-  face: <path d="M12 3a9 9 0 100 18 9 9 0 000-18zM8.5 10a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zm7 0a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4zM8 15.5h8a4 4 0 01-8 0z" />,
-  bars: <path d="M4 20V10h4v10H4zm6 0V4h4v16h-4zm6 0v-7h4v7h-4z" />
+  // 01 AI Visibility Tracking — bar chart
+  track: (
+    <g fill="currentColor" stroke="none">
+      <rect x="4.4" y="13" width="3" height="6.6" rx="1.5" />
+      <rect x="10.5" y="5.4" width="3" height="14.2" rx="1.5" />
+      <rect x="16.6" y="9.4" width="3" height="10.2" rx="1.5" />
+    </g>
+  ),
+  // 04 AEO/GEO Recommendations — AI chip with refresh arrows
+  bulb: (
+    <g>
+      <path d="M4.7 10.3A7.6 7.6 0 0 1 17.8 6.7" />
+      <path d="M17.9 6.7l.1-2.6 2.3 1.2" />
+      <path d="M19.3 13.7A7.6 7.6 0 0 1 6.2 17.3" />
+      <path d="M6.1 17.3l-.1 2.6-2.3-1.2" />
+      <rect x="8.7" y="8.7" width="6.6" height="6.6" rx="1.4" strokeWidth="1.5" />
+      <path
+        d="M10.1 6.9v1.8M13.9 6.9v1.8M10.1 15.3v1.8M13.9 15.3v1.8M6.9 10.1h1.8M6.9 13.9h1.8M15.3 10.1h1.8M15.3 13.9h1.8"
+        strokeWidth="1.3"
+      />
+      <text x="12" y="13.5" textAnchor="middle" fontSize="3.9" fontWeight="700" fill="currentColor" stroke="none" style={{ fontFamily: 'var(--font-mono)' }}>
+        AI
+      </text>
+    </g>
+  ),
+  // 02 Brand Perception — orbit / rotate
+  face: (
+    <g>
+      <ellipse cx="12" cy="12.2" rx="8.8" ry="3.6" />
+      <path d="M12 3.6C8.6 6.8 8.6 17.6 12 20.8" />
+      <path d="M9.3 18.3 12 20.9l2.7-2.6" />
+    </g>
+  ),
+  // 03 Competitive Positioning — star seal / badge
+  bars: (
+    <>
+      <rect x="5.2" y="5.2" width="13.6" height="13.6" rx="4" strokeWidth="1.4" />
+      <rect x="5.2" y="5.2" width="13.6" height="13.6" rx="4" strokeWidth="1.4" transform="rotate(45 12 12)" />
+      <path
+        d="M12 8.4l1.13 2.29 2.53.37-1.83 1.78.43 2.52L12 14.74l-2.26 1.19.43-2.52-1.83-1.78 2.53-.37z"
+        fill="currentColor"
+        stroke="none"
+      />
+    </>
+  )
 }
 
 function Glyph({ d, color }: { d: ReactElement; color: string }) {
   return (
-    <svg viewBox="0 0 24 24" width="18" height="18" fill={color} stroke="none" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      style={{ color, display: 'block' }}
+    >
       {d}
     </svg>
   )
@@ -56,7 +110,7 @@ const PILLARS: Pillar[] = [
     headline: 'See where, when, and how often AI recommends you',
     body: 'Understand where, when, and how often AI recommends your brand across prompts, topics, engines, and audiences.',
     link: 'Explore AI Visibility Tracking',
-    tint: '#ecfdf5',
+    tint: '#ffffff',
     fg: '#047857',
     glyph: G.track,
     Mock: MockVisibility,
@@ -69,7 +123,7 @@ const PILLARS: Pillar[] = [
     headline: 'Understand how AI perceives your brand',
     body: 'Understand how AI perceives your brand across audiences, industries, and use cases — and uncover the drivers shaping that perception.',
     link: 'Explore Brand Perception',
-    tint: '#ecfdf5',
+    tint: '#ffffff',
     fg: '#047857',
     glyph: G.face,
     Mock: MockPerception,
@@ -82,7 +136,7 @@ const PILLARS: Pillar[] = [
     headline: 'See where competitors outperform you',
     body: 'Benchmark against competitors and see where they outperform you across topics, prompts, and AI engines.',
     link: 'Explore Competitive Positioning',
-    tint: '#ecfdf5',
+    tint: '#ffffff',
     fg: '#047857',
     glyph: G.bars,
     Mock: MockRankings,
@@ -95,7 +149,7 @@ const PILLARS: Pillar[] = [
     headline: 'Get prioritized recommendations that move visibility',
     body: 'Get prioritized recommendations to improve your visibility and increase how often AI recommends your brand.',
     link: 'Explore AEO/GEO Recommendations',
-    tint: '#ecfdf5',
+    tint: '#ffffff',
     fg: '#047857',
     glyph: G.bulb,
     Mock: MockRecommendations,
