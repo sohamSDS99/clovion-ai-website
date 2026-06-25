@@ -307,25 +307,6 @@ function Header() {
   return (
     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.1cqw' }}>
-        <span
-          style={{
-            width: '2.8cqw',
-            height: '2.8cqw',
-            borderRadius: '0.8cqw',
-            background: 'linear-gradient(135deg, #8b5cf6, #d946ef)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flex: 'none',
-            boxShadow: '0 0.4cqw 1.1cqw rgba(139,92,246,0.45)'
-          }}
-        >
-          <svg viewBox="0 0 24 24" width="1.8cqw" height="1.8cqw" aria-hidden>
-            <rect x="4" y="13" width="3.4" height="7" rx="1" fill="#fff" />
-            <rect x="10.3" y="9" width="3.4" height="11" rx="1" fill="#fff" />
-            <rect x="16.6" y="5" width="3.4" height="15" rx="1" fill="#fff" />
-          </svg>
-        </span>
         <div>
           <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2.3cqw', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink)', lineHeight: 1 }}>
             AI Visibility Insights
