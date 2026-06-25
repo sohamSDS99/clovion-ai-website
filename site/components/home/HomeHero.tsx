@@ -17,7 +17,7 @@ const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 // Left panel — citation-score bars, each brand-tinted with a vibrant gradient.
 const BARS = [
-  { key: 'microsoft', h: 100, from: '#7c6cf5', to: '#7c6cf5' },
+  { key: 'microsoft', h: 100, from: '#8a8f98', to: '#8a8f98' },
   { key: 'monday', h: 74, from: '#22c55e', to: '#22c55e' },
   { key: 'check', h: 80, from: '#f59e0b', to: '#f59e0b' },
   { key: 'atlassian', h: 62, from: '#7c6cf5', to: '#7c6cf5' },
