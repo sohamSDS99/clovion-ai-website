@@ -17,11 +17,11 @@ const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 // Left panel — citation-score bars, each brand-tinted with a vibrant gradient.
 const BARS = [
-  { key: 'microsoft', h: 100, from: '#36c5f0', to: '#0a84d6' },
-  { key: 'monday', h: 74, from: '#ff5a7a', to: '#e0294b' },
-  { key: 'check', h: 80, from: '#34d399', to: '#16a34a' },
-  { key: 'atlassian', h: 62, from: '#4c9aff', to: '#2266e0' },
-  { key: 'asana', h: 55, from: '#ff8a8a', to: '#ef5a5a' }
+  { key: 'microsoft', h: 100, from: '#1f6fb0', to: '#0b466f' },
+  { key: 'monday', h: 74, from: '#b32f48', to: '#7a1d2c' },
+  { key: 'check', h: 80, from: '#1c8a4e', to: '#0e5730' },
+  { key: 'atlassian', h: 62, from: '#2a5bb0', to: '#163a78' },
+  { key: 'asana', h: 55, from: '#bf4444', to: '#822d2d' }
 ]
 
 // Right panel — citation categories (legend order).
