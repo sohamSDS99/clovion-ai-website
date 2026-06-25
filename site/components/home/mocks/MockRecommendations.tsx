@@ -2,7 +2,7 @@
 
 // Pillar 4 — "Opportunities" alert-list dashboard. Coded (no raster).
 
-import { type ReactNode } from 'react'
+import { type ReactNode, useEffect, useState } from 'react'
 import { cb, useReducedMotion, useReveal, useCountUp, useStagger } from './motion'
 import { LIGHT } from './palette'
 
@@ -27,16 +27,79 @@ const ROWS: Row[] = [
 
 const COLS = '2.6fr 6.5fr 1.4fr 1.6fr 0.4fr'
 
+// Rows the drawer tours through, with the detail it reveals.
+const TOUR = [0, 1, 4]
+const DETAILS: Record<number, { what: string; fixes: string[] }> = {
+  0: {
+    what:
+      "This related query recurred 27 times around your prompts this window — yet none of those AI answers cited or recommended you. It's an open lane to capture.",
+    fixes: [
+      'Publish a focused page that answers this query directly.',
+      'Add FAQ / HowTo structured data so engines extract you cleanly.',
+      'Cite first-party numbers the model can quote back.'
+    ]
+  },
+  1: {
+    what:
+      'Salesforce was mentioned 617 times in the last 7 days versus 0 in the prior 28 — a sudden breakout in how often AI surfaces them for your prompts.',
+    fixes: [
+      'Open the prompts where Salesforce broke out.',
+      'Counter the claims AI is rewarding with stronger first-party proof.',
+      'Track share-of-voice weekly to confirm the gap is closing.'
+    ]
+  },
+  4: {
+    what:
+      'Trello was mentioned 161 times in the last 7 days versus 0 in the prior 28 — a fresh surge worth a closer look across your tracked prompts.',
+    fixes: [
+      "Review the prompts and engines driving Trello's lift.",
+      'Strengthen the pages those answers should be citing.',
+      'Set an alert threshold so the next breakout pings sooner.'
+    ]
+  }
+}
+
 export function MockRecommendations({ show }: { show: boolean }) {
   const play = useReveal(show)
   const reduced = useReducedMotion()
   const count = useCountUp(49, play, { durationMs: 650 })
   const rows = useStagger(ROWS.length, play, 45, 320)
 
+  // Self-driving drawer: open a row → hold → slide away → next row, forever.
+  const [openState, setOpenState] = useState(false)
+  const [displayIdx, setDisplayIdx] = useState<number | null>(null)
+  useEffect(() => {
+    if (!play || reduced) {
+      setOpenState(false)
+      return
+    }
+    let i = 0
+    let hold: ReturnType<typeof setTimeout>
+    let gap: ReturnType<typeof setTimeout>
+    const open = () => {
+      setDisplayIdx(TOUR[i])
+      setOpenState(true)
+      hold = setTimeout(() => {
+        setOpenState(false)
+        gap = setTimeout(() => {
+          i = (i + 1) % TOUR.length
+          open()
+        }, 1500)
+      }, 3600)
+    }
+    const start = setTimeout(open, 1600)
+    return () => {
+      clearTimeout(start)
+      clearTimeout(hold)
+      clearTimeout(gap)
+    }
+  }, [play, reduced])
+
   return (
     <div
       style={{
         ...LIGHT,
+        position: 'relative',
         width: '100%',
         height: '100%',
         containerType: 'size',
@@ -95,9 +158,13 @@ export function MockRecommendations({ show }: { show: boolean }) {
                   alignItems: 'center',
                   padding: '1cqw 1.6cqw',
                   borderBottom: i < ROWS.length - 1 ? '1px solid var(--line)' : 'none',
+                  background: openState && displayIdx === i ? 'var(--subtle)' : 'transparent',
+                  boxShadow: openState && displayIdx === i ? 'inset 0.35cqw 0 0 var(--ink)' : 'inset 0 0 0 transparent',
                   opacity: rows[i] ? 1 : 0,
                   transform: rows[i] ? 'none' : 'translateY(0.6cqw)',
-                  transition: reduced ? 'none' : `opacity 0.4s ${cb}, transform 0.4s ${cb}`
+                  transition: reduced
+                    ? 'none'
+                    : `opacity 0.4s ${cb}, transform 0.4s ${cb}, background 0.35s ${cb}, box-shadow 0.35s ${cb}`
                 }}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.6cqw', fontSize: '1.15cqw', fontWeight: 600 }}>
@@ -155,7 +222,138 @@ export function MockRecommendations({ show }: { show: boolean }) {
           </span>
         </div>
       </div>
+
+      {/* Backdrop scrim — dims the table while the drawer is open. */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(10,10,15,0.24)',
+          opacity: openState ? 1 : 0,
+          transition: reduced ? 'none' : `opacity 0.4s ${cb}`,
+          zIndex: 5,
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* Side drawer — auto-opens to reveal "what it is / how to fix it". */}
+      <Drawer
+        open={openState}
+        row={displayIdx != null ? ROWS[displayIdx] : null}
+        detail={displayIdx != null ? DETAILS[displayIdx] : null}
+      />
     </div>
+  )
+}
+
+function Drawer({ open, row, detail }: { open: boolean; row: Row | null; detail: { what: string; fixes: string[] } | null }) {
+  const reduced = useReducedMotion()
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'absolute',
+        top: 0,
+        right: 0,
+        bottom: 0,
+        width: '54cqw',
+        background: 'var(--white)',
+        borderLeft: '1px solid var(--line)',
+        boxShadow: open ? '-1.5cqw 0 5cqw rgba(10,10,15,0.16)' : 'none',
+        transform: open ? 'translateX(0)' : 'translateX(108%)',
+        transition: reduced ? 'none' : `transform 0.52s ${cb}`,
+        zIndex: 6,
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '2cqw 2.2cqw',
+        overflow: 'hidden'
+      }}
+    >
+      {row && detail && (
+        <>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1cqw' }}>
+            <div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95cqw', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--ink-40)' }}>Opportunity</div>
+              <div style={{ marginTop: '0.5cqw', fontFamily: 'var(--font-display)', fontSize: '2cqw', fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.2 }}>{row.title}</div>
+            </div>
+            <span style={{ fontSize: '1.6cqw', color: 'var(--ink-40)', lineHeight: 1, flexShrink: 0 }}>✕</span>
+          </div>
+
+          {/* Meta pills */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.7cqw', marginTop: '1.1cqw' }}>
+            <Pill kind={row.source} />
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5cqw', fontSize: '1.05cqw', fontWeight: 600 }}>
+              <Dot color={NEG} /> High impact
+            </span>
+          </div>
+
+          {/* What it is */}
+          <DrawerSection label="WHAT IT IS">
+            <p style={{ margin: 0, fontSize: '1.2cqw', lineHeight: 1.55, color: 'var(--ink-70)' }}>{detail.what}</p>
+          </DrawerSection>
+
+          {/* How to fix it */}
+          <DrawerSection label="HOW TO FIX IT">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.9cqw' }}>
+              {detail.fixes.map((f, i) => (
+                <div
+                  key={i}
+                  style={{
+                    display: 'flex',
+                    gap: '0.8cqw',
+                    alignItems: 'flex-start',
+                    opacity: open ? 1 : 0,
+                    transform: open ? 'none' : 'translateY(0.8cqw)',
+                    transition: reduced ? 'none' : `opacity 0.4s ${cb} ${0.14 + i * 0.08}s, transform 0.4s ${cb} ${0.14 + i * 0.08}s`
+                  }}
+                >
+                  <Check />
+                  <span style={{ fontSize: '1.15cqw', lineHeight: 1.5, color: 'var(--ink-80, var(--ink))' }}>{f}</span>
+                </div>
+              ))}
+            </div>
+          </DrawerSection>
+
+          {/* Footer actions */}
+          <div style={{ marginTop: 'auto', display: 'flex', gap: '0.8cqw', paddingTop: '1.4cqw', borderTop: '1px solid var(--line)' }}>
+            <span style={{ background: 'var(--ink)', color: 'var(--white)', fontSize: '1.15cqw', fontWeight: 600, padding: '0.8cqw 1.6cqw', borderRadius: '0.8cqw' }}>Apply fix</span>
+            <span style={{ color: 'var(--ink-60)', fontSize: '1.15cqw', fontWeight: 600, padding: '0.8cqw 1.4cqw', borderRadius: '0.8cqw', border: '1px solid var(--line)' }}>Dismiss</span>
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function Pill({ kind }: { kind: 'query' | 'alert' }) {
+  if (kind === 'query') {
+    return (
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5cqw', fontSize: '1.05cqw', fontWeight: 600, color: POSITIVE, padding: '0.25cqw 0.8cqw', borderRadius: '999px', background: 'var(--positive-bg)', border: '1px solid var(--positive-border)' }}>
+        <Dot color={POSITIVE} /> Query gap
+      </span>
+    )
+  }
+  return (
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5cqw', fontSize: '1.05cqw', fontWeight: 600, color: 'var(--ink-70)', padding: '0.25cqw 0.8cqw', borderRadius: '999px', border: '1px solid var(--line)' }}>
+      <Dot color={NEG} /> Alert
+    </span>
+  )
+}
+
+function DrawerSection({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div style={{ marginTop: '1.6cqw' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.95cqw', letterSpacing: '0.12em', color: 'var(--ink-40)', marginBottom: '0.7cqw' }}>{label}</div>
+      {children}
+    </div>
+  )
+}
+
+function Check() {
+  return (
+    <span style={{ flexShrink: 0, marginTop: '0.1cqw', width: '1.7cqw', height: '1.7cqw', borderRadius: '999px', background: 'var(--positive-bg)', color: POSITIVE, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.05cqw', fontWeight: 700 }}>✓</span>
   )
 }
 
