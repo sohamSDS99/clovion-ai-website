@@ -291,7 +291,55 @@ function HeroBento() {
   )
 }
 
+const LINES = ['Ask Clovion AI', 'Ask about your AI visibility']
+
+// Types each line, holds, erases, then moves to the next — looping forever.
+function useTypeLines(run: boolean, reduced: boolean) {
+  const [text, setText] = useState('')
+  useEffect(() => {
+    if (!run) return
+    if (reduced) {
+      setText(LINES[1])
+      return
+    }
+    let p = 0
+    let i = 0
+    let mode: 'type' | 'hold' | 'erase' = 'type'
+    let timer: ReturnType<typeof setTimeout>
+    const step = () => {
+      const full = LINES[p]
+      if (mode === 'type') {
+        i += 1
+        setText(full.slice(0, i))
+        if (i >= full.length) {
+          mode = 'hold'
+          timer = setTimeout(step, 1500)
+          return
+        }
+        timer = setTimeout(step, 55 + Math.random() * 45)
+      } else if (mode === 'hold') {
+        mode = 'erase'
+        timer = setTimeout(step, 30)
+      } else {
+        i -= 1
+        setText(full.slice(0, i))
+        if (i <= 0) {
+          p = (p + 1) % LINES.length
+          mode = 'type'
+          timer = setTimeout(step, 420)
+          return
+        }
+        timer = setTimeout(step, 24)
+      }
+    }
+    timer = setTimeout(step, 700)
+    return () => clearTimeout(timer)
+  }, [run, reduced])
+  return text
+}
+
 function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
+  const typed = useTypeLines(on, reduced)
   return (
     <div
       style={{
@@ -331,12 +379,12 @@ function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
             <HaloMark size={22} />
           </span>
 
-          {/* Caret + placeholder */}
-          {!reduced && (
-            <span style={{ display: 'inline-block', width: 2.5, height: '1.3rem', background: '#0a0a0f', borderRadius: 1, flexShrink: 0, animation: 'clvComposerCaret 1s step-end infinite' }} />
-          )}
-          <span style={{ flex: 1, minWidth: 0, fontSize: '1.05rem', fontWeight: 600, color: 'rgba(10,10,15,0.46)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            Ask about your AI visibility&hellip;
+          {/* Typewriter: cycles the two lines, caret at the end */}
+          <span style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', fontSize: '1.05rem', fontWeight: 600, color: 'rgba(10,10,15,0.5)' }}>
+            <span style={{ minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{typed}</span>
+            {!reduced && (
+              <span style={{ display: 'inline-block', width: 2.5, height: '1.3rem', marginLeft: 2, background: '#0a0a0f', borderRadius: 1, flexShrink: 0, animation: 'clvComposerCaret 1s step-end infinite' }} />
+            )}
           </span>
 
           {/* Send */}
