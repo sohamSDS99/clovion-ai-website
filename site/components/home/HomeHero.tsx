@@ -340,7 +340,7 @@ function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
           </span>
 
           {/* Send */}
-          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0, background: '#8b8b90', color: '#fff', fontWeight: 600, fontSize: '0.95rem', padding: '11px 20px', borderRadius: 999 }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0, background: '#0a0a0f', color: '#fff', fontWeight: 600, fontSize: '0.95rem', padding: '11px 20px', borderRadius: 999 }}>
             Send
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M5 12h14" />
