@@ -441,8 +441,8 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
                   background: b.color,
                   boxShadow: '0 6px 16px rgba(10,10,15,0.10)',
                   transformOrigin: 'bottom',
-                  transform: reduced ? 'scaleY(1)' : on ? undefined : 'scaleY(0)',
-                  animation: reduced || !on ? 'none' : `clvBarPop 4.5s ${EASE} ${i * 0.32}s infinite both`
+                  transform: on || reduced ? 'scaleY(1)' : 'scaleY(0)',
+                  transition: reduced ? 'none' : `transform 0.55s cubic-bezier(0.34, 1.4, 0.5, 1) ${i * 0.12}s`
                 }}
               >
                 <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.16), transparent 42%)' }} />
@@ -454,7 +454,6 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
           </div>
         ))}
       </div>
-      <style>{'@keyframes clvBarPop{0%{transform:scaleY(0)}10%{transform:scaleY(1.05)}16%{transform:scaleY(1)}86%{transform:scaleY(1)}94%{transform:scaleY(0)}100%{transform:scaleY(0)}}'}</style>
     </div>
   )
 }
