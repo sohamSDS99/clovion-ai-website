@@ -420,11 +420,7 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
           lineHeight: 1,
           fontVariantNumeric: 'tabular-nums',
           width: 'fit-content',
-          backgroundImage: 'linear-gradient(135deg, var(--ink) 30%, var(--ink-60))',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          color: 'transparent'
+          color: '#047857'
         }}
       >
         {score.toFixed(1)}%
@@ -439,29 +435,17 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
                 style={{
                   position: 'relative',
                   width: '100%',
-                  height: on || reduced ? `${b.h}%` : '0%',
+                  height: `${b.h}%`,
                   borderRadius: '9px 9px 4px 4px',
                   overflow: 'hidden',
                   background: b.color,
                   boxShadow: '0 6px 16px rgba(10,10,15,0.10)',
-                  transition: reduced ? 'none' : `height 1s ${EASE} ${0.3 + i * 0.1}s`
+                  transformOrigin: 'bottom',
+                  transform: reduced ? 'scaleY(1)' : on ? undefined : 'scaleY(0)',
+                  animation: reduced || !on ? 'none' : `clvBarPop 4.5s ${EASE} ${i * 0.32}s infinite both`
                 }}
               >
                 <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.16), transparent 42%)' }} />
-                {!reduced && (
-                  <div
-                    aria-hidden
-                    style={{
-                      position: 'absolute',
-                      left: 0,
-                      right: 0,
-                      height: '45%',
-                      top: '-45%',
-                      background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.28), transparent)',
-                      animation: `heroBarSheen ${2.6 + i * 0.25}s ease-in-out ${i * 0.2}s infinite`
-                    }}
-                  />
-                )}
               </div>
             </div>
             <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 42, height: 42, borderRadius: 12, background: 'var(--ink-06)', border: '1px solid var(--line)', flexShrink: 0 }}>
@@ -470,7 +454,7 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
           </div>
         ))}
       </div>
-      <style>{'@keyframes heroBarSheen{0%{transform:translateY(0);opacity:0}25%{opacity:1}100%{transform:translateY(560%);opacity:0}}'}</style>
+      <style>{'@keyframes clvBarPop{0%{transform:scaleY(0)}10%{transform:scaleY(1.05)}16%{transform:scaleY(1)}86%{transform:scaleY(1)}94%{transform:scaleY(0)}100%{transform:scaleY(0)}}'}</style>
     </div>
   )
 }

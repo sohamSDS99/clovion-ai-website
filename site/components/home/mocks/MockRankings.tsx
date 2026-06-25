@@ -21,11 +21,11 @@ function Glyph({ m }: { m: Mark }) {
 }
 
 const ROWS: { topic: string; strong: boolean; rank: string; comps: Mark[]; share: number }[] = [
-  { topic: 'Centralized SDS Repository', strong: true, rank: '1st', comps: ['M', 'P', 'SF', 'D'], share: 28.4 },
-  { topic: 'SDS Management', strong: true, rank: '2nd', comps: ['SF', 'D', 'M', 'P'], share: 22.3 },
-  { topic: 'Audit Readiness', strong: false, rank: '7th', comps: ['P', 'M', 'D', 'SF'], share: 8.7 },
-  { topic: 'Compliance Reporting', strong: false, rank: '5th', comps: ['D', 'SF', 'P', 'M'], share: 9.1 },
-  { topic: 'Regulatory Compliance', strong: false, rank: '6th', comps: ['M', 'SF', 'D', 'P'], share: 6.2 }
+  { topic: 'Customer Relationship Management', strong: true, rank: '1st', comps: ['M', 'P', 'SF', 'D'], share: 28.4 },
+  { topic: 'CRM for Small Businesses', strong: true, rank: '2nd', comps: ['SF', 'D', 'M', 'P'], share: 22.3 },
+  { topic: 'Sales Pipeline Management', strong: false, rank: '7th', comps: ['P', 'M', 'D', 'SF'], share: 8.7 },
+  { topic: 'Lead Management', strong: false, rank: '6th', comps: ['D', 'SF', 'P', 'M'], share: 7.4 },
+  { topic: 'CRM Reporting & Analytics', strong: false, rank: '8th', comps: ['M', 'SF', 'D', 'P'], share: 6.2 }
 ]
 
 const COLS = '2.4fr 1fr 0.7fr 0.7fr 0.7fr 0.7fr 2.4fr'
@@ -74,7 +74,7 @@ export function MockRankings({ show }: { show: boolean }) {
             Visibility Ranking by Topic
           </div>
           <div style={{ marginTop: '0.7cqw', fontSize: '1.25cqw', color: 'var(--ink-60)' }}>
-            SDS Manager&rsquo;s visibility rankings compared to Chemical Compliance Software brands by topic
+            Monday&rsquo;s visibility rankings compared to CRM software brands by topic
           </div>
         </div>
         <RangeToggle />
@@ -87,7 +87,7 @@ export function MockRankings({ show }: { show: boolean }) {
           <Head center>
             Your Brand
             <br />
-            <span style={{ fontWeight: 500, color: 'var(--ink-40)' }}>(SDS Manager)</span>
+            <span style={{ fontWeight: 500, color: 'var(--ink-40)' }}>(Monday)</span>
           </Head>
           <Head center>#2</Head>
           <Head center>#3</Head>
@@ -169,13 +169,13 @@ export function MockRankings({ show }: { show: boolean }) {
       {/* Insight cards */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1.4cqw', flex: 1, minHeight: 0 }}>
         <InsightCard shown={cards[0]} icon={<StarIcon />} iconColor={BLUE} title="WHERE YOU WIN" titleColor={BLUE}>
-          Strong visibility in &ldquo;Centralized SDS Repository&rdquo; and &ldquo;SDS Management&rdquo; with top 2 positions.
+          Strong visibility in &ldquo;Customer Relationship Management&rdquo; and &ldquo;CRM for Small Businesses&rdquo; with top 2 positions.
         </InsightCard>
         <InsightCard shown={cards[1]} icon={<ArrowIcon up />} iconColor={POSITIVE} title="TOP OPPORTUNITY" titleColor={POSITIVE}>
-          Improve content and authority around Audit Readiness to close the visibility gap.
+          Improve content and authority around &ldquo;Sales Pipeline Management&rdquo; to close the visibility gap.
         </InsightCard>
         <InsightCard shown={cards[2]} icon={<ArrowIcon />} iconColor={NEG} title="WHERE YOU LOSE" titleColor={NEG}>
-          Competitors dominate &ldquo;Audit Readiness&rdquo; and &ldquo;Compliance Reporting&rdquo;.
+          Competitors dominate &ldquo;CRM Reporting &amp; Analytics&rdquo; and &ldquo;Lead Management&rdquo;.
         </InsightCard>
       </div>
     </div>
