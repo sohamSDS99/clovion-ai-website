@@ -70,16 +70,12 @@ const CARD_NOTES: CardNote[][] = [
 const DRIVERS = [
   { label: 'Easy to use', pct: 38 },
   { label: 'Fast implementation', pct: 31 },
-  { label: 'Good support', pct: 24 },
-  { label: 'Affordable', pct: 22 },
-  { label: 'Scalable', pct: 18 }
+  { label: 'Good support', pct: 24 }
 ]
 const GAPS2 = [
   { label: 'Enterprise-focused', you: 5, leader: 31 },
   { label: 'Most secure', you: 6, leader: 28 },
-  { label: 'Scalable', you: 7, leader: 28 },
-  { label: 'Advanced reporting', you: 8, leader: 22 },
-  { label: 'Integrations', you: 9, leader: 25 }
+  { label: 'Scalable', you: 7, leader: 28 }
 ]
 // Highlight base index per card, for the global sequential paint stagger.
 const HL_OFFSET = CARDS.map((_, i) => CARDS.slice(0, i).reduce((n, c) => n + c.hl.length, 0))
@@ -122,7 +118,7 @@ export function MockPerception({ show }: { show: boolean }) {
   const prompt = useTypewriter(PROMPT, play, 48)
   const mBody = useTypewriter(CARDS[0].body, phase >= 1, 170)
   const pBody = useTypewriter(CARDS[1].body, phase >= 2, 170)
-  const sideHead = useTypewriter('AI VISIBILITY INSIGHTS', phase >= 5, 32)
+  const sideHead = useTypewriter('PERCEPTION DRIVERS AND GAPS', phase >= 5, 32)
 
   const cardShown = [phase >= 1, phase >= 2]
   const bodyDone = [mBody.done, pBody.done]
@@ -179,8 +175,8 @@ export function MockPerception({ show }: { show: boolean }) {
               style={{
                 border: '1px solid var(--line)',
                 borderRadius: '1cqw',
-                padding: '1.1cqw 1.3cqw',
-                marginTop: ci === 1 ? '1cqw' : 0,
+                padding: '1.4cqw 1.6cqw',
+                marginTop: ci === 1 ? '1.1cqw' : 0,
                 opacity: cardShown[ci] || reduced ? 1 : 0,
                 transform: cardShown[ci] || reduced ? 'none' : 'translateY(1cqw)',
                 transition: reduced ? 'none' : `opacity 0.45s ${cb}, transform 0.45s ${cb}`
@@ -189,9 +185,9 @@ export function MockPerception({ show }: { show: boolean }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.7cqw', marginBottom: '0.7cqw' }}>
                 <span style={{ fontSize: '1.15cqw', fontWeight: 600, color: 'var(--ink-50)', padding: '0.15cqw 0.6cqw', border: '1px solid var(--line)', borderRadius: '0.5cqw' }}>{c.rank}</span>
                 <c.Glyph size={18} style={{ color: 'var(--ink-70)' }} />
-                <span style={{ fontSize: '1.6cqw', fontWeight: 700 }}>{c.name}</span>
+                <span style={{ fontSize: '1.75cqw', fontWeight: 700 }}>{c.name}</span>
               </div>
-              <p style={{ margin: 0, fontSize: '1.3cqw', lineHeight: 1.6, color: 'var(--ink-80, var(--ink))' }}>
+              <p style={{ margin: 0, fontSize: '1.42cqw', lineHeight: 1.62, color: 'var(--ink-80, var(--ink))' }}>
                 {bodyDone[ci] || reduced ? (
                   <Highlighted body={c.body} hl={c.hl} baseIndex={HL_OFFSET[ci]} hlOn={hlOn} reduced={reduced} notes={CARD_NOTES[ci]} noteOn={notesOn} />
                 ) : (
@@ -225,8 +221,8 @@ export function MockPerception({ show }: { show: boolean }) {
             }}
           >
             <div>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.75cqw', fontWeight: 700, letterSpacing: '0.1em', minHeight: '2cqw' }}>
-                {reduced ? 'AI VISIBILITY INSIGHTS' : sideHead.text}
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.55cqw', fontWeight: 700, letterSpacing: '0.08em', minHeight: '2cqw' }}>
+                {reduced ? 'PERCEPTION DRIVERS AND GAPS' : sideHead.text}
                 {sideOn && !sideHead.done && !reduced && <Caret />}
               </div>
               <div style={{ marginTop: '0.5cqw', fontSize: '1.2cqw', color: 'var(--ink-60)' }}>Insights based on 12,540 prompts across 6 AI engines</div>
@@ -370,7 +366,7 @@ function SidebarSkeleton() {
       {[0, 1].map((c) => (
         <div key={c} style={{ border: '1px solid var(--line)', borderRadius: '1cqw', padding: '1cqw 1.2cqw', display: 'flex', flexDirection: 'column', gap: '0.7cqw' }}>
           {bar('10cqw', '1.2cqw')}
-          {[0, 1, 2, 3].map((r) => (
+          {[0, 1, 2].map((r) => (
             <div key={r} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1cqw' }}>
               {bar('7cqw')}
               {bar('9cqw')}
