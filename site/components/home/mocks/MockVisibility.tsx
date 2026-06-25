@@ -308,7 +308,7 @@ function Header() {
     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '2cqw' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.1cqw' }}>
         <div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2.3cqw', fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--ink)', lineHeight: 1 }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5cqw', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)', lineHeight: 1 }}>
             AI Visibility Insights
           </div>
           <div style={{ marginTop: '0.8cqw', fontSize: '1.3cqw', color: 'var(--ink-50)' }}>Monday · across 900 AI answers in the last 30 days</div>
