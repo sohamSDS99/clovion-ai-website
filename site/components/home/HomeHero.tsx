@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
-import { Button, Container, ArrowRight } from '@/components/ui'
+import { Button, Container, ArrowRight, HaloMark } from '@/components/ui'
 import { LIGHT } from './mocks/palette'
 
 const HERO_LOGOS = [
@@ -291,59 +291,7 @@ function HeroBento() {
   )
 }
 
-const PROMPTS = [
-  'Which engines cite Clovion most?',
-  'How do we rank against Salesforce?',
-  'Where are our biggest citation gaps?',
-  'What moved our visibility this week?'
-]
-
-function useTypewriterCycle(run: boolean, reduced: boolean) {
-  const [text, setText] = useState('')
-  useEffect(() => {
-    if (!run) return
-    if (reduced) {
-      setText(PROMPTS[0])
-      return
-    }
-    let p = 0
-    let i = 0
-    let mode: 'type' | 'hold' | 'erase' = 'type'
-    let timer: ReturnType<typeof setTimeout>
-    const step = () => {
-      const full = PROMPTS[p]
-      if (mode === 'type') {
-        i += 1
-        setText(full.slice(0, i))
-        if (i >= full.length) {
-          mode = 'hold'
-          timer = setTimeout(step, 1700)
-          return
-        }
-        timer = setTimeout(step, 42 + Math.random() * 46)
-      } else if (mode === 'hold') {
-        mode = 'erase'
-        timer = setTimeout(step, 30)
-      } else {
-        i -= 1
-        setText(full.slice(0, i))
-        if (i <= 0) {
-          p = (p + 1) % PROMPTS.length
-          mode = 'type'
-          timer = setTimeout(step, 420)
-          return
-        }
-        timer = setTimeout(step, 20)
-      }
-    }
-    timer = setTimeout(step, 800)
-    return () => clearTimeout(timer)
-  }, [run, reduced])
-  return text
-}
-
 function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
-  const typed = useTypewriterCycle(on, reduced)
   return (
     <div
       style={{
@@ -351,8 +299,8 @@ function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
         left: '50%',
         bottom: -26,
         zIndex: 20,
-        width: 440,
-        maxWidth: '86%',
+        width: 510,
+        maxWidth: '92%',
         pointerEvents: 'none',
         opacity: on ? 1 : 0,
         transform: `translate(-50%, ${on ? '0' : '28px'}) scale(${on ? 1 : 0.96})`,
@@ -363,85 +311,47 @@ function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
         <div
           style={{
             position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 13,
             background: '#ffffff',
-            borderRadius: 18,
-            border: '1px solid rgba(10,10,15,0.07)',
+            borderRadius: 22,
+            border: '1px solid rgba(10,10,15,0.08)',
             boxShadow: '0 26px 60px rgba(10,10,15,0.22), 0 4px 14px rgba(10,10,15,0.08)',
-            padding: '16px 18px'
+            padding: '14px 14px 14px 20px'
           }}
         >
           <div
             aria-hidden
-            style={{ position: 'absolute', inset: '-22% -12% -34%', borderRadius: 32, background: 'radial-gradient(58% 60% at 50% 100%, rgba(124,108,245,0.20), transparent 70%)', filter: 'blur(16px)', zIndex: -1 }}
+            style={{ position: 'absolute', inset: '-22% -10% -34%', borderRadius: 34, background: 'radial-gradient(58% 60% at 50% 100%, rgba(124,108,245,0.16), transparent 70%)', filter: 'blur(16px)', zIndex: -1 }}
           />
 
-          {/* Prompt input row (typewriter cycle) */}
-          <div style={{ minHeight: 26, display: 'flex', alignItems: 'center', fontSize: '1rem', lineHeight: 1.3 }}>
-            <span style={{ color: typed ? '#0a0a0f' : 'rgba(10,10,15,0.42)', fontWeight: 500 }}>{typed || 'Ask Clovion AI'}</span>
-            {!reduced && (
-              <span style={{ display: 'inline-block', width: 2, height: '1.05em', marginLeft: 3, background: '#7c6cf5', borderRadius: 1, animation: 'clvComposerCaret 1s step-end infinite' }} />
-            )}
-          </div>
+          {/* Clovion mark inside the chatbox */}
+          <span style={{ display: 'inline-flex', alignItems: 'center', color: '#0a0a0f', flexShrink: 0 }}>
+            <HaloMark size={22} />
+          </span>
 
-          {/* Bottom row: locale + tags · send */}
-          <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <FlagChip />
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.82rem', color: 'rgba(10,10,15,0.5)', border: '1px solid rgba(10,10,15,0.12)', borderRadius: 999, padding: '5px 11px' }}>
-                <TagIcon /> No tags
-              </span>
-            </div>
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                background: 'linear-gradient(135deg, #4f46e5, #7c6cf5)',
-                boxShadow: '0 6px 18px rgba(99,102,241,0.45)',
-                animation: reduced || !on ? 'none' : 'clvComposerSend 2.8s ease-in-out 2.4s infinite'
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                <path d="M12 19V6" />
-                <path d="M6 12l6-6 6 6" />
-              </svg>
-            </span>
-          </div>
+          {/* Caret + placeholder */}
+          {!reduced && (
+            <span style={{ display: 'inline-block', width: 2.5, height: '1.3rem', background: '#0a0a0f', borderRadius: 1, flexShrink: 0, animation: 'clvComposerCaret 1s step-end infinite' }} />
+          )}
+          <span style={{ flex: 1, minWidth: 0, fontSize: '1.05rem', fontWeight: 600, color: 'rgba(10,10,15,0.46)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Ask about your AI visibility&hellip;
+          </span>
 
-          <style>{'@keyframes clvComposerFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes clvComposerCaret{50%{opacity:0}}@keyframes clvComposerSend{0%,100%{box-shadow:0 6px 18px rgba(99,102,241,0.4)}50%{box-shadow:0 6px 28px rgba(99,102,241,0.78)}}'}</style>
+          {/* Send */}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, flexShrink: 0, background: '#8b8b90', color: '#fff', fontWeight: 600, fontSize: '0.95rem', padding: '11px 20px', borderRadius: 999 }}>
+            Send
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M5 12h14" />
+              <path d="M13 6l6 6-6 6" />
+            </svg>
+          </span>
+
+          <style>{'@keyframes clvComposerFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}@keyframes clvComposerCaret{50%{opacity:0}}'}</style>
         </div>
       </div>
     </div>
-  )
-}
-
-function FlagChip() {
-  const stripe = 26 / 7
-  return (
-    <span style={{ width: 26, height: 26, borderRadius: 999, overflow: 'hidden', display: 'inline-flex', flexShrink: 0, border: '1px solid rgba(10,10,15,0.1)' }}>
-      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden>
-        <rect width="26" height="26" fill="#fff" />
-        {[0, 1, 2, 3, 4, 5, 6].map((i) => (
-          <rect key={i} y={i * stripe} width="26" height={stripe} fill={i % 2 === 0 ? '#b22234' : '#fff'} />
-        ))}
-        <rect width="12" height={stripe * 4} fill="#3c3b6e" />
-        {[...Array(6)].map((_, i) => (
-          <circle key={i} cx={2.6 + (i % 3) * 4} cy={2.6 + Math.floor(i / 3) * 4.2} r="0.85" fill="#fff" />
-        ))}
-      </svg>
-    </span>
-  )
-}
-
-function TagIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M20.6 13.4 13 21l-9-9V4h8z" />
-      <circle cx="8" cy="8" r="1.3" fill="currentColor" stroke="none" />
-    </svg>
   )
 }
 
