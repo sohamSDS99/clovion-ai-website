@@ -302,14 +302,14 @@ function Highlighted({ body, hl, baseIndex, hlOn, reduced, notes, noteOn }: { bo
                     zIndex: 20,
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '0.5cqw',
+                    gap: '0.6cqw',
                     background: '#18181c',
                     color: '#fff',
-                    fontSize: '1cqw',
+                    fontSize: '1.25cqw',
                     fontWeight: 600,
-                    borderRadius: '0.6cqw',
-                    padding: '0.4cqw 0.8cqw',
-                    boxShadow: '0 6px 16px rgba(0,0,0,0.28)',
+                    borderRadius: '0.75cqw',
+                    padding: '0.6cqw 1.05cqw',
+                    boxShadow: '0 7px 18px rgba(0,0,0,0.3)',
                     pointerEvents: 'none',
                     opacity: noteOn || reduced ? 1 : 0,
                     transform:
@@ -319,7 +319,7 @@ function Highlighted({ body, hl, baseIndex, hlOn, reduced, notes, noteOn }: { bo
                     transition: reduced ? 'none' : `opacity 0.35s ${cb} ${delay}s, transform 0.45s cubic-bezier(0.34, 1.55, 0.5, 1) ${delay}s`
                   }}
                 >
-                  <span style={{ width: '0.6cqw', height: '0.6cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
+                  <span style={{ width: '0.75cqw', height: '0.75cqw', borderRadius: '999px', background: '#fff', opacity: 0.85, flexShrink: 0 }} />
                   {n.text}
                 </span>
               )
