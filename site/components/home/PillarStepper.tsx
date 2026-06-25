@@ -20,51 +20,58 @@ const FRAME_ASPECT = '16 / 10'
 // ── glyph paths ───────────────────────────────────────────────────────
 // Pillar glyphs — green line/fill icons (rendered on a white chip). Use
 // currentColor so the chip's `color` (s.fg) drives them.
+// Pillar glyphs — faithful traces of the supplied logos: a rounded-square
+// frame plus a symbol, rendered green (currentColor) on the white chip.
+const FRAME = <rect x="2" y="2" width="20" height="20" rx="6" strokeWidth="1.9" />
+
 const G = {
-  // 01 AI Visibility Tracking — bar chart
+  // 01 AI Visibility Tracking — framed bar chart (pill bars)
   track: (
-    <g fill="currentColor" stroke="none">
-      <rect x="4.4" y="13" width="3" height="6.6" rx="1.5" />
-      <rect x="10.5" y="5.4" width="3" height="14.2" rx="1.5" />
-      <rect x="16.6" y="9.4" width="3" height="10.2" rx="1.5" />
+    <g fill="none" stroke="currentColor">
+      {FRAME}
+      <g strokeWidth="2.2" strokeLinecap="round">
+        <path d="M8.6 13.2v3.2" />
+        <path d="M12 8v8.4" />
+        <path d="M15.4 10.7v5.7" />
+      </g>
     </g>
   ),
-  // 04 AEO/GEO Recommendations — AI chip with refresh arrows
+  // 04 AEO/GEO Recommendations — framed AI chip with circular refresh arrows
   bulb: (
-    <g>
-      <path d="M4.7 10.3A7.6 7.6 0 0 1 17.8 6.7" />
-      <path d="M17.9 6.7l.1-2.6 2.3 1.2" />
-      <path d="M19.3 13.7A7.6 7.6 0 0 1 6.2 17.3" />
-      <path d="M6.1 17.3l-.1 2.6-2.3-1.2" />
-      <rect x="8.7" y="8.7" width="6.6" height="6.6" rx="1.4" strokeWidth="1.5" />
-      <path
-        d="M10.1 6.9v1.8M13.9 6.9v1.8M10.1 15.3v1.8M13.9 15.3v1.8M6.9 10.1h1.8M6.9 13.9h1.8M15.3 10.1h1.8M15.3 13.9h1.8"
-        strokeWidth="1.3"
-      />
-      <text x="12" y="13.5" textAnchor="middle" fontSize="3.9" fontWeight="700" fill="currentColor" stroke="none" style={{ fontFamily: 'var(--font-mono)' }}>
+    <g fill="none" stroke="currentColor">
+      {FRAME}
+      <path d="M6 12a6 6 0 0 1 10.2-4.3" strokeWidth="1.3" />
+      <path d="M18 12a6 6 0 0 1-10.2 4.3" strokeWidth="1.3" />
+      <path d="M16.2 7.7l.25-2.3 2 1.15" strokeWidth="1.3" />
+      <path d="M7.8 16.3l-.25 2.3-2-1.15" strokeWidth="1.3" />
+      <rect x="9" y="9" width="6" height="6" rx="1" strokeWidth="1.3" />
+      <text x="12" y="13.5" textAnchor="middle" fontSize="3.8" fontWeight="700" fill="currentColor" stroke="none" style={{ fontFamily: 'var(--font-mono)' }}>
         AI
       </text>
     </g>
   ),
-  // 02 Brand Perception — orbit / rotate
+  // 02 Brand Perception — framed 3D rotate (two crossed ellipses + arrows)
   face: (
-    <g>
-      <ellipse cx="12" cy="12.2" rx="8.8" ry="3.6" />
-      <path d="M12 3.6C8.6 6.8 8.6 17.6 12 20.8" />
-      <path d="M9.3 18.3 12 20.9l2.7-2.6" />
+    <g fill="none" stroke="currentColor" strokeWidth="1.4">
+      {FRAME}
+      <ellipse cx="12" cy="12" rx="3.7" ry="7" />
+      <ellipse cx="12" cy="12" rx="7" ry="3.7" />
+      <path d="M10.4 13.1 12 15.4l1.6-2.3z" fill="currentColor" stroke="none" />
+      <path d="M4.5 11.3 4.8 8.7 7.1 10z" fill="currentColor" stroke="none" />
     </g>
   ),
-  // 03 Competitive Positioning — star seal / badge
+  // 03 Competitive Positioning — framed star seal / badge
   bars: (
-    <>
-      <rect x="5.2" y="5.2" width="13.6" height="13.6" rx="4" strokeWidth="1.4" />
-      <rect x="5.2" y="5.2" width="13.6" height="13.6" rx="4" strokeWidth="1.4" transform="rotate(45 12 12)" />
+    <g fill="none" stroke="currentColor">
+      {FRAME}
+      <rect x="6.5" y="6.5" width="11" height="11" rx="3" strokeWidth="1.3" />
+      <rect x="6.5" y="6.5" width="11" height="11" rx="3" strokeWidth="1.3" transform="rotate(45 12 12)" />
       <path
-        d="M12 8.4l1.13 2.29 2.53.37-1.83 1.78.43 2.52L12 14.74l-2.26 1.19.43-2.52-1.83-1.78 2.53-.37z"
+        d="M12 8.9l1 2.02 2.23.32-1.61 1.57.38 2.22L12 14l-2 1.05.38-2.22-1.61-1.57 2.23-.32z"
         fill="currentColor"
         stroke="none"
       />
-    </>
+    </g>
   )
 }
 
@@ -72,8 +79,8 @@ function Glyph({ d, color }: { d: ReactElement; color: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
-      width="20"
-      height="20"
+      width="26"
+      height="26"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.7"
