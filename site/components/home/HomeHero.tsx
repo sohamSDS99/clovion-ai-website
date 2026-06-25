@@ -12,13 +12,30 @@ const HERO_LOGOS = [
   { src: '/logos/google-ai.svg', alt: 'Google AI Overviews' }
 ]
 
-const CHART = [22, 26, 30, 28, 38, 34, 48, 44, 62, 78]
-const BENTO_ENGINES = [
-  { name: 'ChatGPT', score: 92, change: '+18', peak: true },
-  { name: 'Claude', score: 87, change: '+24' },
-  { name: 'Perplexity', score: 81, change: '+12' },
-  { name: 'Gemini', score: 74, change: '+9' },
-  { name: 'AI Overviews', score: 69, change: '+6' }
+const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
+
+// Left panel — citation-score bars, each brand-tinted with a vibrant gradient.
+const BARS = [
+  { key: 'microsoft', h: 100, from: '#36c5f0', to: '#0a84d6' },
+  { key: 'monday', h: 74, from: '#ff5a7a', to: '#e0294b' },
+  { key: 'check', h: 80, from: '#34d399', to: '#16a34a' },
+  { key: 'atlassian', h: 62, from: '#4c9aff', to: '#2266e0' },
+  { key: 'asana', h: 55, from: '#ff8a8a', to: '#ef5a5a' }
+]
+
+// Right panel — citation categories (legend order).
+const CATS = [
+  { label: 'Other', pct: 82, count: '13,492', color: '#8a8f98' },
+  { label: 'Social', pct: 10, count: '1,699', color: '#7c6cf5' },
+  { label: 'Owned', pct: 7, count: '1,168', color: '#22c55e' },
+  { label: 'Earned media', pct: 1, count: '183', color: '#f59e0b' }
+]
+// Donut draw order, clockwise from top (colored arcs first, grey fills the rest).
+const DONUT = [
+  { color: '#7c6cf5', pct: 10 },
+  { color: '#22c55e', pct: 7 },
+  { color: '#f59e0b', pct: 1 },
+  { color: '#8a8f98', pct: 82 }
 ]
 
 export function HomeHero() {
@@ -92,7 +109,7 @@ export function HomeHero() {
         </div>
 
         <div className="mt-12 md:mt-20 max-w-6xl mx-auto -mx-4 md:mx-auto px-4 md:px-0 overflow-x-auto md:overflow-visible">
-          <div className="min-w-[520px] md:min-w-0">
+          <div className="min-w-[880px] md:min-w-0">
             <HeroBento />
           </div>
         </div>
@@ -167,17 +184,36 @@ function useCountUp(target: number, run: boolean, ms = 1400) {
   return v
 }
 
+function useCountInt(target: number, run: boolean, ms = 1600) {
+  const [v, setV] = useState(0)
+  useEffect(() => {
+    if (!run) return
+    let raf = 0
+    let start = 0
+    const tick = (now: number) => {
+      if (!start) start = now
+      const t = Math.min(1, (now - start) / ms)
+      setV(Math.round((1 - Math.pow(1 - t, 3)) * target))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [run, target, ms])
+  return v
+}
+
 function HeroBento() {
   const rootRef = useRef<HTMLDivElement>(null)
   const hasRunRef = useRef(false)
   const [on, setOn] = useState(false)
-  const metric = useCountUp(28.4, on)
+  const [reduced, setReduced] = useState(false)
 
   useEffect(() => {
     const node = rootRef.current
     if (!node) return
     const reduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduce) {
+      setReduced(true)
       hasRunRef.current = true
       setOn(true)
       return
@@ -213,172 +249,233 @@ function HeroBento() {
         {/* App chrome top bar */}
         <div style={{ height: 48, borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12 }}>
           <div style={{ display: 'flex', gap: 6 }}>
-            <span style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
-            <span style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
-            <span style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
+            {[0, 1, 2].map((k) => (
+              <span key={k} style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
+            ))}
           </div>
           <div style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--ink-50)' }}>
-            Workspaces / Clovion AI / Visibility
+            Workspaces / Clovion AI / Citations
           </div>
           <div style={{ width: 24 }} />
         </div>
 
-        <div style={{ display: 'flex' }}>
-          {/* Sidebar */}
-          <aside
-            className="hidden md:block"
-            style={{ width: 176, background: 'var(--subtle)', borderRight: '1px solid var(--line)', padding: 12 }}
-          >
-            <div
-              style={{
-                padding: 8,
-                borderRadius: 8,
-                background: 'var(--white)',
-                border: '1px solid var(--line)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                fontSize: '0.82rem',
-                fontWeight: 600,
-                color: 'var(--ink)'
-              }}
-            >
-              <span>Clovion AI</span>
-              <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden style={{ color: 'var(--ink-50)' }}>
-                <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <nav style={{ marginTop: 16, display: 'grid', gap: 2 }}>
-              {['Dashboard', 'Visibility', 'Discovery', 'Agents', 'Insights'].map((l) => {
-                const active = l === 'Visibility'
-                return (
-                  <div
-                    key={l}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '6px 8px',
-                      borderRadius: 6,
-                      fontSize: '0.84rem',
-                      background: active ? 'var(--ink-04)' : 'transparent',
-                      fontWeight: active ? 600 : 400,
-                      color: active ? 'var(--ink)' : 'var(--ink-70)'
-                    }}
-                  >
-                    <span style={{ height: 6, width: 6, borderRadius: 999, background: active ? 'var(--ink)' : 'transparent' }} />
-                    {l}
-                  </div>
-                )
-              })}
-            </nav>
-          </aside>
-
-          {/* Main */}
-          <main style={{ flex: 1, padding: 28, minWidth: 0 }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600, color: 'var(--ink-50)' }}>
-              VISIBILITY
-            </div>
-
-            <div style={{ marginTop: 12, display: 'flex', alignItems: 'flex-end', gap: 12, flexWrap: 'wrap' }}>
-              <div>
-                <div
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: '2.5rem',
-                    fontWeight: 600,
-                    letterSpacing: '-0.02em',
-                    lineHeight: 1,
-                    fontVariantNumeric: 'tabular-nums',
-                    color: 'var(--ink)'
-                  }}
-                >
-                  {metric.toFixed(1)}%
-                </div>
-                <div style={{ marginTop: 6, fontSize: '0.84rem', color: 'var(--ink-60)' }}>
-                  Share of voice · last 30 days
-                </div>
-              </div>
-              <span
-                style={{
-                  marginBottom: 4,
-                  opacity: on ? 1 : 0,
-                  transition: 'opacity 0.5s ease 0.8s',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 4,
-                  padding: '2px 8px',
-                  borderRadius: 999,
-                  background: 'var(--positive-bg)',
-                  border: '1px solid var(--positive-border)',
-                  color: 'var(--positive)',
-                  fontSize: '0.74rem',
-                  fontWeight: 600
-                }}
-              >
-                ↑ 6.2 pts
-              </span>
-            </div>
-
-            {/* Bar chart */}
-            <div style={{ marginTop: 24, display: 'flex', alignItems: 'flex-end', gap: 6, height: 96 }}>
-              {CHART.map((h, i) => (
-                <div
-                  key={i}
-                  style={{
-                    flex: 1,
-                    borderRadius: 2,
-                    background: i === CHART.length - 1 ? 'var(--ink)' : 'var(--ink-60)',
-                    height: on ? `${h}%` : '0%',
-                    transition: `height 1.2s var(--ease-out-expo) ${i * 80}ms`
-                  }}
-                />
-              ))}
-            </div>
-
-            {/* Engine breakdown */}
-            <div style={{ marginTop: 28, display: 'grid', gap: 8 }}>
-              {BENTO_ENGINES.map((e, i) => (
-                <div
-                  key={e.name}
-                  className="grid grid-cols-[5.5rem_1fr_auto] sm:grid-cols-[8.5rem_1fr_auto] gap-3 items-center"
-                  style={{
-                    opacity: on ? 1 : 0,
-                    transform: on ? 'none' : 'translateY(6px)',
-                    transition: `all 0.5s ease ${1200 + i * 100}ms`
-                  }}
-                >
-                  <span style={{ fontWeight: 600, fontSize: '0.82rem', color: 'var(--ink)' }}>{e.name}</span>
-                  <span style={{ height: 6, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden' }}>
-                    <span
-                      style={{
-                        display: 'block',
-                        height: '100%',
-                        borderRadius: 999,
-                        background: e.peak ? 'var(--ink)' : 'var(--ink-40)',
-                        width: on ? `${e.score}%` : '0%',
-                        transition: `width 0.9s var(--ease-out-expo) ${1400 + i * 100}ms`
-                      }}
-                    />
-                  </span>
-                  <span
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '0.78rem',
-                      fontVariantNumeric: 'tabular-nums',
-                      color: 'var(--ink-70)',
-                      whiteSpace: 'nowrap'
-                    }}
-                  >
-                    <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{e.score}%</span>
-                    <span style={{ color: 'var(--ink)', fontWeight: 600, marginLeft: 8 }}>{e.change}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </main>
+        {/* Two panels in one frame */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1px 1.15fr' }}>
+          <div style={{ padding: 28, minWidth: 0 }}>
+            <CitationScore on={on} reduced={reduced} />
+          </div>
+          <div aria-hidden style={{ background: 'var(--line)' }} />
+          <div style={{ padding: 28, minWidth: 0 }}>
+            <CitationCategories on={on} reduced={reduced} />
+          </div>
         </div>
       </div>
     </div>
+  )
+}
+
+function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
+  const score = useCountUp(4.4, on, 1400)
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', letterSpacing: '0.16em', textTransform: 'uppercase', color: 'var(--ink-50)', fontWeight: 600 }}>
+        Citation Score
+      </div>
+      <div
+        style={{
+          marginTop: 10,
+          fontFamily: 'var(--font-display)',
+          fontSize: '3rem',
+          fontWeight: 600,
+          letterSpacing: '-0.02em',
+          lineHeight: 1,
+          fontVariantNumeric: 'tabular-nums',
+          width: 'fit-content',
+          backgroundImage: 'linear-gradient(135deg, var(--ink) 28%, #8b9bff)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          color: 'transparent'
+        }}
+      >
+        {score.toFixed(1)}%
+      </div>
+      <div style={{ marginTop: 8, fontSize: '0.9rem', color: 'var(--ink-60)' }}>Cited in 46 of 1038 cited answers</div>
+
+      <div style={{ marginTop: 'auto', paddingTop: 28, display: 'flex', alignItems: 'flex-end', gap: 18 }}>
+        {BARS.map((b, i) => (
+          <div key={b.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
+            <div style={{ width: '100%', height: 184, display: 'flex', alignItems: 'flex-end' }}>
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: on || reduced ? `${b.h}%` : '0%',
+                  borderRadius: '9px 9px 4px 4px',
+                  overflow: 'hidden',
+                  backgroundImage: `linear-gradient(180deg, ${b.from}, ${b.to})`,
+                  boxShadow: `0 8px 22px ${b.from}45`,
+                  transition: reduced ? 'none' : `height 1s ${EASE} ${0.3 + i * 0.1}s`
+                }}
+              >
+                <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.4), transparent 42%)' }} />
+                {!reduced && (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      height: '45%',
+                      top: '-45%',
+                      background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.5), transparent)',
+                      animation: `heroBarSheen ${2.6 + i * 0.25}s ease-in-out ${i * 0.2}s infinite`
+                    }}
+                  />
+                )}
+              </div>
+            </div>
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 42, height: 42, borderRadius: 12, background: 'var(--ink-06)', border: '1px solid var(--line)', flexShrink: 0 }}>
+              <BrandGlyph name={b.key} />
+            </span>
+          </div>
+        ))}
+      </div>
+      <style>{'@keyframes heroBarSheen{0%{transform:translateY(0);opacity:0}25%{opacity:1}100%{transform:translateY(560%);opacity:0}}'}</style>
+    </div>
+  )
+}
+
+function CitationCategories({ on, reduced }: { on: boolean; reduced: boolean }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>Citation categories</div>
+      <div style={{ marginTop: 6, fontSize: '0.84rem', color: 'var(--ink-50)' }}>Where the engines pull citations from · this window</div>
+
+      <div style={{ marginTop: 'auto', marginBottom: 'auto', paddingTop: 18, display: 'flex', alignItems: 'center', gap: 28 }}>
+        <Donut on={on} reduced={reduced} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {CATS.map((c, i) => (
+            <div
+              key={c.label}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '9px 0',
+                borderBottom: i < CATS.length - 1 ? '1px solid var(--line)' : 'none',
+                opacity: on || reduced ? 1 : 0,
+                transform: on || reduced ? 'none' : 'translateY(6px)',
+                transition: reduced ? 'none' : `opacity 0.5s ${EASE} ${0.6 + i * 0.1}s, transform 0.5s ${EASE} ${0.6 + i * 0.1}s`
+              }}
+            >
+              <span style={{ width: 11, height: 11, borderRadius: 3, background: c.color, flexShrink: 0, boxShadow: `0 0 9px ${c.color}77` }} />
+              <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--ink)' }}>{c.label}</span>
+              <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.92rem', color: 'var(--ink)' }}>{c.pct}%</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--ink-50)', minWidth: '3.6rem', textAlign: 'right' }}>{c.count}</span>
+              <span style={{ color: 'var(--ink-40)', fontSize: '0.9rem' }}>›</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Donut({ on, reduced }: { on: boolean; reduced: boolean }) {
+  const total = useCountInt(16542, on, 1700)
+  const cx = 100
+  const cy = 100
+  const r = 80
+  const C = 2 * Math.PI * r
+  let cum = 0
+  return (
+    <div style={{ position: 'relative', width: 200, height: 200, flexShrink: 0 }}>
+      <div
+        aria-hidden
+        style={{ position: 'absolute', inset: '12%', borderRadius: '999px', background: 'radial-gradient(circle, rgba(124,108,245,0.20), rgba(52,211,153,0.08) 55%, transparent 72%)', filter: 'blur(10px)' }}
+      />
+      <svg viewBox="0 0 200 200" width="200" height="200" style={{ position: 'relative', display: 'block' }} aria-hidden>
+        <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--ink-06)" strokeWidth="22" />
+        {DONUT.map((s, i) => {
+          const frac = s.pct / 100
+          const segLen = Math.max(3, frac * C - 3)
+          const rot = (cum / 100) * 360 - 90
+          const node = (
+            <circle
+              key={i}
+              cx={cx}
+              cy={cy}
+              r={r}
+              fill="none"
+              stroke={s.color}
+              strokeWidth="22"
+              strokeLinecap="butt"
+              strokeDasharray={`${segLen} ${C}`}
+              strokeDashoffset={on || reduced ? 0 : segLen}
+              transform={`rotate(${rot} ${cx} ${cy})`}
+              style={{
+                filter: `drop-shadow(0 0 6px ${s.color}66)`,
+                transition: reduced ? 'none' : `stroke-dashoffset 0.9s ${EASE} ${0.3 + i * 0.16}s`
+              }}
+            />
+          )
+          cum += s.pct
+          return node
+        })}
+      </svg>
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.3rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+          {total.toLocaleString()}
+        </div>
+        <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '0.64rem', letterSpacing: '0.18em', color: 'var(--ink-50)' }}>CITATIONS</div>
+      </div>
+    </div>
+  )
+}
+
+function BrandGlyph({ name }: { name: string }) {
+  const s = 22
+  if (name === 'microsoft') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" aria-hidden>
+        <rect x="3" y="3" width="8" height="8" rx="1" fill="#f25022" />
+        <rect x="13" y="3" width="8" height="8" rx="1" fill="#7fba00" />
+        <rect x="3" y="13" width="8" height="8" rx="1" fill="#00a4ef" />
+        <rect x="13" y="13" width="8" height="8" rx="1" fill="#ffb900" />
+      </svg>
+    )
+  }
+  if (name === 'monday') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" aria-hidden>
+        <rect x="3" y="7" width="4.4" height="10" rx="2.2" fill="#ff3d57" />
+        <rect x="9.8" y="7" width="4.4" height="10" rx="2.2" fill="#ffcb00" />
+        <rect x="16.6" y="7" width="4.4" height="10" rx="2.2" fill="#00c875" />
+      </svg>
+    )
+  }
+  if (name === 'check') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <path d="M2 13l4.2 4.2L13 9.5" />
+        <path d="M11 16.6l1.4 1.4L21.6 8.4" />
+      </svg>
+    )
+  }
+  if (name === 'atlassian') {
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" aria-hidden>
+        <path d="M7.05 11.3a.62.62 0 00-1.07.08L2.07 19a.62.62 0 00.56.9h5.02a.6.6 0 00.55-.34c1.04-2.12.42-5.34-1.15-8.26z" fill="#2684ff" />
+        <path d="M11.36 4.5a8.3 8.3 0 00-.48 8.18l2.6 5.2a.62.62 0 00.56.34h5.02a.62.62 0 00.56-.9S12.5 4.74 12.42 4.5a.6.6 0 00-1.06 0z" fill="#2684ff" />
+      </svg>
+    )
+  }
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill="#f06a6a" aria-hidden>
+      <circle cx="12" cy="6.6" r="3.3" />
+      <circle cx="6.6" cy="15.4" r="3.3" />
+      <circle cx="17.4" cy="15.4" r="3.3" />
+    </svg>
   )
 }
