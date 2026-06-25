@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { Button, Container, ArrowRight } from '@/components/ui'
 import { LIGHT } from './mocks/palette'
 
@@ -31,13 +31,9 @@ const CATS = [
   { label: 'Owned', pct: 7, count: '1,168', color: '#22c55e' },
   { label: 'Earned media', pct: 1, count: '183', color: '#f59e0b' }
 ]
-// Donut draw order, clockwise from top (colored arcs first, grey fills the rest).
-const DONUT = [
-  { color: '#7c6cf5', pct: 10 },
-  { color: '#22c55e', pct: 7 },
-  { color: '#f59e0b', pct: 1 },
-  { color: '#8a8f98', pct: 82 }
-]
+// Donut draw order (indices into CATS), clockwise from top: colored arcs first,
+// grey "Other" fills the rest.
+const DONUT_ORDER = [1, 2, 3, 0]
 
 export function HomeHero() {
   return (
@@ -250,9 +246,9 @@ function HeroBento() {
       >
         {/* App chrome top bar */}
         <div style={{ height: 48, borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12 }}>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {[0, 1, 2].map((k) => (
-              <span key={k} style={{ height: 10, width: 10, borderRadius: 999, background: 'var(--ink-15)' }} />
+          <div style={{ display: 'flex', gap: 8 }}>
+            {['#ff5f57', '#febc2e', '#28c840'].map((c) => (
+              <span key={c} style={{ height: 12, width: 12, borderRadius: 999, background: c }} />
             ))}
           </div>
           <div style={{ flex: 1, textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.74rem', color: 'var(--ink-50)' }}>
@@ -349,89 +345,176 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
 }
 
 function CitationCategories({ on, reduced }: { on: boolean; reduced: boolean }) {
+  const [hovered, setHovered] = useState<number | null>(null)
+  const [tip, setTip] = useState<{ x: number; y: number } | null>(null)
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.15rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>Citation categories</div>
       <div style={{ marginTop: 6, fontSize: '0.84rem', color: 'var(--ink-50)' }}>Where the engines pull citations from · this window</div>
 
       <div style={{ marginTop: 'auto', marginBottom: 'auto', paddingTop: 18, display: 'flex', alignItems: 'center', gap: 28 }}>
-        <Donut on={on} reduced={reduced} />
+        <Donut on={on} reduced={reduced} hovered={hovered} setHovered={setHovered} tip={tip} setTip={setTip} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          {CATS.map((c, i) => (
-            <div
-              key={c.label}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 10,
-                padding: '9px 0',
-                borderBottom: i < CATS.length - 1 ? '1px solid var(--line)' : 'none',
-                opacity: on || reduced ? 1 : 0,
-                transform: on || reduced ? 'none' : 'translateY(6px)',
-                transition: reduced ? 'none' : `opacity 0.5s ${EASE} ${0.6 + i * 0.1}s, transform 0.5s ${EASE} ${0.6 + i * 0.1}s`
-              }}
-            >
-              <span style={{ width: 11, height: 11, borderRadius: 3, background: c.color, flexShrink: 0, boxShadow: `0 0 9px ${c.color}77` }} />
-              <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--ink)' }}>{c.label}</span>
-              <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.92rem', color: 'var(--ink)' }}>{c.pct}%</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--ink-50)', minWidth: '3.6rem', textAlign: 'right' }}>{c.count}</span>
-              <span style={{ color: 'var(--ink-40)', fontSize: '0.9rem' }}>›</span>
-            </div>
-          ))}
+          {CATS.map((c, i) => {
+            const active = hovered === i
+            const dim = hovered !== null && !active
+            return (
+              <div
+                key={c.label}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered(null)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '9px 8px',
+                  margin: '0 -8px',
+                  borderRadius: 8,
+                  cursor: 'default',
+                  borderBottom: i < CATS.length - 1 ? '1px solid var(--line)' : 'none',
+                  background: active ? 'var(--subtle)' : 'transparent',
+                  opacity: on || reduced ? (dim ? 0.5 : 1) : 0,
+                  transform: on || reduced ? 'none' : 'translateY(6px)',
+                  transition: reduced
+                    ? 'none'
+                    : `opacity 0.35s ${EASE}${on ? '' : ` ${0.6 + i * 0.1}s`}, transform 0.5s ${EASE} ${0.6 + i * 0.1}s, background 0.2s ${EASE}`
+                }}
+              >
+                <span style={{ width: 11, height: 11, borderRadius: 3, background: c.color, flexShrink: 0, boxShadow: `0 0 9px ${c.color}77` }} />
+                <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--ink)' }}>{c.label}</span>
+                <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.92rem', color: 'var(--ink)' }}>{c.pct}%</span>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--ink-50)', minWidth: '3.6rem', textAlign: 'right' }}>{c.count}</span>
+                <span style={{ color: 'var(--ink-40)', fontSize: '0.9rem' }}>›</span>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
   )
 }
 
-function Donut({ on, reduced }: { on: boolean; reduced: boolean }) {
+function Donut({
+  on,
+  reduced,
+  hovered,
+  setHovered,
+  tip,
+  setTip
+}: {
+  on: boolean
+  reduced: boolean
+  hovered: number | null
+  setHovered: (v: number | null) => void
+  tip: { x: number; y: number } | null
+  setTip: (v: { x: number; y: number } | null) => void
+}) {
   const total = useCountInt(16542, on, 1700)
+  const boxRef = useRef<HTMLDivElement>(null)
   const cx = 100
   const cy = 100
   const r = 80
   const C = 2 * Math.PI * r
+
   let cum = 0
+  const segs = DONUT_ORDER.map((idx) => {
+    const c = CATS[idx]
+    const segLen = Math.max(3, (c.pct / 100) * C - 3)
+    const rot = (cum / 100) * 360 - 90
+    cum += c.pct
+    return { idx, color: c.color, segLen, rot }
+  })
+
+  const onMove = (idx: number) => (e: ReactMouseEvent) => {
+    const rect = boxRef.current?.getBoundingClientRect()
+    if (!rect) return
+    setHovered(idx)
+    setTip({ x: e.clientX - rect.left, y: e.clientY - rect.top })
+  }
+
   return (
-    <div style={{ position: 'relative', width: 200, height: 200, flexShrink: 0 }}>
+    <div
+      ref={boxRef}
+      style={{ position: 'relative', width: 200, height: 200, flexShrink: 0 }}
+      onMouseLeave={() => {
+        setHovered(null)
+        setTip(null)
+      }}
+    >
       <div
         aria-hidden
         style={{ position: 'absolute', inset: '12%', borderRadius: '999px', background: 'radial-gradient(circle, rgba(124,108,245,0.20), rgba(52,211,153,0.08) 55%, transparent 72%)', filter: 'blur(10px)' }}
       />
-      <svg viewBox="0 0 200 200" width="200" height="200" style={{ position: 'relative', display: 'block' }} aria-hidden>
+      <svg viewBox="0 0 200 200" width="200" height="200" style={{ position: 'relative', display: 'block', overflow: 'visible' }}>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--ink-06)" strokeWidth="22" />
-        {DONUT.map((s, i) => {
-          const frac = s.pct / 100
-          const segLen = Math.max(3, frac * C - 3)
-          const rot = (cum / 100) * 360 - 90
-          const node = (
+        {segs.map((s, i) => {
+          const active = hovered === s.idx
+          const dim = hovered !== null && !active
+          return (
             <circle
-              key={i}
+              key={s.idx}
               cx={cx}
               cy={cy}
               r={r}
               fill="none"
               stroke={s.color}
-              strokeWidth="22"
+              strokeWidth={active ? 29 : 22}
               strokeLinecap="butt"
-              strokeDasharray={`${segLen} ${C}`}
-              strokeDashoffset={on || reduced ? 0 : segLen}
-              transform={`rotate(${rot} ${cx} ${cy})`}
+              strokeDasharray={`${s.segLen} ${C}`}
+              strokeDashoffset={on || reduced ? 0 : s.segLen}
+              transform={`rotate(${s.rot} ${cx} ${cy})`}
+              onMouseMove={onMove(s.idx)}
               style={{
-                filter: `drop-shadow(0 0 6px ${s.color}66)`,
-                transition: reduced ? 'none' : `stroke-dashoffset 0.9s ${EASE} ${0.3 + i * 0.16}s`
+                cursor: 'pointer',
+                opacity: dim ? 0.45 : 1,
+                filter: active ? `drop-shadow(0 0 11px ${s.color})` : `drop-shadow(0 0 6px ${s.color}66)`,
+                transition: reduced
+                  ? 'none'
+                  : `stroke-dashoffset 0.9s ${EASE} ${0.3 + i * 0.16}s, stroke-width 0.22s ${EASE}, opacity 0.22s ${EASE}, filter 0.22s ${EASE}`
               }}
             />
           )
-          cum += s.pct
-          return node
         })}
       </svg>
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
+      <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.3rem', fontWeight: 600, letterSpacing: '-0.02em', lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
           {total.toLocaleString()}
         </div>
         <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '0.64rem', letterSpacing: '0.18em', color: 'var(--ink-50)' }}>CITATIONS</div>
       </div>
+
+      {tip && hovered !== null && <DonutTip cat={CATS[hovered]} x={tip.x} y={tip.y} />}
+    </div>
+  )
+}
+
+function DonutTip({ cat, x, y }: { cat: (typeof CATS)[number]; x: number; y: number }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: x,
+        top: y,
+        transform: 'translate(-50%, -118%)',
+        pointerEvents: 'none',
+        zIndex: 12,
+        background: '#18181c',
+        color: '#fff',
+        borderRadius: 11,
+        padding: '9px 12px',
+        minWidth: 124,
+        boxShadow: '0 12px 30px rgba(0,0,0,0.4)',
+        animation: 'clvTipPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) both'
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ width: 9, height: 9, borderRadius: 3, background: cat.color, flexShrink: 0, boxShadow: `0 0 8px ${cat.color}` }} />
+        <span style={{ fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.01em' }}>{cat.label}</span>
+      </div>
+      <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 700, lineHeight: 1 }}>{cat.count}</div>
+      <div style={{ marginTop: 3, fontSize: '0.74rem', color: 'rgba(255,255,255,0.62)' }}>{cat.pct}% of total citations</div>
+      <style>{'@keyframes clvTipPop{from{opacity:0;transform:translate(-50%,-100%) scale(0.92)}to{opacity:1;transform:translate(-50%,-118%) scale(1)}}'}</style>
     </div>
   )
 }
