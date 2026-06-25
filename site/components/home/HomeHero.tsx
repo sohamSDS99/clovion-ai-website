@@ -17,19 +17,19 @@ const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 // Left panel — citation-score bars, each brand-tinted with a vibrant gradient.
 const BARS = [
-  { key: 'microsoft', h: 100, from: '#8a8f98', to: '#8a8f98' },
-  { key: 'monday', h: 74, from: '#22c55e', to: '#22c55e' },
-  { key: 'check', h: 80, from: '#f59e0b', to: '#f59e0b' },
-  { key: 'atlassian', h: 62, from: '#7c6cf5', to: '#7c6cf5' },
-  { key: 'asana', h: 55, from: '#22c55e', to: '#22c55e' }
+  { key: 'microsoft', h: 100, color: 'rgba(10,10,15,0.82)' },
+  { key: 'monday', h: 74, color: 'rgba(10,10,15,0.5)' },
+  { key: 'check', h: 80, color: 'rgba(10,10,15,0.62)' },
+  { key: 'atlassian', h: 62, color: 'rgba(10,10,15,0.4)' },
+  { key: 'asana', h: 55, color: 'rgba(10,10,15,0.34)' }
 ]
 
 // Right panel — citation categories (legend order).
 const CATS = [
-  { label: 'Other', pct: 82, count: '13,492', color: '#8a8f98' },
-  { label: 'Social', pct: 10, count: '1,699', color: '#7c6cf5' },
-  { label: 'Owned', pct: 7, count: '1,168', color: '#22c55e' },
-  { label: 'Earned media', pct: 1, count: '183', color: '#f59e0b' }
+  { label: 'Other', pct: 82, count: '13,492', color: 'rgba(10,10,15,0.30)' },
+  { label: 'Social', pct: 10, count: '1,699', color: 'rgba(10,10,15,0.55)' },
+  { label: 'Owned', pct: 7, count: '1,168', color: '#047857' },
+  { label: 'Earned media', pct: 1, count: '183', color: 'rgba(10,10,15,0.80)' }
 ]
 // Donut draw order (indices into CATS), clockwise from top: colored arcs first,
 // grey "Other" fills the rest.
@@ -371,7 +371,7 @@ function Composer({ on, reduced }: { on: boolean; reduced: boolean }) {
         >
           <div
             aria-hidden
-            style={{ position: 'absolute', inset: '-22% -10% -34%', borderRadius: 34, background: 'radial-gradient(58% 60% at 50% 100%, rgba(124,108,245,0.16), transparent 70%)', filter: 'blur(16px)', zIndex: -1 }}
+            style={{ position: 'absolute', inset: '-22% -10% -34%', borderRadius: 34, background: 'radial-gradient(58% 60% at 50% 100%, rgba(4,120,87,0.10), transparent 70%)', filter: 'blur(16px)', zIndex: -1 }}
           />
 
           {/* Clovion mark inside the chatbox */}
@@ -420,7 +420,7 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
           lineHeight: 1,
           fontVariantNumeric: 'tabular-nums',
           width: 'fit-content',
-          backgroundImage: 'linear-gradient(135deg, var(--ink) 28%, #8b9bff)',
+          backgroundImage: 'linear-gradient(135deg, var(--ink) 30%, var(--ink-60))',
           WebkitBackgroundClip: 'text',
           backgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
@@ -442,12 +442,12 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
                   height: on || reduced ? `${b.h}%` : '0%',
                   borderRadius: '9px 9px 4px 4px',
                   overflow: 'hidden',
-                  backgroundImage: `linear-gradient(180deg, ${b.from}, ${b.to})`,
-                  boxShadow: `0 8px 22px ${b.from}45`,
+                  background: b.color,
+                  boxShadow: '0 6px 16px rgba(10,10,15,0.10)',
                   transition: reduced ? 'none' : `height 1s ${EASE} ${0.3 + i * 0.1}s`
                 }}
               >
-                <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.4), transparent 42%)' }} />
+                <div aria-hidden style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.16), transparent 42%)' }} />
                 {!reduced && (
                   <div
                     aria-hidden
@@ -457,7 +457,7 @@ function CitationScore({ on, reduced }: { on: boolean; reduced: boolean }) {
                       right: 0,
                       height: '45%',
                       top: '-45%',
-                      background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.5), transparent)',
+                      background: 'linear-gradient(180deg, transparent, rgba(255,255,255,0.28), transparent)',
                       animation: `heroBarSheen ${2.6 + i * 0.25}s ease-in-out ${i * 0.2}s infinite`
                     }}
                   />
@@ -511,7 +511,7 @@ function CitationCategories({ on, reduced }: { on: boolean; reduced: boolean }) 
                     : `opacity 0.35s ${EASE}${on ? '' : ` ${0.6 + i * 0.1}s`}, transform 0.5s ${EASE} ${0.6 + i * 0.1}s, background 0.2s ${EASE}`
                 }}
               >
-                <span style={{ width: 11, height: 11, borderRadius: 3, background: c.color, flexShrink: 0, boxShadow: `0 0 9px ${c.color}77` }} />
+                <span style={{ width: 11, height: 11, borderRadius: 3, background: c.color, flexShrink: 0 }} />
                 <span style={{ fontSize: '0.92rem', fontWeight: 600, color: 'var(--ink)' }}>{c.label}</span>
                 <span style={{ marginLeft: 'auto', fontFamily: 'var(--font-mono)', fontWeight: 700, fontSize: '0.92rem', color: 'var(--ink)' }}>{c.pct}%</span>
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.84rem', color: 'var(--ink-50)', minWidth: '3.6rem', textAlign: 'right' }}>{c.count}</span>
@@ -574,7 +574,7 @@ function Donut({
     >
       <div
         aria-hidden
-        style={{ position: 'absolute', inset: '12%', borderRadius: '999px', background: 'radial-gradient(circle, rgba(124,108,245,0.20), rgba(52,211,153,0.08) 55%, transparent 72%)', filter: 'blur(10px)' }}
+        style={{ position: 'absolute', inset: '12%', borderRadius: '999px', background: 'radial-gradient(circle, rgba(4,120,87,0.09), transparent 70%)', filter: 'blur(10px)' }}
       />
       <svg viewBox="0 0 200 200" width="200" height="200" style={{ position: 'relative', display: 'block', overflow: 'visible' }}>
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--ink-06)" strokeWidth="22" />
@@ -598,10 +598,9 @@ function Donut({
               style={{
                 cursor: 'pointer',
                 opacity: dim ? 0.45 : 1,
-                filter: active ? `drop-shadow(0 0 11px ${s.color})` : `drop-shadow(0 0 6px ${s.color}66)`,
                 transition: reduced
                   ? 'none'
-                  : `stroke-dashoffset 0.9s ${EASE} ${0.3 + i * 0.16}s, stroke-width 0.22s ${EASE}, opacity 0.22s ${EASE}, filter 0.22s ${EASE}`
+                  : `stroke-dashoffset 0.9s ${EASE} ${0.3 + i * 0.16}s, stroke-width 0.22s ${EASE}, opacity 0.22s ${EASE}`
               }}
             />
           )
@@ -640,7 +639,7 @@ function DonutTip({ cat, x, y }: { cat: (typeof CATS)[number]; x: number; y: num
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 9, height: 9, borderRadius: 3, background: cat.color, flexShrink: 0, boxShadow: `0 0 8px ${cat.color}` }} />
+        <span style={{ width: 9, height: 9, borderRadius: 3, background: cat.color, flexShrink: 0 }} />
         <span style={{ fontSize: '0.82rem', fontWeight: 600, letterSpacing: '0.01em' }}>{cat.label}</span>
       </div>
       <div style={{ marginTop: 6, fontFamily: 'var(--font-mono)', fontSize: '1rem', fontWeight: 700, lineHeight: 1 }}>{cat.count}</div>
