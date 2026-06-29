@@ -30,6 +30,15 @@ const groups = [
     ]
   },
   {
+    title: 'Free Tools',
+    links: [
+      { label: 'llms.txt Generator', href: '/tools/llms-txt-generator' },
+      { label: 'AI Crawlability Checker', href: '/tools/ai-crawlability-checker' },
+      { label: 'Robots.txt AI Bot Checker', href: '/tools/robots-checker' },
+      { label: 'Query Fan-Out Generator', href: '/tools/fanout' }
+    ]
+  },
+  {
     title: 'Company',
     links: [
       { label: 'About', href: '/about' },
@@ -75,7 +84,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {groups.map((g) => (
               <div key={g.title}>
                 <div className="text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-ink-50 mb-4">{g.title}</div>
