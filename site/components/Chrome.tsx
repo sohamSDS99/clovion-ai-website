@@ -9,7 +9,7 @@ import { HomeFooter } from './HomeFooter'
 const HOME_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/brand-perception', '/features/fanout-query', '/features/ai-crawlability', '/features/platform-coverage', '/pricing', '/affiliate', '/free-ai-visibility-score', '/customers', '/about', '/changelog', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
 
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
-const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal']
+const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
 function isHomeChrome(pathname: string): boolean {
   if (HOME_ROUTES.has(pathname)) return true

@@ -8,7 +8,7 @@ const DARK_ROUTES = new Set<string>(['/', '/features/ai-visibility-tracking', '/
 // Prefix-matched dark sections — covers index + every nested/[slug] page.
 // The whole marketing site is dark, so this spans content, docs, legal, and
 // the comparison/alternatives pages.
-const DARK_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal']
+const DARK_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
 function isDarkRoute(pathname: string): boolean {
   if (DARK_ROUTES.has(pathname)) return true
