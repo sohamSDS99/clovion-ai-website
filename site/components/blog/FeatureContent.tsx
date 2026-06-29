@@ -78,89 +78,6 @@ function Hero() {
   )
 }
 
-function ChipRail({
-  active,
-  onChange,
-  counts
-}: {
-  active: Category
-  onChange: (next: Category) => void
-  counts: Record<Category, number>
-}) {
-  const chips: { key: Category; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'geo', label: 'GEO' },
-    { key: 'ai-search', label: 'AI Search' },
-    { key: 'seo', label: 'SEO' }
-  ]
-  return (
-    <section style={{ padding: '2rem 0 1rem' }}>
-      {/* Top padding separates the filter rail from the featured card above it
-          (the featured section has 0 bottom padding, so they'd otherwise touch). */}
-      <div style={CONTAINER}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            flexWrap: 'wrap',
-            paddingBottom: 8
-          }}
-        >
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.74rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              color: 'var(--ink-50)',
-              marginRight: 4
-            }}
-          >
-            Filter
-          </span>
-          {chips.map((c) => {
-            const isActive = active === c.key
-            return (
-              <button
-                key={c.key}
-                onClick={() => onChange(c.key)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 16px',
-                  borderRadius: 999,
-                  border: isActive ? '1px solid var(--white)' : '1px solid var(--line)',
-                  background: isActive ? 'var(--white)' : 'transparent',
-                  color: isActive ? 'var(--ink-surface, #0a0a0f)' : 'var(--ink-70)',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.78rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                  cursor: 'pointer',
-                  transition: 'all .2s ease'
-                }}
-              >
-                <span>{c.label}</span>
-                <span
-                  style={{
-                    fontVariantNumeric: 'tabular-nums',
-                    color: isActive ? 'var(--ink-50)' : 'var(--ink-50)',
-                    opacity: 0.75
-                  }}
-                >
-                  {counts[c.key]}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 // Card shape the composer renders. CMS posts are mapped into this shape and
 // merged with the curated blogPosts; tag/readTime/role are optional because
 // CMS summaries may not carry them.
@@ -183,9 +100,10 @@ function FeaturedCard({ post }: { post: Post }) {
   // Text block is shared by both layouts (banner-on-top when a cover exists,
   // side-by-side placeholder otherwise) so the two paths can't drift.
   const textBlock = (
-    <div style={{ padding: 'clamp(2rem, 4vw, 3.25rem)', display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ height: '100%', boxSizing: 'border-box', padding: 'clamp(1.5rem, 2.5vw, 2rem)', display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div
         style={{
+          flexShrink: 0,
           display: 'inline-flex',
           alignItems: 'center',
           gap: 10,
@@ -200,17 +118,20 @@ function FeaturedCard({ post }: { post: Post }) {
         <span style={{ height: 1, width: 24, background: 'var(--ink-25, rgba(255,255,255,0.24))' }} />
         <span>{categoryLabel(post.category)}</span>
       </div>
-      <h2 style={{ ...DISPLAY_MD, margin: 0 }}>{post.title}</h2>
+      <h2 style={{ ...DISPLAY_MD, fontSize: 'clamp(1.4rem, 1.7vw + 0.45rem, 2.05rem)', lineHeight: 1.1, flexShrink: 0, margin: 0 }}>{post.title}</h2>
       <p
         style={{
           ...LEAD,
           fontSize: '1.02rem',
           margin: 0,
           maxWidth: 640,
-          // Clamp so the text column never exceeds the image's 16:9 height in the
-          // side-by-side layout (which would stretch & crop the cover).
+          flexShrink: 0,
+          // Clamp to 2 lines so the text column fits within the cover's 16:9
+          // height in the side-by-side layout — the card height equals the image
+          // height, so a longer excerpt can't push the text past it and get
+          // clipped. flexShrink:0 keeps the flex column from collapsing it.
           display: '-webkit-box',
-          WebkitLineClamp: 3,
+          WebkitLineClamp: 2,
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden'
         }}
@@ -308,19 +229,20 @@ function FeaturedCard({ post }: { post: Post }) {
           >
             {post.coverImageUrl ? (
               // Side-by-side, picture-dominant: image LEFT (~60%, the 1.5fr
-              // track), text RIGHT (~40%, the 1fr track). The image sits in a
-              // fixed 16:9 frame — object-fit:cover fills it with no bars and the
-              // aspect-ratio reserves the box before load (no CLS). The image's
-              // 16:9 height drives the card; the excerpt is line-clamped so the
-              // text column stays within that height — the cover is neither
-              // stretched/cropped nor leaves an empty gap. inset hairline keeps a
-              // dark/near-black cover framed and gives a clean seam to the text.
-              // On mobile the grid collapses to one column: image on top.
+              // track), text RIGHT (~40%, the 1fr track). The cover is a
+              // designed landscape banner, so it must show WHOLE (no crop): it
+              // sits in a fixed 16:9 frame that drives the card height. The text
+              // cell positions its content absolutely on desktop so it never
+              // expands the row past the image height — the card height equals
+              // the image height, so there's no black gap below the cover and no
+              // crop. On mobile the grid collapses to one column (image on top,
+              // text static below). inset hairline keeps a dark/near-black cover
+              // framed.
               <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
                 <div
+                  className="aspect-[16/9]"
                   style={{
                     position: 'relative',
-                    aspectRatio: '16 / 9',
                     overflow: 'hidden',
                     background: 'var(--ink-surface, #0a0a0f)'
                   }}
@@ -336,7 +258,9 @@ function FeaturedCard({ post }: { post: Post }) {
                     style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.14)', pointerEvents: 'none' }}
                   />
                 </div>
-                {textBlock}
+                <div className="relative" style={{ overflow: 'hidden' }}>
+                  <div className="md:absolute md:inset-0">{textBlock}</div>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr]" style={{ position: 'relative' }}>
@@ -805,38 +729,17 @@ function FAQItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean
 }
 
 function FAQ() {
-  const [open, setOpen] = useState<number>(0)
+  // Start with everything collapsed (-1) — index 0 was forced open before.
+  const [open, setOpen] = useState<number>(-1)
   return (
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0' }}>Blog, answered.</h2>
-            <p style={{ ...LEAD, fontSize: '0.96rem', margin: '18px 0 0', maxWidth: 360 }}>
-              Cadence, sourcing, reuse, and how to send us something to publish.
-            </p>
-            <a
-              href="mailto:research@clovion.ai"
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none'
-              }}
-            >
-              Email the research team <ArrowRight />
-            </a>
-          </div>
-          <div>
-            {FAQS.map((f, i) => (
-              <FAQItem key={i} q={f.q} a={f.a} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
-            ))}
-          </div>
+        {/* Centered, single-column: just the title, then the accordion below. */}
+        <h2 style={{ ...DISPLAY_MD, margin: 0, textAlign: 'center' }}>Frequently Asked Questions</h2>
+        <div style={{ maxWidth: 760, margin: '40px auto 0' }}>
+          {FAQS.map((f, i) => (
+            <FAQItem key={i} q={f.q} a={f.a} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
+          ))}
         </div>
       </div>
     </section>
@@ -892,7 +795,9 @@ export default function FeatureContent({
   initialCategory?: Category
   cmsPosts?: Post[]
 }) {
-  const [active, setActive] = useState<Category>(initialCategory)
+  // No on-page filter UI anymore; the category is fixed by the route
+  // (/blog shows all, /blog/category/<x> pre-filters via initialCategory).
+  const [active] = useState<Category>(initialCategory)
 
   // Only CMS-published posts are shown — each one maps to a real
   // /blog/[slug] detail page. (The old curated/demo posts were dropped: they
@@ -910,16 +815,6 @@ export default function FeatureContent({
 
   const featured = sorted[0]
   const rest = sorted.slice(1)
-
-  const counts = useMemo<Record<Category, number>>(() => {
-    const c: Record<Category, number> = { all: rest.length, geo: 0, 'ai-search': 0, seo: 0 }
-    rest.forEach((p) => {
-      if (p.category === 'geo' || p.category === 'ai-search' || p.category === 'seo') {
-        c[p.category]++
-      }
-    })
-    return c
-  }, [rest])
 
   const filtered = useMemo<Post[]>(() => {
     if (active === 'all') return rest
@@ -956,7 +851,6 @@ export default function FeatureContent({
     <>
       <Hero />
       <FeaturedCard post={featured} />
-      <ChipRail active={active} onChange={setActive} counts={counts} />
       <PostGrid posts={filtered} />
       <NewsletterBand />
       <FAQ />
