@@ -94,7 +94,9 @@ function ChipRail({
     { key: 'seo', label: 'SEO' }
   ]
   return (
-    <section style={{ padding: '0 0 1rem' }}>
+    <section style={{ padding: '2rem 0 1rem' }}>
+      {/* Top padding separates the filter rail from the featured card above it
+          (the featured section has 0 bottom padding, so they'd otherwise touch). */}
       <div style={CONTAINER}>
         <div
           style={{
