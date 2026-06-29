@@ -5,6 +5,8 @@ import { CTABanner } from '@/components/sections'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { PostHeader } from '@/components/cms/PostHeader'
+import { ArticleToc } from '@/components/cms/ArticleToc'
+import { extractToc } from '@/components/cms/toc'
 import { getContent, listSlugs } from '@/lib/cms'
 
 export const revalidate = 300
@@ -61,6 +63,10 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     item.category?.name
   ].filter(Boolean) as string[]
 
+  // Inject stable ids into the body's H2s and pull the section list for the
+  // sticky TOC rail.
+  const { html: bodyHtml, toc } = extractToc(item.bodyHtml)
+
   return (
     <article className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
@@ -88,8 +94,21 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
       <Section tight className="!pt-0">
         <Container>
-          <div className="max-w-3xl">
-            <ProseHtml html={item.bodyHtml} />
+          {/* Two-column reading layout: sticky H2 rail (left) + body (right).
+              On < lg the rail is hidden and the body spans full width. The
+              sticky lives inside the grid track so it releases when the body
+              ends, then scrolls away with the page. */}
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
+            {toc.length > 0 && (
+              <aside className="hidden lg:block">
+                <div className="lg:sticky lg:top-24">
+                  <ArticleToc items={toc} />
+                </div>
+              </aside>
+            )}
+            <div className="min-w-0 max-w-3xl">
+              <ProseHtml html={bodyHtml} />
+            </div>
           </div>
         </Container>
       </Section>
