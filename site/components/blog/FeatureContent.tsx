@@ -172,6 +172,7 @@ export type Post = {
   readTime?: string
   tag?: string
   role?: string
+  coverImageUrl?: string | null
 }
 
 function FeaturedCard({ post }: { post: Post }) {
@@ -300,61 +301,73 @@ function FeaturedCard({ post }: { post: Post }) {
                 overflow: 'hidden'
               }}
             >
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  opacity: 0.5,
-                  backgroundImage: 'radial-gradient(rgba(255,255,255,0.55) 1px, transparent 1px)',
-                  backgroundSize: '18px 18px'
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background:
-                    'radial-gradient(ellipse 65% 55% at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 70%)'
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexDirection: 'column'
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    fontStyle: 'italic',
-                    fontWeight: 600,
-                    fontSize: 'clamp(5rem, 12vw, 11rem)',
-                    lineHeight: 0.85,
-                    letterSpacing: '-0.04em',
-                    color: 'var(--on-ink, #fff)',
-                    opacity: 0.92,
-                    userSelect: 'none'
-                  }}
-                >
-                  {categoryLabel(post.category).split(' ')[0].toUpperCase()}
-                </span>
-                <span
-                  style={{
-                    marginTop: 18,
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.7rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.32em',
-                    color: 'var(--on-ink-50, rgba(255,255,255,0.55))'
-                  }}
-                >
-                  Volume 01 · {formatDate(post.date)}
-                </span>
-              </div>
+              {post.coverImageUrl ? (
+                // The post's dedicated cover/title image fills the panel.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={post.coverImageUrl}
+                  alt=""
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <>
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      opacity: 0.5,
+                      backgroundImage: 'radial-gradient(rgba(255,255,255,0.55) 1px, transparent 1px)',
+                      backgroundSize: '18px 18px'
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background:
+                        'radial-gradient(ellipse 65% 55% at 50% 50%, rgba(255,255,255,0.06) 0%, transparent 70%)'
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column'
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-display)',
+                        fontStyle: 'italic',
+                        fontWeight: 600,
+                        fontSize: 'clamp(5rem, 12vw, 11rem)',
+                        lineHeight: 0.85,
+                        letterSpacing: '-0.04em',
+                        color: 'var(--on-ink, #fff)',
+                        opacity: 0.92,
+                        userSelect: 'none'
+                      }}
+                    >
+                      {categoryLabel(post.category).split(' ')[0].toUpperCase()}
+                    </span>
+                    <span
+                      style={{
+                        marginTop: 18,
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.7rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.32em',
+                        color: 'var(--on-ink-50, rgba(255,255,255,0.55))'
+                      }}
+                    >
+                      Volume 01 · {formatDate(post.date)}
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </Link>
@@ -382,13 +395,12 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 18,
-        padding: 28,
         borderRadius: 22,
         border: '1px solid var(--line)',
         background: 'var(--white)',
         textDecoration: 'none',
         color: 'inherit',
+        overflow: 'hidden',
         transition: 'border-color .25s ease',
         height: '100%'
       }}
@@ -399,6 +411,14 @@ function PostCard({ post, index }: { post: Post; index: number }) {
         e.currentTarget.style.borderColor = 'var(--line)'
       }}
     >
+      {post.coverImageUrl && (
+        <div style={{ aspectRatio: '16 / 9', overflow: 'hidden', borderBottom: '1px solid var(--line)' }}>
+          {/* The post's dedicated cover/title image. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={post.coverImageUrl} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        </div>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: 28, flex: 1 }}>
       <div
         style={{
           display: 'inline-flex',
@@ -464,6 +484,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
         <span style={{ marginLeft: 'auto', color: 'var(--ink-60)', display: 'inline-flex' }}>
           <ArrowRight size={15} />
         </span>
+      </div>
       </div>
     </Link>
     </div>
