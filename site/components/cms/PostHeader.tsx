@@ -35,13 +35,16 @@ export function PostHeader({
           </Link>
         )}
 
-        {/* 1 — eyebrow + title */}
+        {/* 1 — eyebrow + title + byline (date · author). Standard editorial
+            order: the byline sits directly under the title — never below the
+            body/excerpt. */}
         <div className={`max-w-3xl ${backHref ? 'mt-8' : ''}`}>
           <Eyebrow>{eyebrow}</Eyebrow>
           <h1 className="display-md mt-5 text-balance">{title}</h1>
+          {meta && <div className="mt-6">{meta}</div>}
         </div>
 
-        {/* 2 — cover image, directly below the title (canonical order) */}
+        {/* 2 — cover/hero image, below the title + byline */}
         {coverImageUrl && (
           <div className="mt-8 overflow-hidden rounded-[24px] border border-[var(--line)]">
             {/* CMS-hosted on an external host → plain <img>, not next/image. */}
@@ -50,11 +53,10 @@ export function PostHeader({
           </div>
         )}
 
-        {/* 3 — excerpt + meta */}
-        {(excerpt || meta) && (
+        {/* 3 — excerpt / lead, after the hero image */}
+        {excerpt && (
           <div className="mt-8 max-w-3xl">
-            {excerpt && <p className="lead text-[var(--ink-70)]">{excerpt}</p>}
-            {meta && <div className={excerpt ? 'mt-6' : ''}>{meta}</div>}
+            <p className="lead text-[var(--ink-70)]">{excerpt}</p>
           </div>
         )}
       </Container>
