@@ -24,11 +24,16 @@ export async function generateMetadata({
 
   const seo = item.seo ?? {}
   const ogImage = seo.ogImage ?? item.coverImageUrl ?? undefined
+  // Always emit a canonical: the CMS value when set, else this post's own URL
+  // (resolved against metadataBase). Prevents duplicate-URL ambiguity for crawlers.
+  const canonical = seo.canonicalUrl || `/blog/${params.slug}`
   return {
     title: seo.metaTitle || item.title,
     description: seo.metaDescription || item.excerpt || undefined,
-    alternates: seo.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: { index: !seo.noIndex, follow: !seo.noIndex },
+    alternates: { canonical },
+    // noindex,follow — a de-indexed post should still let crawlers traverse its
+    // outbound links (don't couple follow to noIndex).
+    robots: { index: !seo.noIndex, follow: true },
     openGraph: {
       title: seo.metaTitle || item.title,
       description: seo.metaDescription || item.excerpt || undefined,

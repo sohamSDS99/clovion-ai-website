@@ -60,7 +60,9 @@ export const metadata: Metadata = {
   },
   description:
     'Track your brand mentions across ChatGPT, Perplexity, Gemini, and AI Overviews. Get the GEO fixes that actually move the needle. Used by Linear, Ramp, Notion, and Vercel.',
-  metadataBase: new URL('https://clovion.ai'),
+  // www is the host that serves 200 (apex 301-redirects to it). Canonical and
+  // OG URLs resolve against this, so they must point at www, not the redirect.
+  metadataBase: new URL('https://www.clovion.ai'),
   openGraph: {
     title: 'Clovion AI — Track your brand visibility in AI search',
     description: 'See how AI engines describe your brand. Fix what is holding you back. Across ChatGPT, Claude, Perplexity, Gemini, and AI Overviews.',

@@ -177,6 +177,91 @@ export type Post = {
 
 function FeaturedCard({ post }: { post: Post }) {
   const { ref, seen } = useReveal<HTMLDivElement>()
+
+  // Text block is shared by both layouts (banner-on-top when a cover exists,
+  // side-by-side placeholder otherwise) so the two paths can't drift.
+  const textBlock = (
+    <div style={{ padding: 'clamp(2rem, 4vw, 3.25rem)', display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: 10,
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.72rem',
+          textTransform: 'uppercase',
+          letterSpacing: '0.18em',
+          color: 'var(--ink-60)'
+        }}
+      >
+        <span>Featured</span>
+        <span style={{ height: 1, width: 24, background: 'var(--ink-25, rgba(255,255,255,0.24))' }} />
+        <span>{categoryLabel(post.category)}</span>
+      </div>
+      <h2 style={{ ...DISPLAY_MD, margin: 0 }}>{post.title}</h2>
+      <p style={{ ...LEAD, fontSize: '1.02rem', margin: 0, maxWidth: 640 }}>{post.excerpt}</p>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          flexWrap: 'wrap',
+          marginTop: 'auto'
+        }}
+      >
+        <span
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 999,
+            background: 'var(--ink-surface, #0a0a0f)',
+            color: 'var(--on-ink, #fff)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '0.76rem',
+            fontWeight: 600,
+            letterSpacing: '0.04em'
+          }}
+        >
+          {initials(post.author)}
+        </span>
+        <div
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.74rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.14em',
+            color: 'var(--ink-60)'
+          }}
+        >
+          <span style={{ color: 'var(--ink)' }}>{post.author}</span>
+          <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
+          <span>{formatDate(post.date)}</span>
+          {post.readTime && (
+            <>
+              <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
+              <span>{post.readTime}</span>
+            </>
+          )}
+        </div>
+        <span
+          style={{
+            marginLeft: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: '0.92rem',
+            fontWeight: 600,
+            color: 'var(--ink)'
+          }}
+        >
+          Read story <ArrowRight />
+        </span>
+      </div>
+    </div>
+  )
+
   return (
     <section style={{ padding: '1.5rem 0 0' }}>
       <div style={CONTAINER}>
@@ -185,136 +270,81 @@ function FeaturedCard({ post }: { post: Post }) {
           style={{
             opacity: seen ? 1 : 0,
             transform: seen ? 'translateY(0)' : 'translateY(12px)',
-            transition: 'opacity .55s ease, transform .55s var(--ease-out-expo)'
+            // Literal easing — a var(--*) inside a transition shorthand is
+            // dropped by React's style serialization, killing the animation.
+            transition: 'opacity .55s ease, transform .55s cubic-bezier(0.16, 1, 0.3, 1)'
           }}
         >
-        <Link
-          href={`/blog/${post.slug}`}
-          onClick={() => trackCta('Featured post', 'blog_featured')}
-          style={{
-            position: 'relative',
-            display: 'block',
-            borderRadius: 28,
-            border: '1px solid var(--line)',
-            background: 'var(--white)',
-            overflow: 'hidden',
-            textDecoration: 'none',
-            color: 'inherit'
-          }}
-        >
-          <div
-            aria-hidden
+          <Link
+            href={`/blog/${post.slug}`}
+            onClick={() => trackCta('Featured post', 'blog_featured')}
             style={{
-              position: 'absolute',
-              inset: 0,
-              opacity: 0.35,
-              backgroundImage: 'radial-gradient(circle at 88% 8%, rgba(255,255,255,0.04) 0%, transparent 55%)'
+              position: 'relative',
+              display: 'block',
+              borderRadius: 28,
+              border: '1px solid var(--line)',
+              background: 'var(--white)',
+              overflow: 'hidden',
+              textDecoration: 'none',
+              color: 'inherit'
             }}
-          />
-          <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr]" style={{ position: 'relative' }}>
-            <div style={{ padding: 'clamp(2rem, 4vw, 3.25rem)', display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 10,
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.72rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.18em',
-                  color: 'var(--ink-60)'
-                }}
-              >
-                <span>Featured</span>
-                <span style={{ height: 1, width: 24, background: 'var(--ink-25, rgba(255,255,255,0.24))' }} />
-                <span>{categoryLabel(post.category)}</span>
-              </div>
-              <h2 style={{ ...DISPLAY_MD, margin: 0 }}>{post.title}</h2>
-              <p style={{ ...LEAD, fontSize: '1.02rem', margin: 0, maxWidth: 580 }}>{post.excerpt}</p>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 16,
-                  flexWrap: 'wrap',
-                  marginTop: 'auto'
-                }}
-              >
-                <span
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 999,
-                    background: 'var(--ink-surface, #0a0a0f)',
-                    color: 'var(--on-ink, #fff)',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.76rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.04em'
-                  }}
-                >
-                  {initials(post.author)}
-                </span>
+          >
+            {post.coverImageUrl ? (
+              // Banner-on-top: a FIXED 16:9 frame (aspect-ratio reserves the box
+              // before the image loads → no layout shift; bounds height → a
+              // portrait upload can't tower over the layout) + object-fit:cover
+              // (fills the frame edge-to-edge, no letterbox bars). Covers are
+              // landscape heroes, so 16:9 cover shows the whole image with no
+              // visible crop. inset hairline keeps a dark/near-black cover from
+              // merging into the ink-surface backdrop.
+              <>
                 <div
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.74rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.14em',
-                    color: 'var(--ink-60)'
+                    position: 'relative',
+                    aspectRatio: '16 / 9',
+                    overflow: 'hidden',
+                    background: 'var(--ink-surface, #0a0a0f)',
+                    borderBottom: '1px solid var(--line)'
                   }}
                 >
-                  <span style={{ color: 'var(--ink)' }}>{post.author}</span>
-                  <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
-                  <span>{formatDate(post.date)}</span>
-                  {post.readTime && (
-                    <>
-                      <span style={{ margin: '0 8px', opacity: 0.4 }}>·</span>
-                      <span>{post.readTime}</span>
-                    </>
-                  )}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={post.coverImageUrl}
+                    alt={post.title}
+                    style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+                  />
+                  {/* Hairline ON TOP of the image (an inset shadow on the wrapper
+                      would be painted under the full-bleed img and hidden). Keeps
+                      a dark/near-black/broken cover reading as a framed region. */}
+                  <span
+                    aria-hidden
+                    style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.14)', pointerEvents: 'none' }}
+                  />
                 </div>
-                <span
+                {textBlock}
+              </>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr]" style={{ position: 'relative' }}>
+                <div
+                  aria-hidden
                   style={{
-                    marginLeft: 'auto',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    fontSize: '0.92rem',
-                    fontWeight: 600,
-                    color: 'var(--ink)'
+                    position: 'absolute',
+                    inset: 0,
+                    opacity: 0.35,
+                    backgroundImage: 'radial-gradient(circle at 88% 8%, rgba(255,255,255,0.04) 0%, transparent 55%)'
+                  }}
+                />
+                {textBlock}
+                <div
+                  aria-hidden
+                  style={{
+                    position: 'relative',
+                    minHeight: 240,
+                    background: 'var(--ink-surface, #0a0a0f)',
+                    borderLeft: '1px solid var(--on-ink-15, rgba(255,255,255,0.08))',
+                    overflow: 'hidden'
                   }}
                 >
-                  Read story <ArrowRight />
-                </span>
-              </div>
-            </div>
-            <div
-              aria-hidden
-              style={{
-                position: 'relative',
-                minHeight: 240,
-                background: 'var(--ink-surface, #0a0a0f)',
-                borderLeft: '1px solid var(--on-ink-15, rgba(255,255,255,0.08))',
-                overflow: 'hidden'
-              }}
-            >
-              {post.coverImageUrl ? (
-                // The post's dedicated cover/title image. `contain` (not
-                // `cover`) so the WHOLE image is always visible inside the
-                // panel regardless of its aspect ratio — a wide 16:9 hero in a
-                // portrait-ish side panel must not be center-cropped to a slice.
-                // The dark panel frames any letterbox gaps.
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={post.coverImageUrl}
-                  alt=""
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
-                />
-              ) : (
-                <>
                   <div
                     style={{
                       position: 'absolute',
@@ -370,11 +400,10 @@ function FeaturedCard({ post }: { post: Post }) {
                       Volume 01 · {formatDate(post.date)}
                     </span>
                   </div>
-                </>
-              )}
-            </div>
-          </div>
-        </Link>
+                </div>
+              </div>
+            )}
+          </Link>
         </div>
       </div>
     </section>
@@ -390,7 +419,8 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       style={{
         opacity: seen ? 1 : 0,
         transform: seen ? 'translateY(0)' : 'translateY(10px)',
-        transition: `opacity .5s ease ${delay}ms, transform .5s var(--ease-out-expo) ${delay}ms`,
+        // Literal easing — var(--*) in a transition shorthand is dropped by React.
+        transition: `opacity .5s ease ${delay}ms, transform .5s cubic-bezier(0.16, 1, 0.3, 1) ${delay}ms`,
         height: '100%'
       }}
     >
@@ -418,16 +448,27 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       {post.coverImageUrl && (
         <div
           style={{
+            position: 'relative',
             aspectRatio: '16 / 9',
             overflow: 'hidden',
-            borderBottom: '1px solid var(--line)',
-            background: 'var(--ink-surface, #0a0a0f)'
+            background: 'var(--ink-surface, #0a0a0f)',
+            borderBottom: '1px solid var(--line)'
           }}
         >
-          {/* The post's dedicated cover/title image. `contain` keeps the whole
-              image visible at any aspect ratio; the dark backdrop frames gaps. */}
+          {/* Fixed 16:9 frame (reserves space → no CLS, bounds height → no
+              portrait blowup) + object-fit:cover (fills the frame, no bars).
+              Same contract as the featured banner and detail hero. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={post.coverImageUrl} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+          <img
+            src={post.coverImageUrl}
+            alt={post.title}
+            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+          />
+          {/* Hairline on top of the image so a dark/broken cover still frames. */}
+          <span
+            aria-hidden
+            style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.14)', pointerEvents: 'none' }}
+          />
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: 28, flex: 1 }}>

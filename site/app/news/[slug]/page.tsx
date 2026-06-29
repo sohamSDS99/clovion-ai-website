@@ -29,16 +29,19 @@ export async function generateMetadata({
   const item = await getContent('NEWS', params.slug)
   if (!item) return { title: 'News | Clovion AI' }
 
-  const { seo } = item
+  const seo = item.seo ?? {}
   const title = seo.metaTitle || item.title
   const description = seo.metaDescription || item.excerpt || undefined
   const ogImage = seo.ogImage || item.coverImageUrl || undefined
+  // Always emit a canonical: CMS value when set, else this article's own URL.
+  const canonical = seo.canonicalUrl || `/news/${params.slug}`
 
   return {
     title,
     description,
-    alternates: seo.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined,
-    robots: { index: !seo.noIndex, follow: !seo.noIndex },
+    alternates: { canonical },
+    // noindex,follow — keep link traversal even when de-indexed.
+    robots: { index: !seo.noIndex, follow: true },
     openGraph: {
       title,
       description,

@@ -44,12 +44,21 @@ export function PostHeader({
           {meta && <div className="mt-6">{meta}</div>}
         </div>
 
-        {/* 2 — cover/hero image, below the title + byline */}
+        {/* 2 — cover/hero image, below the title + byline. Fixed 16:9 frame
+            (aspect-ratio reserves the box → no layout shift; bounds height) +
+            object-cover (fills the frame, no letterbox bars). Same contract as
+            the index featured banner and grid cards so the three can't drift. */}
         {coverImageUrl && (
-          <div className="mt-8 overflow-hidden rounded-[24px] border border-[var(--line)]">
+          <div className="relative mt-8 aspect-[16/9] overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--ink-surface,#0a0a0f)]">
             {/* CMS-hosted on an external host → plain <img>, not next/image. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt={title} className="block h-auto w-full object-cover" />
+            <img src={coverImageUrl} alt={title} className="block h-full w-full object-cover object-center" />
+            {/* Hairline on top of the image so a dark/broken cover still frames. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 rounded-[24px]"
+              style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.14)' }}
+            />
           </div>
         )}
 
