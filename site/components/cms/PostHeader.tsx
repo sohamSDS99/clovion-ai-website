@@ -74,10 +74,11 @@ export function PostHeader({
         )}
 
         {/* 3 — excerpt / lead, after the hero image. Same width as the cover so
-            the lead spans the full image edge. */}
+            the lead spans the full image edge; justified so both edges align
+            with the cover frame. */}
         {excerpt && (
-          <div className="mx-auto mt-8 max-w-4xl text-center">
-            <p className="lead text-[var(--ink-70)]">{excerpt}</p>
+          <div className="mx-auto mt-8 max-w-4xl">
+            <p className="lead text-justify text-[var(--ink-70)]">{excerpt}</p>
           </div>
         )}
       </Container>
