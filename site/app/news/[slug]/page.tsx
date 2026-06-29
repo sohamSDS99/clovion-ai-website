@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { Section, Container, Eyebrow, ArrowRight } from '@/components/ui'
+import { Section, Container, ArrowRight } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
+import { PostHeader } from '@/components/cms/PostHeader'
 import { getContent, listSlugs } from '@/lib/cms'
 import type { NewsData } from '@/lib/cms-types'
 
@@ -65,52 +65,35 @@ export default async function NewsArticlePage({
     <div className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
 
-      <Section className="relative overflow-hidden">
-        <Container>
-          <div className="max-w-3xl">
-            <Eyebrow>NEWS</Eyebrow>
-            <h1 className="display-md mt-5">{item.title}</h1>
-            {item.excerpt && (
-              <p className="lead mt-6 text-[var(--ink-70)]">{item.excerpt}</p>
-            )}
+      <PostHeader
+        eyebrow="NEWS"
+        title={item.title}
+        coverImageUrl={item.coverImageUrl}
+        excerpt={item.excerpt}
+        meta={
+          date || dateline || sourceUrl ? (
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--ink-60)]">
+              {dateline && <span className="text-[var(--ink-80)]">{dateline}</span>}
+              {date && <span>{date}</span>}
+              {sourceUrl && (
+                <a
+                  href={sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[var(--ink)] underline underline-offset-4 transition-colors hover:text-[var(--ink-70)]"
+                >
+                  Source
+                  <ArrowRight />
+                </a>
+              )}
+            </div>
+          ) : null
+        }
+      />
 
-            {(date || dateline || sourceUrl) && (
-              <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--ink-60)]">
-                {dateline && <span className="text-[var(--ink-80)]">{dateline}</span>}
-                {date && <span>{date}</span>}
-                {sourceUrl && (
-                  <a
-                    href={sourceUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 text-[var(--ink)] underline underline-offset-4 transition-colors hover:text-[var(--ink-70)]"
-                  >
-                    Source
-                    <ArrowRight />
-                  </a>
-                )}
-              </div>
-            )}
-          </div>
-        </Container>
-      </Section>
-
-      <Section tight>
+      <Section tight className="!pt-0">
         <Container>
           <div className="mx-auto max-w-3xl">
-            {item.coverImageUrl && (
-              <div className="relative mb-12 aspect-[16/9] overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--subtle)]">
-                <Image
-                  src={item.coverImageUrl}
-                  alt={item.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 768px"
-                  unoptimized
-                />
-              </div>
-            )}
-
             <ProseHtml html={item.bodyHtml} />
           </div>
         </Container>

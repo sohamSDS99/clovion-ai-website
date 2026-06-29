@@ -326,6 +326,7 @@ Plus `<ChromeHeader />` + `<ChromeFooter />` gates (pick light or dark chrome by
 - `components/affiliate/` — ReferralFlow (3-node animated loop), FeatureContent
 - `components/customers/` — LogoWall (hero mock), FeatureContent (server wrapper exports Metadata + JSON-LD; client composer renders LogoWall hero + 5-tile metrics + 3 featured case stories + filterable 28-row grid + 6 testimonials + customer FAQ + dark FinalCTA), utils
 - `components/blog/` — FeatureContent (server wrapper at `app/blog/page.tsx` + 3 category-page wrappers all pass `initialCategory` into the same client composer; sections are hero + featured card + ChipRail filter + post grid + newsletter band + blog FAQ + dark FinalCTA), utils
+- **`components/cms/PostHeader.tsx`** — the **canonical** header for every CMS post `[slug]` template (blog + news). Renders, in this fixed order: back-link → eyebrow → title → **cover image (always directly below the title)** → excerpt → meta. Both `app/blog/[slug]/page.tsx` and `app/news/[slug]/page.tsx` use it. **Never hand-roll a post header / place the cover image in a separate later section again** — that's what put the blog cover below the excerpt/meta. Add new post types via this component so the cover stays under the title.
 - `components/home/*` — homepage `/` section components (updated 2026-06-23 — see "Section components for /" below)
 
 **Dead code from the prior homepage design** (orphan, safe to delete):

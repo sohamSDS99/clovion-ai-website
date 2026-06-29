@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Section, Container, Eyebrow, ArrowRight } from '@/components/ui'
+import { Section, Container } from '@/components/ui'
 import { CTABanner } from '@/components/sections'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
+import { PostHeader } from '@/components/cms/PostHeader'
 import { getContent, listSlugs } from '@/lib/cms'
 
 export const revalidate = 300
@@ -60,49 +60,28 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     <article className="clv-dark clv-ai-vis-page">
       <JsonLd data={item.jsonLd} />
 
-      <Section className="relative overflow-hidden">
-        <Container>
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-1.5 text-sm text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors"
-          >
-            <ArrowRight className="rotate-180" /> Back to blog
-          </Link>
-          <div className="mt-8 max-w-3xl">
-            <Eyebrow>Blog</Eyebrow>
-            <h1 className="display-md mt-5 text-balance">{item.title}</h1>
-            {item.excerpt && <p className="lead mt-6 text-[var(--ink-70)]">{item.excerpt}</p>}
-            {meta.length > 0 && (
-              <div className="mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--ink-60)]">
-                {meta.map((part, i) => (
-                  <span key={i} className="inline-flex items-center gap-3">
-                    {i > 0 && <span aria-hidden className="text-[var(--ink-30)]">·</span>}
-                    <span>{part}</span>
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-        </Container>
-      </Section>
-
-      {item.coverImageUrl && (
-        <Section tight className="!pt-0">
-          <Container>
-            <div className="overflow-hidden rounded-[24px] border border-[var(--line)]">
-              {/* CMS-hosted cover image; external host, so plain <img>. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={item.coverImageUrl}
-                alt={item.title}
-                className="w-full h-auto object-cover"
-              />
+      <PostHeader
+        eyebrow="Blog"
+        title={item.title}
+        coverImageUrl={item.coverImageUrl}
+        excerpt={item.excerpt}
+        backHref="/blog"
+        backLabel="Back to blog"
+        meta={
+          meta.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--ink-60)]">
+              {meta.map((part, i) => (
+                <span key={i} className="inline-flex items-center gap-3">
+                  {i > 0 && <span aria-hidden className="text-[var(--ink-30)]">·</span>}
+                  <span>{part}</span>
+                </span>
+              ))}
             </div>
-          </Container>
-        </Section>
-      )}
+          ) : null
+        }
+      />
 
-      <Section tight className={item.coverImageUrl ? '!pt-2' : '!pt-0'}>
+      <Section tight className="!pt-0">
         <Container>
           <div className="max-w-3xl">
             <ProseHtml html={item.bodyHtml} />
