@@ -673,6 +673,8 @@
   letter-spacing: -0.01em;
   color: var(--ink);
   text-wrap: balance;
+  /* Clear the sticky site header when the TOC rail jumps to an anchor. */
+  scroll-margin-top: 6rem;
 }
 /* Headings own their top space; tighten the gap to the text that follows so a
    heading reads as attached to its section, not floating between paragraphs. */
