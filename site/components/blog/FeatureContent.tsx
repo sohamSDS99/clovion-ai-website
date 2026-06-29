@@ -302,12 +302,16 @@ function FeaturedCard({ post }: { post: Post }) {
               }}
             >
               {post.coverImageUrl ? (
-                // The post's dedicated cover/title image fills the panel.
+                // The post's dedicated cover/title image. `contain` (not
+                // `cover`) so the WHOLE image is always visible inside the
+                // panel regardless of its aspect ratio — a wide 16:9 hero in a
+                // portrait-ish side panel must not be center-cropped to a slice.
+                // The dark panel frames any letterbox gaps.
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={post.coverImageUrl}
                   alt=""
-                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain' }}
                 />
               ) : (
                 <>
@@ -412,10 +416,18 @@ function PostCard({ post, index }: { post: Post; index: number }) {
       }}
     >
       {post.coverImageUrl && (
-        <div style={{ aspectRatio: '16 / 9', overflow: 'hidden', borderBottom: '1px solid var(--line)' }}>
-          {/* The post's dedicated cover/title image. */}
+        <div
+          style={{
+            aspectRatio: '16 / 9',
+            overflow: 'hidden',
+            borderBottom: '1px solid var(--line)',
+            background: 'var(--ink-surface, #0a0a0f)'
+          }}
+        >
+          {/* The post's dedicated cover/title image. `contain` keeps the whole
+              image visible at any aspect ratio; the dark backdrop frames gaps. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={post.coverImageUrl} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <img src={post.coverImageUrl} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
         </div>
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: 28, flex: 1 }}>
