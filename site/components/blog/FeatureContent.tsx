@@ -199,7 +199,22 @@ function FeaturedCard({ post }: { post: Post }) {
         <span>{categoryLabel(post.category)}</span>
       </div>
       <h2 style={{ ...DISPLAY_MD, margin: 0 }}>{post.title}</h2>
-      <p style={{ ...LEAD, fontSize: '1.02rem', margin: 0, maxWidth: 640 }}>{post.excerpt}</p>
+      <p
+        style={{
+          ...LEAD,
+          fontSize: '1.02rem',
+          margin: 0,
+          maxWidth: 640,
+          // Clamp so the text column never exceeds the image's 16:9 height in the
+          // side-by-side layout (which would stretch & crop the cover).
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden'
+        }}
+      >
+        {post.excerpt}
+      </p>
       <div
         style={{
           display: 'flex',
@@ -290,21 +305,22 @@ function FeaturedCard({ post }: { post: Post }) {
             }}
           >
             {post.coverImageUrl ? (
-              // Banner-on-top: a FIXED 16:9 frame (aspect-ratio reserves the box
-              // before the image loads → no layout shift; bounds height → a
-              // portrait upload can't tower over the layout) + object-fit:cover
-              // (fills the frame edge-to-edge, no letterbox bars). Covers are
-              // landscape heroes, so 16:9 cover shows the whole image with no
-              // visible crop. inset hairline keeps a dark/near-black cover from
-              // merging into the ink-surface backdrop.
-              <>
+              // Side-by-side, picture-dominant: image LEFT (~60%, the 1.5fr
+              // track), text RIGHT (~40%, the 1fr track). The image sits in a
+              // fixed 16:9 frame — object-fit:cover fills it with no bars and the
+              // aspect-ratio reserves the box before load (no CLS). The image's
+              // 16:9 height drives the card; the excerpt is line-clamped so the
+              // text column stays within that height — the cover is neither
+              // stretched/cropped nor leaves an empty gap. inset hairline keeps a
+              // dark/near-black cover framed and gives a clean seam to the text.
+              // On mobile the grid collapses to one column: image on top.
+              <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
                 <div
                   style={{
                     position: 'relative',
                     aspectRatio: '16 / 9',
                     overflow: 'hidden',
-                    background: 'var(--ink-surface, #0a0a0f)',
-                    borderBottom: '1px solid var(--line)'
+                    background: 'var(--ink-surface, #0a0a0f)'
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -313,16 +329,13 @@ function FeaturedCard({ post }: { post: Post }) {
                     alt={post.title}
                     style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
                   />
-                  {/* Hairline ON TOP of the image (an inset shadow on the wrapper
-                      would be painted under the full-bleed img and hidden). Keeps
-                      a dark/near-black/broken cover reading as a framed region. */}
                   <span
                     aria-hidden
                     style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.14)', pointerEvents: 'none' }}
                   />
                 </div>
                 {textBlock}
-              </>
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr]" style={{ position: 'relative' }}>
                 <div
