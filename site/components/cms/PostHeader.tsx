@@ -42,7 +42,7 @@ export function PostHeader({
         {/* 1 — eyebrow + title + byline (date · author). Standard editorial
             order: the byline sits directly under the title — never below the
             body/excerpt. */}
-        <div className={`max-w-4xl ${backHref ? 'mt-8' : ''}`}>
+        <div className={`mx-auto max-w-4xl text-center ${backHref ? 'mt-8' : ''}`}>
           <Eyebrow>{eyebrow}</Eyebrow>
           <h1
             className="display-md mt-5 text-balance"
@@ -50,7 +50,7 @@ export function PostHeader({
           >
             {title}
           </h1>
-          {meta && <div className="mt-6">{meta}</div>}
+          {meta && <div className="mt-6 flex justify-center">{meta}</div>}
         </div>
 
         {/* 2 — cover/hero image, below the title + byline. Fixed 16:9 frame
@@ -60,7 +60,7 @@ export function PostHeader({
             Constrained to the shared column so it sits a touch smaller and
             aligned with the title/excerpt. */}
         {coverImageUrl && (
-          <div className="relative mt-8 aspect-[16/9] max-w-4xl overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--ink-surface,#0a0a0f)]">
+          <div className="relative mx-auto mt-8 aspect-[16/9] max-w-4xl overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--ink-surface,#0a0a0f)]">
             {/* CMS-hosted on an external host → plain <img>, not next/image. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={coverImageUrl} alt={title} className="block h-full w-full object-cover object-center" />
@@ -76,7 +76,7 @@ export function PostHeader({
         {/* 3 — excerpt / lead, after the hero image. Same width as the cover so
             the lead spans the full image edge. */}
         {excerpt && (
-          <div className="mt-8 max-w-4xl">
+          <div className="mx-auto mt-8 max-w-4xl text-center">
             <p className="lead text-[var(--ink-70)]">{excerpt}</p>
           </div>
         )}
