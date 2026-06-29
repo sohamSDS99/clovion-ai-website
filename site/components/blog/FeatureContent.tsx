@@ -462,15 +462,20 @@ function PostCard({ post, index }: { post: Post; index: number }) {
         <div
           style={{
             position: 'relative',
-            aspectRatio: '16 / 9',
+            // 4:3 (taller than 16:9) so the picture DOMINATES the card vertically
+            // — the larger share goes to the image, the text block below is kept
+            // compact. flexShrink:0 holds that share when the grid stretches a
+            // card to match a taller sibling.
+            aspectRatio: '4 / 3',
+            flexShrink: 0,
             overflow: 'hidden',
             background: 'var(--ink-surface, #0a0a0f)',
             borderBottom: '1px solid var(--line)'
           }}
         >
-          {/* Fixed 16:9 frame (reserves space → no CLS, bounds height → no
-              portrait blowup) + object-fit:cover (fills the frame, no bars).
-              Same contract as the featured banner and detail hero. */}
+          {/* Reserves space → no CLS, bounds height → no portrait blowup;
+              object-fit:cover fills the frame (no bars). Same cover contract as
+              the featured card and detail hero. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={post.coverImageUrl}
@@ -484,7 +489,7 @@ function PostCard({ post, index }: { post: Post; index: number }) {
           />
         </div>
       )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 18, padding: 28, flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
       <div
         style={{
           display: 'inline-flex',
@@ -506,7 +511,22 @@ function PostCard({ post, index }: { post: Post; index: number }) {
         )}
       </div>
       <h3 style={{ ...DISPLAY_SM, fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)', margin: 0 }}>{post.title}</h3>
-      <p style={{ fontSize: '0.95rem', lineHeight: 1.6, color: 'var(--ink-70)', margin: 0 }}>{post.excerpt}</p>
+      <p
+        style={{
+          fontSize: '0.95rem',
+          lineHeight: 1.6,
+          color: 'var(--ink-70)',
+          margin: 0,
+          // Compact text block: clamp the excerpt to 2 lines so the picture keeps
+          // the larger share of the card.
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden'
+        }}
+      >
+        {post.excerpt}
+      </p>
       <div
         style={{
           display: 'flex',
