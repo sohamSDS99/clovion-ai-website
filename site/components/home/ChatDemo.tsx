@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { RecoveryPlan } from './RecoveryPlan'
 
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x))
@@ -14,15 +15,11 @@ const CARD_LOGOS = [
   '/logos/google-ai.svg'
 ]
 
-const CATEGORY_ROWS = [
-  { n: 'VelocityEHS', v: 82 },
-  { n: 'Sphera', v: 58.7 },
-  { n: 'Intelex', v: 49.3 },
-  { n: 'Enablon', v: 44.7 },
-  { n: 'SDS Manager', v: 17.3, you: true }
-]
 
-const RESPONSE_WORDS = 'I have all the data needed. Here is the complete deep-dive analysis.'.split(' ')
+const RESPONSE_WORDS =
+  'Your visibility declined primarily because competitors increased coverage across comparison content, while mentions of your pricing and enterprise capabilities decreased. Focus on creating comparison content for your top competitors, strengthening pages covering enterprise use cases, and improving authority around pricing topics.'.split(
+    ' '
+  )
 
 type Depth = 'lg' | 'md' | 'sm'
 
@@ -452,7 +449,7 @@ export function ChatDemo() {
                     fontWeight: 500
                   }}
                 >
-                  Go deep and research what is driving my visibility score.
+                  Why did our AI visibility drop by 12% this month, and what are the three highest-impact actions we should take to recover it?
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 11, alignItems: 'flex-start' }}>
@@ -480,103 +477,19 @@ export function ChatDemo() {
                     Thought for 163s
                   </span>
                   <p style={{ margin: '8px 0 0', fontSize: '0.92rem', lineHeight: 1.55, color: 'var(--ink-70)' }}>
-                    I have all the data needed. Here is the complete deep-dive analysis.
+                    Your visibility declined primarily because competitors increased coverage across comparison content, while mentions of your pricing and enterprise capabilities decreased. Focus on creating comparison content for your top competitors, strengthening pages covering enterprise use cases, and improving authority around pricing topics.
                   </p>
                   <div
                     style={{
-                      marginTop: 14,
-                      borderRadius: 11,
+                      marginTop: 16,
+                      borderRadius: 13,
                       border: '1px solid var(--line)',
                       background: 'var(--white)',
-                      overflow: 'hidden'
+                      padding: '16px 18px 18px',
+                      ...reveal(true, 14)
                     }}
                   >
-                    <div style={{ padding: '11px 13px 9px', borderBottom: '1px solid var(--line)' }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.92rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
-                        SDS Manager — Deep-Dive
-                      </div>
-                      <div style={{ marginTop: 4, fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)' }}>
-                        May 18 – Jun 15, 2026 · ChatGPT
-                      </div>
-                    </div>
-                    <div style={{ padding: '10px 13px 12px' }}>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6 }}>
-                        {(
-                          [
-                            ['Visibility', '17.3%'],
-                            ['Rank', '#11 / 147'],
-                            ['SoV', '2.4%'],
-                            ['Avg. pos', '5.4']
-                          ] as const
-                        ).map(([k, v]) => (
-                          <div
-                            key={k}
-                            style={{
-                              borderRadius: 8,
-                              background: 'var(--subtle)',
-                              border: '1px solid var(--line)',
-                              padding: '7px 9px'
-                            }}
-                          >
-                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.52rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)' }}>
-                              {k}
-                            </div>
-                            <div style={{ marginTop: 2, fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
-                              {v}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ marginTop: 11, display: 'grid', gap: 6 }}>
-                        {CATEGORY_ROWS.map((c) => (
-                          <div
-                            key={c.n}
-                            style={{
-                              display: 'grid',
-                              gridTemplateColumns: '6rem 1fr auto',
-                              alignItems: 'center',
-                              gap: 8
-                            }}
-                          >
-                            <span
-                              style={{
-                                fontSize: '0.74rem',
-                                fontWeight: c.you ? 700 : 500,
-                                color: c.you ? 'var(--ink)' : 'var(--ink-70)',
-                                whiteSpace: 'nowrap',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis'
-                              }}
-                            >
-                              {c.n}
-                            </span>
-                            <span style={{ height: 5, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden' }}>
-                              <span
-                                style={{
-                                  display: 'block',
-                                  height: '100%',
-                                  width: `${c.v}%`,
-                                  borderRadius: 999,
-                                  background: c.you ? 'var(--ink)' : 'var(--ink-30)'
-                                }}
-                              />
-                            </span>
-                            <span
-                              style={{
-                                width: 38,
-                                textAlign: 'right',
-                                fontFamily: 'var(--font-mono)',
-                                fontSize: '0.68rem',
-                                color: c.you ? 'var(--ink)' : 'var(--ink-60)',
-                                fontVariantNumeric: 'tabular-nums'
-                              }}
-                            >
-                              {c.v}%
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+                    <RecoveryPlan show={true} />
                   </div>
                 </div>
               </div>
@@ -744,12 +657,12 @@ export function ChatDemo() {
 
             <div
               style={{
-                padding: '24px 28px 22px',
-                height: 'min(72vh, 560px)',
+                padding: '18px 28px 18px',
+                height: 'min(86vh, 680px)',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 16
+                gap: 14
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'flex-end', ...reveal(step >= 1) }}>
@@ -765,7 +678,7 @@ export function ChatDemo() {
                     fontWeight: 500
                   }}
                 >
-                  Go deep and research the topics, pieces of content, and overall changes in the data that are driving my visibility score.
+                  Why did our AI visibility drop by 12% this month, and what are the three highest-impact actions we should take to recover it?
                 </div>
               </div>
 
@@ -822,128 +735,11 @@ export function ChatDemo() {
                       borderRadius: 13,
                       border: '1px solid var(--line)',
                       background: 'var(--white)',
-                      overflow: 'hidden',
+                      padding: '16px 18px 18px',
                       ...reveal(step >= 5, 14)
                     }}
                   >
-                    <div style={{ padding: '13px 16px 11px', borderBottom: '1px solid var(--line)' }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontSize: '0.98rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
-                        SDS Manager — Visibility Deep-Dive Analysis
-                      </div>
-                      <div style={{ marginTop: 5, fontFamily: 'var(--font-mono)', fontSize: '0.62rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)' }}>
-                        May 18 – Jun 15, 2026 · ChatGPT · United States
-                      </div>
-                    </div>
-                    <div style={{ padding: '12px 16px 14px' }}>
-                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                        {(
-                          [
-                            ['Visibility', '17.3%'],
-                            ['Rank', '#11 / 147'],
-                            ['Share of voice', '2.4%'],
-                            ['Avg. position', '5.4']
-                          ] as const
-                        ).map(([k, v]) => (
-                          <div
-                            key={k}
-                            style={{
-                              flex: '1 1 0',
-                              minWidth: 96,
-                              borderRadius: 9,
-                              background: 'var(--subtle)',
-                              border: '1px solid var(--line)',
-                              padding: '8px 11px'
-                            }}
-                          >
-                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.56rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-50)', whiteSpace: 'nowrap' }}>
-                              {k}
-                            </div>
-                            <div style={{ marginTop: 3, fontFamily: 'var(--font-display)', fontSize: '1.05rem', fontWeight: 600, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
-                              {v}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ marginTop: 13, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-50)' }}>
-                          Category share of voice
-                        </span>
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            padding: '3px 9px',
-                            borderRadius: 999,
-                            background: 'var(--positive-bg)',
-                            border: '1px solid var(--positive-border)',
-                            color: 'var(--positive)',
-                            fontFamily: 'var(--font-mono)',
-                            fontSize: '0.62rem',
-                            fontWeight: 600,
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.08em'
-                          }}
-                        >
-                          Rank #11 of 147
-                        </span>
-                      </div>
-                      <div style={{ marginTop: 10, display: 'grid', gap: 8 }}>
-                        {CATEGORY_ROWS.map((c, i) => {
-                          const on = step >= 6
-                          return (
-                            <div
-                              key={c.n}
-                              style={{
-                                display: 'grid',
-                                gridTemplateColumns: '7.5rem 1fr auto',
-                                alignItems: 'center',
-                                gap: 10,
-                                opacity: on ? 1 : 0,
-                                transform: on ? 'none' : 'translateY(6px)',
-                                transition: `opacity 0.4s ease ${i * 0.07}s, transform 0.45s ${EASE} ${i * 0.07}s`
-                              }}
-                            >
-                              <span
-                                style={{
-                                  fontSize: '0.82rem',
-                                  fontWeight: c.you ? 700 : 500,
-                                  color: c.you ? 'var(--ink)' : 'var(--ink-70)',
-                                  whiteSpace: 'nowrap',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis'
-                                }}
-                              >
-                                {c.n}
-                              </span>
-                              <span style={{ height: 6, borderRadius: 999, background: 'var(--ink-06)', overflow: 'hidden' }}>
-                                <span
-                                  style={{
-                                    display: 'block',
-                                    height: '100%',
-                                    width: on ? `${c.v}%` : '0%',
-                                    borderRadius: 999,
-                                    background: c.you ? 'var(--ink)' : 'var(--ink-30)',
-                                    transition: `width 0.85s ${EASE} ${i * 0.07}s`
-                                  }}
-                                />
-                              </span>
-                              <span
-                                style={{
-                                  width: 44,
-                                  textAlign: 'right',
-                                  fontFamily: 'var(--font-mono)',
-                                  fontSize: '0.74rem',
-                                  color: c.you ? 'var(--ink)' : 'var(--ink-60)',
-                                  fontVariantNumeric: 'tabular-nums'
-                                }}
-                              >
-                                {c.v}%
-                              </span>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
+                    <RecoveryPlan show={step >= 5} />
                   </div>
                 </div>
               </div>

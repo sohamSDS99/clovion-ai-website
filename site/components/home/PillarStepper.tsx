@@ -452,7 +452,7 @@ export function PillarStepper() {
           color: 'var(--ink)'
         }}
       >
-        Everything you need to understand and improve AI visibility.
+        Others show you what&rsquo;s happening. Clovion shows you what to do next.
       </h2>
       <p
         style={{
@@ -466,7 +466,7 @@ export function PillarStepper() {
           textWrap: 'balance'
         }}
       >
-        Millions of buying decisions now start with AI. Most brands don&rsquo;t know how they&rsquo;re represented — or whether AI recommends them at all. Clovion helps you earn more.
+        AI visibility isn&rsquo;t improved by dashboards. It&rsquo;s improved by action. Clovion turns every insight into prioritized recommendations your team can act on immediately.
       </p>
     </div>
   )
