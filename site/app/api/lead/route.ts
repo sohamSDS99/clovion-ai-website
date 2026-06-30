@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { verifyTurnstile } from '@/lib/freeScore/turnstile'
+import { mintScanToken, SCAN_COOKIE } from '@/lib/freeScore/scanToken'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -46,12 +48,30 @@ export async function POST(req: NextRequest) {
   const last_name = clean(body.last_name)
   const email = clean(body.email).toLowerCase()
   const country = clean(body.country)
+  const company = clean(body.company)
+  const domain = clean(body.domain)
+  const turnstileToken = typeof body.turnstileToken === 'string' ? body.turnstileToken : ''
 
   if (!first_name || !last_name || !email || !country) {
     return NextResponse.json({ error: 'all fields are required', code: 'missing_fields' }, { status: 400 })
   }
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: 'enter a valid email', code: 'bad_email' }, { status: 400 })
+  }
+
+  // Anti-abuse: when a Turnstile token is supplied (the free-score gate), it
+  // must verify. Off-page CTAs that send no token still work — they just don't
+  // get a scan-authorization cookie.
+  let gateVerified = false
+  if (turnstileToken) {
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+      req.headers.get('x-real-ip')?.trim() ||
+      undefined
+    gateVerified = await verifyTurnstile(turnstileToken, ip)
+    if (!gateVerified) {
+      return NextResponse.json({ error: 'challenge failed, please retry', code: 'challenge_failed' }, { status: 400 })
+    }
   }
 
   const now = new Date()
@@ -66,6 +86,8 @@ export async function POST(req: NextRequest) {
         last_name,
         email,
         country,
+        company,
+        domain,
         trial_start_date: isoUtc(now),
         trial_end_date: isoUtc(trialEnd),
         user_type: 'trial',
@@ -94,5 +116,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'could not submit', code: 'network' }, { status: 502 })
   }
 
-  return NextResponse.json({ ok: true })
+  const res = NextResponse.json({ ok: true })
+  if (gateVerified) {
+    // Mint the short-lived scan-authorization cookie that /api/scan requires.
+    res.cookies.set(SCAN_COOKIE, mintScanToken(email), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 30 * 60,
+    })
+  }
+  return res
 }
