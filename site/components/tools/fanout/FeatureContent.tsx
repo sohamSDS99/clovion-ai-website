@@ -5,6 +5,7 @@ import { Container, Section, Button, Eyebrow, HeroShade, ArrowRight } from '@/co
 import { LIGHT, TAG_COLORS } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger, useCountUp } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import { FAQS } from './faqs'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -101,14 +102,6 @@ function FqArrow({ size = 14 }: { size?: number }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  )
-}
-
-function FqPlus({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -905,124 +898,6 @@ function Educational() {
   )
 }
 
-/* ── 04 — FAQ ────────────────────────────────────────────────────── */
-function FAQItem({
-  q,
-  a,
-  open,
-  onToggle
-}: {
-  q: string
-  a: string
-  open: boolean
-  onToggle: () => void
-}) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--ink-25)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)',
-          color: 'var(--ink)'
-        }}
-        aria-expanded={open}
-      >
-        <span style={{ fontSize: '1.1rem', fontWeight: 600, letterSpacing: '-0.01em' }}>
-          {q}
-        </span>
-        <span
-          aria-hidden
-          style={{
-            flexShrink: 0,
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: `transform 0.25s ${cb}`,
-            display: 'inline-flex'
-          }}
-        >
-          <FqPlus size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 480 : 0,
-          transition: `max-height 0.35s ${cb}`
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            padding: '0 48px 26px 0',
-            fontSize: '1rem',
-            lineHeight: 1.6,
-            color: 'var(--ink-70)'
-          }}
-        >
-          {a}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function ToolFAQ() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <Section id="faq">
-      <Container>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0', color: 'var(--ink)' }}>
-              Questions, answered.
-            </h2>
-            <p style={{ ...LEAD, margin: '20px 0 0', maxWidth: 360, color: 'var(--ink-70)' }}>
-              Quick answers on how fan-out works, why it matters, and how to use this output for content planning.
-            </p>
-            <a
-              href="/free-ai-visibility-score"
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none'
-              }}
-            >
-              Get your full score <FqArrow />
-            </a>
-          </div>
-          <div>
-            {FAQS.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={open === i}
-                onToggle={() => setOpen(open === i ? -1 : i)}
-              />
-            ))}
-          </div>
-        </div>
-      </Container>
-    </Section>
-  )
-}
-
 /* ── 05 — FINAL CTA ──────────────────────────────────────────────── */
 function FinalCTA() {
   return (
@@ -1145,7 +1020,7 @@ export default function FeatureContent() {
         submittedQuery={submittedQuery}
       />
       <Educational />
-      <ToolFAQ />
+      <FAQAccordion items={FAQS} />
       <FinalCTA />
     </>
   )

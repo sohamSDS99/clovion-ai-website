@@ -5,6 +5,7 @@ import { Container, Section, Button, Eyebrow, Tag, ArrowRight, Check } from './u
 import { cn } from '@/lib/cn'
 import { customers, aiEngines, faqs as defaultFaqs, testimonials as defaultTestimonials } from '@/lib/content'
 import { openCalendly } from '@/lib/openCalendly'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import Link from 'next/link'
 
 export function LogoMarquee({
@@ -55,75 +56,19 @@ export function AIEngineStrip({ className }: { className?: string }) {
 
 export function FAQ({
   items = defaultFaqs,
-  heading = 'Frequently asked questions',
-  sub = "If yours isn't here, drop us a line and we'll get back to you.",
-  className
+  heading: _heading,
+  sub: _sub,
+  className: _className
 }: {
   items?: readonly { q: string; a: string }[]
+  /** @deprecated headline is locked to "Frequently Asked Questions" by FAQAccordion */
   heading?: string
+  /** @deprecated subtitle removed in new FAQ spec */
   sub?: string
+  /** @deprecated wrapper styling owned by FAQAccordion */
   className?: string
 }) {
-  const [open, setOpen] = useState<number | null>(0)
-
-  return (
-    <Section className={className}>
-      <Container>
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 className="display-md mt-5 text-balance">{heading}</h2>
-            <p className="lead mt-5 max-w-xl mx-auto text-balance">{sub}</p>
-            <div className="mt-8 inline-flex justify-center">
-              <Button href="/contact" variant="secondary" size="sm">
-                Talk to us <ArrowRight />
-              </Button>
-            </div>
-          </div>
-
-          <ul className="mt-16 divide-y divide-[var(--line)] border-y border-[var(--line)]">
-            {items.map((item, idx) => {
-              const isOpen = open === idx
-              return (
-                <li key={item.q}>
-                  <button
-                    onClick={() => setOpen(isOpen ? null : idx)}
-                    className="w-full text-left py-6 flex items-start gap-6 group"
-                    aria-expanded={isOpen}
-                  >
-                    <span className="display-sm flex-1 text-[1.15rem] md:text-[1.3rem] font-semibold leading-snug">
-                      {item.q}
-                    </span>
-                    <span
-                      className={cn(
-                        'mt-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--line)] transition-[transform,background-color,border-color,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                        isOpen ? 'bg-ink text-white rotate-45 border-[var(--ink)]' : 'group-hover:border-[rgb(var(--ink-rgb)/20%)]'
-                      )}
-                      aria-hidden
-                    >
-                      <svg viewBox="0 0 16 16" width="14" height="14" fill="none">
-                        <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                      </svg>
-                    </span>
-                  </button>
-                  <div
-                    className={cn(
-                      'grid transition-[grid-template-rows] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                      isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-                    )}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="pb-7 pr-12 text-[1rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)]">{item.a}</p>
-                    </div>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      </Container>
-    </Section>
-  )
+  return <FAQAccordion items={[...items]} />
 }
 
 export function CTABanner({
