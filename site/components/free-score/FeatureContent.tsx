@@ -537,7 +537,6 @@ function Hero({
                     Talk to an expert <ArrowRight size={12} />
                   </button>
                 </div>
-              )}
             </form>
 
             {/* Trust pills */}
