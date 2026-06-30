@@ -25,7 +25,6 @@ import type { FreeScoreResult } from '@/app/api/free-score/route'
  * LEAD_CAPTURED_KEY so the gate only fires once per browser.
  */
 const LEAD_CAPTURED_KEY = 'clv_lead_captured'
-type HydrationState = 'hydrating' | 'gated' | 'unlocked'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
 const CONTAINER: CSSProperties = {
@@ -289,8 +288,7 @@ function Hero({
   stepIndex,
   scanResult,
   scanError,
-  gateState,
-  onUnlockClick
+  onRequestUnlock
 }: {
   stage: Stage
   setStage: (s: Stage) => void
@@ -301,26 +299,17 @@ function Hero({
   stepIndex: number
   scanResult: FreeScoreResult | null
   scanError: string
-  gateState: HydrationState
-  onUnlockClick: () => void
+  onRequestUnlock: (cleanDomain: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string>('')
 
-  // The form is "live" only after the visitor has unlocked the lead gate.
-  // During hydration we render the input visually but inert (no flash from
-  // skeleton → form). In the gated state the input stays disabled and an
-  // unlock prompt + button takes the place of the live submit row.
-  const locked = gateState !== 'unlocked'
-  const inputDisabled = locked || stage === 'analyzing'
+  // Form is live on page load — no hydration gate. The lead-capture modal
+  // is triggered at submit time if the visitor hasn't yet captured.
+  const inputDisabled = stage === 'analyzing'
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
-    // Defensive: never start a scan while the gate is still closed.
-    if (locked) {
-      onUnlockClick()
-      return
-    }
     const clean = normalizeDomain(domain)
     if (!isValidDomain(clean)) {
       setError('Enter a domain like example.com.')
@@ -328,10 +317,26 @@ function Hero({
       return
     }
     setError('')
-    setSubmittedDomain(clean)
-    setStage('analyzing')
     analytics.formSubmit('free_ai_visibility_score', 'free_score_page')
     analytics.getFreeScore('free_score_hero')
+
+    // Gate at submit: if returning visitor (localStorage flag), run scan
+    // immediately. Else hand the domain to the parent — it opens the modal
+    // and resumes the scan after a successful capture.
+    let captured = false
+    if (typeof window !== 'undefined') {
+      try {
+        captured = window.localStorage.getItem(LEAD_CAPTURED_KEY) === '1'
+      } catch {
+        captured = false
+      }
+    }
+    if (captured) {
+      setSubmittedDomain(clean)
+      setStage('analyzing')
+    } else {
+      onRequestUnlock(clean)
+    }
   }
 
   const handleReset = () => {
@@ -355,13 +360,7 @@ function Hero({
         }}
       />
       <div style={{ ...CONTAINER, padding: '7rem 2rem 5rem' }}>
-        <div
-          className={
-            locked
-              ? 'grid grid-cols-1 gap-10 items-center'
-              : 'grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center'
-          }
-        >
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
           <div>
             <p
               style={{
@@ -396,7 +395,7 @@ function Hero({
                   <input
                     ref={inputRef}
                     type="text"
-                    value={locked ? '' : domain}
+                    value={domain}
                     onChange={(e) => {
                       setDomain(e.target.value)
                       if (error) setError('')
@@ -419,14 +418,12 @@ function Hero({
                       color: 'var(--ink)',
                       outline: 'none',
                       boxShadow: 'var(--shadow-card)',
-                      opacity: locked ? 0.55 : 1,
                       cursor: inputDisabled ? 'not-allowed' : 'text',
-                      transition: 'border-color .2s ease, opacity .25s ease'
+                      transition: 'border-color .2s ease'
                     }}
                   />
                 </div>
-                {!locked && (
-                  <button
+                <button
                     type="submit"
                     disabled={stage === 'analyzing'}
                     className="btn btn-primary"
@@ -447,44 +444,9 @@ function Hero({
                     {stage === 'analyzing' ? 'Scanning…' : 'Get my free score'}
                     {stage !== 'analyzing' && <ArrowRight size={14} />}
                   </button>
-                )}
               </div>
 
-              {/* Gated unlock prompt — replaces the live submit row until the
-                  lead form is filled. Hidden during the brief hydrating frame
-                  so the input doesn't ship with an unlock CTA that vanishes. */}
-              {gateState === 'gated' && (
-                <div style={{ marginTop: 14 }}>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: '0.95rem',
-                      lineHeight: 1.5,
-                      color: 'var(--ink-70)'
-                    }}
-                  >
-                    Fill out a quick form to unlock your free score.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={onUnlockClick}
-                    className="btn btn-primary btn-lg"
-                    style={{
-                      marginTop: 14,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      borderRadius: 16,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Get Free Score <ArrowRight size={14} />
-                  </button>
-                </div>
-              )}
-
-              {!locked && (error || scanError) && (
+              {(error || scanError) && (
                 <p
                   role="alert"
                   style={{
@@ -497,8 +459,7 @@ function Hero({
                   {error || scanError}
                 </p>
               )}
-              {!locked && (
-                <div
+              <div
                   style={{
                     marginTop: 14,
                     display: 'flex',
@@ -612,8 +573,7 @@ function Hero({
             </div>
           </div>
 
-          {!locked && (
-            <ScoreDial
+          <ScoreDial
               stage={stage}
               score={typeof scanResult?.score === 'number' ? scanResult.score : SCORE}
               subscoreSummary={(scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
@@ -621,7 +581,6 @@ function Hero({
               submittedDomain={submittedDomain}
               stepIndex={stepIndex}
             />
-          )}
         </div>
       </div>
     </section>
@@ -1047,31 +1006,19 @@ export default function FeatureContent() {
   const [scanError, setScanError] = useState('')
 
   /* ── Lead-gate machine ─────────────────────────────────────────────
-   * Initial state is "hydrating" so SSR + first client render match —
-   * neither side has read localStorage yet. The effect below flips us
-   * to "gated" or "unlocked" on mount. When gated, modalOpen latches to
-   * true so the form pops up automatically on first paint.
+   * No friction on page load — the hero + scan UI render fully live.
+   * The gate triggers ONLY when the visitor clicks the scan submit
+   * button. If they've already captured (localStorage flag), the scan
+   * fires immediately. Otherwise we stash the typed domain, open the
+   * modal, and resume the scan automatically once the form submits.
    */
-  const [gateState, setGateState] = useState<HydrationState>('hydrating')
   const [modalOpen, setModalOpen] = useState(false)
+  const [pendingDomain, setPendingDomain] = useState<string>('')
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    let captured = false
-    try {
-      captured = window.localStorage.getItem(LEAD_CAPTURED_KEY) === '1'
-    } catch {
-      // localStorage can throw in private mode / disabled storage. Treat
-      // that as "not captured" — the modal will guard the gate instead.
-      captured = false
-    }
-    if (captured) {
-      setGateState('unlocked')
-    } else {
-      setGateState('gated')
-      setModalOpen(true)
-    }
-  }, [])
+  const handleRequestUnlock = (cleanDomain: string) => {
+    setPendingDomain(cleanDomain)
+    setModalOpen(true)
+  }
 
   const handleUnlockSuccess = () => {
     if (typeof window !== 'undefined') {
@@ -1081,12 +1028,21 @@ export default function FeatureContent() {
         // ignore — gate falls back to in-memory unlock for this session.
       }
     }
-    setGateState('unlocked')
     setModalOpen(false)
+    // Resume the deferred scan with the domain the visitor typed before
+    // hitting the gate. If there's no pendingDomain, the modal was
+    // opened some other way — just close and let them re-submit.
+    if (pendingDomain) {
+      setSubmittedDomain(pendingDomain)
+      setStage('analyzing')
+      setPendingDomain('')
+    }
   }
 
-  const handleUnlockClick = () => setModalOpen(true)
-  const handleModalClose = () => setModalOpen(false)
+  const handleModalClose = () => {
+    setModalOpen(false)
+    setPendingDomain('')
+  }
 
   // Walk the analysis-step indicator while we wait on the API. Holds at
   // the last step until the fetch effect below transitions stage.
@@ -1157,10 +1113,6 @@ export default function FeatureContent() {
     []
   )
 
-  // Only render the mock/scan section tree once the lead gate is unlocked.
-  // During "hydrating" + "gated" the page is just the hero + the gate.
-  const unlocked = gateState === 'unlocked'
-
   return (
     <>
       <div id="hero" />
@@ -1174,13 +1126,10 @@ export default function FeatureContent() {
         stepIndex={stepIndex}
         scanResult={scanResult}
         scanError={scanError}
-        gateState={gateState}
-        onUnlockClick={handleUnlockClick}
+        onRequestUnlock={handleRequestUnlock}
       />
 
-      {unlocked && (
-        <>
-          <JumpLinks />
+      <JumpLinks />
 
           <FeatureBlock
             id="measure"
@@ -1221,21 +1170,18 @@ export default function FeatureContent() {
           <RecommendationsSection
             recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
           />
-          <MetricsBand />
-          <FAQAccordion items={FAQS} />
-          <FinalCTA />
-        </>
-      )}
+      <MetricsBand />
+      <FAQAccordion items={FAQS} />
+      <FinalCTA />
 
-      {/* Lead-gate modal — controlled mount. Only renders while gated so
-          we don't pin a closed dialog into the DOM after unlock. */}
-      {gateState === 'gated' && (
-        <LeadCaptureModal
-          open={modalOpen}
-          onClose={handleModalClose}
-          onSuccess={handleUnlockSuccess}
-        />
-      )}
+      {/* Lead-gate modal — always mounted, controlled by modalOpen. Opens
+          when the visitor clicks the scan submit button without having
+          previously captured (no localStorage flag). */}
+      <LeadCaptureModal
+        open={modalOpen}
+        onClose={handleModalClose}
+        onSuccess={handleUnlockSuccess}
+      />
     </>
   )
 }
