@@ -9,9 +9,12 @@ import {
 } from 'react'
 import { Button, ArrowRight } from '@/components/ui'
 import { FAQAccordion } from '@/components/FAQAccordion'
-import { LIGHT, RED, RED_BG, RED_BORDER } from '@/components/home/mocks/palette'
+import { RED } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger, useCountUp } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
+import ToolLeadModal from '@/components/tools/shared/ToolLeadModal'
+import ToolResultModal from '@/components/tools/shared/ToolResultModal'
+import { useToolLeadGate } from '@/components/tools/shared/useToolLeadGate'
 import { FAQS } from './faqs'
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -237,7 +240,8 @@ function HeroWithForm({
   submittedUrl,
   setSubmittedUrl,
   error,
-  setError
+  setError,
+  gateRun
 }: {
   stage: Stage
   setStage: (s: Stage) => void
@@ -247,6 +251,7 @@ function HeroWithForm({
   setSubmittedUrl: (s: string) => void
   error: string
   setError: (s: string) => void
+  gateRun: (action: () => void) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [focused, setFocused] = useState(false)
@@ -259,12 +264,15 @@ function HeroWithForm({
       return
     }
     setError('')
-    setSubmittedUrl(normalizeUrl(url))
-    setStage('checking')
-    // brief feel-good delay so the submit feels real (no API; just toggles state)
-    window.setTimeout(() => {
-      setStage('result')
-    }, 850)
+    // Gate the check behind the lead form.
+    gateRun(() => {
+      setSubmittedUrl(normalizeUrl(url))
+      setStage('checking')
+      // brief feel-good delay so the submit feels real (no API; just toggles state)
+      window.setTimeout(() => {
+        setStage('result')
+      }, 850)
+    })
   }
 
   const onReset = () => {
@@ -333,6 +341,7 @@ function HeroWithForm({
                 spellCheck={false}
                 aria-label="Your website URL"
                 disabled={stage === 'checking'}
+                className="clv-form-field"
                 style={{
                   flex: '1 1 320px',
                   height: 56,
@@ -444,10 +453,12 @@ function HeroWithForm({
               onClick={() => {
                 if (stage === 'checking') return
                 setError('')
-                setUrl('https://notion.so')
-                setSubmittedUrl('notion.so')
-                setStage('checking')
-                window.setTimeout(() => setStage('result'), 850)
+                gateRun(() => {
+                  setUrl('https://notion.so')
+                  setSubmittedUrl('notion.so')
+                  setStage('checking')
+                  window.setTimeout(() => setStage('result'), 850)
+                })
               }}
               style={{
                 fontFamily: 'var(--font-mono)',
@@ -474,7 +485,7 @@ function HeroWithForm({
                   fontSize: '0.72rem',
                   textTransform: 'uppercase',
                   letterSpacing: '0.1em',
-                  color: 'var(--white)',
+                  color: 'var(--ink)',
                   textDecoration: 'underline',
                   textUnderlineOffset: 3,
                   background: 'transparent',
@@ -489,34 +500,22 @@ function HeroWithForm({
           </div>
         </div>
 
-        {/* ── RESULT CARD ── */}
-        {(stage === 'checking' || stage === 'result') && (
+        {/* ── RESULT POPUP ── */}
+        <ToolResultModal open={stage === 'checking' || stage === 'result'} onClose={onReset}>
           <ResultCard stage={stage} submittedUrl={submittedUrl} />
-        )}
+        </ToolResultModal>
       </div>
     </section>
   )
 }
 
 /* ─────────────────────────────────────────────────────────────────────
- *  RESULT CARD — light surface island on the dark page via LIGHT spread.
+ *  RESULT CARD — renders inside the dark ToolResultModal (dark tokens).
  *  Stagger-reveals header → summary strip → rows.
  * ────────────────────────────────────────────────────────────────────── */
 function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: string }) {
   const reduced = useReducedMotion()
-  const [outerOpen, setOuterOpen] = useState(false)
   const play = stage === 'result'
-
-  useEffect(() => {
-    if (stage === 'result') {
-      // double-rAF so the initial styles flush before the transition kicks in
-      const id = requestAnimationFrame(() => {
-        requestAnimationFrame(() => setOuterOpen(true))
-      })
-      return () => cancelAnimationFrame(id)
-    }
-    setOuterOpen(false)
-  }, [stage])
 
   const rowFlags = useStagger(BOTS.length, play, 60, 220)
   const allowedCount = useCountUp(ALLOWED_COUNT, play, { durationMs: 700, startMs: 120 })
@@ -525,20 +524,7 @@ function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: strin
   // checking: dotted loading shimmer card
   if (stage === 'checking') {
     return (
-      <div
-        style={{
-          ...(LIGHT as CSSProperties),
-          containerType: 'size',
-          background: 'var(--white)',
-          color: 'var(--ink)',
-          border: '1px solid var(--line)',
-          borderRadius: 20,
-          padding: 'clamp(20px, 3cqw, 36px)',
-          boxShadow: 'var(--shadow-card)',
-          maxWidth: 960,
-          margin: '40px auto 0'
-        }}
-      >
+      <div style={{ color: 'var(--ink)' }}>
         <div
           style={{
             display: 'flex',
@@ -624,23 +610,7 @@ function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: strin
   }
 
   return (
-    <div
-      style={{
-        ...(LIGHT as CSSProperties),
-        containerType: 'size',
-        background: 'var(--white)',
-        color: 'var(--ink)',
-        border: '1px solid var(--line)',
-        borderRadius: 20,
-        padding: 'clamp(20px, 3cqw, 36px)',
-        boxShadow: 'var(--shadow-card)',
-        maxWidth: 960,
-        margin: '40px auto 0',
-        opacity: outerOpen ? 1 : 0,
-        transform: outerOpen ? 'translateY(0)' : 'translateY(12px)',
-        transition: `opacity 0.48s ${cb}, transform 0.48s ${cb}`
-      }}
-    >
+    <div style={{ color: 'var(--ink)' }}>
       {/* header strip */}
       <div
         style={{
@@ -891,9 +861,9 @@ function StatusPill({ status }: { status: 'Allowed' | 'Blocked' }) {
         fontSize: '0.82rem',
         fontWeight: 600,
         letterSpacing: '-0.005em',
-        background: isAllowed ? 'var(--positive-bg)' : RED_BG,
-        border: `1px solid ${isAllowed ? 'var(--positive-border)' : RED_BORDER}`,
-        color: isAllowed ? 'var(--positive)' : RED,
+        background: isAllowed ? 'var(--positive-bg)' : 'rgba(248,113,113,0.13)',
+        border: `1px solid ${isAllowed ? 'var(--positive-border)' : 'rgba(248,113,113,0.32)'}`,
+        color: isAllowed ? 'var(--positive)' : '#f87171',
         whiteSpace: 'nowrap'
       }}
     >
@@ -905,7 +875,7 @@ function StatusPill({ status }: { status: 'Allowed' | 'Blocked' }) {
           width: 14,
           height: 14,
           borderRadius: 999,
-          background: isAllowed ? 'var(--positive)' : RED,
+          background: isAllowed ? 'var(--positive)' : '#f87171',
           color: '#ffffff'
         }}
       >
@@ -1139,6 +1109,7 @@ export default function FeatureContent() {
   const [url, setUrl] = useState('')
   const [submittedUrl, setSubmittedUrl] = useState('')
   const [error, setError] = useState('')
+  const gate = useToolLeadGate()
 
   return (
     <>
@@ -1151,7 +1122,9 @@ export default function FeatureContent() {
         setSubmittedUrl={setSubmittedUrl}
         error={error}
         setError={setError}
+        gateRun={gate.request}
       />
+      <ToolLeadModal open={gate.open} tool="ai-crawlability-checker" onClose={gate.close} onSuccess={gate.success} />
       <EducationalSection />
       <FAQAccordion items={FAQS} />
       <FinalCTA />

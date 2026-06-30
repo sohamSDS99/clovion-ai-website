@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
 import { openCalendly } from '@/lib/openCalendly'
-import { LIGHT, RED } from '@/components/home/mocks/palette'
+import { RED } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger } from '@/components/home/mocks/motion'
 import { FAQAccordion } from '@/components/FAQAccordion'
+import ToolLeadModal from '@/components/tools/shared/ToolLeadModal'
+import { useToolLeadGate } from '@/components/tools/shared/useToolLeadGate'
 import { FAQS } from './faqs'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -36,6 +38,17 @@ const LEAD: CSSProperties = {
   color: 'var(--ink-70)',
   textWrap: 'balance' as CSSProperties['textWrap']
 }
+
+/* Clovion white wordmark — used in the dark result modal header. */
+const CLOVION_LOGO =
+  'https://res.cloudinary.com/doajh6jwk/image/upload/v1782804104/Clovion-Logo-white_xoqx8t.png'
+
+/* Dark-brand red for "Blocked" pills + Disallow tint (light pinks read wrong
+   on the black modal surface). */
+const RED_BRIGHT = '#f87171'
+const RED_BG_DARK = 'rgba(248,113,113,0.13)'
+const RED_BORDER_DARK = 'rgba(248,113,113,0.32)'
+const GREEN_BRIGHT = '#4ade80'
 
 /* ── Hardcoded sample result ──────────────────────────────────────── */
 type Status = 'allowed' | 'blocked' | 'indeterminate'
@@ -162,7 +175,7 @@ function Hero({
   paste,
   setPaste,
   stage,
-  setStage,
+  onRun,
   onReset,
   showReset
 }: {
@@ -173,7 +186,7 @@ function Hero({
   paste: string
   setPaste: (s: string) => void
   stage: Stage
-  setStage: (s: Stage) => void
+  onRun: () => void
   onReset: () => void
   showReset: boolean
 }) {
@@ -209,9 +222,9 @@ function Hero({
       }
     }
     setError('')
-    setStage('submitting')
-    // 400ms feel-good delay before reveal (no network, this is just polish).
-    window.setTimeout(() => setStage('result'), 400)
+    // Gate the run behind the lead form; the composer kicks off the scan on
+    // a successful submit.
+    onRun()
   }
 
   return (
@@ -330,7 +343,7 @@ function Hero({
                     spellCheck={false}
                     disabled={stage === 'submitting'}
                     aria-label="URL to fetch robots.txt from"
-                    className="clv-tool-input"
+                    className="clv-form-field"
                     style={{
                       width: '100%',
                       height: 56,
@@ -353,7 +366,7 @@ function Hero({
                   trackEvent="cta_click"
                   trackLocation="tools_robots_checker_hero"
                 >
-                  {stage === 'submitting' ? 'Parsing…' : 'Parse'} <ArrowRight />
+                  {stage === 'submitting' ? 'Checking…' : 'Check'} <ArrowRight />
                 </Button>
               </div>
             ) : (
@@ -370,7 +383,7 @@ function Hero({
                   disabled={stage === 'submitting'}
                   aria-label="robots.txt contents"
                   rows={12}
-                  className="clv-tool-textarea"
+                  className="clv-form-field"
                   style={{
                     width: '100%',
                     minHeight: 240,
@@ -406,7 +419,7 @@ function Hero({
                     trackEvent="cta_click"
                     trackLocation="tools_robots_checker_hero"
                   >
-                    {stage === 'submitting' ? 'Parsing…' : 'Parse'} <ArrowRight />
+                    {stage === 'submitting' ? 'Checking…' : 'Check'} <ArrowRight />
                   </Button>
                   <span
                     style={{
@@ -461,27 +474,19 @@ function Hero({
             )}
           </form>
 
-          {/* Style block for placeholder/focus — can't be done inline. */}
-          <style>{`
-            .clv-tool-input::placeholder,
-            .clv-tool-textarea::placeholder { color: var(--ink-50); }
-            .clv-tool-input:focus,
-            .clv-tool-textarea:focus {
-              outline: 2px solid var(--focus-ring);
-              outline-offset: 2px;
-              border-color: var(--white) !important;
-            }
-          `}</style>
         </div>
       </div>
     </section>
   )
 }
 
-/* ── 02 — RESULT CARD (LIGHT palette island on dark page) ─────────── */
-function ResultCard({ revealed }: { revealed: boolean }) {
+/* ── 02 — RESULT MODAL (Clovion dark-brand popup) ─────────────────── */
+function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const reduced = useReducedMotion()
-  const rowFlags = useStagger(BOTS.length, revealed, 45, 220)
+  // `shown` drives the entrance transition: it flips true one frame after the
+  // modal mounts so opacity/transform animate from their initial values.
+  const [shown, setShown] = useState(false)
+  const rowFlags = useStagger(BOTS.length, shown, 45, 220)
   const [parsedOpen, setParsedOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const allowed = BOTS.filter((b) => b.status === 'allowed').length
@@ -490,18 +495,42 @@ function ResultCard({ revealed }: { revealed: boolean }) {
 
   // Trigger parsed-rules slide-in after table rows finish staggering.
   const [parsedReveal, setParsedReveal] = useState(false)
+
+  // Body scroll lock + Esc to close while the modal is open.
   useEffect(() => {
-    if (!revealed) {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = prevOverflow
+    }
+  }, [open, onClose])
+
+  // Reset + replay the reveal each time the modal opens.
+  useEffect(() => {
+    if (!open) {
+      setShown(false)
       setParsedReveal(false)
+      setParsedOpen(false)
       return
     }
     if (reduced) {
+      setShown(true)
       setParsedReveal(true)
       return
     }
+    const raf = requestAnimationFrame(() => setShown(true))
     const t = window.setTimeout(() => setParsedReveal(true), 220 + BOTS.length * 45 + 80)
-    return () => window.clearTimeout(t)
-  }, [revealed, reduced])
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(t)
+    }
+  }, [open, reduced])
 
   const handleCopy = async () => {
     try {
@@ -513,26 +542,90 @@ function ResultCard({ revealed }: { revealed: boolean }) {
     }
   }
 
+  if (!open) return null
+
   return (
-    <div style={{ ...CONTAINER, paddingBottom: 32 }}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="robots-result-title"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem',
+        background: 'rgba(8,8,11,0.55)',
+        backdropFilter: 'blur(4px)',
+        opacity: shown ? 1 : 0,
+        transition: `opacity 240ms ${cb}`
+      }}
+    >
       <div
         style={{
-          ...(LIGHT as CSSProperties),
-          containerType: 'size',
+          containerType: 'inline-size',
+          position: 'relative',
           background: 'var(--white)',
           color: 'var(--ink)',
           border: '1px solid var(--line)',
           borderRadius: 24,
-          padding: 'clamp(20px, 3cqw, 36px)',
-          boxShadow: 'var(--shadow-card)',
-          maxWidth: 960,
-          margin: '0 auto',
-          opacity: revealed ? 1 : 0,
-          transform: revealed ? 'translateY(0)' : 'translateY(12px)',
-          transition: `opacity 480ms ${cb}, transform 480ms ${cb}`
+          padding: 'clamp(22px, 3.2cqw, 44px)',
+          boxShadow: '0 40px 120px -24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)',
+          width: '100%',
+          maxWidth: 1080,
+          maxHeight: '90vh',
+          overflowY: 'auto',
+          textAlign: 'left',
+          opacity: shown ? 1 : 0,
+          transform: shown ? 'translateY(0)' : 'translateY(12px)',
+          transition: `opacity 360ms ${cb}, transform 360ms ${cb}`
         }}
       >
-        {/* Card header */}
+        {/* Brand bar — Clovion logo + close */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 16,
+            marginBottom: 22
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={CLOVION_LOGO}
+            alt="Clovion AI"
+            style={{ height: 26, width: 'auto', display: 'block' }}
+          />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 36,
+              height: 36,
+              borderRadius: 999,
+              border: '1px solid var(--line)',
+              background: 'var(--ink-surface)',
+              color: 'var(--ink-60)',
+              cursor: 'pointer',
+              flexShrink: 0,
+              transition: `color 160ms ${cb}, border-color 160ms ${cb}`
+            }}
+          >
+            <XIcon size={13} />
+          </button>
+        </div>
+
+        {/* Audit header */}
         <div
           style={{
             display: 'flex',
@@ -558,6 +651,7 @@ function ResultCard({ revealed }: { revealed: boolean }) {
               Robots.txt audit
             </p>
             <h3
+              id="robots-result-title"
               style={{
                 margin: '6px 0 0',
                 fontFamily: 'var(--font-display)',
@@ -809,9 +903,9 @@ function StatusPill({ status }: { status: Status }) {
           alignItems: 'center',
           gap: 6,
           padding: '4px 10px',
-          background: '#fde8e8',
-          border: '1px solid #f7cfcf',
-          color: RED,
+          background: RED_BG_DARK,
+          border: `1px solid ${RED_BORDER_DARK}`,
+          color: RED_BRIGHT,
           borderRadius: 'var(--radius-pill)',
           fontFamily: 'var(--font-mono)',
           fontSize: '0.72rem',
@@ -831,7 +925,7 @@ function StatusPill({ status }: { status: Status }) {
         alignItems: 'center',
         gap: 6,
         padding: '4px 10px',
-        background: 'rgba(10,10,15,0.04)',
+        background: 'rgba(255,255,255,0.06)',
         border: '1px solid var(--ink-25)',
         color: 'var(--ink-60)',
         borderRadius: 'var(--radius-pill)',
@@ -875,7 +969,7 @@ function Pill({ tone, children }: { tone: 'ok' | 'bad' | 'neutral'; children: Re
     )
   if (tone === 'bad')
     return (
-      <span style={{ ...styles, background: '#fde8e8', color: RED, border: '1px solid #f7cfcf' }}>
+      <span style={{ ...styles, background: RED_BG_DARK, color: RED_BRIGHT, border: `1px solid ${RED_BORDER_DARK}` }}>
         {children}
       </span>
     )
@@ -883,7 +977,7 @@ function Pill({ tone, children }: { tone: 'ok' | 'bad' | 'neutral'; children: Re
     <span
       style={{
         ...styles,
-        background: 'rgba(10,10,15,0.04)',
+        background: 'rgba(255,255,255,0.06)',
         color: 'var(--ink-60)',
         border: '1px solid var(--ink-25)'
       }}
@@ -916,7 +1010,7 @@ function tintRobots(src: string): React.ReactNode {
       const [head, rest] = splitAtColon(line)
       node = (
         <>
-          <span style={{ color: '#15803d', fontWeight: 600 }}>{head}</span>
+          <span style={{ color: GREEN_BRIGHT, fontWeight: 600 }}>{head}</span>
           <span style={{ color: 'var(--ink-80)' }}>{rest}</span>
         </>
       )
@@ -924,7 +1018,7 @@ function tintRobots(src: string): React.ReactNode {
       const [head, rest] = splitAtColon(line)
       node = (
         <>
-          <span style={{ color: '#b91c1c', fontWeight: 600 }}>{head}</span>
+          <span style={{ color: RED_BRIGHT, fontWeight: 600 }}>{head}</span>
           <span style={{ color: 'var(--ink-80)' }}>{rest}</span>
         </>
       )
@@ -966,70 +1060,67 @@ function Educational() {
   return (
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={CONTAINER}>
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div>
-            <Eyebrow>The basics</Eyebrow>
-            <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0', color: 'var(--ink)' }}>
-              What is robots.txt for AI?
-            </h2>
+        {/* Centered heading */}
+        <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+          <Eyebrow>The basics</Eyebrow>
+          <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0', color: 'var(--ink)' }}>
+            What is robots.txt for AI?
+          </h2>
+          <div style={{ display: 'grid', gap: 18, marginTop: 24 }}>
+            <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.65, color: 'var(--ink-70)' }}>
+              Robots.txt is a 30-year-old text file sitting at the root of your site. It was
+              designed for search-engine spiders, but AI engines inherited the same protocol.
+              Today it is the front door of your domain for every AI crawler that respects
+              standards — which is most of them.
+            </p>
+            <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.65, color: 'var(--ink-70)' }}>
+              A bot that is disallowed at the door cannot read your pages, which means it cannot
+              quote, summarize, or recommend them in AI answers. A bot that is allowed gets to
+              read — but reading is still only step one of being cited.
+            </p>
+            <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.65, color: 'var(--ink-70)' }}>
+              The checker walks every line of your robots.txt against a list of 15 known AI
+              agents and tells you, per bot, whether you currently let them in.
+            </p>
           </div>
-          <div>
-            <div style={{ display: 'grid', gap: 18 }}>
-              <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.65, color: 'var(--ink-70)' }}>
-                Robots.txt is a 30-year-old text file sitting at the root of your site. It was
-                designed for search-engine spiders, but AI engines inherited the same protocol.
-                Today it is the front door of your domain for every AI crawler that respects
-                standards — which is most of them.
-              </p>
-              <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.65, color: 'var(--ink-70)' }}>
-                A bot that is disallowed at the door cannot read your pages, which means it cannot
-                quote, summarize, or recommend them in AI answers. A bot that is allowed gets to
-                read — but reading is still only step one of being cited.
-              </p>
-              <p style={{ margin: 0, fontSize: '1rem', lineHeight: 1.65, color: 'var(--ink-70)' }}>
-                The checker walks every line of your robots.txt against a list of 15 known AI
-                agents and tells you, per bot, whether you currently let them in.
-              </p>
-            </div>
+        </div>
+
+        {/* Tiles */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" style={{ marginTop: 40 }}>
+          {tiles.map((t) => (
             <div
-              className="grid grid-cols-1 gap-4 sm:grid-cols-3"
-              style={{ marginTop: 32 }}
+              key={t.title}
+              style={{
+                padding: 24,
+                background: 'var(--ink-surface)',
+                border: '1px solid var(--ink-25)',
+                borderRadius: 16,
+                textAlign: 'center'
+              }}
             >
-              {tiles.map((t) => (
-                <div
-                  key={t.title}
-                  style={{
-                    padding: 20,
-                    background: 'var(--ink-surface)',
-                    border: '1px solid var(--ink-25)',
-                    borderRadius: 16
-                  }}
-                >
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontFamily: 'var(--font-display)',
-                      fontSize: '0.95rem',
-                      fontWeight: 600,
-                      color: 'var(--white)'
-                    }}
-                  >
-                    {t.title}
-                  </h3>
-                  <p
-                    style={{
-                      margin: '8px 0 0',
-                      fontSize: '0.84rem',
-                      lineHeight: 1.55,
-                      color: 'var(--ink-70)'
-                    }}
-                  >
-                    {t.body}
-                  </p>
-                </div>
-              ))}
+              <h3
+                style={{
+                  margin: 0,
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '0.95rem',
+                  fontWeight: 600,
+                  color: 'var(--ink)'
+                }}
+              >
+                {t.title}
+              </h3>
+              <p
+                style={{
+                  margin: '8px 0 0',
+                  fontSize: '0.84rem',
+                  lineHeight: 1.55,
+                  color: 'var(--ink-70)'
+                }}
+              >
+                {t.body}
+              </p>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
@@ -1062,7 +1153,7 @@ function FinalCTA() {
               backgroundSize: '24px 24px'
             }}
           />
-          <div style={{ position: 'relative', maxWidth: 640 }}>
+          <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto', textAlign: 'center' }}>
             <span
               style={{
                 fontFamily: 'var(--font-mono)',
@@ -1088,7 +1179,7 @@ function FinalCTA() {
                 fontSize: 'var(--text-lead)',
                 lineHeight: 1.55,
                 color: 'var(--on-ink-70)',
-                marginTop: 24,
+                margin: '24px auto 0',
                 maxWidth: 540
               }}
             >
@@ -1096,7 +1187,7 @@ function FinalCTA() {
               your brand, where competitors win, and the three highest-lift fixes to close the
               gap — free, no card.
             </p>
-            <div style={{ marginTop: 36, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ marginTop: 36, display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
               <Button
                 href="/free-ai-visibility-score"
                 variant="primary"
@@ -1131,10 +1222,17 @@ export default function FeatureContent() {
   const [url, setUrl] = useState('')
   const [paste, setPaste] = useState('')
   const [stage, setStage] = useState<Stage>('idle')
+  const gate = useToolLeadGate()
+
+  // 400ms feel-good delay before reveal (no network, this is just polish).
+  const runScan = () => {
+    setStage('submitting')
+    window.setTimeout(() => setStage('result'), 400)
+  }
 
   const handleReset = () => {
     setStage('idle')
-    // Don't wipe the URL / paste — users often want to tweak and re-parse.
+    // Don't wipe the URL / paste — users often want to tweak and re-check.
   }
 
   return (
@@ -1147,11 +1245,12 @@ export default function FeatureContent() {
         paste={paste}
         setPaste={setPaste}
         stage={stage}
-        setStage={setStage}
+        onRun={() => gate.request(runScan)}
         onReset={handleReset}
-        showReset={stage === 'result'}
+        showReset={false}
       />
-      {stage !== 'idle' && <ResultCard revealed={stage === 'result'} />}
+      <ResultModal open={stage === 'result'} onClose={handleReset} />
+      <ToolLeadModal open={gate.open} tool="robots-checker" onClose={gate.close} onSuccess={gate.success} />
       <Educational />
       <FAQAccordion items={FAQS} />
       <FinalCTA />
