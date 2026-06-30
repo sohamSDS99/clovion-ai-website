@@ -1073,6 +1073,10 @@ export default function FeatureContent() {
   const runEmailScan = (clean: string, email?: string) => {
     setSubmittedEmail(email || '')
     setPopupKind('generating')
+    // Clear the input so a second "Get score" click can't immediately re-fire
+    // the same scan (and re-send an email) — the user must enter a website again.
+    setDomain('')
+    setSubmittedDomain('')
     ;(async () => {
       try {
         const res = await fetch(SCAN_ENDPOINT, {
