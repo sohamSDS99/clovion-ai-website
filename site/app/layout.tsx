@@ -6,7 +6,6 @@ import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google'
 import { ChromeHeader, ChromeFooter } from '@/components/Chrome'
 import { ThemeShell } from '@/components/ThemeShell'
 import { RouteTracker } from '@/components/RouteTracker'
-import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 
 // Inline pre-hydration script — applies the .clv-dark scope synchronously
 // for routes that ship dark (currently just `/`) so the body bg paints
@@ -120,7 +119,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ChromeHeader />
         <main>{children}</main>
         <ChromeFooter />
-        <LeadCaptureModal />
       </body>
       <GoogleAnalytics gaId="G-QXKYL1Z4LB" />
     </html>
