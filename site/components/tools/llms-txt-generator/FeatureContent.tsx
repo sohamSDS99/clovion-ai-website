@@ -199,7 +199,7 @@ function Hero({
     height: 52,
     padding: '0 18px',
     background: 'var(--ink-surface)',
-    color: 'var(--white)',
+    color: 'var(--ink)',
     border: '1px solid var(--ink-25)',
     borderRadius: 14,
     fontFamily: 'var(--font-display)',
@@ -212,7 +212,7 @@ function Hero({
     minHeight: 86,
     padding: '14px 18px',
     background: 'var(--ink-surface)',
-    color: 'var(--white)',
+    color: 'var(--ink)',
     border: '1px solid var(--ink-25)',
     borderRadius: 14,
     fontFamily: 'var(--font-display)',
@@ -317,7 +317,7 @@ function Hero({
               onChange={set('url')}
               style={inputStyle}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--white)'
+                e.currentTarget.style.borderColor = 'var(--ink)'
                 e.currentTarget.style.boxShadow = '0 0 0 4px var(--focus-ring)'
               }}
               onBlur={(e) => {
@@ -340,7 +340,7 @@ function Hero({
               onChange={set('brand')}
               style={inputStyle}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--white)'
+                e.currentTarget.style.borderColor = 'var(--ink)'
                 e.currentTarget.style.boxShadow = '0 0 0 4px var(--focus-ring)'
               }}
               onBlur={(e) => {
@@ -361,7 +361,7 @@ function Hero({
               onChange={set('what')}
               style={textareaStyle}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--white)'
+                e.currentTarget.style.borderColor = 'var(--ink)'
                 e.currentTarget.style.boxShadow = '0 0 0 4px var(--focus-ring)'
               }}
               onBlur={(e) => {
@@ -382,7 +382,7 @@ function Hero({
               onChange={set('priority')}
               style={{ ...textareaStyle, minHeight: 96 }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--white)'
+                e.currentTarget.style.borderColor = 'var(--ink)'
                 e.currentTarget.style.boxShadow = '0 0 0 4px var(--focus-ring)'
               }}
               onBlur={(e) => {
