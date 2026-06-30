@@ -27,7 +27,7 @@ export default function EmailGate({
 }: {
   domain: string
   onClose: () => void
-  onGated: () => void
+  onGated: (email: string) => void
 }) {
   const [form, setForm] = useState<FormState>(EMPTY)
   const [token, setToken] = useState('')
@@ -59,7 +59,7 @@ export default function EmailGate({
         throw new Error(data?.error || 'Something went wrong. Please try again.')
       }
       analytics.formSubmit('free_score_lead', 'free_score_gate')
-      onGated()
+      onGated(form.email)
     } catch (err) {
       setStatus('error')
       setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
@@ -161,7 +161,7 @@ export default function EmailGate({
             disabled={submitting}
             className="mt-5 flex h-12 w-full items-center justify-center rounded-full bg-neutral-900 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {submitting ? 'Scanning…' : 'Show my score'}
+            {submitting ? 'Submitting…' : 'Email me my score'}
           </button>
           <p className="mt-3 text-center text-xs text-neutral-400">No credit card. We&rsquo;ll never share your details.</p>
         </form>

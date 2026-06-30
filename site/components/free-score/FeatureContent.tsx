@@ -14,6 +14,7 @@ import PromptResults from './PromptResults'
 import PromptCards from './PromptCards'
 import RecommendationList from './RecommendationList'
 import EmailGate from './EmailGate'
+import ThankYou from './ThankYou'
 import { analytics } from '@/lib/analytics'
 import { openCalendly } from '@/lib/openCalendly'
 import { FAQAccordion } from '@/components/FAQAccordion'
@@ -980,6 +981,10 @@ export default function FeatureContent() {
   const [scanResult, setScanResult] = useState<FreeScoreResult | null>(null)
   const [scanError, setScanError] = useState('')
   const [gateFor, setGateFor] = useState<string | null>(null)
+  // Score is delivered by email — after the lead form we show this confirmation
+  // instead of an on-page scan. 'limit' is shown when the daily quota is hit.
+  const [popupKind, setPopupKind] = useState<'generating' | 'limit' | null>(null)
+  const [submittedEmail, setSubmittedEmail] = useState('')
 
   // Walk the analysis-step indicator while we wait on the API. Holds at
   // the last step until the fetch effect below transitions stage.
@@ -1061,8 +1066,46 @@ export default function FeatureContent() {
     []
   )
 
+  // Kick off the scan server-side (it generates the score and emails the
+  // report) and show the confirmation popup. We deliberately do NOT render the
+  // scan on-page anymore — delivery is by email. If the auth cookie has expired
+  // (returning visitor), /api/scan answers 401 and we reopen the gate.
+  const runEmailScan = (clean: string, email?: string) => {
+    setSubmittedEmail(email || '')
+    setPopupKind('generating')
+    ;(async () => {
+      try {
+        const res = await fetch(SCAN_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ domain: clean })
+        })
+        const data: { code?: string } = await res.json().catch(() => ({}))
+        if (res.status === 401 && data?.code === 'gate_required') {
+          // Auth cookie expired (returning visitor) → reopen the gate.
+          try {
+            sessionStorage.removeItem(LEAD_FLAG)
+          } catch {
+            /* sessionStorage unavailable */
+          }
+          setPopupKind(null)
+          setGateFor(clean)
+          return
+        }
+        if (res.status === 429) {
+          // Daily free-scan quota (or burst rate limit) reached.
+          setPopupKind('limit')
+          return
+        }
+        // Otherwise the scan runs and emails the report; nothing to render here.
+      } catch {
+        /* Network error — the popup already promises an email; nothing to show. */
+      }
+    })()
+  }
+
   // Route every scan start through the gate when gating is on (and not yet
-  // captured this session); otherwise go straight to analyzing.
+  // captured this session); otherwise run the email scan directly.
   const startScan = (clean: string) => {
     let gated = false
     try {
@@ -1074,8 +1117,7 @@ export default function FeatureContent() {
       setGateFor(clean)
       return
     }
-    setSubmittedDomain(clean)
-    setStage('analyzing')
+    runEmailScan(clean)
   }
 
   return (
@@ -1142,7 +1184,7 @@ export default function FeatureContent() {
         <EmailGate
           domain={gateFor}
           onClose={() => setGateFor(null)}
-          onGated={() => {
+          onGated={(email) => {
             try {
               sessionStorage.setItem(LEAD_FLAG, '1')
             } catch {
@@ -1150,9 +1192,46 @@ export default function FeatureContent() {
             }
             const d = gateFor
             setGateFor(null)
-            setSubmittedDomain(d)
-            setStage('analyzing')
+            if (d) runEmailScan(d, email)
           }}
+        />
+      )}
+      {popupKind && (
+        <ThankYou
+          title={
+            popupKind === 'limit'
+              ? 'You’ve used your free scan'
+              : 'Your visibility score is being generated'
+          }
+          body={
+            popupKind === 'limit' ? (
+              <>
+                You’ve reached the free scan limit for now. Check your inbox for your report — or{' '}
+                <a
+                  href="https://app.clovion.ai/signup"
+                  style={{ color: '#34d399', fontWeight: 600, textDecoration: 'none' }}
+                >
+                  start a free trial
+                </a>{' '}
+                for unlimited scans across 10 engines.
+              </>
+            ) : (
+              <>
+                We’ll email you when it’s ready
+                {submittedEmail ? (
+                  <>
+                    {' '}
+                    at{' '}
+                    <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>
+                      {submittedEmail}
+                    </span>
+                  </>
+                ) : null}
+                . Thank you!
+              </>
+            )
+          }
+          onClose={() => setPopupKind(null)}
         />
       )}
     </>

@@ -13,9 +13,9 @@ export const dynamic = 'force-dynamic'
 // Webhook payload contract (do not change keys without re-mapping the Make
 // scenario):
 //   [ { event: "free_score", timestamp, data: {
-//         first_name, last_name, email, country,
+//         first_name, last_name, email, country, company, domain,
 //         trial_start_date, trial_end_date,
-//         user_type: "trial", event: "email_verified_trial_started" } } ]
+//         user_type: "free_score_generator_lead", event: "free_score_generated" } } ]
 
 const WEBHOOK_URL =
   process.env.LEAD_WEBHOOK_URL ||
@@ -90,8 +90,8 @@ export async function POST(req: NextRequest) {
         domain,
         trial_start_date: isoUtc(now),
         trial_end_date: isoUtc(trialEnd),
-        user_type: 'trial',
-        event: 'email_verified_trial_started'
+        user_type: 'free_score_generator_lead',
+        event: 'free_score_generated'
       }
     }
   ]
