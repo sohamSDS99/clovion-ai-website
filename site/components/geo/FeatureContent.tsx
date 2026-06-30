@@ -8,6 +8,7 @@ import DiffPanel from './DiffPanel'
 import ResolvedPanel from './ResolvedPanel'
 import IntegrationStrip from './IntegrationStrip'
 import StellarOrbit from './StellarOrbit'
+import { FAQAccordion } from '@/components/FAQAccordion'
 
 const G_CONTAINER: React.CSSProperties = {
   maxWidth: 'var(--container-max)',
@@ -54,14 +55,6 @@ function ArrowRightIcon({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function PlusIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -747,86 +740,6 @@ const G_FAQS = [
   },
 ]
 
-function FAQItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)',
-        }}
-      >
-        <span style={{ fontSize: '1.1rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>{q}</span>
-        <span style={{
-          flexShrink: 0,
-          color: 'var(--ink-60)',
-          transform: open ? 'rotate(45deg)' : 'none',
-          transition: 'transform .25s ease',
-          display: 'inline-flex',
-        }}>
-          <PlusIcon size={18} />
-        </span>
-      </button>
-      <div style={{ overflow: 'hidden', maxHeight: open ? 600 : 0, transition: 'max-height .35s var(--ease-out-expo)' }}>
-        <p style={{ margin: 0, padding: '0 48px 26px 0', fontSize: '1rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>{a}</p>
-      </div>
-    </div>
-  )
-}
-
-function FAQ() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <section style={{ padding: 'var(--section) 0' }}>
-      <div style={G_CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <MonoEyebrow>FAQ</MonoEyebrow>
-            <h2 style={{ ...G_DISPLAY_MD, margin: '16px 0 0' }}>Questions about suggestions.</h2>
-            <a
-              href="/pricing"
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Talk to us <ArrowRightIcon />
-            </a>
-          </div>
-          <div>
-            {G_FAQS.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={open === i}
-                onToggle={() => setOpen(open === i ? -1 : i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /* ── 08 — FINAL CTA (dark) ───────────────────────────────────────── */
 function FinalCTA() {
   return (
@@ -892,7 +805,7 @@ export default function FeatureContent() {
       <Prioritization />
       <Workflow />
       <Stack />
-      <FAQ />
+      <FAQAccordion items={G_FAQS} />
       <FinalCTA />
     </Fragment>
   )

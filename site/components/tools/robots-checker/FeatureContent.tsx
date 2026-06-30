@@ -5,6 +5,7 @@ import { Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
 import { openCalendly } from '@/lib/openCalendly'
 import { LIGHT, RED } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger } from '@/components/home/mocks/motion'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import { FAQS } from './faqs'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -1035,127 +1036,7 @@ function Educational() {
   )
 }
 
-/* ── 04 — FAQ ─────────────────────────────────────────────────────── */
-function FAQSection() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <section style={{ padding: 'var(--section) 0' }}>
-      <div style={CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0', color: 'var(--ink)' }}>
-              Questions, answered.
-            </h2>
-            <a
-              href="/free-ai-visibility-score"
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                cursor: 'pointer'
-              }}
-            >
-              Get your full score <ArrowRight />
-            </a>
-          </div>
-          <div>
-            {FAQS.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={open === i}
-                onToggle={() => setOpen(open === i ? -1 : i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function FAQItem({
-  q,
-  a,
-  open,
-  onToggle
-}: {
-  q: string
-  a: string
-  open: boolean
-  onToggle: () => void
-}) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)'
-        }}
-      >
-        <span
-          style={{
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            letterSpacing: '-0.01em',
-            color: 'var(--ink)'
-          }}
-        >
-          {q}
-        </span>
-        <span
-          style={{
-            flexShrink: 0,
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: `transform 250ms ${cb}`,
-            display: 'inline-flex'
-          }}
-        >
-          <PlusIcon size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 600 : 0,
-          transition: `max-height 350ms ${cb}`
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            padding: '0 48px 26px 0',
-            fontSize: '1rem',
-            lineHeight: 1.65,
-            color: 'var(--ink-70)'
-          }}
-        >
-          {a}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-/* ── 05 — FINAL CTA ───────────────────────────────────────────────── */
+/* ── 04 — FINAL CTA ───────────────────────────────────────────────── */
 function FinalCTA() {
   return (
     <section style={{ padding: 'var(--section) 0' }}>
@@ -1272,7 +1153,7 @@ export default function FeatureContent() {
       />
       {stage !== 'idle' && <ResultCard revealed={stage === 'result'} />}
       <Educational />
-      <FAQSection />
+      <FAQAccordion items={FAQS} />
       <FinalCTA />
     </>
   )

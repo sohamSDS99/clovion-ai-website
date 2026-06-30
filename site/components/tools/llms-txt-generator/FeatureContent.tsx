@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Button, Eyebrow, ArrowRight } from '@/components/ui'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import { LIGHT } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger, useTypewriter } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
@@ -70,13 +71,6 @@ function DownloadIcon({ size = 14 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="M8 2.5v8M4.5 7l3.5 3.5L11.5 7M3 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-function PlusIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   )
 }
@@ -851,114 +845,6 @@ function WhatIsLlmsTxt() {
   )
 }
 
-/* ── FAQ ─────────────────────────────────────────────────────────── */
-function FAQItem({
-  q,
-  a,
-  open,
-  onToggle
-}: {
-  q: string
-  a: string
-  open: boolean
-  onToggle: () => void
-}) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)'
-        }}
-      >
-        <span style={{ fontSize: '1.1rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
-          {q}
-        </span>
-        <span
-          style={{
-            flexShrink: 0,
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: `transform .25s ${cb}`
-          }}
-        >
-          <PlusIcon size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 480 : 0,
-          transition: `max-height .35s ${cb}`
-        }}
-      >
-        <p style={{ margin: 0, padding: '0 48px 26px 0', fontSize: '1rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>
-          {a}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function FAQ() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <section id="faq" style={{ padding: 'var(--section) 0' }}>
-      <div style={CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0', color: 'var(--ink)' }}>
-              Questions, answered.
-            </h2>
-            <p style={{ ...LEAD, fontSize: '1rem', margin: '18px 0 0' }}>
-              Short answers on what llms.txt is, why it matters, and where this generator fits in
-              your AI visibility stack.
-            </p>
-            <a
-              href="/free-ai-visibility-score"
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                cursor: 'pointer'
-              }}
-            >
-              Get your full score <ArrowRight />
-            </a>
-          </div>
-          <div>
-            {FAQS.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={open === i}
-                onToggle={() => setOpen(open === i ? -1 : i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /* ── FINAL CTA ───────────────────────────────────────────────────── */
 function FinalCTA() {
   return (
@@ -1123,7 +1009,7 @@ export default function FeatureContent() {
         )}
       </div>
       <WhatIsLlmsTxt />
-      <FAQ />
+      <FAQAccordion items={FAQS} />
       <FinalCTA />
     </>
   )

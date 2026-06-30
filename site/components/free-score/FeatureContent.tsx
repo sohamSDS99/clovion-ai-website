@@ -15,6 +15,7 @@ import PromptCards from './PromptCards'
 import RecommendationList from './RecommendationList'
 import { analytics } from '@/lib/analytics'
 import { openCalendly } from '@/lib/openCalendly'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import type { FreeScoreResult } from '@/app/api/free-score/route'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -182,14 +183,6 @@ function ArrowRight({ size = 14 }: { size?: number }) {
     </svg>
   )
 }
-function PlusIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 /* ── Eyebrow ─────────────────────────────────────────────────────── */
 function Eyebrow({ children }: { children: ReactNode }) {
   return (
@@ -904,110 +897,6 @@ const FAQS = [
   }
 ]
 
-function FAQItem({
-  q,
-  a,
-  open,
-  onToggle
-}: {
-  q: string
-  a: string
-  open: boolean
-  onToggle: () => void
-}) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)'
-        }}
-      >
-        <span style={{ fontSize: '1.15rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>
-          {q}
-        </span>
-        <span
-          style={{
-            flexShrink: 0,
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: 'transform .25s ease'
-          }}
-        >
-          <PlusIcon size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 320 : 0,
-          transition: 'max-height .35s var(--ease-out-expo)'
-        }}
-      >
-        <p style={{ margin: 0, padding: '0 48px 26px 0', fontSize: '1rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>
-          {a}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function FAQ() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <section style={{ padding: 'var(--section) 0' }}>
-      <div style={CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <Eyebrow>FAQ</Eyebrow>
-            <h2 style={{ ...DISPLAY_MD, margin: '16px 0 0' }}>Free score, answered.</h2>
-            <button
-              type="button"
-              onClick={() => openCalendly('free_score_faq')}
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0
-              }}
-            >
-              Talk to an expert <ArrowRight />
-            </button>
-          </div>
-          <div>
-            {FAQS.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={open === i}
-                onToggle={() => setOpen(open === i ? -1 : i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /* ── 09 — FINAL CTA (dark) ────────────────────────────────────────── */
 function FinalCTA() {
   return (
@@ -1208,7 +1097,7 @@ export default function FeatureContent() {
         recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
       />
       <MetricsBand />
-      <FAQ />
+      <FAQAccordion items={FAQS} />
       <FinalCTA />
     </>
   )

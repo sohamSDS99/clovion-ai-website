@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, type CSSProperties, type ReactNode } from 'react'
+import { FAQAccordion } from '@/components/FAQAccordion'
 
 /* ── Layout / type constants ───────────────────────────────────── */
 const S_CONTAINER: CSSProperties = { maxWidth: 'var(--container-max)', margin: '0 auto', padding: '0 2rem' }
@@ -53,14 +54,6 @@ function CheckIcon({ size = 10 }: { size?: number }) {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  )
-}
-
-function PlusIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -839,94 +832,6 @@ function DescriptionToDirection() {
   )
 }
 
-/* ── 06 — FAQ ─────────────────────────────────────────────────── */
-function FAQItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)',
-        }}
-      >
-        <span style={{ fontSize: '1.1rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>{q}</span>
-        <span
-          style={{
-            flexShrink: 0,
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: 'transform .25s ease',
-          }}
-        >
-          <PlusIcon size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 600 : 0,
-          transition: 'max-height .35s var(--ease-out-expo)',
-        }}
-      >
-        <p style={{ margin: 0, padding: '0 48px 26px 0', fontSize: '1rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>
-          {a}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-function FAQ() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <section style={{ padding: 'var(--section) 0' }}>
-      <div style={S_CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <h2 style={{ ...S_DISPLAY_MD, margin: '16px 0 0' }}>Questions about sentiment.</h2>
-            <a
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Talk to us <ArrowRight />
-            </a>
-          </div>
-          <div>
-            {BP_FAQS.map((f, i) => (
-              <FAQItem
-                key={i}
-                q={f.q}
-                a={f.a}
-                open={open === i}
-                onToggle={() => setOpen(open === i ? -1 : i)}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /* ── 07 — FINAL CTA (dark) ────────────────────────────────────── */
 function FinalCTA() {
   return (
@@ -997,7 +902,7 @@ export default function FeatureContent() {
       {/* SECTION 05 — FROM DESCRIPTION TO DIRECTION */}
       <DescriptionToDirection />
       {/* SECTION 06 — FAQ */}
-      <FAQ />
+      <FAQAccordion items={BP_FAQS} />
       {/* SECTION 07 — FINAL CTA */}
       <FinalCTA />
     </>

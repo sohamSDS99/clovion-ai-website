@@ -7,6 +7,7 @@ import FanoutExpanded from './FanoutExpanded'
 import FanoutAnalyzed from './FanoutAnalyzed'
 import FanoutImproved from './FanoutImproved'
 import FanoutMap from './FanoutMap'
+import { FAQAccordion } from '@/components/FAQAccordion'
 
 const FQ_CONTAINER: CSSProperties = { maxWidth: 'var(--container-max)', margin: '0 auto', padding: '0 2rem' }
 const FQ_DISPLAY_LG: CSSProperties = { fontFamily: 'var(--font-display)', fontSize: 'var(--display-lg)', fontWeight: 600, letterSpacing: 'var(--track-display-lg)', lineHeight: 1.02, textWrap: 'balance' as CSSProperties['textWrap'] }
@@ -26,14 +27,6 @@ function FqCheck({ size = 12 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
-    </svg>
-  )
-}
-
-function FqPlus({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
     </svg>
   )
 }
@@ -669,87 +662,6 @@ const FQ_FAQS = [
   },
 ]
 
-function FAQItem({ q, a, open, onToggle }: { q: string; a: string; open: boolean; onToggle: () => void }) {
-  return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        onClick={onToggle}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 24,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)',
-        }}
-      >
-        <span style={{ fontSize: '1.1rem', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>{q}</span>
-        <span
-          style={{
-            flexShrink: 0,
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: 'transform .25s ease',
-            display: 'inline-flex',
-          }}
-        >
-          <FqPlus size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 600 : 0,
-          transition: 'max-height .35s var(--ease-out-expo)',
-        }}
-      >
-        <p style={{ margin: 0, padding: '0 48px 26px 0', fontSize: '1rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>{a}</p>
-      </div>
-    </div>
-  )
-}
-
-function FAQ() {
-  const [open, setOpen] = useState<number>(0)
-  return (
-    <section id="faq" style={{ padding: 'var(--section) 0', scrollMarginTop: 80 }}>
-      <div style={FQ_CONTAINER}>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 items-start">
-          <div className="lg:sticky lg:top-24">
-            <FqEyebrow mono>FAQ</FqEyebrow>
-            <h2 style={{ ...FQ_DISPLAY_MD, margin: '16px 0 0' }}>Questions about fanout queries.</h2>
-            <a
-              style={{
-                marginTop: 24,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 6,
-                fontSize: '0.95rem',
-                fontWeight: 600,
-                color: 'var(--ink)',
-                textDecoration: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Talk to us <FqArrow />
-            </a>
-          </div>
-          <div>
-            {FQ_FAQS.map((f, i) => (
-              <FAQItem key={i} q={f.q} a={f.a} open={open === i} onToggle={() => setOpen(open === i ? -1 : i)} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /* ── 07 — FINAL CTA (dark) ─────────────────────────────────────── */
 function FinalCTA() {
   return (
@@ -809,7 +721,9 @@ export default function FeatureContent() {
       <HowItWorks />
       <WhyFanout />
       <Loop />
-      <FAQ />
+      <div id="faq" style={{ scrollMarginTop: 80 }}>
+        <FAQAccordion items={FQ_FAQS} />
+      </div>
       <FinalCTA />
     </>
   )
