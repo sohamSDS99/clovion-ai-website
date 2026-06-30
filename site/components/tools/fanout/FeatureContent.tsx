@@ -246,7 +246,7 @@ function Hero({
                 borderRadius: 18,
                 background: 'var(--ink-surface)',
                 border: `1px solid ${
-                  error ? '#e5484d' : focused ? 'var(--white)' : 'var(--ink-25)'
+                  error ? '#e5484d' : focused ? 'var(--ink)' : 'var(--ink-25)'
                 }`,
                 transition: `border-color 0.18s ${cb}, box-shadow 0.18s ${cb}`,
                 boxShadow: focused
@@ -281,7 +281,7 @@ function Hero({
                   minHeight: 110,
                   padding: '18px 20px',
                   background: 'transparent',
-                  color: 'var(--white)',
+                  color: 'var(--ink)',
                   border: 'none',
                   outline: 'none',
                   resize: 'vertical',

@@ -338,9 +338,9 @@ function HeroWithForm({
                   height: 56,
                   padding: '0 20px',
                   background: 'var(--ink-surface)',
-                  color: 'var(--white)',
+                  color: 'var(--ink)',
                   border: `1px solid ${
-                    error ? RED : focused ? 'var(--white)' : 'var(--ink-25)'
+                    error ? RED : focused ? 'var(--ink)' : 'var(--ink-25)'
                   }`,
                   borderRadius: 'var(--radius-pill, 999px)',
                   fontFamily: 'var(--font-display)',
