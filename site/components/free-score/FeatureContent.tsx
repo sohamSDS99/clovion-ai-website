@@ -16,7 +16,16 @@ import RecommendationList from './RecommendationList'
 import { analytics } from '@/lib/analytics'
 import { openCalendly } from '@/lib/openCalendly'
 import { FAQAccordion } from '@/components/FAQAccordion'
+import { LeadCaptureModal } from '@/components/LeadCaptureModal'
 import type { FreeScoreResult } from '@/app/api/free-score/route'
+
+/* ── Lead-gate constants ─────────────────────────────────────────────
+ * Page-level lead gate: the visitor must submit the lead form before
+ * the scan UI unlocks. State persists in localStorage under
+ * LEAD_CAPTURED_KEY so the gate only fires once per browser.
+ */
+const LEAD_CAPTURED_KEY = 'clv_lead_captured'
+type HydrationState = 'hydrating' | 'gated' | 'unlocked'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
 const CONTAINER: CSSProperties = {
@@ -279,7 +288,9 @@ function Hero({
   setSubmittedDomain,
   stepIndex,
   scanResult,
-  scanError
+  scanError,
+  gateState,
+  onUnlockClick
 }: {
   stage: Stage
   setStage: (s: Stage) => void
@@ -290,12 +301,26 @@ function Hero({
   stepIndex: number
   scanResult: FreeScoreResult | null
   scanError: string
+  gateState: HydrationState
+  onUnlockClick: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string>('')
 
+  // The form is "live" only after the visitor has unlocked the lead gate.
+  // During hydration we render the input visually but inert (no flash from
+  // skeleton → form). In the gated state the input stays disabled and an
+  // unlock prompt + button takes the place of the live submit row.
+  const locked = gateState !== 'unlocked'
+  const inputDisabled = locked || stage === 'analyzing'
+
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
+    // Defensive: never start a scan while the gate is still closed.
+    if (locked) {
+      onUnlockClick()
+      return
+    }
     const clean = normalizeDomain(domain)
     if (!isValidDomain(clean)) {
       setError('Enter a domain like example.com.')
@@ -330,7 +355,13 @@ function Hero({
         }}
       />
       <div style={{ ...CONTAINER, padding: '7rem 2rem 5rem' }}>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
+        <div
+          className={
+            locked
+              ? 'grid grid-cols-1 gap-10 items-center'
+              : 'grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center'
+          }
+        >
           <div>
             <p
               style={{
@@ -365,7 +396,7 @@ function Hero({
                   <input
                     ref={inputRef}
                     type="text"
-                    value={domain}
+                    value={locked ? '' : domain}
                     onChange={(e) => {
                       setDomain(e.target.value)
                       if (error) setError('')
@@ -373,8 +404,9 @@ function Hero({
                     placeholder="your-brand.com"
                     autoComplete="off"
                     spellCheck={false}
-                    disabled={stage === 'analyzing'}
+                    disabled={inputDisabled}
                     aria-label="Your domain"
+                    aria-disabled={inputDisabled}
                     style={{
                       width: '100%',
                       height: 54,
@@ -387,33 +419,72 @@ function Hero({
                       color: 'var(--ink)',
                       outline: 'none',
                       boxShadow: 'var(--shadow-card)',
-                      transition: 'border-color .2s ease'
+                      opacity: locked ? 0.55 : 1,
+                      cursor: inputDisabled ? 'not-allowed' : 'text',
+                      transition: 'border-color .2s ease, opacity .25s ease'
                     }}
                   />
                 </div>
-                <button
-                  type="submit"
-                  disabled={stage === 'analyzing'}
-                  className="btn btn-primary"
-                  style={{
-                    height: 54,
-                    padding: '0 22px',
-                    borderRadius: 16,
-                    fontSize: '0.95rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    whiteSpace: 'nowrap',
-                    cursor: stage === 'analyzing' ? 'wait' : 'pointer',
-                    opacity: stage === 'analyzing' ? 0.7 : 1
-                  }}
-                >
-                  {stage === 'analyzing' ? 'Scanning…' : 'Get my free score'}
-                  {stage !== 'analyzing' && <ArrowRight size={14} />}
-                </button>
+                {!locked && (
+                  <button
+                    type="submit"
+                    disabled={stage === 'analyzing'}
+                    className="btn btn-primary"
+                    style={{
+                      height: 54,
+                      padding: '0 22px',
+                      borderRadius: 16,
+                      fontSize: '0.95rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      whiteSpace: 'nowrap',
+                      cursor: stage === 'analyzing' ? 'wait' : 'pointer',
+                      opacity: stage === 'analyzing' ? 0.7 : 1
+                    }}
+                  >
+                    {stage === 'analyzing' ? 'Scanning…' : 'Get my free score'}
+                    {stage !== 'analyzing' && <ArrowRight size={14} />}
+                  </button>
+                )}
               </div>
-              {(error || scanError) && (
+
+              {/* Gated unlock prompt — replaces the live submit row until the
+                  lead form is filled. Hidden during the brief hydrating frame
+                  so the input doesn't ship with an unlock CTA that vanishes. */}
+              {gateState === 'gated' && (
+                <div style={{ marginTop: 14 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: '0.95rem',
+                      lineHeight: 1.5,
+                      color: 'var(--ink-70)'
+                    }}
+                  >
+                    Fill out a quick form to unlock your free score.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={onUnlockClick}
+                    className="btn btn-primary btn-lg"
+                    style={{
+                      marginTop: 14,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      borderRadius: 16,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Get Free Score <ArrowRight size={14} />
+                  </button>
+                </div>
+              )}
+
+              {!locked && (error || scanError) && (
                 <p
                   role="alert"
                   style={{
@@ -426,84 +497,86 @@ function Hero({
                   {error || scanError}
                 </p>
               )}
-              <div
-                style={{
-                  marginTop: 14,
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 14,
-                  alignItems: 'center'
-                }}
-              >
-                <button
-                  type="button"
-                  disabled={stage === 'analyzing'}
-                  onClick={() => {
-                    if (stage === 'analyzing') return
-                    setError('')
-                    setDomain('notion.so')
-                    setSubmittedDomain('notion.so')
-                    setStage('analyzing')
-                    analytics.getFreeScore('free_score_hero_example')
-                  }}
+              {!locked && (
+                <div
                   style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    color: 'var(--ink-60)',
-                    border: '1px solid var(--line)',
-                    borderRadius: 999,
-                    padding: '6px 14px',
-                    cursor: stage === 'analyzing' ? 'not-allowed' : 'pointer',
-                    background: 'transparent',
-                    opacity: stage === 'analyzing' ? 0.5 : 1
+                    marginTop: 14,
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: 14,
+                    alignItems: 'center'
                   }}
                 >
-                  Try: notion.so <ArrowRight size={12} />
-                </button>
-                {stage === 'result' && (
                   <button
                     type="button"
-                    onClick={handleReset}
+                    disabled={stage === 'analyzing'}
+                    onClick={() => {
+                      if (stage === 'analyzing') return
+                      setError('')
+                      setDomain('notion.so')
+                      setSubmittedDomain('notion.so')
+                      setStage('analyzing')
+                      analytics.getFreeScore('free_score_hero_example')
+                    }}
                     style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.72rem',
                       textTransform: 'uppercase',
                       letterSpacing: '0.1em',
-                      color: 'var(--ink)',
-                      textDecoration: 'underline',
-                      textUnderlineOffset: 3,
+                      color: 'var(--ink-60)',
+                      border: '1px solid var(--line)',
+                      borderRadius: 999,
+                      padding: '6px 14px',
+                      cursor: stage === 'analyzing' ? 'not-allowed' : 'pointer',
+                      background: 'transparent',
+                      opacity: stage === 'analyzing' ? 0.5 : 1
+                    }}
+                  >
+                    Try: notion.so <ArrowRight size={12} />
+                  </button>
+                  {stage === 'result' && (
+                    <button
+                      type="button"
+                      onClick={handleReset}
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.72rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.1em',
+                        color: 'var(--ink)',
+                        textDecoration: 'underline',
+                        textUnderlineOffset: 3,
+                        background: 'transparent',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      Run another scan
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => openCalendly('free_score_hero')}
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.72rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      color: 'var(--ink-60)',
                       background: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: 0
+                      padding: 0,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4
                     }}
                   >
-                    Run another scan
+                    Talk to an expert <ArrowRight size={12} />
                   </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => openCalendly('free_score_hero')}
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.72rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.1em',
-                    color: 'var(--ink-60)',
-                    background: 'transparent',
-                    border: 'none',
-                    cursor: 'pointer',
-                    padding: 0,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4
-                  }}
-                >
-                  Talk to an expert <ArrowRight size={12} />
-                </button>
-              </div>
+                </div>
+              )}
             </form>
 
             {/* Trust pills */}
@@ -539,14 +612,16 @@ function Hero({
             </div>
           </div>
 
-          <ScoreDial
-            stage={stage}
-            score={typeof scanResult?.score === 'number' ? scanResult.score : SCORE}
-            subscoreSummary={(scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
-            platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS}
-            submittedDomain={submittedDomain}
-            stepIndex={stepIndex}
-          />
+          {!locked && (
+            <ScoreDial
+              stage={stage}
+              score={typeof scanResult?.score === 'number' ? scanResult.score : SCORE}
+              subscoreSummary={(scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
+              platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS}
+              submittedDomain={submittedDomain}
+              stepIndex={stepIndex}
+            />
+          )}
         </div>
       </div>
     </section>
@@ -971,6 +1046,48 @@ export default function FeatureContent() {
   const [scanResult, setScanResult] = useState<FreeScoreResult | null>(null)
   const [scanError, setScanError] = useState('')
 
+  /* ── Lead-gate machine ─────────────────────────────────────────────
+   * Initial state is "hydrating" so SSR + first client render match —
+   * neither side has read localStorage yet. The effect below flips us
+   * to "gated" or "unlocked" on mount. When gated, modalOpen latches to
+   * true so the form pops up automatically on first paint.
+   */
+  const [gateState, setGateState] = useState<HydrationState>('hydrating')
+  const [modalOpen, setModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    let captured = false
+    try {
+      captured = window.localStorage.getItem(LEAD_CAPTURED_KEY) === '1'
+    } catch {
+      // localStorage can throw in private mode / disabled storage. Treat
+      // that as "not captured" — the modal will guard the gate instead.
+      captured = false
+    }
+    if (captured) {
+      setGateState('unlocked')
+    } else {
+      setGateState('gated')
+      setModalOpen(true)
+    }
+  }, [])
+
+  const handleUnlockSuccess = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(LEAD_CAPTURED_KEY, '1')
+      } catch {
+        // ignore — gate falls back to in-memory unlock for this session.
+      }
+    }
+    setGateState('unlocked')
+    setModalOpen(false)
+  }
+
+  const handleUnlockClick = () => setModalOpen(true)
+  const handleModalClose = () => setModalOpen(false)
+
   // Walk the analysis-step indicator while we wait on the API. Holds at
   // the last step until the fetch effect below transitions stage.
   useEffect(() => {
@@ -1040,6 +1157,10 @@ export default function FeatureContent() {
     []
   )
 
+  // Only render the mock/scan section tree once the lead gate is unlocked.
+  // During "hydrating" + "gated" the page is just the hero + the gate.
+  const unlocked = gateState === 'unlocked'
+
   return (
     <>
       <div id="hero" />
@@ -1053,52 +1174,68 @@ export default function FeatureContent() {
         stepIndex={stepIndex}
         scanResult={scanResult}
         scanError={scanError}
+        gateState={gateState}
+        onUnlockClick={handleUnlockClick}
       />
 
-      <JumpLinks />
+      {unlocked && (
+        <>
+          <JumpLinks />
 
-      <FeatureBlock
-        id="measure"
-        eyebrow="What we measure"
-        headline="Four signals behind one visibility score."
-        body={[
-          'A single 0–100 number is useful only when you know what it represents. The free score breaks down into four named signals so you can see which part of your AI visibility is strong, which is weak, and where the biggest fix lives.',
-          'Each signal is sampled the same way across engines, which means your scores stay comparable as you make changes and run the scan again next quarter.'
-        ]}
-        bullets={[
-          'Mention Rate: how often your brand surfaces in category prompts.',
-          'Sentiment: how AI engines describe you when you do appear.',
-          'Citation Strength: how often your domain is cited as a source.',
-          'Competitive Position: your share of voice against the top three rivals.'
-        ]}
-        visual={<SubscoreCards subscores={scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES} />}
-      />
+          <FeatureBlock
+            id="measure"
+            eyebrow="What we measure"
+            headline="Four signals behind one visibility score."
+            body={[
+              'A single 0–100 number is useful only when you know what it represents. The free score breaks down into four named signals so you can see which part of your AI visibility is strong, which is weak, and where the biggest fix lives.',
+              'Each signal is sampled the same way across engines, which means your scores stay comparable as you make changes and run the scan again next quarter.'
+            ]}
+            bullets={[
+              'Mention Rate: how often your brand surfaces in category prompts.',
+              'Sentiment: how AI engines describe you when you do appear.',
+              'Citation Strength: how often your domain is cited as a source.',
+              'Competitive Position: your share of voice against the top three rivals.'
+            ]}
+            visual={<SubscoreCards subscores={scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES} />}
+          />
 
-      <FeatureBlock
-        id="where"
-        flip
-        eyebrow="Where we look"
-        headline="Four engines, twelve prompts, one snapshot."
-        body={[
-          'The free check runs the same buyer-style prompt set across the AI engines most buyers actually use during the early stages of a purchase decision.',
-          'Prompts are category-level, not branded. That keeps the scan honest: you only score when AI surfaces you organically, the way a real prospect would find you.'
-        ]}
-        bullets={[
-          'ChatGPT for the broadest reach in conversational answers.',
-          'Claude for sentiment and reasoning-heavy responses.',
-          'Perplexity for cited, source-linked answers.',
-          'Google AI Overviews for generative results inside search.'
-        ]}
-        visual={<PlatformPanel platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS} />}
-      />
+          <FeatureBlock
+            id="where"
+            flip
+            eyebrow="Where we look"
+            headline="Four engines, twelve prompts, one snapshot."
+            body={[
+              'The free check runs the same buyer-style prompt set across the AI engines most buyers actually use during the early stages of a purchase decision.',
+              'Prompts are category-level, not branded. That keeps the scan honest: you only score when AI surfaces you organically, the way a real prospect would find you.'
+            ]}
+            bullets={[
+              'ChatGPT for the broadest reach in conversational answers.',
+              'Claude for sentiment and reasoning-heavy responses.',
+              'Perplexity for cited, source-linked answers.',
+              'Google AI Overviews for generative results inside search.'
+            ]}
+            visual={<PlatformPanel platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS} />}
+          />
 
-      <RealPrompts prompts={scanResult?.prompts && scanResult.prompts.length > 0 ? scanResult.prompts : SAMPLE_PROMPTS} />
-      <RecommendationsSection
-        recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
-      />
-      <MetricsBand />
-      <FAQAccordion items={FAQS} />
-      <FinalCTA />
+          <RealPrompts prompts={scanResult?.prompts && scanResult.prompts.length > 0 ? scanResult.prompts : SAMPLE_PROMPTS} />
+          <RecommendationsSection
+            recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
+          />
+          <MetricsBand />
+          <FAQAccordion items={FAQS} />
+          <FinalCTA />
+        </>
+      )}
+
+      {/* Lead-gate modal — controlled mount. Only renders while gated so
+          we don't pin a closed dialog into the DOM after unlock. */}
+      {gateState === 'gated' && (
+        <LeadCaptureModal
+          open={modalOpen}
+          onClose={handleModalClose}
+          onSuccess={handleUnlockSuccess}
+        />
+      )}
     </>
   )
 }

@@ -1,25 +1,33 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { countries } from '@/lib/countries'
-import { analytics } from '@/lib/analytics'
+import { analytics, track } from '@/lib/analytics'
 
-// LeadCaptureModal — mounted ONCE in the root layout.
+// LeadCaptureModal — controlled-mode lead-capture dialog.
 //
-// Two responsibilities:
-//  1. Global click interceptor. Every "Get Free Score" CTA across the site
-//     ultimately renders an <a href="/free-ai-visibility-score"> (Button→Link,
-//     plain <a>, FqBtn, CTABanner→Button). A single capture-phase click
-//     listener on document catches them all — no need to edit ~20 call sites.
-//     We preventDefault + stopPropagation so neither the native navigation nor
-//     Next.js's <Link> handler fires; instead we open this modal.
-//  2. The lead form itself. Fields mirror the webhook payload's user-supplied
-//     data (first_name, last_name, email, country). On submit we POST to
-//     /api/lead (which forwards the full trial_start payload to Make), then
-//     send the visitor on to the score page they were originally headed to.
-
-const SCORE_PATH = '/free-ai-visibility-score'
+// This component is NO LONGER a global click interceptor. It does not install
+// any document-level listeners. The parent fully owns visibility via the
+// `open` prop, and reacts to the form lifecycle via `onClose` / `onSuccess`.
+//
+// API:
+//   <LeadCaptureModal
+//     open={boolean}                // parent decides when the dialog is visible
+//     onClose={() => void}          // fired on X-click, Esc, or backdrop click
+//     onSuccess={() => void}        // fired immediately after a successful
+//                                   // POST /api/lead (2xx). Parent owns what
+//                                   // happens next (close + reveal scan UI).
+//   />
+//
+// Submit flow:
+//   1. POST { first_name, last_name, email, country } → /api/lead
+//   2. On 2xx: persist `clv_lead_captured=1` in localStorage, fire
+//      `generate_lead` GA4 event via analytics.formSubmit(...), call onSuccess().
+//   3. On non-2xx / network error: surface the error inline; the dialog stays
+//      open so the user can retry.
+//
+// The component does NOT navigate after success (the user is already on
+// /free-ai-visibility-score). Routing belongs to the parent.
 
 type FormState = {
   first_name: string
@@ -30,58 +38,40 @@ type FormState = {
 
 const EMPTY: FormState = { first_name: '', last_name: '', email: '', country: '' }
 
-export function LeadCaptureModal() {
-  const router = useRouter()
-  const [open, setOpen] = useState(false)
+// Inline literal — never put var(--*) inside a transition shorthand.
+const EASE_OUT_EXPO = 'cubic-bezier(0.16, 1, 0.3, 1)'
+
+export function LeadCaptureModal({
+  open,
+  onClose,
+  onSuccess
+}: {
+  open: boolean
+  onClose: () => void
+  onSuccess: () => void
+}) {
   const [form, setForm] = useState<FormState>(EMPTY)
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
-  // Where to send the visitor after a successful submit (the href they clicked).
-  const destRef = useRef<string>(SCORE_PATH)
   const firstFieldRef = useRef<HTMLInputElement>(null)
 
-  // --- Global click interceptor -------------------------------------------
+  // Fire `lead_form_open` once each time the parent flips `open` false → true.
+  // Preserves the telemetry the old global interceptor used to emit (it called
+  // analytics.getFreeScore('lead_form_open') at the moment it intercepted the
+  // click). Tracked here so the event still surfaces in GA4 without any global
+  // listener.
   useEffect(() => {
-    function onClick(e: MouseEvent) {
-      // Only hijack a plain primary click. Let middle/right-click and the
-      // browser's own new-tab modifiers behave normally.
-      if (e.defaultPrevented || e.button !== 0) return
-
-      const target = e.target as HTMLElement | null
-      const anchor = target?.closest('a')
-      if (!anchor) return
-
-      const rawHref = anchor.getAttribute('href')
-      if (!rawHref) return
-
-      let path: string
-      try {
-        path = new URL(anchor.href, window.location.origin).pathname
-      } catch {
-        return
-      }
-      if (path.replace(/\/$/, '') !== SCORE_PATH) return
-
-      // It's a Get-Free-Score destination — gate it behind the lead form.
-      e.preventDefault()
-      e.stopPropagation()
-      destRef.current = rawHref.startsWith('http') ? path : rawHref
-      analytics.getFreeScore('lead_form_open')
-      setOpen(true)
-    }
-
-    document.addEventListener('click', onClick, true)
-    return () => document.removeEventListener('click', onClick, true)
-  }, [])
+    if (!open) return
+    track({ event: 'lead_form_open' })
+  }, [open])
 
   const close = useCallback(() => {
-    // Don't let the user dismiss mid-submit or during the success hand-off
-    // (we're about to redirect them to the score page).
-    if (status === 'submitting' || status === 'success') return
-    setOpen(false)
-  }, [status])
+    // Don't let the user dismiss mid-submit — we have a request in flight.
+    if (status === 'submitting') return
+    onClose()
+  }, [status, onClose])
 
-  // Esc to close + body scroll lock while open.
+  // Esc to close + body scroll lock while open + autofocus first field.
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
@@ -90,7 +80,6 @@ export function LeadCaptureModal() {
     document.addEventListener('keydown', onKey)
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    // focus the first field once painted
     const t = setTimeout(() => firstFieldRef.current?.focus(), 30)
     return () => {
       document.removeEventListener('keydown', onKey)
@@ -99,11 +88,12 @@ export function LeadCaptureModal() {
     }
   }, [open, close])
 
-  // Reset transient state when the modal closes.
+  // Reset transient state whenever the dialog closes so the next open is clean.
   useEffect(() => {
     if (!open) {
       setStatus('idle')
       setErrorMsg('')
+      setForm(EMPTY)
     }
   }, [open])
 
@@ -125,16 +115,19 @@ export function LeadCaptureModal() {
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || 'Something went wrong. Please try again.')
       }
-      analytics.formSubmit('free_score_lead', 'lead_form')
-      // Show a brief thank-you, then hand the visitor to the score page they
-      // were originally headed for.
-      setStatus('success')
-      const dest = destRef.current || SCORE_PATH
-      setTimeout(() => {
-        setOpen(false)
-        setForm(EMPTY)
-        router.push(dest)
-      }, 1600)
+      // Persist the captured flag so the parent (and any future visit) can
+      // skip the gate entirely.
+      try {
+        localStorage.setItem('clv_lead_captured', '1')
+      } catch {
+        // localStorage can throw in some privacy modes — ignore, the parent
+        // can still proceed with the in-memory success signal.
+      }
+      // Fire GA4 lead-generation event before handing control back to parent.
+      analytics.formSubmit('lead_capture', 'free_score_page')
+      // Hand off to parent. Parent decides whether to close, reveal scan UI,
+      // celebrate, etc. — this component does not navigate.
+      onSuccess()
     } catch (err) {
       setStatus('error')
       setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
@@ -162,7 +155,8 @@ export function LeadCaptureModal() {
         justifyContent: 'center',
         padding: '1rem',
         background: 'rgba(8,8,11,0.55)',
-        backdropFilter: 'blur(4px)'
+        backdropFilter: 'blur(4px)',
+        transition: `opacity 240ms ${EASE_OUT_EXPO}`
       }}
     >
       <div
@@ -171,18 +165,6 @@ export function LeadCaptureModal() {
         className="w-full max-w-[440px] rounded-2xl bg-white text-neutral-900 shadow-2xl"
         style={{ border: '1px solid #eceae5' }}
       >
-        {status === 'success' ? (
-          <div className="flex flex-col items-center px-6 py-12 text-center">
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-900 text-white">
-              <svg width="26" height="26" viewBox="0 0 16 16" fill="none" aria-hidden>
-                <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            <h2 className="mt-5 text-xl font-semibold tracking-tight text-neutral-900">Thanks — you&rsquo;re all set.</h2>
-            <p className="mt-2 text-sm text-neutral-500">Taking you to your free AI visibility score&hellip;</p>
-          </div>
-        ) : (
-          <>
         <div className="flex items-start justify-between px-6 pt-6">
           <div>
             <h2 id="lead-form-title" className="text-xl font-semibold tracking-tight text-neutral-900">
@@ -196,7 +178,8 @@ export function LeadCaptureModal() {
             type="button"
             onClick={close}
             aria-label="Close"
-            className="ml-3 -mr-1 -mt-1 rounded-md p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+            className="ml-3 -mr-1 -mt-1 rounded-md p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-700"
+            style={{ transition: `background-color 160ms ${EASE_OUT_EXPO}, color 160ms ${EASE_OUT_EXPO}` }}
           >
             <svg width="18" height="18" viewBox="0 0 16 16" fill="none" aria-hidden>
               <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
@@ -269,7 +252,8 @@ export function LeadCaptureModal() {
           <button
             type="submit"
             disabled={submitting}
-            className="mt-5 flex h-12 w-full items-center justify-center rounded-full bg-neutral-900 text-base font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-5 flex h-12 w-full items-center justify-center rounded-full bg-neutral-900 text-base font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            style={{ transition: `opacity 160ms ${EASE_OUT_EXPO}` }}
           >
             {submitting ? 'Submitting…' : 'Get my free score'}
           </button>
@@ -278,15 +262,13 @@ export function LeadCaptureModal() {
             No credit card. We&rsquo;ll never share your details.
           </p>
         </form>
-          </>
-        )}
       </div>
     </div>
   )
 }
 
 const inputCls =
-  'w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 outline-none transition-colors placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900'
+  'w-full rounded-lg border border-neutral-200 bg-white px-3.5 py-2.5 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

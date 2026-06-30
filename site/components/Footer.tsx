@@ -27,6 +27,7 @@ const groups = [
   {
     title: 'Free Tools',
     links: [
+      { label: 'Get Free Score', href: '/free-ai-visibility-score' },
       { label: 'llms.txt Generator', href: '/tools/llms-txt-generator' },
       { label: 'AI Crawlability Checker', href: '/tools/ai-crawlability-checker' },
       { label: 'Robots.txt AI Bot Checker', href: '/tools/robots-checker' },
