@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { Container, Section, Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
-import { LIGHT, TAG_COLORS } from '@/components/home/mocks/palette'
+import { TAG_COLORS } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger, useCountUp } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
 import { FAQAccordion } from '@/components/FAQAccordion'
+import ToolLeadModal from '@/components/tools/shared/ToolLeadModal'
+import ToolResultModal from '@/components/tools/shared/ToolResultModal'
+import { useToolLeadGate } from '@/components/tools/shared/useToolLeadGate'
 import { FAQS } from './faqs'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -127,13 +130,15 @@ function Hero({
   setStage,
   query,
   setQuery,
-  setSubmittedQuery
+  setSubmittedQuery,
+  gateRun
 }: {
   stage: Stage
   setStage: (s: Stage) => void
   query: string
   setQuery: (q: string) => void
   setSubmittedQuery: (q: string) => void
+  gateRun: (action: () => void) => void
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const [error, setError] = useState<string>('')
@@ -148,10 +153,13 @@ function Hero({
       return
     }
     setError('')
-    setSubmittedQuery(trimmed)
-    setStage('submitting')
-    // Local-only feel-good delay before result reveal.
-    setTimeout(() => setStage('result'), 480)
+    // Gate the run behind the lead form.
+    gateRun(() => {
+      setSubmittedQuery(trimmed)
+      setStage('submitting')
+      // Local-only feel-good delay before result reveal.
+      setTimeout(() => setStage('result'), 480)
+    })
   }
 
   const handleReset = () => {
@@ -164,11 +172,13 @@ function Hero({
   const tryExample = () => {
     if (stage === 'submitting') return
     const sample = 'best CRM for a growing SaaS company with 50 employees'
-    setQuery(sample)
-    setSubmittedQuery(sample)
-    setError('')
-    setStage('submitting')
-    setTimeout(() => setStage('result'), 480)
+    gateRun(() => {
+      setQuery(sample)
+      setSubmittedQuery(sample)
+      setError('')
+      setStage('submitting')
+      setTimeout(() => setStage('result'), 480)
+    })
   }
 
   return (
@@ -276,6 +286,7 @@ function Hero({
                 autoComplete="off"
                 disabled={stage === 'submitting'}
                 aria-label="Seed query"
+                className="clv-form-field"
                 style={{
                   width: '100%',
                   minHeight: 110,
@@ -616,29 +627,7 @@ function ResultCard({
   if (!visible) return null
 
   return (
-    <Section
-      className="relative"
-      tight
-      id="result"
-    >
-      <Container>
-        <div
-          style={{
-            ...(LIGHT as React.CSSProperties),
-            containerType: 'size',
-            background: 'var(--white)',
-            color: 'var(--ink)',
-            border: '1px solid var(--line)',
-            borderRadius: 24,
-            padding: 'clamp(22px, 3cqw, 40px)',
-            boxShadow: '0 32px 80px -28px rgba(10,10,15,0.55), 0 0 0 1px rgba(255,255,255,0.04)',
-            maxWidth: 1040,
-            margin: '0 auto',
-            opacity: rootRevealed ? 1 : 0,
-            transform: rootRevealed ? 'translateY(0)' : 'translateY(12px)',
-            transition: `opacity 0.48s ${cb}, transform 0.48s ${cb}`
-          }}
-        >
+    <div>
           {/* Header */}
           <div
             style={{
@@ -777,9 +766,7 @@ function ResultCard({
               Get your full score <FqArrow size={12} />
             </a>
           </div>
-        </div>
-      </Container>
-    </Section>
+    </div>
   )
 }
 
@@ -1005,6 +992,7 @@ export default function FeatureContent() {
   const [stage, setStage] = useState<Stage>('idle')
   const [query, setQuery] = useState<string>('')
   const [submittedQuery, setSubmittedQuery] = useState<string>('')
+  const gate = useToolLeadGate()
 
   return (
     <>
@@ -1014,11 +1002,18 @@ export default function FeatureContent() {
         query={query}
         setQuery={setQuery}
         setSubmittedQuery={setSubmittedQuery}
+        gateRun={gate.request}
       />
-      <ResultCard
-        visible={stage === 'result'}
-        submittedQuery={submittedQuery}
-      />
+      <ToolLeadModal open={gate.open} tool="fanout" onClose={gate.close} onSuccess={gate.success} />
+      <ToolResultModal
+        open={stage === 'result'}
+        onClose={() => {
+          setStage('idle')
+          setSubmittedQuery('')
+        }}
+      >
+        <ResultCard visible={stage === 'result'} submittedQuery={submittedQuery} />
+      </ToolResultModal>
       <Educational />
       <FAQAccordion items={FAQS} />
       <FinalCTA />

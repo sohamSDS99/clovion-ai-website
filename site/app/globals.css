@@ -508,6 +508,29 @@
   --logo-filter: brightness(0);
 }
 
+/* ── Free-tool form fields ────────────────────────────────────────────
+   Strict B&W: dark fill + white text, white text-selection highlight, and
+   no white/blue browser-autofill repaint. Applied via the shared
+   .clv-form-field class on every free-tool input/textarea (NOT the
+   free-score light EmailGate). */
+.clv-form-field::placeholder { color: var(--ink-50); }
+.clv-form-field::selection { background: #ffffff; color: #0a0a0f; }
+.clv-form-field:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-color: var(--ink) !important;
+}
+.clv-form-field:-webkit-autofill,
+.clv-form-field:-webkit-autofill:hover,
+.clv-form-field:-webkit-autofill:focus,
+.clv-form-field:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--ink-surface) inset;
+  caret-color: var(--ink);
+  /* Defeat the autofill background swap entirely. */
+  transition: background-color 9999s ease-out 0s;
+}
+
 /* ── Homepage keyframes (clv- prefix) ─────────────────────────────── */
 @keyframes clv-blink {
   0%, 50% { opacity: 1; }
