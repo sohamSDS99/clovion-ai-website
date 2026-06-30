@@ -10,21 +10,19 @@ import {
 } from 'react'
 import ScoreDial from './ScoreDial'
 import SubscoreCards from './SubscoreCards'
-import PlatformPanel from './PlatformPanel'
+import PromptResults from './PromptResults'
 import PromptCards from './PromptCards'
 import RecommendationList from './RecommendationList'
+import EmailGate from './EmailGate'
 import { analytics } from '@/lib/analytics'
 import { openCalendly } from '@/lib/openCalendly'
 import { FAQAccordion } from '@/components/FAQAccordion'
-import { LeadCaptureModal } from '@/components/LeadCaptureModal'
-import type { FreeScoreResult } from '@/app/api/free-score/route'
+import type { FreeScoreResult } from '@/lib/freeScore/types'
 
-/* ── Lead-gate constants ─────────────────────────────────────────────
- * Page-level lead gate: the visitor must submit the lead form before
- * the scan UI unlocks. State persists in localStorage under
- * LEAD_CAPTURED_KEY so the gate only fires once per browser.
- */
-const LEAD_CAPTURED_KEY = 'clv_lead_captured'
+// v2 wiring: client points at /api/scan by default; gate is flag-gated.
+const SCAN_ENDPOINT = process.env.NEXT_PUBLIC_FREE_SCORE_ENDPOINT || '/api/scan'
+const REQUIRE_GATE = process.env.NEXT_PUBLIC_FREE_SCORE_REQUIRE_GATE === '1'
+const LEAD_FLAG = 'clv_lead_captured'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
 const CONTAINER: CSSProperties = {
@@ -81,12 +79,15 @@ const SUBSCORES = [
   }
 ]
 
-const PLATFORMS = [
-  { name: 'ChatGPT', score: 78, strong: true },
-  { name: 'Claude', score: 65, strong: false },
-  { name: 'Perplexity', score: 42, strong: false },
-  { name: 'AI Overviews', score: 71, strong: true }
-]
+const PLATFORMS = [{ name: 'ChatGPT', score: 78, strong: true }]
+
+// Single-engine row for the ScoreDial mini-strip, derived from a v2 result.
+function chatgptRow(r: FreeScoreResult | null): { name: string; score: number; strong: boolean }[] | null {
+  if (!r || !Array.isArray(r.subscores)) return null
+  const mention = r.subscores.find((s) => s.label === 'Mention Rate')?.value
+  const score = typeof mention === 'number' ? mention : r.score
+  return [{ name: 'ChatGPT', score, strong: score >= 70 }]
+}
 
 const SAMPLE_PROMPTS = [
   {
@@ -288,7 +289,7 @@ function Hero({
   stepIndex,
   scanResult,
   scanError,
-  onRequestUnlock
+  startScan
 }: {
   stage: Stage
   setStage: (s: Stage) => void
@@ -299,14 +300,10 @@ function Hero({
   stepIndex: number
   scanResult: FreeScoreResult | null
   scanError: string
-  onRequestUnlock: (cleanDomain: string) => void
+  startScan: (d: string) => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string>('')
-
-  // Form is live on page load — no hydration gate. The lead-capture modal
-  // is triggered at submit time if the visitor hasn't yet captured.
-  const inputDisabled = stage === 'analyzing'
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
@@ -317,26 +314,9 @@ function Hero({
       return
     }
     setError('')
+    startScan(clean)
     analytics.formSubmit('free_ai_visibility_score', 'free_score_page')
     analytics.getFreeScore('free_score_hero')
-
-    // Gate at submit: if returning visitor (localStorage flag), run scan
-    // immediately. Else hand the domain to the parent — it opens the modal
-    // and resumes the scan after a successful capture.
-    let captured = false
-    if (typeof window !== 'undefined') {
-      try {
-        captured = window.localStorage.getItem(LEAD_CAPTURED_KEY) === '1'
-      } catch {
-        captured = false
-      }
-    }
-    if (captured) {
-      setSubmittedDomain(clean)
-      setStage('analyzing')
-    } else {
-      onRequestUnlock(clean)
-    }
   }
 
   const handleReset = () => {
@@ -403,9 +383,8 @@ function Hero({
                     placeholder="your-brand.com"
                     autoComplete="off"
                     spellCheck={false}
-                    disabled={inputDisabled}
+                    disabled={stage === 'analyzing'}
                     aria-label="Your domain"
-                    aria-disabled={inputDisabled}
                     style={{
                       width: '100%',
                       height: 54,
@@ -418,34 +397,32 @@ function Hero({
                       color: 'var(--ink)',
                       outline: 'none',
                       boxShadow: 'var(--shadow-card)',
-                      cursor: inputDisabled ? 'not-allowed' : 'text',
                       transition: 'border-color .2s ease'
                     }}
                   />
                 </div>
                 <button
-                    type="submit"
-                    disabled={stage === 'analyzing'}
-                    className="btn btn-primary"
-                    style={{
-                      height: 54,
-                      padding: '0 22px',
-                      borderRadius: 16,
-                      fontSize: '0.95rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      whiteSpace: 'nowrap',
-                      cursor: stage === 'analyzing' ? 'wait' : 'pointer',
-                      opacity: stage === 'analyzing' ? 0.7 : 1
-                    }}
-                  >
-                    {stage === 'analyzing' ? 'Scanning…' : 'Get my free score'}
-                    {stage !== 'analyzing' && <ArrowRight size={14} />}
-                  </button>
+                  type="submit"
+                  disabled={stage === 'analyzing'}
+                  className="btn btn-primary"
+                  style={{
+                    height: 54,
+                    padding: '0 22px',
+                    borderRadius: 16,
+                    fontSize: '0.95rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 8,
+                    whiteSpace: 'nowrap',
+                    cursor: stage === 'analyzing' ? 'wait' : 'pointer',
+                    opacity: stage === 'analyzing' ? 0.7 : 1
+                  }}
+                >
+                  {stage === 'analyzing' ? 'Scanning…' : 'Get my free score'}
+                  {stage !== 'analyzing' && <ArrowRight size={14} />}
+                </button>
               </div>
-
               {(error || scanError) && (
                 <p
                   role="alert"
@@ -460,83 +437,82 @@ function Hero({
                 </p>
               )}
               <div
+                style={{
+                  marginTop: 14,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: 14,
+                  alignItems: 'center'
+                }}
+              >
+                <button
+                  type="button"
+                  disabled={stage === 'analyzing'}
+                  onClick={() => {
+                    if (stage === 'analyzing') return
+                    setError('')
+                    setDomain('notion.so')
+                    startScan('notion.so')
+                    analytics.getFreeScore('free_score_hero_example')
+                  }}
                   style={{
-                    marginTop: 14,
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: 14,
-                    alignItems: 'center'
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.72rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: 'var(--ink-60)',
+                    border: '1px solid var(--line)',
+                    borderRadius: 999,
+                    padding: '6px 14px',
+                    cursor: stage === 'analyzing' ? 'not-allowed' : 'pointer',
+                    background: 'transparent',
+                    opacity: stage === 'analyzing' ? 0.5 : 1
                   }}
                 >
+                  Try: notion.so <ArrowRight size={12} />
+                </button>
+                {stage === 'result' && (
                   <button
                     type="button"
-                    disabled={stage === 'analyzing'}
-                    onClick={() => {
-                      if (stage === 'analyzing') return
-                      setError('')
-                      setDomain('notion.so')
-                      setSubmittedDomain('notion.so')
-                      setStage('analyzing')
-                      analytics.getFreeScore('free_score_hero_example')
-                    }}
+                    onClick={handleReset}
                     style={{
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.72rem',
                       textTransform: 'uppercase',
                       letterSpacing: '0.1em',
-                      color: 'var(--ink-60)',
-                      border: '1px solid var(--line)',
-                      borderRadius: 999,
-                      padding: '6px 14px',
-                      cursor: stage === 'analyzing' ? 'not-allowed' : 'pointer',
-                      background: 'transparent',
-                      opacity: stage === 'analyzing' ? 0.5 : 1
-                    }}
-                  >
-                    Try: notion.so <ArrowRight size={12} />
-                  </button>
-                  {stage === 'result' && (
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      style={{
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.72rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        color: 'var(--ink)',
-                        textDecoration: 'underline',
-                        textUnderlineOffset: 3,
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: 0
-                      }}
-                    >
-                      Run another scan
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => openCalendly('free_score_hero')}
-                    style={{
-                      fontFamily: 'var(--font-mono)',
-                      fontSize: '0.72rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.1em',
-                      color: 'var(--ink-60)',
+                      color: 'var(--ink)',
+                      textDecoration: 'underline',
+                      textUnderlineOffset: 3,
                       background: 'transparent',
                       border: 'none',
                       cursor: 'pointer',
-                      padding: 0,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4
+                      padding: 0
                     }}
                   >
-                    Talk to an expert <ArrowRight size={12} />
+                    Run another scan
                   </button>
-                </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => openCalendly('free_score_hero')}
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.72rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: 'var(--ink-60)',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4
+                  }}
+                >
+                  Talk to an expert <ArrowRight size={12} />
+                </button>
+              </div>
             </form>
 
             {/* Trust pills */}
@@ -573,13 +549,13 @@ function Hero({
           </div>
 
           <ScoreDial
-              stage={stage}
-              score={typeof scanResult?.score === 'number' ? scanResult.score : SCORE}
-              subscoreSummary={(scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
-              platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS}
-              submittedDomain={submittedDomain}
-              stepIndex={stepIndex}
-            />
+            stage={stage}
+            score={typeof scanResult?.score === 'number' ? scanResult.score : SCORE}
+            subscoreSummary={(scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES).map((s) => ({ label: s.label, value: s.value }))}
+            platforms={chatgptRow(scanResult) ?? PLATFORMS}
+            submittedDomain={submittedDomain}
+            stepIndex={stepIndex}
+          />
         </div>
       </div>
     </section>
@@ -1003,45 +979,7 @@ export default function FeatureContent() {
   const [stepIndex, setStepIndex] = useState(0)
   const [scanResult, setScanResult] = useState<FreeScoreResult | null>(null)
   const [scanError, setScanError] = useState('')
-
-  /* ── Lead-gate machine ─────────────────────────────────────────────
-   * No friction on page load — the hero + scan UI render fully live.
-   * The gate triggers ONLY when the visitor clicks the scan submit
-   * button. If they've already captured (localStorage flag), the scan
-   * fires immediately. Otherwise we stash the typed domain, open the
-   * modal, and resume the scan automatically once the form submits.
-   */
-  const [modalOpen, setModalOpen] = useState(false)
-  const [pendingDomain, setPendingDomain] = useState<string>('')
-
-  const handleRequestUnlock = (cleanDomain: string) => {
-    setPendingDomain(cleanDomain)
-    setModalOpen(true)
-  }
-
-  const handleUnlockSuccess = () => {
-    if (typeof window !== 'undefined') {
-      try {
-        window.localStorage.setItem(LEAD_CAPTURED_KEY, '1')
-      } catch {
-        // ignore — gate falls back to in-memory unlock for this session.
-      }
-    }
-    setModalOpen(false)
-    // Resume the deferred scan with the domain the visitor typed before
-    // hitting the gate. If there's no pendingDomain, the modal was
-    // opened some other way — just close and let them re-submit.
-    if (pendingDomain) {
-      setSubmittedDomain(pendingDomain)
-      setStage('analyzing')
-      setPendingDomain('')
-    }
-  }
-
-  const handleModalClose = () => {
-    setModalOpen(false)
-    setPendingDomain('')
-  }
+  const [gateFor, setGateFor] = useState<string | null>(null)
 
   // Walk the analysis-step indicator while we wait on the API. Holds at
   // the last step until the fetch effect below transitions stage.
@@ -1075,16 +1013,27 @@ export default function FeatureContent() {
     setScanError('')
     ;(async () => {
       try {
-        const res = await fetch('/api/free-score', {
+        const res = await fetch(SCAN_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ domain: submittedDomain })
         })
-        const data: { error?: string; result?: FreeScoreResult } = await res
+        const data: { error?: string; code?: string; result?: FreeScoreResult } = await res
           .json()
           .catch(() => ({}))
         if (cancelled) return
         if (!res.ok || !data.result) {
+          // Cookie expired / gate required → reopen the gate for this domain.
+          if (res.status === 401 && data.code === 'gate_required') {
+            try {
+              sessionStorage.removeItem(LEAD_FLAG)
+            } catch {
+              /* sessionStorage unavailable */
+            }
+            setGateFor(submittedDomain)
+            setStage('idle')
+            return
+          }
           setScanError(data.error || 'Scan failed. Try again.')
           setStage('idle')
           return
@@ -1112,6 +1061,23 @@ export default function FeatureContent() {
     []
   )
 
+  // Route every scan start through the gate when gating is on (and not yet
+  // captured this session); otherwise go straight to analyzing.
+  const startScan = (clean: string) => {
+    let gated = false
+    try {
+      gated = sessionStorage.getItem(LEAD_FLAG) === '1'
+    } catch {
+      /* sessionStorage unavailable */
+    }
+    if (REQUIRE_GATE && !gated) {
+      setGateFor(clean)
+      return
+    }
+    setSubmittedDomain(clean)
+    setStage('analyzing')
+  }
+
   return (
     <>
       <div id="hero" />
@@ -1125,62 +1091,70 @@ export default function FeatureContent() {
         stepIndex={stepIndex}
         scanResult={scanResult}
         scanError={scanError}
-        onRequestUnlock={handleRequestUnlock}
+        startScan={startScan}
       />
 
       <JumpLinks />
 
-          <FeatureBlock
-            id="measure"
-            eyebrow="What we measure"
-            headline="Four signals behind one visibility score."
-            body={[
-              'A single 0–100 number is useful only when you know what it represents. The free score breaks down into four named signals so you can see which part of your AI visibility is strong, which is weak, and where the biggest fix lives.',
-              'Each signal is sampled the same way across engines, which means your scores stay comparable as you make changes and run the scan again next quarter.'
-            ]}
-            bullets={[
-              'Mention Rate: how often your brand surfaces in category prompts.',
-              'Sentiment: how AI engines describe you when you do appear.',
-              'Citation Strength: how often your domain is cited as a source.',
-              'Competitive Position: your share of voice against the top three rivals.'
-            ]}
-            visual={<SubscoreCards subscores={scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES} />}
-          />
+      <FeatureBlock
+        id="measure"
+        eyebrow="What we measure"
+        headline="Four signals behind one visibility score."
+        body={[
+          'A single 0–100 number is useful only when you know what it represents. The free score breaks down into four named signals so you can see which part of your AI visibility is strong, which is weak, and where the biggest fix lives.',
+          'Each signal is sampled the same way across engines, which means your scores stay comparable as you make changes and run the scan again next quarter.'
+        ]}
+        bullets={[
+          'Mention Rate: how often your brand surfaces in category prompts.',
+          'Sentiment: how AI engines describe you when you do appear.',
+          'Citation Strength: how often your domain is cited as a source.',
+          'Competitive Position: your share of voice against the top three rivals.'
+        ]}
+        visual={<SubscoreCards subscores={scanResult?.subscores && scanResult.subscores.length === 4 ? scanResult.subscores : SUBSCORES} />}
+      />
 
-          <FeatureBlock
-            id="where"
-            flip
-            eyebrow="Where we look"
-            headline="Four engines, twelve prompts, one snapshot."
-            body={[
-              'The free check runs the same buyer-style prompt set across the AI engines most buyers actually use during the early stages of a purchase decision.',
-              'Prompts are category-level, not branded. That keeps the scan honest: you only score when AI surfaces you organically, the way a real prospect would find you.'
-            ]}
-            bullets={[
-              'ChatGPT for the broadest reach in conversational answers.',
-              'Claude for sentiment and reasoning-heavy responses.',
-              'Perplexity for cited, source-linked answers.',
-              'Google AI Overviews for generative results inside search.'
-            ]}
-            visual={<PlatformPanel platforms={scanResult?.platforms && scanResult.platforms.length === 4 ? scanResult.platforms : PLATFORMS} />}
-          />
+      <FeatureBlock
+        id="where"
+        flip
+        eyebrow="Where we look"
+        headline="One engine, ten prompts, one snapshot."
+        body={[
+          'The free check runs a set of real category buyer-prompts through ChatGPT with live web search — the way a prospect researching your category would actually ask.',
+          'Prompts are category-level, not branded. That keeps the scan honest: you only score when ChatGPT surfaces you organically, the way a real buyer would find you.'
+        ]}
+        bullets={[
+          'Ten buyer-intent prompts, scored for whether ChatGPT names you.',
+          'Web-grounded, so results reflect what ChatGPT says today.',
+          'Each prompt shows the mention and whether your domain was cited.',
+          'More engines and daily tracking come with the paid plan.'
+        ]}
+        visual={<PromptResults prompts={scanResult?.prompts && scanResult.prompts.length > 0 ? scanResult.prompts : SAMPLE_PROMPTS} />}
+      />
 
-          <RealPrompts prompts={scanResult?.prompts && scanResult.prompts.length > 0 ? scanResult.prompts : SAMPLE_PROMPTS} />
-          <RecommendationsSection
-            recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
-          />
+      <RealPrompts prompts={scanResult?.prompts && scanResult.prompts.length > 0 ? scanResult.prompts : SAMPLE_PROMPTS} />
+      <RecommendationsSection
+        recommendations={scanResult?.recommendations && scanResult.recommendations.length > 0 ? scanResult.recommendations : RECOMMENDATIONS}
+      />
       <MetricsBand />
       <FAQAccordion items={FAQS} />
       <FinalCTA />
-
-      {/* Lead-gate modal — always mounted, controlled by modalOpen. Opens
-          when the visitor clicks the scan submit button without having
-          previously captured (no localStorage flag). */}
-      <LeadCaptureModal
-        open={modalOpen}
-        onClose={handleModalClose}
-        onSuccess={handleUnlockSuccess}
-      />
+      {gateFor && (
+        <EmailGate
+          domain={gateFor}
+          onClose={() => setGateFor(null)}
+          onGated={() => {
+            try {
+              sessionStorage.setItem(LEAD_FLAG, '1')
+            } catch {
+              /* sessionStorage unavailable */
+            }
+            const d = gateFor
+            setGateFor(null)
+            setSubmittedDomain(d)
+            setStage('analyzing')
+          }}
+        />
+      )}
     </>
   )
 }
