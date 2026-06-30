@@ -16,6 +16,8 @@ import {
   waitForCached,
   getDailySpend,
   addDailySpend,
+  bumpDailyCount,
+  refundDailyCount,
 } from '@/lib/freeScore/store'
 import { runScan, ScanError } from '@/lib/freeScore/scan'
 import { SCAN_COOKIE, verifyScanToken, readCookie } from '@/lib/freeScore/scanToken'
@@ -29,6 +31,9 @@ const REQUIRE_GATE = process.env.FREE_SCORE_REQUIRE_GATE === '1'
 const DAILY_BUDGET_USD = Number(process.env.SCAN_DAILY_BUDGET_USD || 200)
 const EST_COST_USD = Number(process.env.SCAN_COST_USD || 0.04)
 const COALESCE_WAIT_MS = 12_000
+// Anti-abuse: free scans allowed per email / per IP per rolling day.
+const MAX_PER_EMAIL = Number(process.env.FREE_SCORE_MAX_PER_EMAIL || 1)
+const MAX_PER_IP = Number(process.env.FREE_SCORE_MAX_PER_IP || 10)
 
 function extractClientIp(req: Request): string {
   const xff = req.headers.get('x-forwarded-for')
@@ -79,6 +84,19 @@ export async function POST(request: Request) {
     email = auth.email
   }
 
+  // 3b. Per-email / per-IP daily quota (anti-abuse). Reserve up front so one
+  // captured lead can't spam unlimited scans; refund below on any path that
+  // doesn't actually deliver a report.
+  const quotaKeys = email ? [`ip:${ip}`, `email:${email}`] : [`ip:${ip}`]
+  const counts = await Promise.all(quotaKeys.map(bumpDailyCount))
+  const refundQuota = () => Promise.all(quotaKeys.map(refundDailyCount))
+  const overIp = counts[0] > MAX_PER_IP
+  const overEmail = email ? counts[1] > MAX_PER_EMAIL : false
+  if (overIp || overEmail) {
+    // Keep the count elevated (don't refund) so repeated attempts stay blocked.
+    return Response.json({ error: 'free scan limit reached', code: 'quota' }, { status: 429 })
+  }
+
   // 4. Cache hit → instant (and still email a copy if gated)
   const cached = await getCached(domain)
   if (cached) {
@@ -89,12 +107,14 @@ export async function POST(request: Request) {
   // 5. Need a key
   if (!process.env.OPENAI_API_KEY) {
     console.error('[free-score] OPENAI_API_KEY not configured')
+    await refundQuota()
     return Response.json({ error: 'service unavailable', code: 'no_key' }, { status: 503 })
   }
 
   // 6. Spend cap (P3): degrade gracefully when over budget.
   if ((await getDailySpend()) >= DAILY_BUDGET_USD) {
     console.warn(`[free-score] daily spend cap hit ($${DAILY_BUDGET_USD}) — shedding domain=${domain}`)
+    await refundQuota()
     return Response.json(
       {
         error: 'high demand — your report is queued and will be emailed shortly',
@@ -127,6 +147,7 @@ export async function POST(request: Request) {
   } catch (e) {
     const code = e instanceof ScanError ? e.code : 'upstream'
     console.warn(`[free-score] v2 scan failed domain=${domain}: ${(e as Error)?.message}`)
+    await refundQuota()
     return Response.json({ error: 'scan failed', code }, { status: code === 'timeout' ? 504 : 502 })
   } finally {
     if (gotLock) await releaseLock(domain)

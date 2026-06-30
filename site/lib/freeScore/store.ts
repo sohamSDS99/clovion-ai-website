@@ -18,10 +18,12 @@ type Bucket = { count: number; resetAt: number }
 type StoreGlobal = typeof globalThis & {
   __clvMemCache?: Map<string, CacheEntry>
   __clvMemRate?: Map<string, Bucket>
+  __clvMemQuota?: Map<string, Bucket>
 }
 const g = globalThis as StoreGlobal
 const memCache: Map<string, CacheEntry> = g.__clvMemCache ?? (g.__clvMemCache = new Map())
 const memRate: Map<string, Bucket> = g.__clvMemRate ?? (g.__clvMemRate = new Map())
+const memQuota: Map<string, Bucket> = g.__clvMemQuota ?? (g.__clvMemQuota = new Map())
 
 export async function getCached(domain: string): Promise<FreeScoreResult | null> {
   const redis = getRedis()
@@ -166,6 +168,53 @@ export async function addDailySpend(amount: number): Promise<void> {
   const t = todayKey()
   if (memSpend.date !== t) memSpend = { date: t, amount: 0 }
   memSpend.amount += amount
+}
+
+// ── Per-key daily quota (anti-abuse) ─────────────────────────────────────
+// Caps free scans per email / per IP per day. Without this, one captured lead
+// (a 30-min cookie) could fire unlimited scans — each an OpenAI call + an
+// email. Reserve up front with an atomic INCR; refund (decr) if the scan can't
+// be delivered, so a failed attempt doesn't burn the user's free score.
+
+const QUOTA_TTL_S = 24 * 60 * 60
+
+export async function bumpDailyCount(key: string): Promise<number> {
+  const redis = getRedis()
+  if (redis) {
+    try {
+      const k = `quota:${key}:${todayKey()}`
+      const n = await redis.incr(k)
+      if (n === 1) await redis.expire(k, QUOTA_TTL_S)
+      return n
+    } catch (e) {
+      console.warn('[free-score] quota bump → mem:', (e as Error).message)
+    }
+  }
+  const k = `${key}:${todayKey()}`
+  const now = Date.now()
+  const b = memQuota.get(k)
+  if (!b || b.resetAt <= now) {
+    memQuota.set(k, { count: 1, resetAt: now + QUOTA_TTL_S * 1000 })
+    return 1
+  }
+  b.count++
+  return b.count
+}
+
+export async function refundDailyCount(key: string): Promise<void> {
+  const redis = getRedis()
+  if (redis) {
+    try {
+      const k = `quota:${key}:${todayKey()}`
+      const n = await redis.decr(k)
+      if (n < 0) await redis.set(k, '0', 'EX', QUOTA_TTL_S)
+      return
+    } catch (e) {
+      console.warn('[free-score] quota refund → mem:', (e as Error).message)
+    }
+  }
+  const b = memQuota.get(`${key}:${todayKey()}`)
+  if (b && b.count > 0) b.count--
 }
 
 function sleep(ms: number): Promise<void> {
