@@ -754,8 +754,8 @@ function RecommendationsSection({
 
 /* ── 07 — METRICS STRIP (dark) ───────────────────────────────────── */
 const REFRESH_STATS = [
-  { k: 'Engines sampled', v: '4 engines' },
-  { k: 'Prompts run', v: '12 buyer prompts' },
+  { k: 'Engines sampled', v: '1 engine' },
+  { k: 'Prompts run', v: '10 buyer prompts' },
   { k: 'Output', v: '0–100 score' },
   { k: 'Signals', v: 'Mentions · sentiment · citations · SOV' }
 ]
@@ -784,7 +784,7 @@ function MetricsBand() {
       <div style={{ ...CONTAINER, position: 'relative' }}>
         <div style={{ maxWidth: 720 }}>
           <TypingHeadline
-            text="One snapshot. Four engines. Twelve prompts."
+            text="One snapshot. One engine. Ten prompts."
             caretColor="var(--on-ink)"
             style={{ ...DISPLAY_LG, margin: '0', color: 'var(--on-ink)' }}
           />
