@@ -21,6 +21,8 @@ export type FetchResult = {
   contentType: string
   /** Decoded body, truncated to maxBytes. Empty string on a non-2xx with no body. */
   body: string
+  /** Raw Retry-After header from the final response, if present. */
+  retryAfter?: string | null
 }
 
 export class FetchError extends Error {
@@ -34,10 +36,90 @@ export class FetchError extends Error {
 const DEFAULT_TIMEOUT_MS = 10_000
 const DEFAULT_MAX_BYTES = 2_000_000 // 2 MB — plenty for HTML / robots.txt / sitemaps
 const MAX_REDIRECTS = 5
+const DEFAULT_RETRIES = 2 // up to 3 attempts total
 
-// A descriptive, honest UA so site owners can identify the tool in their logs.
+// Real Chrome UA. Many WAF/CDN front-ends (Cloudflare, Akamai, Imperva) serve a
+// 403/503 challenge to non-browser user-agents while letting a browser through,
+// so a legitimate on-demand tool has to look like a browser to get the data a
+// human would see. See TOOL_USER_AGENT below for the honest-bot identifier we
+// still expose to site owners who want to allowlist us.
+const BROWSER_USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36'
+
+// Kept exported for reference / robots allowlisting; no longer the default UA.
 export const TOOL_USER_AGENT =
   'ClovionBot/1.0 (+https://www.clovion.ai/tools; free AI-readiness checker)'
+
+// Full modern-Chrome header set. WAFs increasingly gate on the presence and
+// shape of these client hints + fetch-metadata headers, not just the UA. We
+// deliberately do NOT set Accept-Encoding — undici adds it and transparently
+// decompresses; setting it manually would hand us back raw gzip bytes.
+function browserHeaders(accept: string | undefined, referer: string | undefined): Record<string, string> {
+  const h: Record<string, string> = {
+    'User-Agent': BROWSER_USER_AGENT,
+    Accept: accept ?? 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"macOS"',
+    'Sec-Fetch-Dest': 'document',
+    'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Site': referer ? 'same-origin' : 'none',
+    'Sec-Fetch-User': '?1',
+    'Upgrade-Insecure-Requests': '1',
+  }
+  if (referer) h.Referer = referer
+  return h
+}
+
+// Transient statuses worth a retry: rate-limits, gateway/upstream hiccups, and
+// the Cloudflare-specific 52x family. 403 is intentionally NOT here — it's a
+// deliberate refusal, not a transient blip, so retrying just wastes the budget.
+const RETRYABLE_STATUS = new Set([408, 425, 429, 500, 502, 503, 504, 521, 522, 523, 524, 525, 526, 527, 529])
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms))
+}
+
+/** Parse a Retry-After header (delta-seconds or HTTP-date) into ms, capped. */
+function retryAfterMs(header: string | null, capMs: number): number | null {
+  // A blank/whitespace header (some CDNs emit "Retry-After:" with no value)
+  // must fall back to backoff — Number('') is 0, which would busy-retry.
+  if (!header || !header.trim()) return null
+  const secs = Number(header)
+  if (Number.isFinite(secs)) return Math.min(Math.max(secs, 0) * 1000, capMs)
+  const date = Date.parse(header)
+  if (Number.isFinite(date)) return Math.min(Math.max(date - Date.now(), 0), capMs)
+  return null
+}
+
+/** Exponential backoff with jitter for attempt N (0-based). */
+function backoffMs(attempt: number): number {
+  const base = 400 * 2 ** attempt // 400, 800, 1600…
+  const jitter = Math.floor(Math.random() * 250)
+  return Math.min(base + jitter, 3000)
+}
+
+/** Clamp a wait to the remaining budget (never wait past the deadline). */
+function clampWait(wait: number, deadlineMs?: number): number {
+  if (deadlineMs == null) return wait
+  return Math.min(wait, Math.max(0, deadlineMs - Date.now()))
+}
+
+const DNS_TIMEOUT_MS = 5_000
+
+/** Race a promise against a timeout that rejects with a FetchError. */
+async function withTimeout<T>(p: Promise<T>, ms: number, code: FetchError['code'], msg: string): Promise<T> {
+  let t: ReturnType<typeof setTimeout>
+  const timeout = new Promise<never>((_, reject) => {
+    t = setTimeout(() => reject(new FetchError(code, msg)), ms)
+  })
+  try {
+    return await Promise.race([p, timeout])
+  } finally {
+    clearTimeout(t!)
+  }
+}
 
 // ── Private / internal IP detection ────────────────────────────────────────
 
@@ -64,9 +146,10 @@ function ipv6IsPrivate(ip: string): boolean {
   if (lower === '::1' || lower === '::') return true // loopback / unspecified
   if (lower.startsWith('fe80')) return true // link-local
   if (lower.startsWith('fc') || lower.startsWith('fd')) return true // unique-local fc00::/7
-  // IPv4-mapped (::ffff:a.b.c.d) — extract and check the v4 part.
-  const mapped = lower.match(/::ffff:(\d+\.\d+\.\d+\.\d+)$/)
-  if (mapped) return ipv4IsPrivate(mapped[1])
+  if (lower.startsWith('64:ff9b:')) return true // NAT64 — can embed a private v4
+  // IPv4-mapped (::ffff:a.b.c.d) or IPv4-compatible (::a.b.c.d) — check the v4 part.
+  const embedded = lower.match(/(?:::ffff:|::)(\d+\.\d+\.\d+\.\d+)$/)
+  if (embedded) return ipv4IsPrivate(embedded[1])
   return false
 }
 
@@ -82,8 +165,11 @@ async function assertSafeHost(hostname: string): Promise<void> {
 
   let records: { address: string; family: number }[]
   try {
-    records = await lookup(hostname, { all: true })
-  } catch {
+    // Bound DNS: getaddrinfo has no per-call timeout, so a black-holed NS could
+    // otherwise hang ~10-20s inside a single attempt, past the caller's deadline.
+    records = await withTimeout(lookup(hostname, { all: true }), DNS_TIMEOUT_MS, 'timeout', 'dns lookup timed out')
+  } catch (e) {
+    if (e instanceof FetchError) throw e
     throw new FetchError('network', 'could not resolve host')
   }
   if (records.length === 0) throw new FetchError('network', 'could not resolve host')
@@ -100,14 +186,83 @@ export type SafeFetchOptions = {
   timeoutMs?: number
   maxBytes?: number
   accept?: string
+  /** Retry count for transient failures (network / timeout / 5xx / 429). Default 2. */
+  retries?: number
+  /**
+   * Retry network errors + timeouts (not just retryable statuses). Default true.
+   * Set false for bulk per-page fetches: a hung page rarely recovers on retry, so
+   * retrying just doubles the wall-clock cost — but a 503/429 still gets retried.
+   */
+  retryNetwork?: boolean
+  /** Referer header — helps some WAFs treat sub-page fetches as in-session navigation. */
+  referer?: string
+  /**
+   * Absolute epoch-ms deadline for this whole call (all attempts + backoffs).
+   * Per-attempt timeout and retry waits are clamped to the remaining budget, and
+   * once passed we return the best result so far (or throw). Lets a caller bound
+   * total wall-clock across retries instead of retries × timeoutMs.
+   */
+  deadlineMs?: number
 }
 
 /**
  * Fetch a user-supplied URL with SSRF protection, manual redirect re-validation,
- * a timeout, and a size cap. Returns the (truncated) body even for 4xx/5xx so
- * callers can branch on `status` (e.g. a 404 robots.txt means "default allow").
+ * a timeout, and a size cap. Retries transient failures with backoff (honoring
+ * Retry-After). Returns the (truncated) body even for 4xx/5xx so callers can
+ * branch on `status` (e.g. a 404 robots.txt means "default allow").
  */
 export async function safeFetch(rawUrl: string, opts: SafeFetchOptions = {}): Promise<FetchResult> {
+  const retries = opts.retries ?? DEFAULT_RETRIES
+  const retryNetwork = opts.retryNetwork ?? true
+  const deadlineMs = opts.deadlineMs
+  const baseTimeout = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
+
+  let last: FetchResult | null = null
+  for (let attempt = 0; ; attempt++) {
+    // Clamp this attempt's timeout to the remaining budget so retries can't
+    // multiply past the caller's overall deadline.
+    let timeoutMs = baseTimeout
+    if (deadlineMs != null) {
+      const remaining = deadlineMs - Date.now()
+      if (remaining <= 0) {
+        if (last) return last // out of time → return the best retryable result we saw
+        throw new FetchError('timeout', 'deadline exceeded')
+      }
+      timeoutMs = Math.min(baseTimeout, remaining)
+    }
+
+    let result: FetchResult
+    try {
+      result = await attemptFetch(rawUrl, { ...opts, timeoutMs })
+    } catch (e) {
+      // Permanent errors: never retry (bad URL / SSRF block / redirect loop).
+      if (e instanceof FetchError && (e.code === 'bad_url' || e.code === 'blocked' || e.code === 'too_many_redirects')) {
+        throw e
+      }
+      // Transient (timeout / network): retry with backoff unless the caller opted
+      // out or the budget is spent (clampWait → 0 once the deadline passes).
+      const wait = clampWait(backoffMs(attempt), deadlineMs)
+      if (retryNetwork && attempt < retries && wait > 0) {
+        await sleep(wait)
+        continue
+      }
+      throw e
+    }
+
+    // A retryable status (503/429/5xx…) gets one more shot after a backoff.
+    if (RETRYABLE_STATUS.has(result.status) && attempt < retries) {
+      last = result
+      const wait = clampWait(retryAfterMs(result.retryAfter ?? null, 6000) ?? backoffMs(attempt), deadlineMs)
+      if (wait <= 0) return result // no budget left to wait/retry → return what we have
+      await sleep(wait)
+      continue
+    }
+    return result
+  }
+}
+
+/** One fetch attempt: SSRF-checked, redirect-following, timed, size-bounded. */
+async function attemptFetch(rawUrl: string, opts: SafeFetchOptions): Promise<FetchResult> {
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
   const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES
 
@@ -135,11 +290,7 @@ export async function safeFetch(rawUrl: string, opts: SafeFetchOptions = {}): Pr
           method: 'GET',
           redirect: 'manual',
           signal: controller.signal,
-          headers: {
-            'User-Agent': TOOL_USER_AGENT,
-            Accept: opts.accept ?? 'text/html,text/plain,*/*',
-            'Accept-Language': 'en-US,en;q=0.9',
-          },
+          headers: browserHeaders(opts.accept, hop === 0 ? opts.referer : `${current.protocol}//${current.hostname}`),
         })
       } catch (e) {
         if (controller.signal.aborted) throw new FetchError('timeout', 'request timed out')
@@ -162,14 +313,14 @@ export async function safeFetch(rawUrl: string, opts: SafeFetchOptions = {}): Pr
       }
 
       const contentType = res.headers.get('content-type') || ''
-      const body = await readBounded(res, maxBytes, controller)
-      clearTimeout(timer)
+      const body = await readBounded(res, maxBytes)
       return {
         ok: res.ok,
         status: res.status,
         finalUrl: current.toString(),
         contentType,
         body,
+        retryAfter: res.headers.get('retry-after'),
       }
     }
     throw new FetchError('too_many_redirects', 'too many redirects')
@@ -179,7 +330,7 @@ export async function safeFetch(rawUrl: string, opts: SafeFetchOptions = {}): Pr
 }
 
 // Read a response body up to maxBytes, then stop (don't buffer a huge file).
-async function readBounded(res: Response, maxBytes: number, controller: AbortController): Promise<string> {
+async function readBounded(res: Response, maxBytes: number): Promise<string> {
   if (!res.body) {
     try {
       const t = await res.text()
@@ -199,13 +350,14 @@ async function readBounded(res: Response, maxBytes: number, controller: AbortCon
         chunks.push(value)
         total += value.length
         if (total >= maxBytes) {
-          controller.abort() // stop the transfer
+          // Cancel just the body stream (distinct from the request-timeout abort).
+          await reader.cancel().catch(() => {})
           break
         }
       }
     }
   } catch {
-    // aborted or stream error — return whatever we have
+    // stream error — return whatever we have
   }
   const merged = new Uint8Array(Math.min(total, maxBytes))
   let offset = 0
