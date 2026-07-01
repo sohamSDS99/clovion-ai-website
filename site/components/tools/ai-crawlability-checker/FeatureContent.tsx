@@ -129,8 +129,7 @@ function XTiny({ size = 9 }: { size?: number }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────────
- *  Hardcoded sample result — no backend. Frontend toggles to this on
- *  submit. The list and statuses are the contract from the spec.
+ *  Result shape — from /api/tools/crawlability (real robots.txt fetch).
  * ────────────────────────────────────────────────────────────────────── */
 type Bot = {
   engine: string
@@ -139,70 +138,14 @@ type Bot = {
   detail: string
 }
 
-const BOTS: Bot[] = [
-  {
-    engine: 'ChatGPT (training)',
-    ua: 'GPTBot',
-    status: 'Allowed',
-    detail: 'Used by OpenAI to collect training data.'
-  },
-  {
-    engine: 'ChatGPT (browsing)',
-    ua: 'ChatGPT-User',
-    status: 'Allowed',
-    detail: 'Fetches live pages when ChatGPT users browse.'
-  },
-  {
-    engine: 'Claude (training)',
-    ua: 'anthropic-ai',
-    status: 'Blocked',
-    detail: 'Anthropic training-data collector.'
-  },
-  {
-    engine: 'Claude (live)',
-    ua: 'ClaudeBot',
-    status: 'Allowed',
-    detail: 'Powers Claude’s live answer retrieval.'
-  },
-  {
-    engine: 'Claude (crawler)',
-    ua: 'Claude-Web',
-    status: 'Blocked',
-    detail: 'General Anthropic web crawler.'
-  },
-  {
-    engine: 'Perplexity',
-    ua: 'PerplexityBot',
-    status: 'Allowed',
-    detail: 'Indexes pages for Perplexity citations.'
-  },
-  {
-    engine: 'Google AI Overviews',
-    ua: 'Google-Extended',
-    status: 'Allowed',
-    detail: 'Controls Google AI Overviews and Gemini access.'
-  },
-  {
-    engine: 'Common Crawl',
-    ua: 'CCBot',
-    status: 'Blocked',
-    detail: 'Bulk dataset used by many open-source models.'
-  },
-  {
-    engine: 'Apple Intelligence',
-    ua: 'Applebot-Extended',
-    status: 'Allowed',
-    detail: 'Controls Apple Intelligence access.'
-  },
-  {
-    engine: 'Bytespider (TikTok)',
-    ua: 'Bytespider',
-    status: 'Blocked',
-    detail: 'ByteDance / TikTok crawler.'
-  }
-]
-
-const ALLOWED_COUNT = BOTS.filter((b) => b.status === 'Allowed').length
+type CrawlResult = {
+  url: string
+  exists: boolean
+  robotsUrl: string
+  bots: Bot[]
+  allowedCount: number
+  total: number
+}
 
 /* ─────────────────────────────────────────────────────────────────────
  *  URL validation — mirrors the spec's "Your website URL" expectation.
@@ -231,46 +174,41 @@ type Stage = 'idle' | 'checking' | 'result'
 
 function HeroWithForm({
   stage,
-  setStage,
   url,
   setUrl,
   submittedUrl,
-  setSubmittedUrl,
   error,
-  setError
+  setError,
+  result,
+  runCheck,
+  onResetAll
 }: {
   stage: Stage
-  setStage: (s: Stage) => void
   url: string
   setUrl: (s: string) => void
   submittedUrl: string
-  setSubmittedUrl: (s: string) => void
   error: string
   setError: (s: string) => void
+  result: CrawlResult | null
+  runCheck: (rawUrl: string) => void | Promise<void>
+  onResetAll: () => void
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [focused, setFocused] = useState(false)
 
   const onSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
+    if (stage === 'checking') return
     if (!isValidUrl(url)) {
       setError('Enter a valid website URL, like https://yourbrand.com.')
       inputRef.current?.focus()
       return
     }
-    setError('')
-    setSubmittedUrl(normalizeUrl(url))
-    setStage('checking')
-    // brief feel-good delay so the submit feels real (no API; just toggles state)
-    window.setTimeout(() => {
-      setStage('result')
-    }, 850)
+    void runCheck(url)
   }
 
   const onReset = () => {
-    setStage('idle')
-    setSubmittedUrl('')
-    setError('')
+    onResetAll()
   }
 
   return (
@@ -443,11 +381,8 @@ function HeroWithForm({
               disabled={stage === 'checking'}
               onClick={() => {
                 if (stage === 'checking') return
-                setError('')
                 setUrl('https://notion.so')
-                setSubmittedUrl('notion.so')
-                setStage('checking')
-                window.setTimeout(() => setStage('result'), 850)
+                void runCheck('https://notion.so')
               }}
               style={{
                 fontFamily: 'var(--font-mono)',
@@ -490,8 +425,8 @@ function HeroWithForm({
         </div>
 
         {/* ── RESULT CARD ── */}
-        {(stage === 'checking' || stage === 'result') && (
-          <ResultCard stage={stage} submittedUrl={submittedUrl} />
+        {(stage === 'checking' || (stage === 'result' && result)) && (
+          <ResultCard stage={stage} submittedUrl={submittedUrl} result={result} />
         )}
       </div>
     </section>
@@ -502,10 +437,19 @@ function HeroWithForm({
  *  RESULT CARD — light surface island on the dark page via LIGHT spread.
  *  Stagger-reveals header → summary strip → rows.
  * ────────────────────────────────────────────────────────────────────── */
-function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: string }) {
+function ResultCard({
+  stage,
+  submittedUrl,
+  result
+}: {
+  stage: Stage
+  submittedUrl: string
+  result: CrawlResult | null
+}) {
   const reduced = useReducedMotion()
   const [outerOpen, setOuterOpen] = useState(false)
   const play = stage === 'result'
+  const bots = result?.bots ?? []
 
   useEffect(() => {
     if (stage === 'result') {
@@ -518,8 +462,8 @@ function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: strin
     setOuterOpen(false)
   }, [stage])
 
-  const rowFlags = useStagger(BOTS.length, play, 60, 220)
-  const allowedCount = useCountUp(ALLOWED_COUNT, play, { durationMs: 700, startMs: 120 })
+  const rowFlags = useStagger(bots.length, play, 60, 220)
+  const allowedCount = useCountUp(result?.allowedCount ?? 0, play, { durationMs: 700, startMs: 120 })
   const summaryRevealed = useStagger(2, play, 100, 80) // [summary text, export pill]
 
   // checking: dotted loading shimmer card
@@ -741,7 +685,7 @@ function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: strin
             letterSpacing: '-0.01em'
           }}
         >
-          {allowedCount} of {BOTS.length} AI bots can crawl your site
+          {allowedCount} of {bots.length} AI bots can crawl your site
         </span>
       </div>
 
@@ -777,7 +721,7 @@ function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: strin
           <span>User-Agent</span>
           <span style={{ textAlign: 'right' }}>Status</span>
         </div>
-        {BOTS.map((b, i) => (
+        {bots.map((b, i) => (
           <div
             key={b.ua}
             role="row"
@@ -787,7 +731,7 @@ function ResultCard({ stage, submittedUrl }: { stage: Stage; submittedUrl: strin
               alignItems: 'center',
               gap: 12,
               padding: '14px 18px',
-              borderBottom: i === BOTS.length - 1 ? 'none' : '1px solid var(--line)',
+              borderBottom: i === bots.length - 1 ? 'none' : '1px solid var(--line)',
               opacity: rowFlags[i] ? 1 : 0,
               transform: rowFlags[i] ? 'translateY(0)' : 'translateY(8px)',
               transition: `opacity 0.4s ${cb}, transform 0.4s ${cb}`,
@@ -1139,18 +1083,55 @@ export default function FeatureContent() {
   const [url, setUrl] = useState('')
   const [submittedUrl, setSubmittedUrl] = useState('')
   const [error, setError] = useState('')
+  const [result, setResult] = useState<CrawlResult | null>(null)
+
+  // Real robots.txt fetch + per-engine evaluation.
+  const runCheck = async (rawUrl: string) => {
+    setError('')
+    setSubmittedUrl(normalizeUrl(rawUrl))
+    setStage('checking')
+    setResult(null)
+    try {
+      const res = await fetch('/api/tools/crawlability', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: rawUrl.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setStage('idle')
+        if (data?.code === 'rate_limited') setError('Too many checks — give it a minute and try again.')
+        else if (data?.code === 'timeout') setError('That site took too long to respond. Try again.')
+        else if (data?.code === 'bad_domain' || data?.code === 'bad_url')
+          setError('That doesn’t look like a reachable website URL.')
+        else setError(data?.error || 'Could not check that site. Try again.')
+        return
+      }
+      setResult(data as CrawlResult)
+      setStage('result')
+    } catch {
+      setStage('idle')
+      setError('Network error — please try again.')
+    }
+  }
 
   return (
     <>
       <HeroWithForm
         stage={stage}
-        setStage={setStage}
         url={url}
         setUrl={setUrl}
         submittedUrl={submittedUrl}
-        setSubmittedUrl={setSubmittedUrl}
         error={error}
         setError={setError}
+        result={result}
+        runCheck={runCheck}
+        onResetAll={() => {
+          setStage('idle')
+          setSubmittedUrl('')
+          setError('')
+          setResult(null)
+        }}
       />
       <EducationalSection />
       <FAQAccordion items={FAQS} />
