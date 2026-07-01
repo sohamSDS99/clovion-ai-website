@@ -12,7 +12,7 @@ const TESTIMONIALS = [
   {
     quote:
       'Our Perplexity share of voice went from zero to top three in 30 days. We just followed the on-page suggestions rule by rule. The Gap Finder was the unlock — it showed us the exact competitor pages getting cited when our brand wasn’t mentioned. That’s a content roadmap you can’t get anywhere else.',
-    author: 'Erland Bruvik',
+    author: 'Erlend Bruvik',
     role: 'CEO',
     company: 'SDS Manager'
   },
