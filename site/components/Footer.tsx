@@ -14,14 +14,14 @@ const groups = [
   },
   {
     title: 'Resources',
+    // Mirrors the header "Resources" dropdown (see lib/content.ts) — keep these
+    // two in sync: the footer column shows exactly the dropdown's pages.
     links: [
       { label: 'Blog', href: '/blog' },
-      { label: 'GEO', href: '/blog/category/geo' },
-      { label: 'AI Search', href: '/blog/category/ai-search' },
-      { label: 'SEO', href: '/blog/category/seo' },
-      { label: 'Docs', href: '/docs' },
-      { label: 'Getting Started', href: '/docs/getting-started' },
-      { label: 'Changelog', href: '/changelog' }
+      { label: 'News', href: '/news' },
+      { label: 'Webinars', href: '/webinars' },
+      { label: 'Guides & Downloads', href: '/resources' },
+      { label: 'FAQ', href: '/faq' }
     ]
   },
   {

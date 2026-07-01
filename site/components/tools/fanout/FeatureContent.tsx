@@ -2,10 +2,13 @@
 
 import { useState, useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { Container, Section, Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
-import { LIGHT, TAG_COLORS } from '@/components/home/mocks/palette'
+import { TAG_COLORS } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger, useCountUp } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
 import { FAQAccordion } from '@/components/FAQAccordion'
+import ToolLeadModal from '@/components/tools/shared/ToolLeadModal'
+import ToolResultModal from '@/components/tools/shared/ToolResultModal'
+import { useToolLeadGate } from '@/components/tools/shared/useToolLeadGate'
 import { FAQS } from './faqs'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -89,22 +92,28 @@ type Stage = 'idle' | 'submitting' | 'result'
 
 function Hero({
   stage,
+  setStage,
   query,
   setQuery,
-  onRun,
-  onReset
+  setSubmittedQuery,
+  gateRun,
+  runScan,
+  serverError
 }: {
   stage: Stage
+  setStage: (s: Stage) => void
   query: string
   setQuery: (q: string) => void
-  onRun: (q: string) => Promise<string | null>
-  onReset: () => void
+  setSubmittedQuery: (q: string) => void
+  gateRun: (action: () => void) => void
+  runScan: (q: string) => void
+  serverError: string
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const [error, setError] = useState<string>('')
   const [focused, setFocused] = useState(false)
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
     if (stage === 'submitting') return
     const trimmed = query.trim()
@@ -114,22 +123,23 @@ function Hero({
       return
     }
     setError('')
-    const err = await onRun(trimmed)
-    if (err) setError(err)
+    // Gate the real run behind the lead form.
+    gateRun(() => runScan(trimmed))
   }
 
   const handleReset = () => {
-    onReset()
+    setStage('idle')
+    setQuery('')
+    setSubmittedQuery('')
     setError('')
   }
 
-  const tryExample = async () => {
+  const tryExample = () => {
     if (stage === 'submitting') return
     const sample = 'best CRM for a growing SaaS company with 50 employees'
     setQuery(sample)
     setError('')
-    const err = await onRun(sample)
-    if (err) setError(err)
+    gateRun(() => runScan(sample))
   }
 
   return (
@@ -237,6 +247,7 @@ function Hero({
                 autoComplete="off"
                 disabled={stage === 'submitting'}
                 aria-label="Seed query"
+                className="clv-form-field"
                 style={{
                   width: '100%',
                   minHeight: 110,
@@ -331,7 +342,7 @@ function Hero({
               )}
             </div>
 
-            {error && (
+            {(error || serverError) && (
               <p
                 role="alert"
                 style={{
@@ -342,7 +353,7 @@ function Hero({
                   color: '#e5484d'
                 }}
               >
-                {error}
+                {error || serverError}
               </p>
             )}
           </form>
@@ -581,29 +592,7 @@ function ResultCard({
   if (!visible || !result) return null
 
   return (
-    <Section
-      className="relative"
-      tight
-      id="result"
-    >
-      <Container>
-        <div
-          style={{
-            ...(LIGHT as React.CSSProperties),
-            containerType: 'size',
-            background: 'var(--white)',
-            color: 'var(--ink)',
-            border: '1px solid var(--line)',
-            borderRadius: 24,
-            padding: 'clamp(22px, 3cqw, 40px)',
-            boxShadow: '0 32px 80px -28px rgba(10,10,15,0.55), 0 0 0 1px rgba(255,255,255,0.04)',
-            maxWidth: 1040,
-            margin: '0 auto',
-            opacity: rootRevealed ? 1 : 0,
-            transform: rootRevealed ? 'translateY(0)' : 'translateY(12px)',
-            transition: `opacity 0.48s ${cb}, transform 0.48s ${cb}`
-          }}
-        >
+    <div>
           {/* Header */}
           <div
             style={{
@@ -742,9 +731,7 @@ function ResultCard({
               Get your full score <FqArrow size={12} />
             </a>
           </div>
-        </div>
-      </Container>
-    </Section>
+    </div>
   )
 }
 
@@ -971,12 +958,15 @@ export default function FeatureContent() {
   const [query, setQuery] = useState<string>('')
   const [submittedQuery, setSubmittedQuery] = useState<string>('')
   const [result, setResult] = useState<FanoutResult | null>(null)
+  const [serverError, setServerError] = useState<string>('')
+  const gate = useToolLeadGate()
 
-  // Real LLM-backed fan-out. Returns an error string for the form, or null.
-  const runFanout = async (q: string): Promise<string | null> => {
+  // Real LLM-backed fan-out (runs after the lead gate is satisfied).
+  const runFanout = async (q: string) => {
     setSubmittedQuery(q)
     setStage('submitting')
     setResult(null)
+    setServerError('')
     try {
       const res = await fetch('/api/tools/fanout', {
         method: 'POST',
@@ -986,42 +976,44 @@ export default function FeatureContent() {
       const data = await res.json()
       if (!res.ok) {
         setStage('idle')
-        if (data?.code === 'rate_limited') return 'Too many runs — give it a minute and try again.'
-        if (data?.code === 'timeout') return 'That took too long. Try again.'
-        if (data?.code === 'no_key') return 'The fan-out service is temporarily unavailable.'
-        if (data?.code === 'bad_input') return 'Enter a slightly longer, more specific query.'
-        return data?.error || 'Could not expand that query. Please try again.'
+        if (data?.code === 'rate_limited') setServerError('Too many runs — give it a minute and try again.')
+        else if (data?.code === 'timeout') setServerError('That took too long. Try again.')
+        else if (data?.code === 'no_key') setServerError('The fan-out service is temporarily unavailable.')
+        else if (data?.code === 'bad_input') setServerError('Enter a slightly longer, more specific query.')
+        else setServerError(data?.error || 'Could not expand that query. Please try again.')
+        return
       }
       setResult(data as FanoutResult)
       setStage('result')
-      return null
     } catch {
       setStage('idle')
-      return 'Network error — please try again.'
+      setServerError('Network error — please try again.')
     }
-  }
-
-  const onReset = () => {
-    setStage('idle')
-    setQuery('')
-    setSubmittedQuery('')
-    setResult(null)
   }
 
   return (
     <>
       <Hero
         stage={stage}
+        setStage={setStage}
         query={query}
         setQuery={setQuery}
-        onRun={runFanout}
-        onReset={onReset}
+        setSubmittedQuery={setSubmittedQuery}
+        gateRun={gate.request}
+        runScan={runFanout}
+        serverError={serverError}
       />
-      <ResultCard
-        visible={stage === 'result' && !!result}
-        submittedQuery={submittedQuery}
-        result={result}
-      />
+      <ToolLeadModal open={gate.open} tool="fanout" onClose={gate.close} onSuccess={gate.success} />
+      <ToolResultModal
+        open={stage === 'result' && !!result}
+        onClose={() => {
+          setStage('idle')
+          setSubmittedQuery('')
+          setResult(null)
+        }}
+      >
+        <ResultCard visible={stage === 'result'} submittedQuery={submittedQuery} result={result} />
+      </ToolResultModal>
       <Educational />
       <FAQAccordion items={FAQS} />
       <FinalCTA />

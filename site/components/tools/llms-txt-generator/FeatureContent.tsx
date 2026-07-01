@@ -1,11 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { Button, Eyebrow, ArrowRight } from '@/components/ui'
 import { FAQAccordion } from '@/components/FAQAccordion'
-import { LIGHT } from '@/components/home/mocks/palette'
+import ToolResultModal from '@/components/tools/shared/ToolResultModal'
 import { cb, useReducedMotion, useStagger, useTypewriter } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
+import ToolLeadModal from '@/components/tools/shared/ToolLeadModal'
+import { useToolLeadGate } from '@/components/tools/shared/useToolLeadGate'
 import { FAQS } from './faqs'
 
 /* ── Shared style tokens ─────────────────────────────────────────── */
@@ -245,6 +247,7 @@ function Hero({
             </label>
             <input
               id="lt-url"
+              className="clv-form-field"
               type="text"
               autoComplete="url"
               spellCheck={false}
@@ -269,6 +272,7 @@ function Hero({
             </label>
             <input
               id="lt-brand"
+              className="clv-form-field"
               type="text"
               spellCheck={false}
               placeholder="e.g. Acme"
@@ -292,6 +296,7 @@ function Hero({
             </label>
             <textarea
               id="lt-what"
+              className="clv-form-field"
               placeholder="We build AI-native CRMs for B2B sales teams."
               value={values.what}
               onChange={set('what')}
@@ -308,8 +313,8 @@ function Hero({
           </div>
 
           <p style={{ ...hintStyle, marginTop: 0 }}>
-            We crawl your site (sitemap + pages) to build this. Brand and description are
-            auto-detected from your homepage — fill the fields above only to override.
+            We crawl your site (sitemap + pages) to build this. Brand and description auto-detect
+            from your homepage — fill the fields above only to override.
           </p>
 
           {error && (
@@ -395,20 +400,11 @@ function ResultCard({
     URL.revokeObjectURL(u)
   }
 
-  // The LIGHT spread retargets all `var(--*)` lookups inside this subtree
-  // back to light values, so the card paints as a white product UI on the
-  // dark page.
+  // Plain content container — the ToolResultModal provides the dark card
+  // chrome. All `var(--*)` lookups resolve to their DARK values here (white
+  // text on the dark modal surface).
   const root: CSSProperties = {
-    ...LIGHT,
-    containerType: 'size',
-    background: 'var(--white)',
     color: 'var(--ink)',
-    border: '1px solid var(--line)',
-    borderRadius: 22,
-    padding: 'clamp(20px, 3cqw, 32px)',
-    boxShadow: '0 24px 60px rgba(0,0,0,0.32)',
-    maxWidth: 960,
-    margin: '12px auto 0',
     opacity: revealed ? 1 : 0,
     transform: revealed ? 'translateY(0)' : 'translateY(12px)',
     transition: `opacity .48s ${cb}, transform .48s ${cb}`
@@ -497,9 +493,7 @@ function ResultCard({
   })
 
   return (
-    <section style={{ padding: '0 0 1rem' }}>
-      <div style={CONTAINER}>
-        <div style={root} role="region" aria-label="Generated llms.txt preview">
+    <div style={root} role="region" aria-label="Generated llms.txt preview">
           {/* Header row */}
           <div
             style={{
@@ -641,9 +635,7 @@ function ResultCard({
               Place this at <code style={{ fontFamily: 'var(--font-mono)', background: 'var(--subtle)', padding: '2px 6px', borderRadius: 5, color: 'var(--ink-80)' }}>/llms.txt</code> at your site root.
             </span>
           </div>
-        </div>
-      </div>
-    </section>
+    </div>
   )
 }
 
@@ -859,54 +851,46 @@ export default function FeatureContent() {
   const [output, setOutput] = useState<string>('')
   const [submittedBrand, setSubmittedBrand] = useState<string>('')
 
-  const resultRef = useRef<HTMLDivElement | null>(null)
+  const gate = useToolLeadGate()
 
-  const onSubmit = async () => {
+  const onSubmit = () => {
     setError(null)
     const url = values.url.trim()
     if (!url) {
       setError('Add your website URL to get started.')
       return
     }
-    setStage('submitting')
-    try {
-      const res = await fetch('/api/tools/llms-txt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url, brand: values.brand.trim(), what: values.what.trim() }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
+    // Gate the crawl behind the lead form; run the real crawler on success.
+    gate.request(async () => {
+      setStage('submitting')
+      setOutput('')
+      try {
+        const res = await fetch('/api/tools/llms-txt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, brand: values.brand.trim(), what: values.what.trim() }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setStage('idle')
+          if (data?.code === 'rate_limited') setError('Too many runs — give it a minute and try again.')
+          else if (data?.code === 'timeout') setError('The site took too long to crawl. Try again.')
+          else if (data?.code === 'bad_domain' || data?.code === 'bad_url')
+            setError('That doesn’t look like a reachable website URL.')
+          else if (data?.code === 'unreachable')
+            setError('We couldn’t reach that site. Check the URL and try again.')
+          else setError(data?.error || 'Could not generate llms.txt. Please try again.')
+          return
+        }
+        setOutput(data.llmsTxt || '')
+        setSubmittedBrand(data.brand || values.brand.trim() || url)
+        setStage('result')
+      } catch {
         setStage('idle')
-        if (data?.code === 'rate_limited') setError('Too many runs — give it a minute and try again.')
-        else if (data?.code === 'timeout') setError('The site took too long to crawl. Try again.')
-        else if (data?.code === 'bad_domain' || data?.code === 'bad_url')
-          setError('That doesn’t look like a reachable website URL.')
-        else if (data?.code === 'unreachable')
-          setError('We couldn’t reach that site. Check the URL and try again.')
-        else setError(data?.error || 'Could not generate llms.txt. Please try again.')
-        return
+        setError('Network error — please try again.')
       }
-      setOutput(data.llmsTxt || '')
-      setSubmittedBrand(data.brand || values.brand.trim() || url)
-      setStage('result')
-    } catch {
-      setStage('idle')
-      setError('Network error — please try again.')
-    }
+    })
   }
-
-  // Auto-scroll into the result on first reveal.
-  useEffect(() => {
-    if (stage === 'result' && resultRef.current) {
-      const el = resultRef.current
-      const id = window.setTimeout(() => {
-        const top = el.getBoundingClientRect().top + window.scrollY - 80
-        window.scrollTo({ top, behavior: 'smooth' })
-      }, 120)
-      return () => window.clearTimeout(id)
-    }
-  }, [stage])
 
   const onReset = () => {
     setStage('idle')
@@ -925,16 +909,10 @@ export default function FeatureContent() {
         error={error}
         submitting={stage === 'submitting'}
       />
-      <div ref={resultRef}>
-        {showResult && (
-          <ResultCard
-            text={output}
-            brandLabel={submittedBrand}
-            onReset={onReset}
-            revealed={showResult}
-          />
-        )}
-      </div>
+      <ToolLeadModal open={gate.open} tool="llms-txt-generator" onClose={gate.close} onSuccess={gate.success} />
+      <ToolResultModal open={showResult} onClose={onReset}>
+        <ResultCard text={output} brandLabel={submittedBrand} onReset={onReset} revealed={true} />
+      </ToolResultModal>
       <WhatIsLlmsTxt />
       <FAQAccordion items={FAQS} />
       <FinalCTA />
