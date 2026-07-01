@@ -48,9 +48,12 @@ export function getMeta(html: string, key: string): string {
   return ''
 }
 
-/** Best-effort one-line site description: meta description → og:description. */
+/** Best-effort one-line site description: meta description → og:description.
+ * Whitespace-collapsed so a multi-line meta tag stays on ONE line (a raw newline
+ * would break the `> summary` blockquote and `- [title](url): desc` list line). */
 export function extractDescription(html: string): string {
-  return getMeta(html, 'description') || getMeta(html, 'og:description') || ''
+  const raw = getMeta(html, 'description') || getMeta(html, 'og:description') || ''
+  return raw.replace(/\s+/g, ' ').trim()
 }
 
 /** Best-effort brand/site name: og:site_name → application-name → <title> head. */
