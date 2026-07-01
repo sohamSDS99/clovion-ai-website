@@ -112,70 +112,6 @@ function QuoteIcon({ size = 22 }: { size?: number }) {
   )
 }
 
-/* ── Build a faux llms.txt from the form values ──────────────────── */
-function buildLlmsTxt(brand: string, url: string, what: string, priority: string): string {
-  const cleanBrand = brand.trim() || 'Acme'
-  let cleanUrl = url.trim() || 'https://yourbrand.com'
-  cleanUrl = cleanUrl.replace(/\/+$/, '')
-  if (!/^https?:\/\//i.test(cleanUrl)) cleanUrl = 'https://' + cleanUrl
-  const cleanWhat =
-    (what.trim() ||
-      'We build AI-native CRMs for B2B sales teams.').replace(/\n+/g, ' ')
-
-  const userLines = priority
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .slice(0, 12)
-
-  const fallbackPriority = [
-    { path: '/pricing', label: 'Plans, billing, and what each tier unlocks' },
-    { path: '/features', label: 'Product capabilities at a glance' },
-    { path: '/docs', label: 'Setup, integrations, and reference material' }
-  ]
-
-  const priorityRows =
-    userLines.length > 0
-      ? userLines.map((path) => {
-          const p = path.startsWith('/') ? path : '/' + path.replace(/^https?:\/\/[^/]+/, '')
-          const last = p.split('/').filter(Boolean).pop() || 'home'
-          const pretty = last.replace(/-/g, ' ').replace(/^./, (c) => c.toUpperCase())
-          return `- [${pretty}](${cleanUrl}${p}): Primary entry point for ${pretty.toLowerCase()}.`
-        })
-      : fallbackPriority.map((r) => `- [${r.path.slice(1) || 'Home'}](${cleanUrl}${r.path}): ${r.label}.`)
-
-  return [
-    `# ${cleanBrand}`,
-    '',
-    `> ${cleanWhat}`,
-    '',
-    '## Priority pages',
-    '',
-    ...priorityRows,
-    '',
-    '## Documentation',
-    '',
-    `- [Getting started](${cleanUrl}/docs/getting-started): How to set up ${cleanBrand} in five minutes.`,
-    `- [API reference](${cleanUrl}/docs/api): Endpoints, auth, and error codes.`,
-    `- [Integrations](${cleanUrl}/docs/integrations): Supported tools and how to connect them.`,
-    '',
-    '## Pricing',
-    '',
-    `- [Plans](${cleanUrl}/pricing): Free, growth, and enterprise tiers.`,
-    `- [Billing FAQ](${cleanUrl}/pricing#faq): Trials, taxes, and seat changes.`,
-    '',
-    '## Changelog',
-    '',
-    `- [Release notes](${cleanUrl}/changelog): What shipped, when, and why.`,
-    '',
-    '## Optional',
-    '',
-    `- [About ${cleanBrand}](${cleanUrl}/about): Team, mission, and customers.`,
-    `- [Contact](${cleanUrl}/contact): How to reach support and sales.`,
-    ''
-  ].join('\n')
-}
-
 /* ── HERO + FORM ─────────────────────────────────────────────────── */
 type FormValues = { brand: string; url: string; what: string; priority: string }
 const EMPTY: FormValues = { brand: '', url: '', what: '', priority: '' }
@@ -332,7 +268,7 @@ function Hero({
 
           <div>
             <label htmlFor="lt-brand" style={labelStyle}>
-              Brand name
+              Brand name <span style={{ color: 'var(--ink-40)', textTransform: 'none', letterSpacing: 0 }}>· optional</span>
             </label>
             <input
               id="lt-brand"
@@ -356,7 +292,7 @@ function Hero({
 
           <div>
             <label htmlFor="lt-what" style={labelStyle}>
-              What you do
+              What you do <span style={{ color: 'var(--ink-40)', textTransform: 'none', letterSpacing: 0 }}>· optional</span>
             </label>
             <textarea
               id="lt-what"
@@ -376,28 +312,10 @@ function Hero({
             />
           </div>
 
-          <div>
-            <label htmlFor="lt-priority" style={labelStyle}>
-              Key pages to prioritize <span style={{ color: 'var(--ink-40)', textTransform: 'none', letterSpacing: 0 }}>· optional</span>
-            </label>
-            <textarea
-              id="lt-priority"
-              className="clv-form-field"
-              placeholder="One URL per line — /pricing, /features, /docs"
-              value={values.priority}
-              onChange={set('priority')}
-              style={{ ...textareaStyle, minHeight: 96 }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = 'var(--ink)'
-                e.currentTarget.style.boxShadow = '0 0 0 4px var(--focus-ring)'
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = 'var(--ink-25)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            />
-            <p style={hintStyle}>We don’t fetch your site. This is a local preview from the values you enter.</p>
-          </div>
+          <p style={{ ...hintStyle, marginTop: 0 }}>
+            We crawl your site (sitemap + pages) to build this. Brand and description auto-detect
+            from your homepage — fill the fields above only to override.
+          </p>
 
           {error && (
             <div style={{ fontSize: '0.85rem', color: '#e5484d', fontWeight: 600 }}>
@@ -938,30 +856,39 @@ export default function FeatureContent() {
   const onSubmit = () => {
     setError(null)
     const url = values.url.trim()
-    const brand = values.brand.trim()
-    const what = values.what.trim()
     if (!url) {
       setError('Add your website URL to get started.')
       return
     }
-    if (!brand) {
-      setError('Add your brand name so we can write the header.')
-      return
-    }
-    if (!what) {
-      setError('Describe what you do in one short sentence.')
-      return
-    }
-    // Gate the generation behind the lead form.
-    gate.request(() => {
+    // Gate the crawl behind the lead form; run the real crawler on success.
+    gate.request(async () => {
       setStage('submitting')
-      // 400ms feel-good delay before the result reveals.
-      window.setTimeout(() => {
-        const text = buildLlmsTxt(brand, url, what, values.priority)
-        setOutput(text)
-        setSubmittedBrand(brand)
+      setOutput('')
+      try {
+        const res = await fetch('/api/tools/llms-txt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, brand: values.brand.trim(), what: values.what.trim() }),
+        })
+        const data = await res.json()
+        if (!res.ok) {
+          setStage('idle')
+          if (data?.code === 'rate_limited') setError('Too many runs — give it a minute and try again.')
+          else if (data?.code === 'timeout') setError('The site took too long to crawl. Try again.')
+          else if (data?.code === 'bad_domain' || data?.code === 'bad_url')
+            setError('That doesn’t look like a reachable website URL.')
+          else if (data?.code === 'unreachable')
+            setError('We couldn’t reach that site. Check the URL and try again.')
+          else setError(data?.error || 'Could not generate llms.txt. Please try again.')
+          return
+        }
+        setOutput(data.llmsTxt || '')
+        setSubmittedBrand(data.brand || values.brand.trim() || url)
         setStage('result')
-      }, 400)
+      } catch {
+        setStage('idle')
+        setError('Network error — please try again.')
+      }
     })
   }
 

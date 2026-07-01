@@ -42,7 +42,7 @@ const MONO_LABEL: CSSProperties = {
   textTransform: 'uppercase'
 }
 
-/* ── Mock fan-out payload (intent-grouped, no backend) ───────────── */
+/* ── Fan-out result shape (from /api/tools/fanout) ───────────────── */
 type IntentKey = 'Reformulation' | 'Comparative' | 'Procedural' | 'Pricing'
 
 type Category = {
@@ -53,46 +53,11 @@ type Category = {
   blurb: string
 }
 
-const CATEGORIES: Category[] = [
-  {
-    key: 'Reformulation',
-    title: 'Reformulation',
-    eyebrow: 'Same intent · reworded',
-    blurb: 'Different surface phrasing for the same underlying question.',
-    rows: [
-      'Best CRM platforms for SaaS startups',
-      'Top SaaS CRMs 2026',
-      'SaaS CRM ranking'
-    ]
-  },
-  {
-    key: 'Comparative',
-    title: 'Comparative',
-    eyebrow: 'Head-to-head · alternatives',
-    blurb: 'Engines test vendor-vs-vendor framings to surface trade-offs.',
-    rows: [
-      'HubSpot vs Salesforce for SaaS',
-      'Pipedrive vs Monday CRM',
-      'CRM comparison for 50-person teams'
-    ]
-  },
-  {
-    key: 'Procedural',
-    title: 'Procedural',
-    eyebrow: 'How to · workflow',
-    blurb: 'How-to questions that pull in implementation and evaluation guides.',
-    rows: ['How to migrate to a new CRM', 'How to evaluate a CRM trial']
-  },
-  {
-    key: 'Pricing',
-    title: 'Pricing',
-    eyebrow: 'Cost · tiers',
-    blurb: 'Cost and budget angles — usually the deciding branch for buyers.',
-    rows: ['Cheapest CRM for small SaaS', 'CRM pricing tiers explained']
-  }
-]
-
-const TOTAL_QUERIES = CATEGORIES.reduce((sum, c) => sum + c.rows.length, 0)
+type FanoutResult = {
+  query: string
+  categories: Category[]
+  totalQueries: number
+}
 
 /* ── Local primitives ────────────────────────────────────────────── */
 function FqArrow({ size = 14 }: { size?: number }) {
@@ -131,7 +96,9 @@ function Hero({
   query,
   setQuery,
   setSubmittedQuery,
-  gateRun
+  gateRun,
+  runScan,
+  serverError
 }: {
   stage: Stage
   setStage: (s: Stage) => void
@@ -139,6 +106,8 @@ function Hero({
   setQuery: (q: string) => void
   setSubmittedQuery: (q: string) => void
   gateRun: (action: () => void) => void
+  runScan: (q: string) => void
+  serverError: string
 }) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const [error, setError] = useState<string>('')
@@ -146,6 +115,7 @@ function Hero({
 
   const handleSubmit = (e?: React.FormEvent) => {
     e?.preventDefault()
+    if (stage === 'submitting') return
     const trimmed = query.trim()
     if (trimmed.length < 4) {
       setError('Enter a query of at least 4 characters.')
@@ -153,13 +123,8 @@ function Hero({
       return
     }
     setError('')
-    // Gate the run behind the lead form.
-    gateRun(() => {
-      setSubmittedQuery(trimmed)
-      setStage('submitting')
-      // Local-only feel-good delay before result reveal.
-      setTimeout(() => setStage('result'), 480)
-    })
+    // Gate the real run behind the lead form.
+    gateRun(() => runScan(trimmed))
   }
 
   const handleReset = () => {
@@ -172,13 +137,9 @@ function Hero({
   const tryExample = () => {
     if (stage === 'submitting') return
     const sample = 'best CRM for a growing SaaS company with 50 employees'
-    gateRun(() => {
-      setQuery(sample)
-      setSubmittedQuery(sample)
-      setError('')
-      setStage('submitting')
-      setTimeout(() => setStage('result'), 480)
-    })
+    setQuery(sample)
+    setError('')
+    gateRun(() => runScan(sample))
   }
 
   return (
@@ -381,7 +342,7 @@ function Hero({
               )}
             </div>
 
-            {error && (
+            {(error || serverError) && (
               <p
                 role="alert"
                 style={{
@@ -392,7 +353,7 @@ function Hero({
                   color: '#e5484d'
                 }}
               >
-                {error}
+                {error || serverError}
               </p>
             )}
           </form>
@@ -596,12 +557,16 @@ function CategoryCard({
 
 function ResultCard({
   visible,
-  submittedQuery
+  submittedQuery,
+  result
 }: {
   visible: boolean
   submittedQuery: string
+  result: FanoutResult | null
 }) {
   const reduce = useReducedMotion()
+  const categories = result?.categories ?? []
+  const totalQueries = result?.totalQueries ?? 0
   // Card root reveal — gates the inner stagger.
   const [rootRevealed, setRootRevealed] = useState(false)
   useEffect(() => {
@@ -617,14 +582,14 @@ function ResultCard({
     return () => clearTimeout(t)
   }, [visible, reduce])
 
-  // Stagger the 4 category cards, 180ms apart, starting after root reveals.
-  const cardFlags = useStagger(CATEGORIES.length, rootRevealed, 180, reduce ? 0 : 220)
-  const totalCount = useCountUp(TOTAL_QUERIES, rootRevealed, {
+  // Stagger the category cards, 180ms apart, starting after root reveals.
+  const cardFlags = useStagger(categories.length, rootRevealed, 180, reduce ? 0 : 220)
+  const totalCount = useCountUp(totalQueries, rootRevealed, {
     durationMs: 900,
     startMs: reduce ? 0 : 180
   })
 
-  if (!visible) return null
+  if (!visible || !result) return null
 
   return (
     <div>
@@ -691,7 +656,7 @@ function ResultCard({
               </span>
               sub-queries
               <span style={{ color: 'var(--ink-40)' }}>·</span>
-              4 intents
+              {categories.length} intents
             </div>
           </div>
 
@@ -707,9 +672,9 @@ function ResultCard({
           >
             <span style={{ color: 'var(--ink)' }}>1 query</span>{' '}
             <span style={{ color: 'var(--ink-40)' }}>→</span>{' '}
-            <span style={{ color: 'var(--ink)' }}>{TOTAL_QUERIES} sub-queries</span>{' '}
+            <span style={{ color: 'var(--ink)' }}>{totalQueries} sub-queries</span>{' '}
             <span style={{ color: 'var(--ink-40)' }}>across</span>{' '}
-            <span style={{ color: 'var(--ink)' }}>4 intent types</span>
+            <span style={{ color: 'var(--ink)' }}>{categories.length} intent types</span>
           </p>
 
           {/* Grid of categories */}
@@ -717,7 +682,7 @@ function ResultCard({
             className="grid grid-cols-1 md:grid-cols-2 gap-5"
             style={{ marginTop: 22 }}
           >
-            {CATEGORIES.map((c, i) => (
+            {categories.map((c, i) => (
               <CategoryCard
                 key={c.key}
                 category={c}
@@ -749,7 +714,7 @@ function ResultCard({
                 maxWidth: 560
               }}
             >
-              Sample output — illustrative of how ChatGPT, Perplexity, and Google AI rewrite a single buyer query before answering.
+              Live fan-out — how ChatGPT, Perplexity, and Google AI would rewrite this query into parallel searches before answering.
             </p>
             <a
               href="/free-ai-visibility-score"
@@ -992,7 +957,39 @@ export default function FeatureContent() {
   const [stage, setStage] = useState<Stage>('idle')
   const [query, setQuery] = useState<string>('')
   const [submittedQuery, setSubmittedQuery] = useState<string>('')
+  const [result, setResult] = useState<FanoutResult | null>(null)
+  const [serverError, setServerError] = useState<string>('')
   const gate = useToolLeadGate()
+
+  // Real LLM-backed fan-out (runs after the lead gate is satisfied).
+  const runFanout = async (q: string) => {
+    setSubmittedQuery(q)
+    setStage('submitting')
+    setResult(null)
+    setServerError('')
+    try {
+      const res = await fetch('/api/tools/fanout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: q }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setStage('idle')
+        if (data?.code === 'rate_limited') setServerError('Too many runs — give it a minute and try again.')
+        else if (data?.code === 'timeout') setServerError('That took too long. Try again.')
+        else if (data?.code === 'no_key') setServerError('The fan-out service is temporarily unavailable.')
+        else if (data?.code === 'bad_input') setServerError('Enter a slightly longer, more specific query.')
+        else setServerError(data?.error || 'Could not expand that query. Please try again.')
+        return
+      }
+      setResult(data as FanoutResult)
+      setStage('result')
+    } catch {
+      setStage('idle')
+      setServerError('Network error — please try again.')
+    }
+  }
 
   return (
     <>
@@ -1003,16 +1000,19 @@ export default function FeatureContent() {
         setQuery={setQuery}
         setSubmittedQuery={setSubmittedQuery}
         gateRun={gate.request}
+        runScan={runFanout}
+        serverError={serverError}
       />
       <ToolLeadModal open={gate.open} tool="fanout" onClose={gate.close} onSuccess={gate.success} />
       <ToolResultModal
-        open={stage === 'result'}
+        open={stage === 'result' && !!result}
         onClose={() => {
           setStage('idle')
           setSubmittedQuery('')
+          setResult(null)
         }}
       >
-        <ResultCard visible={stage === 'result'} submittedQuery={submittedQuery} />
+        <ResultCard visible={stage === 'result'} submittedQuery={submittedQuery} result={result} />
       </ToolResultModal>
       <Educational />
       <FAQAccordion items={FAQS} />

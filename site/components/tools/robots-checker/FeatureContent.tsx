@@ -50,36 +50,8 @@ const RED_BG_DARK = 'rgba(248,113,113,0.13)'
 const RED_BORDER_DARK = 'rgba(248,113,113,0.32)'
 const GREEN_BRIGHT = '#4ade80'
 
-/* ── Hardcoded sample result ──────────────────────────────────────── */
+/* ── Result shape (from /api/tools/robots) ────────────────────────── */
 type Status = 'allowed' | 'blocked' | 'indeterminate'
-
-const SAMPLE_ROBOTS = `# robots.txt — sample audit
-# Last updated: 2026-06-15
-
-User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /api/internal/
-Disallow: /drafts/
-
-User-agent: GPTBot
-Allow: /
-Allow: /blog/
-Disallow: /pricing/internal/
-
-User-agent: ClaudeBot
-Allow: /
-
-# Locked down by legal — under review
-User-agent: anthropic-ai
-Disallow: /
-
-User-agent: CCBot
-Disallow: /
-
-User-agent: Bytespider
-Disallow: /
-`
 
 type BotRow = {
   bot: string
@@ -88,23 +60,16 @@ type BotRow = {
   status: Status
 }
 
-const BOTS: BotRow[] = [
-  { bot: 'GPTBot', ua: 'GPTBot', rule: 'Allow: /', status: 'allowed' },
-  { bot: 'ChatGPT-User', ua: 'ChatGPT-User', rule: 'wildcard · Allow: /', status: 'allowed' },
-  { bot: 'anthropic-ai', ua: 'anthropic-ai', rule: 'Disallow: /', status: 'blocked' },
-  { bot: 'ClaudeBot', ua: 'ClaudeBot', rule: 'Allow: /', status: 'allowed' },
-  { bot: 'Claude-Web', ua: 'Claude-Web', rule: 'wildcard · Allow: /', status: 'allowed' },
-  { bot: 'PerplexityBot', ua: 'PerplexityBot', rule: 'wildcard · Allow: /', status: 'allowed' },
-  { bot: 'Google-Extended', ua: 'Google-Extended', rule: 'wildcard · Allow: /', status: 'allowed' },
-  { bot: 'CCBot', ua: 'CCBot', rule: 'Disallow: /', status: 'blocked' },
-  { bot: 'Applebot-Extended', ua: 'Applebot-Extended', rule: 'wildcard · Allow: /', status: 'allowed' },
-  { bot: 'Bytespider', ua: 'Bytespider', rule: 'Disallow: /', status: 'blocked' },
-  { bot: 'Diffbot', ua: 'Diffbot', rule: 'wildcard · Allow: /', status: 'allowed' },
-  { bot: 'YouBot', ua: 'YouBot', rule: 'wildcard · conflicting', status: 'indeterminate' },
-  { bot: 'AI2Bot', ua: 'AI2Bot', rule: 'wildcard · pattern unclear', status: 'indeterminate' },
-  { bot: 'Cohere-AI', ua: 'cohere-ai', rule: 'Disallow: /', status: 'blocked' },
-  { bot: 'Meta-ExternalAgent', ua: 'Meta-ExternalAgent', rule: 'wildcard · Allow: /', status: 'allowed' }
-]
+type RobotsResult = {
+  source: 'url' | 'paste'
+  url?: string
+  exists: boolean
+  robotsUrl: string | null
+  robotsText: string
+  bots: BotRow[]
+  counts: { allowed: number; blocked: number; indeterminate: number }
+  fetchedStatus?: number
+}
 
 /* ── Icons ──────────────────────────────────────────────────────── */
 function CheckIcon({ size = 12 }: { size?: number }) {
@@ -175,6 +140,7 @@ function Hero({
   paste,
   setPaste,
   stage,
+  serverError,
   onRun,
   onReset,
   showReset
@@ -186,6 +152,7 @@ function Hero({
   paste: string
   setPaste: (s: string) => void
   stage: Stage
+  serverError: string
   onRun: () => void
   onReset: () => void
   showReset: boolean
@@ -435,7 +402,7 @@ function Hero({
               </div>
             )}
 
-            {error && (
+            {(error || serverError) && (
               <p
                 style={{
                   marginTop: 12,
@@ -447,7 +414,7 @@ function Hero({
                   marginRight: 'auto'
                 }}
               >
-                {error}
+                {error || serverError}
               </p>
             )}
 
@@ -481,17 +448,26 @@ function Hero({
 }
 
 /* ── 02 — RESULT MODAL (Clovion dark-brand popup) ─────────────────── */
-function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+function ResultModal({
+  open,
+  onClose,
+  result
+}: {
+  open: boolean
+  onClose: () => void
+  result: RobotsResult | null
+}) {
   const reduced = useReducedMotion()
   // `shown` drives the entrance transition: it flips true one frame after the
   // modal mounts so opacity/transform animate from their initial values.
   const [shown, setShown] = useState(false)
-  const rowFlags = useStagger(BOTS.length, shown, 45, 220)
+  const bots = result?.bots ?? []
+  const rowFlags = useStagger(bots.length, shown, 45, 220)
   const [parsedOpen, setParsedOpen] = useState(false)
   const [copied, setCopied] = useState(false)
-  const allowed = BOTS.filter((b) => b.status === 'allowed').length
-  const blocked = BOTS.filter((b) => b.status === 'blocked').length
-  const indeterminate = BOTS.filter((b) => b.status === 'indeterminate').length
+  const allowed = result?.counts.allowed ?? 0
+  const blocked = result?.counts.blocked ?? 0
+  const indeterminate = result?.counts.indeterminate ?? 0
 
   // Trigger parsed-rules slide-in after table rows finish staggering.
   const [parsedReveal, setParsedReveal] = useState(false)
@@ -525,16 +501,16 @@ function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) 
       return
     }
     const raf = requestAnimationFrame(() => setShown(true))
-    const t = window.setTimeout(() => setParsedReveal(true), 220 + BOTS.length * 45 + 80)
+    const t = window.setTimeout(() => setParsedReveal(true), 220 + bots.length * 45 + 80)
     return () => {
       cancelAnimationFrame(raf)
       window.clearTimeout(t)
     }
-  }, [open, reduced])
+  }, [open, reduced, bots.length])
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(SAMPLE_ROBOTS)
+      await navigator.clipboard.writeText(result?.robotsText ?? '')
       setCopied(true)
       window.setTimeout(() => setCopied(false), 1600)
     } catch {
@@ -542,7 +518,7 @@ function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) 
     }
   }
 
-  if (!open) return null
+  if (!open || !result) return null
 
   return (
     <div
@@ -663,6 +639,21 @@ function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) 
             >
               AI bot status
             </h3>
+            {result.url && (
+              <p
+                style={{
+                  margin: '6px 0 0',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.78rem',
+                  color: 'var(--ink-60)'
+                }}
+              >
+                {result.robotsUrl || result.url}
+                {!result.exists && (
+                  <span style={{ color: 'var(--ink-50)' }}> · no robots.txt found — all bots allowed by default</span>
+                )}
+              </p>
+            )}
           </div>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <Pill tone="ok">{allowed} Allowed</Pill>
@@ -701,13 +692,14 @@ function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) 
               </div>
             ))}
             {/* rows */}
-            {BOTS.map((b, i) => (
+            {bots.map((b, i) => (
               <BotRowCells key={b.bot} row={b} revealed={rowFlags[i]} />
             ))}
           </div>
         </div>
 
-        {/* Section B — parsed rules collapse */}
+        {/* Section B — parsed rules collapse (only when a robots.txt was found) */}
+        {result.exists && result.robotsText.trim() && (
         <div
           style={{
             marginTop: 24,
@@ -819,10 +811,11 @@ function ResultModal({ open, onClose }: { open: boolean; onClose: () => void }) 
                 wordBreak: 'break-word'
               }}
             >
-              {tintRobots(SAMPLE_ROBOTS)}
+              {tintRobots(result.robotsText)}
             </pre>
           </div>
         </div>
+        )}
       </div>
     </div>
   )
@@ -1222,16 +1215,43 @@ export default function FeatureContent() {
   const [url, setUrl] = useState('')
   const [paste, setPaste] = useState('')
   const [stage, setStage] = useState<Stage>('idle')
+  const [result, setResult] = useState<RobotsResult | null>(null)
+  const [serverError, setServerError] = useState('')
   const gate = useToolLeadGate()
 
-  // 400ms feel-good delay before reveal (no network, this is just polish).
-  const runScan = () => {
+  // Real fetch + parse (runs after the lead gate is satisfied).
+  const runScan = async () => {
     setStage('submitting')
-    window.setTimeout(() => setStage('result'), 400)
+    setResult(null)
+    setServerError('')
+    const payload = tab === 'url' ? { url: url.trim() } : { content: paste }
+    try {
+      const res = await fetch('/api/tools/robots', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setStage('idle')
+        if (data?.code === 'rate_limited') setServerError('Too many checks — give it a minute and try again.')
+        else if (data?.code === 'timeout') setServerError('The site took too long to respond. Try again.')
+        else if (data?.code === 'bad_domain' || data?.code === 'bad_url')
+          setServerError('That doesn’t look like a reachable website URL.')
+        else setServerError(data?.error || 'Could not fetch robots.txt. Check the URL and try again.')
+        return
+      }
+      setResult(data as RobotsResult)
+      setStage('result')
+    } catch {
+      setStage('idle')
+      setServerError('Network error — please try again.')
+    }
   }
 
   const handleReset = () => {
     setStage('idle')
+    setResult(null)
     // Don't wipe the URL / paste — users often want to tweak and re-check.
   }
 
@@ -1245,11 +1265,12 @@ export default function FeatureContent() {
         paste={paste}
         setPaste={setPaste}
         stage={stage}
+        serverError={serverError}
         onRun={() => gate.request(runScan)}
         onReset={handleReset}
         showReset={false}
       />
-      <ResultModal open={stage === 'result'} onClose={handleReset} />
+      <ResultModal open={stage === 'result'} onClose={handleReset} result={result} />
       <ToolLeadModal open={gate.open} tool="robots-checker" onClose={gate.close} onSuccess={gate.success} />
       <Educational />
       <FAQAccordion items={FAQS} />
