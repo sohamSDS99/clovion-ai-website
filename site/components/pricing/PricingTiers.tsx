@@ -272,6 +272,9 @@ function TierCard({ t, billing }: { t: Tier; billing: 'monthly' | 'annual' }) {
             variant={t.ctaVariant}
             size="lg"
             className="w-full justify-center"
+            // Non-sales tiers (Starter/Growth) route to signup; Talk to Sales
+            // opens Calendly via onClick (no href).
+            href={t.cta === 'Talk to Sales' ? undefined : 'https://app.clovion.ai/signup'}
             // Talk to Sales tiers: openCalendly owns the single tracked push
             // (book_demo w/ plan_name). trackLocation+trackEvent would fire a
             // second pricing_click push → two per-button events per click.
