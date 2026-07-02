@@ -1,19 +1,22 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 /**
- * DeepDive — collapsible "Detailed feature breakdown" for the Clovion vs Peec AI
- * comparison page. Progressive disclosure keeps the page scannable instead of a
- * wall of text: each of the 8 breakdown points opens to show the Clovion side
- * and the Peec AI side. All copy is verbatim from the source brief.
+ * DeepDive — "Detailed feature breakdown" as a feature EXPLORER (not an
+ * accordion). A topic rail selects one of the eight breakdown points; the
+ * selected point's Clovion vs Peec AI comparison is always shown on the right.
+ *
+ * Why an explorer: the eight points carry a lot of verbatim copy. Showing them
+ * all at once reads as a wall of text; hiding them behind a collapsed accordion
+ * means nothing is visible by default. The explorer keeps one topic always open
+ * (defaults to the first) while only ever showing a single point's text — calm,
+ * premium, scannable. Mirrors the site's PillarStepper pattern.
  *
  * Dark-theme rules (Clovion brandbook): colours via var(--*) tokens only so they
- * flip correctly under .clv-dark. Never put var(--*) inside a transition
- * shorthand — inline the literal cubic-bezier instead.
+ * flip under .clv-dark. Never put var(--*) inside a transition shorthand — inline
+ * the literal cubic-bezier instead.
  */
-
-const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 export type DeepDiveItem = {
   n: string
@@ -21,27 +24,6 @@ export type DeepDiveItem = {
   intro?: string
   clovion: string[]
   peec: string[]
-}
-
-function PlusIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
-      <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const onChange = () => setReduced(mq.matches)
-    onChange()
-    mq.addEventListener('change', onChange)
-    return () => mq.removeEventListener('change', onChange)
-  }, [])
-  return reduced
 }
 
 function SideBlock({
@@ -59,7 +41,7 @@ function SideBlock({
         borderRadius: 16,
         border: '1px solid var(--line)',
         background: emphasized ? 'var(--subtle)' : 'var(--white)',
-        padding: '20px 22px'
+        padding: '22px 24px'
       }}
     >
       <div
@@ -72,7 +54,7 @@ function SideBlock({
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
           color: emphasized ? 'var(--ink)' : 'var(--ink-50)',
-          marginBottom: 12
+          marginBottom: 14
         }}
       >
         <span
@@ -103,140 +85,140 @@ function SideBlock({
   )
 }
 
-function Row({
-  item,
-  open,
-  onToggle,
-  reduceMotion
-}: {
-  item: DeepDiveItem
-  open: boolean
-  onToggle: () => void
-  reduceMotion: boolean
-}) {
-  const iconTransition = reduceMotion ? 'none' : `transform .25s ${EASE}`
-  const panelTransition = reduceMotion ? 'none' : `max-height .4s ${EASE}, opacity .4s ${EASE}`
+export function DeepDive({ items }: { items: DeepDiveItem[] }) {
+  const [active, setActive] = useState(0)
+  const item = items[active]
+  const single = item.peec.length === 0
 
   return (
-    <div style={{ borderBottom: '1px solid var(--line)' }}>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        style={{
-          width: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 20,
-          padding: '24px 0',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontFamily: 'var(--font-display)',
-          color: 'var(--ink)'
-        }}
-      >
-        <span
-          aria-hidden
-          style={{
-            flexShrink: 0,
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.85rem',
-            letterSpacing: '0.02em',
-            color: open ? 'var(--ink)' : 'var(--ink-40)',
-            width: 28,
-            transition: reduceMotion ? 'none' : `color .25s ${EASE}`
-          }}
-        >
-          {item.n}
-        </span>
-        <span
-          style={{
-            flex: 1,
-            fontSize: '1.12rem',
-            fontWeight: 600,
-            letterSpacing: '-0.01em',
-            color: 'var(--ink)'
-          }}
-        >
-          {item.title}
-        </span>
-        <span
-          aria-hidden
-          style={{
-            flexShrink: 0,
-            display: 'inline-flex',
-            color: 'var(--ink-60)',
-            transform: open ? 'rotate(45deg)' : 'none',
-            transition: iconTransition
-          }}
-        >
-          <PlusIcon size={18} />
-        </span>
-      </button>
-      <div
-        style={{
-          overflow: 'hidden',
-          maxHeight: open ? 1600 : 0,
-          opacity: open ? 1 : 0,
-          transition: panelTransition
-        }}
-      >
-        <div style={{ padding: '0 0 28px', paddingLeft: 48 }}>
+    <div>
+      <style>{`
+        .fx-explorer { display: grid; grid-template-columns: 1fr; gap: 28px; }
+        @media (min-width: 1024px) {
+          .fx-explorer { grid-template-columns: minmax(240px, 0.42fr) 1fr; gap: 48px; align-items: start; }
+        }
+        .fx-rail { display: flex; flex-direction: row; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+        .fx-rail::-webkit-scrollbar { display: none; }
+        .fx-item { flex: 0 0 auto; }
+        @media (min-width: 1024px) {
+          .fx-rail { flex-direction: column; overflow: visible; padding-bottom: 0; gap: 6px; }
+          .fx-item { width: 100%; }
+        }
+        .fx-title { display: none; }
+        @media (min-width: 1024px) { .fx-title { display: block; } }
+        .fx-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        @media (min-width: 768px) { .fx-grid { grid-template-columns: 1fr 1fr; gap: 16px; } }
+        .fx-grid[data-single="true"] { grid-template-columns: 1fr; }
+        @keyframes fxfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .fx-panel { animation: fxfade .38s cubic-bezier(0.16, 1, 0.3, 1); }
+        @media (prefers-reduced-motion: reduce) { .fx-panel { animation: none; } }
+      `}</style>
+
+      <div className="fx-explorer">
+        {/* Topic rail */}
+        <div className="fx-rail" role="tablist" aria-label="Feature breakdown topics">
+          {items.map((it, i) => {
+            const on = i === active
+            return (
+              <button
+                key={it.n}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setActive(i)}
+                className="fx-item"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  border: '1px solid',
+                  borderColor: on ? 'var(--line)' : 'transparent',
+                  background: on ? 'var(--white)' : 'transparent',
+                  boxShadow: on ? 'var(--shadow-soft)' : 'none',
+                  borderRadius: 14,
+                  padding: '14px 16px',
+                  whiteSpace: 'nowrap',
+                  transition:
+                    'background .2s cubic-bezier(0.16, 1, 0.3, 1), border-color .2s cubic-bezier(0.16, 1, 0.3, 1)'
+                }}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.8rem',
+                    letterSpacing: '0.04em',
+                    color: on ? 'var(--ink)' : 'var(--ink-40)'
+                  }}
+                >
+                  {it.n}
+                </span>
+                <span
+                  className="fx-title"
+                  style={{
+                    fontSize: '0.98rem',
+                    fontWeight: 600,
+                    letterSpacing: '-0.01em',
+                    color: on ? 'var(--ink)' : 'var(--ink-60)'
+                  }}
+                >
+                  {it.title}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Active topic panel */}
+        <div className="fx-panel" key={active} role="tabpanel">
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: item.intro ? 18 : 22 }}>
+            <span
+              aria-hidden
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'clamp(1.8rem, 3vw, 2.4rem)',
+                lineHeight: 1,
+                color: 'rgb(var(--ink-rgb) / 12%)'
+              }}
+            >
+              {item.n}
+            </span>
+            <h3
+              style={{
+                margin: 0,
+                fontFamily: 'var(--font-display)',
+                fontSize: '1.5rem',
+                fontWeight: 600,
+                letterSpacing: '-0.01em',
+                color: 'var(--ink)'
+              }}
+            >
+              {item.title}
+            </h3>
+          </div>
+
           {item.intro && (
             <p
               style={{
-                margin: '0 0 18px',
+                margin: '0 0 20px',
                 fontSize: '1rem',
                 lineHeight: 1.6,
                 color: 'var(--ink)',
-                maxWidth: 720
+                maxWidth: 760
               }}
             >
               {item.intro}
             </p>
           )}
-          <div className="dd-grid">
+
+          <div className="fx-grid" data-single={single ? 'true' : 'false'}>
             <SideBlock label="Clovion AI" paragraphs={item.clovion} emphasized />
-            {item.peec.length > 0 && <SideBlock label="Peec AI" paragraphs={item.peec} />}
+            {!single && <SideBlock label="Peec AI" paragraphs={item.peec} />}
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-export function DeepDive({ items }: { items: DeepDiveItem[] }) {
-  const [openSet, setOpenSet] = useState<Set<number>>(() => new Set())
-  const reduceMotion = useReducedMotion()
-
-  const toggle = (i: number) => {
-    setOpenSet((prev) => {
-      const next = new Set(prev)
-      if (next.has(i)) next.delete(i)
-      else next.add(i)
-      return next
-    })
-  }
-
-  return (
-    <div>
-      {/* Local responsive rule for the two-up side blocks — single column on
-          mobile, Clovion + Peec side-by-side from the md breakpoint up. */}
-      <style>{`
-        .dd-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-        @media (min-width: 768px) { .dd-grid { grid-template-columns: 1fr 1fr; gap: 16px; } }
-      `}</style>
-      {items.map((item, i) => (
-        <Row
-          key={item.n}
-          item={item}
-          open={openSet.has(i)}
-          onToggle={() => toggle(i)}
-          reduceMotion={reduceMotion}
-        />
-      ))}
     </div>
   )
 }
