@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/cn'
 import type { ComponentProps, ReactNode } from 'react'
-import { analytics, track, buttonId } from '@/lib/analytics'
+import { analytics, track, buttonId, buttonEvent } from '@/lib/analytics'
 
 // Recursively extract plain text from a ReactNode tree (e.g. Button children
 // may be "Start free trial <ArrowRight/>" — we want just the text part).
@@ -110,6 +110,7 @@ export function Button({
         cta_text: text,
         cta_location: trackLocation,
         button_id: buttonId(trackLocation, text),
+        button_event: buttonEvent(trackLocation, trackPlan || text || trackEvent),
         ...(trackPlan ? { plan_name: trackPlan } : {}),
         ...(href ? { link_url: href } : {})
       })
