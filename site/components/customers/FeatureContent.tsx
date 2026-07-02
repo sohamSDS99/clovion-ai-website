@@ -750,7 +750,7 @@ function FinalCTA() {
               <CTAButtons location="customers_final_cta" />
               <button
                 type="button"
-                onClick={() => openCalendly('customers_final_cta')}
+                onClick={() => openCalendly('customers_final_cta', undefined, 'Talk to Sales')}
                 style={{
                   display: 'inline-flex',
                   alignItems: 'center',

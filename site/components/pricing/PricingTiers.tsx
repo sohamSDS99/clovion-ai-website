@@ -279,7 +279,7 @@ function TierCard({ t, billing }: { t: Tier; billing: 'monthly' | 'annual' }) {
               t.cta === 'Talk to Sales'
                 ? (e) => {
                     e.preventDefault()
-                    openCalendly('pricing_card', t.name)
+                    openCalendly('pricing_card', t.name, t.cta)
                   }
                 : undefined
             }

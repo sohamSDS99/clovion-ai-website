@@ -1196,7 +1196,7 @@ function FinalCTA() {
                 trackLocation="tools_robots_checker_final_cta"
                 onClick={(e) => {
                   e.preventDefault()
-                  openCalendly('tools_robots_checker_final_cta')
+                  openCalendly('tools_robots_checker_final_cta', undefined, 'Talk to an Expert')
                 }}
               >
                 Talk to an Expert

@@ -256,7 +256,7 @@ export default function ComparisonTable() {
                   c.label === 'Talk to Sales'
                     ? (e) => {
                         e.preventDefault()
-                        openCalendly('pricing_table', COL[i])
+                        openCalendly('pricing_table', COL[i], 'Talk to Sales')
                       }
                     : undefined
                 }
