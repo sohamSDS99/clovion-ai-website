@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/cn'
 import type { ComponentProps, ReactNode } from 'react'
-import { analytics, track } from '@/lib/analytics'
+import { analytics, track, buttonId } from '@/lib/analytics'
 
 // Recursively extract plain text from a ReactNode tree (e.g. Button children
 // may be "Start free trial <ArrowRight/>" — we want just the text part).
-function extractText(node: ReactNode): string {
+export function extractText(node: ReactNode): string {
   if (typeof node === 'string') return node
   if (typeof node === 'number') return String(node)
   if (Array.isArray(node)) return node.map(extractText).join('')
@@ -90,14 +91,25 @@ export function Button({
     className
   )
 
+  // Unique per-button-instance identity: <page>__<location>__<text-slug>.
+  // Computed at render (usePathname) and stamped as data-btn-id on the DOM
+  // element so GTM's catch-all click trigger can also identify this exact
+  // button. The same ID is pushed with the semantic dataLayer event on click.
+  const pathname = usePathname()
+  const btnText = extractText(children).trim()
+  const btnId = trackLocation
+    ? buttonId(trackLocation, btnText, pathname ?? undefined)
+    : undefined
+
   const fireTracking = () => {
     if (!trackLocation) return
-    const text = extractText(children).trim()
+    const text = btnText
     if (trackEvent) {
       track({
         event: trackEvent,
         cta_text: text,
         cta_location: trackLocation,
+        button_id: buttonId(trackLocation, text),
         ...(trackPlan ? { plan_name: trackPlan } : {}),
         ...(href ? { link_url: href } : {})
       })
@@ -105,9 +117,9 @@ export function Button({
     }
     if (!text) return
     const lower = text.toLowerCase()
-    if (lower.includes('free trial')) analytics.startTrial(trackLocation, trackPlan)
-    else if (lower.includes('free score')) analytics.getFreeScore(trackLocation)
-    else if (lower.includes('demo')) analytics.bookDemo(trackLocation)
+    if (lower.includes('free trial')) analytics.startTrial(trackLocation, trackPlan, text)
+    else if (lower.includes('free score')) analytics.getFreeScore(trackLocation, text)
+    else if (lower.includes('demo')) analytics.bookDemo(trackLocation, text)
     else analytics.ctaClick(text, trackLocation, href)
   }
 
@@ -127,6 +139,7 @@ export function Button({
           href={href}
           className={classes}
           onClick={fireTracking}
+          data-btn-id={btnId}
           {...(sameTab ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
         >
           {children}
@@ -134,7 +147,7 @@ export function Button({
       )
     }
     return (
-      <Link href={href} className={classes} onClick={fireTracking}>
+      <Link href={href} className={classes} onClick={fireTracking} data-btn-id={btnId}>
         {children}
       </Link>
     )
@@ -143,6 +156,7 @@ export function Button({
   return (
     <button
       className={classes}
+      data-btn-id={btnId}
       {...rest}
       onClick={(e) => {
         fireTracking()

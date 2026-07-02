@@ -387,7 +387,7 @@ function FinalCTA() {
                 href="#"
                 onClick={(e) => {
                   e.preventDefault()
-                  openCalendly('pricing_final_cta')
+                  openCalendly('pricing_final_cta', undefined, 'Talk to Sales')
                 }}
                 style={{
                   display: 'inline-flex',

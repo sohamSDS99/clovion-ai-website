@@ -115,7 +115,7 @@ export function CTABanner({
                     href={secondaryHref}
                     onClick={(e) => {
                       e.preventDefault()
-                      openCalendly('final_cta')
+                      openCalendly('final_cta', undefined, secondary)
                     }}
                     className="btn h-12 px-6 text-base text-white border border-white/15 hover:bg-white/5 cursor-pointer"
                   >

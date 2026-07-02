@@ -141,7 +141,7 @@ export function Loop() {
             trackLocation="home_loop"
             onClick={(e) => {
               e.preventDefault()
-              openCalendly('home_loop')
+              openCalendly('home_loop', undefined, 'Talk to an Expert')
             }}
             style={{
               background: 'transparent',

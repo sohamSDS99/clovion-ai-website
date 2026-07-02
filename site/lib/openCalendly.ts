@@ -1,5 +1,5 @@
 import { CALENDLY_URL } from './calendly'
-import { track } from './analytics'
+import { track, buttonId } from './analytics'
 
 declare global {
   interface Window {
@@ -7,11 +7,15 @@ declare global {
   }
 }
 
-export function openCalendly(location?: string, plan?: string) {
+// `text` is the visible button label — pass it from the callsite so the
+// button_id (<page>__<location>__<text-slug>) identifies this exact button.
+export function openCalendly(location?: string, plan?: string, text = 'Talk to Sales') {
   if (location) {
     track({
       event: 'book_demo',
       cta_location: location,
+      cta_text: text,
+      button_id: buttonId(location, text),
       ...(plan ? { plan_name: plan } : {})
     })
   }

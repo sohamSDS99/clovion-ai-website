@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui'
+import { Button, extractText } from '@/components/ui'
 import { openCalendly } from '@/lib/openCalendly'
 import type { ReactNode } from 'react'
 
@@ -30,7 +30,7 @@ export function TalkToSalesButton({
       trackLocation={location}
       onClick={(e) => {
         e.preventDefault()
-        openCalendly(location, plan)
+        openCalendly(location, plan, extractText(children).trim() || 'Talk to Sales')
       }}
     >
       {children}

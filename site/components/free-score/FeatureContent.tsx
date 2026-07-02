@@ -495,7 +495,7 @@ function Hero({
                 )}
                 <button
                   type="button"
-                  onClick={() => openCalendly('free_score_hero')}
+                  onClick={() => openCalendly('free_score_hero', undefined, 'Talk to an expert')}
                   style={{
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.72rem',
@@ -867,7 +867,7 @@ function MetricsBand() {
           </a>
           <button
             type="button"
-            onClick={() => openCalendly('free_score_metrics')}
+            onClick={() => openCalendly('free_score_metrics', undefined, 'Talk to an expert')}
             className="btn btn-secondary btn-lg"
             style={{ cursor: 'pointer' }}
           >
@@ -958,7 +958,7 @@ function FinalCTA() {
               </a>
               <button
                 type="button"
-                onClick={() => openCalendly('free_score_final_cta')}
+                onClick={() => openCalendly('free_score_final_cta', undefined, 'Talk to an expert')}
                 className="btn btn-secondary btn-lg"
                 style={{ cursor: 'pointer' }}
               >
