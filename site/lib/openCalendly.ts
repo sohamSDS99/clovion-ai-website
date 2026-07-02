@@ -1,5 +1,5 @@
 import { CALENDLY_URL } from './calendly'
-import { track, buttonId } from './analytics'
+import { track, buttonId, buttonEvent } from './analytics'
 
 declare global {
   interface Window {
@@ -16,6 +16,7 @@ export function openCalendly(location?: string, plan?: string, text = 'Talk to S
       cta_location: location,
       cta_text: text,
       button_id: buttonId(location, text),
+      button_event: buttonEvent(location, 'book_demo'),
       ...(plan ? { plan_name: plan } : {})
     })
   }
