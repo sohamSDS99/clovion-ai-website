@@ -1192,8 +1192,6 @@ function FinalCTA() {
               <Button
                 variant="invert"
                 size="lg"
-                trackEvent="cta_click"
-                trackLocation="tools_robots_checker_final_cta"
                 onClick={(e) => {
                   e.preventDefault()
                   openCalendly('tools_robots_checker_final_cta', undefined, 'Talk to an Expert')

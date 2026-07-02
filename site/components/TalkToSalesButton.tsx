@@ -27,7 +27,9 @@ export function TalkToSalesButton({
       variant={variant}
       size={size}
       className={className}
-      trackLocation={location}
+      // No trackLocation here — openCalendly() pushes the book_demo event
+      // (with button_id + button_event). A trackLocation would make Button
+      // fire a second cta_click push and double-count this physical button.
       onClick={(e) => {
         e.preventDefault()
         openCalendly(location, plan, extractText(children).trim() || 'Talk to Sales')

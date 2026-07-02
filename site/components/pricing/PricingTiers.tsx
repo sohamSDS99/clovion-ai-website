@@ -272,9 +272,12 @@ function TierCard({ t, billing }: { t: Tier; billing: 'monthly' | 'annual' }) {
             variant={t.ctaVariant}
             size="lg"
             className="w-full justify-center"
-            trackLocation="pricing_card"
-            trackEvent="pricing_click"
-            trackPlan={t.name}
+            // Talk to Sales tiers: openCalendly owns the single tracked push
+            // (book_demo w/ plan_name). trackLocation+trackEvent would fire a
+            // second pricing_click push → two per-button events per click.
+            trackLocation={t.cta === 'Talk to Sales' ? undefined : 'pricing_card'}
+            trackEvent={t.cta === 'Talk to Sales' ? undefined : 'pricing_click'}
+            trackPlan={t.cta === 'Talk to Sales' ? undefined : t.name}
             onClick={
               t.cta === 'Talk to Sales'
                 ? (e) => {
