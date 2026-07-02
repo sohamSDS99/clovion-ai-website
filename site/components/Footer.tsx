@@ -51,6 +51,12 @@ const groups = [
       { label: 'Privacy', href: '/legal/privacy' },
       { label: 'Terms', href: '/legal/terms' }
     ]
+  },
+  {
+    title: 'Comparisons',
+    links: [
+      { label: 'Clovion vs Peec AI', href: '/compare/clovion-vs-peec-ai' }
+    ]
   }
 ]
 
@@ -80,7 +86,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
             {groups.map((g) => (
               <div key={g.title}>
                 <div className="text-[0.78rem] font-semibold uppercase tracking-[0.08em] text-ink-50 mb-4">{g.title}</div>
