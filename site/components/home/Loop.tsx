@@ -138,7 +138,6 @@ export function Loop() {
           <Button
             variant="ghost"
             size="lg"
-            trackLocation="home_loop"
             onClick={(e) => {
               e.preventDefault()
               openCalendly('home_loop', undefined, 'Talk to an Expert')

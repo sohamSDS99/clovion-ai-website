@@ -249,9 +249,11 @@ export default function ComparisonTable() {
                 variant={c.variant}
                 size="sm"
                 className="w-full justify-center"
-                trackLocation="pricing_table"
-                trackEvent="pricing_click"
-                trackPlan={COL[i]}
+                // Talk to Sales column: openCalendly owns the single tracked
+                // push (book_demo w/ plan_name) — see PricingTiers note.
+                trackLocation={c.label === 'Talk to Sales' ? undefined : 'pricing_table'}
+                trackEvent={c.label === 'Talk to Sales' ? undefined : 'pricing_click'}
+                trackPlan={c.label === 'Talk to Sales' ? undefined : COL[i]}
                 onClick={
                   c.label === 'Talk to Sales'
                     ? (e) => {

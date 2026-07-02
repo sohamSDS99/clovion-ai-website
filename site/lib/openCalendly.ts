@@ -16,7 +16,7 @@ export function openCalendly(location?: string, plan?: string, text = 'Talk to S
       cta_location: location,
       cta_text: text,
       button_id: buttonId(location, text),
-      button_event: buttonEvent(location, 'book_demo'),
+      button_event: buttonEvent(location, text),
       ...(plan ? { plan_name: plan } : {})
     })
   }

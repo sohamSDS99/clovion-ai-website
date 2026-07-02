@@ -826,8 +826,6 @@ function FinalCTA() {
               <Button
                 variant="invert"
                 size="lg"
-                trackEvent="book_demo"
-                trackLocation="tools_llms_txt_generator_final_cta"
                 onClick={(e) => {
                   e.preventDefault()
                   openCalendly('tools_llms_txt_generator_final_cta', undefined, 'Talk to an Expert')

@@ -67,14 +67,57 @@ function eventSafe(s: string): string {
 // a page prefix or identical buttons on different pages collapse again.
 const SHARED_LOCATIONS = new Set(['header', 'header_mobile', 'final_cta'])
 
-// Per-button GA4 EVENT NAME, e.g. home_hero_start_free_trial. Sent alongside
-// the semantic event via GTM's dynamic-Event-Name tag ("GA4 Event - per
-// button"), so every button surfaces as its own row in GA4's Events report.
-// GA4 hard-caps event names at 40 chars — longer names are silently dropped,
-// hence the slice.
-export function buttonEvent(location: string, intent: string): string {
-  const loc = SHARED_LOCATIONS.has(location) ? `${pageSlug()}_${location}` : location
-  return eventSafe(`${loc}_${intent}`).slice(0, 40).replace(/_+$/, '')
+// Compact intent for the event name, derived from the button's visible text
+// (or the pricing plan name). Keeps names short and human-scannable.
+function buttonIntent(textOrIntent: string): string {
+  const t = textOrIntent.toLowerCase()
+  if (t.includes('free trial')) return 'free_trial'
+  if (t.includes('free score')) return 'free_score'
+  if (t.includes('demo')) return 'book_demo'
+  if (t.includes('talk to sales')) return 'sales'
+  if (t.includes('expert')) return 'expert'
+  if (t.includes('log in') || t.includes('login')) return 'login'
+  if (t.includes('sign up') || t.includes('signup')) return 'signup'
+  return eventSafe(textOrIntent)
+}
+
+// Verbose location/page slugs compressed so every event name fits GA4's
+// hard 40-char cap (names over 40 chars are dropped by GA4).
+const LOCATION_SQUEEZES: [RegExp, string][] = [
+  [/^tools_/, ''],
+  [/^features_/, ''],
+  [/_generator/, ''],
+  [/_checker/, ''],
+  [/^alternatives_/, 'alt_'],
+  [/^compare_clovion_vs_/, 'compare_'],
+  [/^blog_category_/, 'blog_'],
+  [/^free_ai_visibility_score/, 'free_score'],
+  [/^geo_improvement_suggestions/, 'geo'],
+  [/^ai_visibility_tracking/, 'ai_visibility'],
+  [/^sentiment_analysis/, 'sentiment'],
+  [/^brand_perception/, 'brand'],
+  [/^platform_coverage/, 'platform'],
+  [/^ai_crawlability/, 'ai_crawl']
+]
+
+function compactLocation(loc: string): string {
+  let out = loc
+  for (const [re, sub] of LOCATION_SQUEEZES) out = out.replace(re, sub)
+  return out
+}
+
+// Per-button GA4 EVENT NAME: <location>_<intent>_click, e.g.
+//   home_hero_free_trial_click        (Start Free Trial, homepage hero)
+//   home_final_cta_free_trial_click   (same button text, pre-footer)
+//   pricing_card_growth_click         (Growth tier card)
+//   pricing_header_login_click        (Log in, header while on /pricing)
+// Sent via GTM's dynamic-Event-Name tag ("GA4 Event - per button"), so every
+// button instance surfaces as its own row in GA4's Events report.
+export function buttonEvent(location: string, textOrIntent: string): string {
+  const prefixed = SHARED_LOCATIONS.has(location) ? `${pageSlug()}_${location}` : location
+  const loc = compactLocation(eventSafe(prefixed))
+  const name = `${loc}_${buttonIntent(textOrIntent)}_click`
+  return name.slice(0, 40).replace(/^_+|_+$/g, '')
 }
 
 export const analytics = {
@@ -94,7 +137,7 @@ export const analytics = {
       cta_location: location,
       cta_text: text,
       button_id: buttonId(location, text),
-      button_event: buttonEvent(location, 'book_demo')
+      button_event: buttonEvent(location, text)
     }),
 
   startTrial: (location: string, plan?: string, text = 'Start Free Trial') =>
@@ -103,7 +146,7 @@ export const analytics = {
       cta_location: location,
       cta_text: text,
       button_id: buttonId(location, text),
-      button_event: buttonEvent(location, 'start_trial'),
+      button_event: buttonEvent(location, text),
       ...(plan ? { plan_name: plan } : {})
     }),
 
@@ -113,7 +156,7 @@ export const analytics = {
       cta_location: location,
       cta_text: text,
       button_id: buttonId(location, text),
-      button_event: buttonEvent(location, 'free_score')
+      button_event: buttonEvent(location, text)
     }),
 
   pricingClick: (plan: string, location: string, text?: string) =>
