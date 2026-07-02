@@ -1070,7 +1070,7 @@ export default function ClovionVsPeecAiPage() {
       </Section>
 
       {/* FAQ ---------------------------------------------------------------- */}
-      <FAQAccordion headline="FAQ" items={faqs} trackLocation="compare_peec_faq" />
+      <FAQAccordion headline="FAQ" items={faqs} />
 
       {/* FINAL CTA ---------------------------------------------------------- */}
       <CTABanner
