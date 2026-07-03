@@ -9,7 +9,6 @@ import {
   HeroShade
 } from '@/components/ui'
 import { FAQAccordion } from '@/components/FAQAccordion'
-import { CTABanner } from '@/components/sections'
 import { DeepDive, type DeepDiveItem } from './DeepDive'
 
 export const metadata = {
@@ -489,7 +488,12 @@ export default function ClovionVsPeecAiPage() {
                   Clovion vs Peec AI
                 </span>
               </div>
-              <h1 className="display-lg mt-7 text-balance">Clovion vs Peec AI.</h1>
+              <h1
+                className="display-lg mt-7 lg:whitespace-nowrap"
+                style={{ fontSize: 'clamp(2.25rem, 3.6vw, 3rem)' }}
+              >
+                Clovion vs Peec AI.
+              </h1>
               <p
                 className="mt-5"
                 style={{
@@ -503,25 +507,10 @@ export default function ClovionVsPeecAiPage() {
                 Multi-engine AI visibility comparison
               </p>
               <p className="lead mt-7" style={{ color: 'var(--ink-70)' }}>
-                Clovion and Peec AI both help marketing teams track brand visibility across
-                AI-generated answers. The core difference is what happens after measurement. Peec
-                AI is strong for AI search analytics: prompts, models, projects, countries, daily
-                tracking, reporting, and unlimited users. Clovion is built for teams that need more
-                than a dashboard.
+                Both track brand visibility across AI-generated answers. The difference is what
+                happens after measurement: Peec AI reports the data; Clovion is built for teams that
+                need more than a dashboard.
               </p>
-              <div className="mt-10 flex flex-wrap gap-3">
-                <Button href="https://app.clovion.ai/signup" trackLocation="compare_peec_hero" size="lg">
-                  Start Free Trial <ArrowRight />
-                </Button>
-                <Button
-                  href="/free-ai-visibility-score"
-                  trackLocation="compare_peec_hero"
-                  size="lg"
-                  variant="secondary"
-                >
-                  Get Free Score
-                </Button>
-              </div>
             </div>
 
             {/* RIGHT — head-to-head matchup card */}
@@ -971,14 +960,20 @@ export default function ClovionVsPeecAiPage() {
                     <span
                       aria-hidden
                       style={{
-                        marginTop: 7,
+                        marginTop: 5,
                         flexShrink: 0,
-                        width: 7,
-                        height: 7,
+                        display: 'inline-flex',
+                        height: 22,
+                        width: 22,
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         borderRadius: 999,
-                        background: 'var(--ink-25)'
+                        background: 'var(--ink)',
+                        color: 'var(--white)'
                       }}
-                    />
+                    >
+                      <Check className="h-3 w-3" />
+                    </span>
                     <span style={{ fontSize: '0.98rem', lineHeight: 1.6, color: 'var(--ink-70)' }}>
                       <strong style={{ color: 'var(--ink)' }}>{it.lead}</strong> {it.body}
                     </span>
@@ -1072,16 +1067,64 @@ export default function ClovionVsPeecAiPage() {
       {/* FAQ ---------------------------------------------------------------- */}
       <FAQAccordion headline="FAQ" items={faqs} />
 
-      {/* FINAL CTA ---------------------------------------------------------- */}
-      <CTABanner
-        heading="Choose Clovion if your team wants more than visibility dashboards."
-        sub="Why choose Clovion"
-        body="Clovion is built to measure AI visibility per model, diagnose the cause of visibility gaps, prescribe the specific earnable fix, and re-measure whether the fix worked."
-        primary="Start Free Trial"
-        primaryHref="https://app.clovion.ai/signup"
-        secondary="Get Free Score"
-        secondaryHref="/free-ai-visibility-score"
-      />
+      {/* FINAL CTA — centered ---------------------------------------------- */}
+      <Section>
+        <Container>
+          <div
+            className="relative isolate overflow-hidden rounded-[28px] bg-ink text-white px-8 md:px-14 py-16 md:py-20 text-center"
+            data-track-location="compare_peec_final_cta"
+          >
+            <div
+              aria-hidden
+              className="absolute inset-0 -z-10 opacity-90"
+              style={{
+                background:
+                  'radial-gradient(ellipse 70% 80% at 50% 50%, rgba(10,10,15,0.18), transparent 65%)'
+              }}
+            />
+            <div className="grid-bg absolute inset-0 -z-10 opacity-50 mix-blend-overlay" aria-hidden />
+            <Eyebrow className="justify-center text-white/70">Why choose Clovion</Eyebrow>
+            <h2
+              className="mt-5 mx-auto text-balance"
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+                lineHeight: 1.12,
+                fontSize: 'clamp(1.9rem, 3.4vw, 2.6rem)',
+                maxWidth: 760
+              }}
+            >
+              Choose Clovion if your team wants more than visibility dashboards.
+            </h2>
+            <p
+              className="mt-6 mx-auto text-white/70"
+              style={{ fontSize: '1.02rem', lineHeight: 1.55, maxWidth: 840 }}
+            >
+              Clovion is built to measure AI visibility per model, diagnose the cause of visibility
+              gaps, prescribe the specific earnable fix, and re-measure whether the fix worked.
+            </p>
+            <div className="mt-9 flex flex-wrap justify-center gap-3">
+              <Button
+                href="https://app.clovion.ai/signup"
+                variant="primary"
+                size="lg"
+                trackLocation="compare_peec_final_cta"
+              >
+                Start Free Trial <ArrowRight />
+              </Button>
+              <Button
+                href="/free-ai-visibility-score"
+                variant="secondary"
+                size="lg"
+                trackLocation="compare_peec_final_cta"
+              >
+                Get Free Score
+              </Button>
+            </div>
+          </div>
+        </Container>
+      </Section>
     </>
   )
 }

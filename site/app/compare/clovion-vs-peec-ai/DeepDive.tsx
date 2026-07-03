@@ -7,15 +7,16 @@ import { useState } from 'react'
  * accordion). A topic rail selects one of the eight breakdown points; the
  * selected point's Clovion vs Peec AI comparison is always shown on the right.
  *
- * Why an explorer: the eight points carry a lot of verbatim copy. Showing them
- * all at once reads as a wall of text; hiding them behind a collapsed accordion
- * means nothing is visible by default. The explorer keeps one topic always open
- * (defaults to the first) while only ever showing a single point's text — calm,
- * premium, scannable. Mirrors the site's PillarStepper pattern.
+ * One topic is always open (defaults to the first) and only that point's text
+ * is on screen at a time — calm, premium, scannable. Mirrors the site's
+ * PillarStepper pattern.
  *
- * Dark-theme rules (Clovion brandbook): colours via var(--*) tokens only so they
- * flip under .clv-dark. Never put var(--*) inside a transition shorthand — inline
- * the literal cubic-bezier instead.
+ * Layout uses Tailwind utility classes (no runtime <style> tag): a
+ * client-injected <style> element hydrates its CSS text inconsistently and
+ * trips React hydration error #425, so all responsive rules live in classes.
+ *
+ * Dark-theme rules (Clovion brandbook): colours via var(--*) tokens only so
+ * they flip under .clv-dark.
  */
 
 export type DeepDiveItem = {
@@ -91,132 +92,115 @@ export function DeepDive({ items }: { items: DeepDiveItem[] }) {
   const single = item.peec.length === 0
 
   return (
-    <div>
-      <style>{`
-        .fx-explorer { display: grid; grid-template-columns: 1fr; gap: 28px; }
-        @media (min-width: 1024px) {
-          .fx-explorer { grid-template-columns: minmax(240px, 0.42fr) 1fr; gap: 48px; align-items: start; }
-        }
-        .fx-rail { display: flex; flex-direction: row; gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
-        .fx-rail::-webkit-scrollbar { display: none; }
-        .fx-item { flex: 0 0 auto; }
-        @media (min-width: 1024px) {
-          .fx-rail { flex-direction: column; overflow: visible; padding-bottom: 0; gap: 6px; }
-          .fx-item { width: 100%; }
-        }
-        .fx-title { display: none; }
-        @media (min-width: 1024px) { .fx-title { display: block; } }
-        .fx-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-        @media (min-width: 768px) { .fx-grid { grid-template-columns: 1fr 1fr; gap: 16px; } }
-        .fx-grid[data-single="true"] { grid-template-columns: 1fr; }
-        @keyframes fxfade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-        .fx-panel { animation: fxfade .38s cubic-bezier(0.16, 1, 0.3, 1); }
-        @media (prefers-reduced-motion: reduce) { .fx-panel { animation: none; } }
-      `}</style>
-
-      <div className="fx-explorer">
-        {/* Topic rail */}
-        <div className="fx-rail" role="tablist" aria-label="Feature breakdown topics">
-          {items.map((it, i) => {
-            const on = i === active
-            return (
-              <button
-                key={it.n}
-                type="button"
-                role="tab"
-                aria-selected={on}
-                onClick={() => setActive(i)}
-                className="fx-item"
+    <div className="grid grid-cols-1 gap-7 lg:grid-cols-[minmax(240px,0.42fr)_1fr] lg:items-start lg:gap-12">
+      {/* Topic rail — horizontal scroll on mobile, vertical list on desktop */}
+      <div
+        role="tablist"
+        aria-label="Feature breakdown topics"
+        className="flex flex-row gap-2 overflow-x-auto pb-1.5 lg:flex-col lg:gap-1.5 lg:overflow-visible lg:pb-0"
+        style={{ scrollbarWidth: 'none' }}
+      >
+        {items.map((it, i) => {
+          const on = i === active
+          return (
+            <button
+              key={it.n}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              onClick={() => setActive(i)}
+              className="flex shrink-0 items-center gap-3 rounded-[14px] px-4 py-3.5 text-left lg:w-full"
+              style={{
+                cursor: 'pointer',
+                border: '1px solid',
+                borderColor: on ? 'var(--line)' : 'transparent',
+                background: on ? 'var(--white)' : 'transparent',
+                boxShadow: on ? 'var(--shadow-soft)' : 'none',
+                whiteSpace: 'nowrap',
+                transition:
+                  'background .2s cubic-bezier(0.16, 1, 0.3, 1), border-color .2s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              <span
+                aria-hidden
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12,
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  border: '1px solid',
-                  borderColor: on ? 'var(--line)' : 'transparent',
-                  background: on ? 'var(--white)' : 'transparent',
-                  boxShadow: on ? 'var(--shadow-soft)' : 'none',
-                  borderRadius: 14,
-                  padding: '14px 16px',
-                  whiteSpace: 'nowrap',
-                  transition:
-                    'background .2s cubic-bezier(0.16, 1, 0.3, 1), border-color .2s cubic-bezier(0.16, 1, 0.3, 1)'
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.04em',
+                  color: on ? 'var(--ink)' : 'var(--ink-40)'
                 }}
               >
-                <span
-                  aria-hidden
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.8rem',
-                    letterSpacing: '0.04em',
-                    color: on ? 'var(--ink)' : 'var(--ink-40)'
-                  }}
-                >
-                  {it.n}
-                </span>
-                <span
-                  className="fx-title"
-                  style={{
-                    fontSize: '0.98rem',
-                    fontWeight: 600,
-                    letterSpacing: '-0.01em',
-                    color: on ? 'var(--ink)' : 'var(--ink-60)'
-                  }}
-                >
-                  {it.title}
-                </span>
-              </button>
-            )
-          })}
+                {it.n}
+              </span>
+              <span
+                className="hidden lg:block"
+                style={{
+                  fontSize: '0.98rem',
+                  fontWeight: 600,
+                  letterSpacing: '-0.01em',
+                  color: on ? 'var(--ink)' : 'var(--ink-60)'
+                }}
+              >
+                {it.title}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Active topic panel */}
+      <div role="tabpanel">
+        <div
+          style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: item.intro ? 18 : 22 }}
+        >
+          <span
+            aria-hidden
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'clamp(1.8rem, 3vw, 2.4rem)',
+              lineHeight: 1,
+              color: 'rgb(var(--ink-rgb) / 12%)'
+            }}
+          >
+            {item.n}
+          </span>
+          <h3
+            style={{
+              margin: 0,
+              fontFamily: 'var(--font-display)',
+              fontSize: '1.5rem',
+              fontWeight: 600,
+              letterSpacing: '-0.01em',
+              color: 'var(--ink)'
+            }}
+          >
+            {item.title}
+          </h3>
         </div>
 
-        {/* Active topic panel */}
-        <div className="fx-panel" key={active} role="tabpanel">
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: item.intro ? 18 : 22 }}>
-            <span
-              aria-hidden
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: 'clamp(1.8rem, 3vw, 2.4rem)',
-                lineHeight: 1,
-                color: 'rgb(var(--ink-rgb) / 12%)'
-              }}
-            >
-              {item.n}
-            </span>
-            <h3
-              style={{
-                margin: 0,
-                fontFamily: 'var(--font-display)',
-                fontSize: '1.5rem',
-                fontWeight: 600,
-                letterSpacing: '-0.01em',
-                color: 'var(--ink)'
-              }}
-            >
-              {item.title}
-            </h3>
-          </div>
+        {item.intro && (
+          <p
+            style={{
+              margin: '0 0 20px',
+              fontSize: '1rem',
+              lineHeight: 1.6,
+              color: 'var(--ink)',
+              maxWidth: 760
+            }}
+          >
+            {item.intro}
+          </p>
+        )}
 
-          {item.intro && (
-            <p
-              style={{
-                margin: '0 0 20px',
-                fontSize: '1rem',
-                lineHeight: 1.6,
-                color: 'var(--ink)',
-                maxWidth: 760
-              }}
-            >
-              {item.intro}
-            </p>
-          )}
-
-          <div className="fx-grid" data-single={single ? 'true' : 'false'}>
-            <SideBlock label="Clovion AI" paragraphs={item.clovion} emphasized />
-            {!single && <SideBlock label="Peec AI" paragraphs={item.peec} />}
-          </div>
+        <div
+          className={
+            single
+              ? 'grid grid-cols-1 gap-3.5'
+              : 'grid grid-cols-1 gap-3.5 md:grid-cols-2 md:gap-4'
+          }
+        >
+          <SideBlock label="Clovion AI" paragraphs={item.clovion} emphasized />
+          {!single && <SideBlock label="Peec AI" paragraphs={item.peec} />}
         </div>
       </div>
     </div>
