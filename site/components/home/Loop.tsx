@@ -1,5 +1,6 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import { Button, Container, ArrowRight } from '@/components/ui'
 import { TypingHeadline } from './TypingHeadline'
 import { openCalendly } from '@/lib/openCalendly'
@@ -28,13 +29,20 @@ const NODES = [
 export function Loop() {
   return (
     <section
-      className="py-16 md:py-28"
+      className="clv-dark py-16 md:py-28"
+      data-track-location="home_loop"
       style={{
+        // Dark band on the light homepage. .clv-dark scopes dark tokens so the
+        // node cards, on-ink text, and white primary button render as designed,
+        // while --bg is pinned to the light page tone so the band fades softly
+        // into the sections above/below. The dot-grid below is the band's own
+        // texture (a tile shade) — the main white canvas itself stays flat.
+        ['--bg' as string]: '#FAF9F7',
         position: 'relative',
         background: 'linear-gradient(to bottom, var(--bg) 0%, var(--ink-surface) 8%, var(--ink-surface) 92%, var(--bg) 100%)',
         color: 'var(--on-ink)',
         overflow: 'hidden'
-      }}
+      } as CSSProperties}
     >
       <div
         aria-hidden
@@ -138,7 +146,8 @@ export function Loop() {
           <Button
             variant="ghost"
             size="lg"
-            trackLocation="home_loop"
+            // No trackLocation: openCalendly pushes book_demo already —
+            // trackLocation would double-fire cta_click on the same click.
             onClick={(e) => {
               e.preventDefault()
               openCalendly('home_loop')

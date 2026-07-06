@@ -8,10 +8,11 @@ import { ThemeShell } from '@/components/ThemeShell'
 import { RouteTracker } from '@/components/RouteTracker'
 
 // Inline pre-hydration script — applies the .clv-dark scope synchronously
-// for routes that ship dark (currently just `/`) so the body bg paints
-// black from the first frame instead of cream→black flickering after
-// ThemeShell's useEffect runs. Mirrors ThemeShell's DARK_ROUTES set.
-const themeBootstrap = `(function(){try{var p=location.pathname;var pre=['/blog','/news','/webinars','/resources','/faq','/compare','/alternatives','/docs','/legal','/tools'];var darkPre=pre.some(function(x){return p===x||p.indexOf(x+'/')===0;});if(p==='/'||p==='/features/ai-visibility-tracking'||p==='/features/geo-improvement-suggestions'||p==='/features/sentiment-analysis'||p==='/features/brand-perception'||p==='/features/fanout-query'||p==='/features/ai-crawlability'||p==='/features/platform-coverage'||p==='/pricing'||p==='/affiliate'||p==='/free-ai-visibility-score'||p==='/customers'||p==='/about'||p==='/changelog'||p==='/blog'||p==='/blog/category/geo'||p==='/blog/category/ai-search'||p==='/blog/category/seo'||darkPre)document.documentElement.classList.add('clv-dark');}catch(_){}})();`
+// for routes that ship dark so the body bg paints black from the first frame
+// instead of cream→black flickering after ThemeShell's useEffect runs.
+// Mirrors ThemeShell's DARK_ROUTES set. NOTE: `/` is intentionally absent —
+// the homepage ships LIGHT (#FAF9F7); see app/page.tsx.
+const themeBootstrap = `(function(){try{var p=location.pathname;var pre=['/blog','/news','/webinars','/resources','/faq','/compare','/alternatives','/docs','/legal','/tools'];var darkPre=pre.some(function(x){return p===x||p.indexOf(x+'/')===0;});if(p==='/features/ai-visibility-tracking'||p==='/features/geo-improvement-suggestions'||p==='/features/sentiment-analysis'||p==='/features/brand-perception'||p==='/features/fanout-query'||p==='/features/ai-crawlability'||p==='/features/platform-coverage'||p==='/pricing'||p==='/affiliate'||p==='/free-ai-visibility-score'||p==='/customers'||p==='/about'||p==='/changelog'||p==='/blog'||p==='/blog/category/geo'||p==='/blog/category/ai-search'||p==='/blog/category/seo'||darkPre)document.documentElement.classList.add('clv-dark');}catch(_){}})();`
 
 // Microsoft Clarity — session recordings + heatmaps. Project x8d3ot6py2.
 // Loads asynchronously; the snippet queues calls until the remote script
