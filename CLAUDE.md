@@ -132,7 +132,8 @@ Override the auto-detect with explicit `trackEvent` (e.g. pricing tier cards use
 | Pricing comparison table CTAs | `components/pricing/ComparisonTable.tsx` | `pricing_table` + per-tier `plan_name` |
 | Each marketing page hero / end CTA | the page's own `page.tsx` | `<page>_hero`, `<page>_final_cta`, etc. |
 | Free-score form submit | `components/free-score/FeatureContent.tsx` (Hero.handleSubmit) | `free_score_page`, `free_score_hero` |
-| Lead-capture gate (modal opens when the visitor clicks the scan submit button on `/free-ai-visibility-score` AND `localStorage.clv_lead_captured !== '1'`; the typed domain is stashed as `pendingDomain` and the scan auto-resumes after `POST /api/lead` 2xx sets the flag) | `components/free-score/FeatureContent.tsx` + `LeadCaptureModal` (locally mounted, controlled API: `{ open, onClose, onSuccess }`) | n/a (form-submit event handled by `LeadCaptureModal`) |
+| Free-score lead gate (submit-time gate on `/free-ai-visibility-score`; opens `EmailGate` + Turnstile widget when the visitor clicks the scan submit AND `localStorage.clv_lead_captured !== '1'`; the typed domain is stashed as `pendingDomain` and the scan auto-resumes after the gate submits; env-flag-gated via `NEXT_PUBLIC_FREE_SCORE_REQUIRE_GATE=1`) | `components/free-score/FeatureContent.tsx` + `EmailGate.tsx` + `TurnstileWidget.tsx` | n/a (form-submit tracked inside `EmailGate`) |
+| Free-tool lead gate (per-tool modal opens on EVERY submit — no localStorage persistence; POSTs `{name, email, turnstileToken, tool}` to `/api/tool-lead`, which forwards to the SAME Make webhook the free-score uses with a per-tool event name) | `components/tools/shared/ToolLeadModal.tsx` + `components/tools/shared/useToolLeadGate.ts` (in each tool's `FeatureContent.tsx`: `const gate = useToolLeadGate(); … <ToolLeadModal tool="<slug>" open={gate.open} onClose={gate.close} onSuccess={gate.success} />`) | n/a (form-submit tracked inside `ToolLeadModal`) |
 | Talk-to-Sales buttons (all 8 across pricing + legal + comparison/alt/feature CTABanners) | see "Talk-to-Sales → Calendly" section below | `pricing_card`, `pricing_table`, `pricing_faq`, `pricing_final_cta`, `legal_terms`, `final_cta` |
 
 **Pricing tier CTAs live in a client island.** `app/pricing/page.tsx` is a server component (server wrapper + JSON-LD); the per-tier CTAs are rendered inside `components/pricing/PricingTiers.tsx` (a client island). The older `app/pricing/PricingTiers.tsx` is an intentional orphan from the rebuild — kept on disk, no longer imported. **Enterprise tier CTA** does not navigate — it opens the Calendly popup (see "Talk-to-Sales → Calendly" section).
@@ -173,50 +174,106 @@ Every "Talk to Sales" / "Talk to sales" CTA opens the Calendly **PopupWidget** (
 
 **stale `lib/content.ts` data:** `pricingTiers[i].cta === 'Talk to sales'` and `app/pricing/PricingTiers.tsx`'s `tier.cta === 'Talk to sales' → CALENDLY_URL` are intentional orphans (old code path, no longer rendered). Real wiring lives in `components/pricing/PricingTiers.tsx`.
 
-## Free AI Visibility Score backend
+## Free AI Visibility Score backend (v2 — native OpenAI + Redis)
 
-The `/free-ai-visibility-score` page is interactive — users type a domain, hit submit, and see a real scored breakdown.
+The `/free-ai-visibility-score` page is interactive — users type a domain, hit submit, and see a real scored breakdown. Rewritten from the ground up in PR #29: **the legacy `/api/free-score` route (OpenRouter-based, in-memory caches) is DELETED.** The new implementation lives in `/api/scan` and its supporting `lib/freeScore/*` layer.
 
-### Backend — `site/app/api/free-score/route.ts`
+### Backend — `site/app/api/scan/route.ts`
 
-POST endpoint, Node runtime, `maxDuration = 60`. Hardened in commit `7f34376` after the original implementation returned identical templated scores (45 with 40/60/30/50 subscores) for any unknown brand — the model collapsed to a memory template instead of grounding in fresh web search. Current pipeline:
+POST endpoint, Node runtime, `maxDuration = 60`, `dynamic = 'force-dynamic'`. Native OpenAI `gpt-4o-mini` via `lib/openai.ts` — web-grounded, single engine (ChatGPT), consolidated to ~2 web searches per scan (was 8 in v1 → cost dropped ~5×). Pipeline:
 
-1. **Rate limit by IP first** (cheapest reject). In-memory token bucket on `globalThis.__clvIpRateLimit`, **5 req / 60s / IP**. Returns `429` with `Retry-After` header. IP comes from `x-forwarded-for` then `x-real-ip` then `'unknown'`.
-2. **Validate body** — JSON body must contain `domain: string`, non-empty.
-3. **Normalize + validate domain** — `validateDomain()` lowercases, strips protocol/www/path, then rejects: empty, length > 253, fails `/^[a-z0-9.-]+\.[a-z]{2,}$/i`, **literal IPv4 (`^\d+\.\d+\.\d+\.\d+`), localhost / RFC1918 ranges (`127.`/`10.`/`172.16-31.`/`192.168.`)**. SSRF defence — model could otherwise be told to research internal hostnames.
-4. **Cache hit** — `globalThis.__clvDomainCache` Map keyed by normalized domain, **24h TTL**. Returns `{ domain, result, cached: true }` instantly (~20ms vs ~8s fresh).
-5. **Call OpenRouter** via `callModel()` — `openai/gpt-4o` (no `:online` suffix; we use explicit `plugins: [{ id: 'web', max_results: 8 }]` so the web tool is forced per request, not a memory shortcut). Temperature 0.6 on first pass. Wrapped in `AbortController` with **25s timeout** → maps to `504`. **`JSON.stringify(domain)` in the user prompt** to neutralise newline-based prompt injection. **`MAX_RESPONSE_BYTES = 100_000`** size guard before `JSON.parse` (memory-bomb defence).
-6. **`validateShape()`** — hard checks: 4 subscores, 4 platforms, ≥1 prompt, ≥1 recommendation, all numeric fields finite + in `[0, 100]`. Malformed → 502.
-7. **`detectTemplate()`** — smell-counting validator. Smells: `score === 45`, all subscores mid-band multiples of 5, all platform scores mid-band multiples of 5, recommendation lift triplet matches a known canonical (`8/5/3`, `11/7/4`, `12/8/5`, `10/6/3`, `9/6/3`, `10/5/3`, `9/5/3`, `7/5/3`, `7/4/3`, `6/4/3`), lifts in tight-clustering small-integer pattern, evidence_excerpts missing/under-2, brand name absent from any evidence excerpt. **Rejects only at smells >= 3** so a legitimately-round value for a well-known brand doesn't false-positive.
-8. **`normalizeStrong()`** — enforces `strong = score >= 70` per platform deterministically (the model occasionally ignores its own rule and sets `strong:true` at 69).
-9. **Retry on template** — second call at temperature 0.9 with `--- RETRY CONTEXT ---` addendum quoting the specific rejection reason, same `openai/gpt-4o` model (`perplexity/sonar-pro` retry was tried but returns 400 on `response_format: json_object`).
-10. **Cache + return.** Confidence-passing results are cached; "both attempts templated" results are returned but **not cached** so the next request gets a fresh chance.
+1. **Rate limit by IP** — token bucket via `checkRateLimit` in `lib/freeScore/store.ts`. **5 req / 60s / IP**. Redis-backed when `REDIS_URL` is set (shared across replicas); in-memory `Map` fallback otherwise. Every Redis op is wrapped so a Redis failure degrades to the in-memory path instead of throwing — Redis is an accelerator, not a system of record. Returns `429` with `Retry-After` header.
+2. **Validate + normalize domain** — `normalizeDomain` + `validateDomain` in `lib/freeScore/validate.ts`. Strips protocol/www/path, lowercases, rejects empty / length > 253 / bad regex / **literal IPv4** / **localhost + RFC1918 ranges** (`127.`/`10.`/`172.16-31.`/`192.168.`). SSRF defence.
+3. **Gate cookie (optional)** — when `FREE_SCORE_REQUIRE_GATE=1`, the endpoint expects a signed `SCAN_COOKIE` set by `EmailGate` after a successful lead submit. Verified via `verifyScanToken` from `lib/freeScore/scanToken.ts`. No cookie + gate required → `401`.
+4. **Cache hit** — `getCached(domain)` from `lib/freeScore/store.ts`. Keys: `scan:result:<domain>` in Redis / in-memory. **24h TTL** (`CACHE_TTL_S`). Returns cached result instantly.
+5. **Spend cap** — `getDailySpend()` checks the day's LLM spend against a cap (env-configurable). Over cap → `503`. Prevents runaway costs.
+6. **Single-flight lock** — `acquireLock(domain)` prevents duplicate concurrent scans on the same domain across the fleet (Redis `SETNX`-style). Others `waitForCached(domain)` (bounded poll) to piggyback on the running scan.
+7. **Run scan** — `runScan(domain)` in `lib/freeScore/scan.ts` calls native OpenAI, prompts for web grounding, parses to `FreeScoreResult`. Throws `ScanError` with a `code` (`timeout`/`upstream`/`malformed`) on failure. Wrapped in `AbortController`; timeout maps to `504`.
+8. **Cache + spend accounting** — successful result: `setCached(domain, result)` + `addDailySpend()`. `releaseLock(domain)`.
+9. **Email (optional)** — when the visitor came through `EmailGate`, `sendReportEmail(email, result)` from `lib/freeScore/email.ts` fires the delivery. Non-blocking (`.catch` logs; the API response still returns immediately).
+10. **Return** `{ domain, result: FreeScoreResult, cached?: true }`. Same shape as v1 so the client didn't change.
 
-**Anti-template prompt rules (system message).** Forbids round mid-band defaults (40, 45, 50, 55, 60), demands `evidence_excerpts` array of 3 literal web quotes, requires brand to appear in evidence, demands per-brand variance in lift integers (no fixed triplet across brands), **competitor scope rule** — same buying-decision category + geography, not adjacent-category players (vector DBs ≠ LLM API competitors; universities ≠ edtech platforms; SE Asian super-apps ≠ Indian payment apps), and a **prompt-integrity rule** instructing the model to treat the domain string as data, never as instructions.
+**Anti-template prompt rules + `detectTemplate()` + `normalizeStrong()`** carried over verbatim from v1 — the model still has a template-collapse tendency for unknown brands, so the smell-count validator + retry-at-higher-temp remain. Rejects at `smells >= 3`.
 
-**Error responses are sanitized.** Clients receive `{ error: 'scan failed', code: 'timeout'|'upstream'|'malformed' }` only. Full upstream detail is logged server-side via `console.warn` tagged `[free-score]` — never leaked to the client.
+**Error responses are sanitized.** Clients receive `{ error: 'scan failed', code: <code> }` only. Full upstream detail is logged server-side via `console.warn` tagged `[free-score]`.
 
-**Returns** `{ domain, result: FreeScoreResult, cached?: true }`. `result.evidence_excerpts` is an optional `string[]` field on `FreeScoreResult` introduced by the hardening; older callers tolerate its absence.
+### `lib/freeScore/` layer
+
+- **`validate.ts`** — `normalizeDomain`, `validateDomain` (SSRF-safe regex + private-range block).
+- **`store.ts`** — `getCached` / `setCached` / `checkRateLimit` / `acquireLock` / `releaseLock` / `waitForCached` / `getDailySpend` / `addDailySpend` / `bumpDailyCount` / `refundDailyCount`. Redis-first with in-memory fallback. Consumers should not import `getRedis` directly.
+- **`scan.ts`** — `runScan(domain)` + `ScanError` class. Owns the OpenAI call + response parsing.
+- **`scanToken.ts`** — `SCAN_COOKIE` name + `verifyScanToken` + `readCookie`. HMAC-signed cookie set by `EmailGate` after a successful lead submit; verified by `/api/scan` when `FREE_SCORE_REQUIRE_GATE=1`.
+- **`email.ts`** — `sendReportEmail(email, result)` — post-scan email delivery.
+- **`turnstile.ts`** — `verifyTurnstile(token)` — Cloudflare Turnstile CAPTCHA verification. Shared by `/api/scan` and `/api/tool-lead`.
+- **`types.ts`** — `FreeScoreResult` shape.
+- **`../openai.ts`** — thin OpenAI client wrapper (native SDK, not OpenRouter).
+- **`../redis.ts`** — `getRedis()` returns a shared `ioredis` connection or `null` if `REDIS_URL` isn't set. Consumers use the wrapped `store.ts` helpers; no one should import `getRedis` outside `store.ts` (nor `turnstile.ts` if it needs a store).
 
 ### Frontend — `site/components/free-score/FeatureContent.tsx` + sub-components
 
-Form state (`stage`, `domain`, `submittedDomain`, `stepIndex`, `scanResult`, `scanError`). Two useEffects watch `stage === 'analyzing'`: one walks the mock step indicator, the other fires the real fetch and owns the stage transition. Mock `SCORE / SUBSCORES / PLATFORMS / SAMPLE_PROMPTS / RECOMMENDATIONS` constants render only during idle/analyzing — production scan results take over via length-aware fallback patterns like `(scanResult?.subscores && scanResult.subscores.length === 4) ? scanResult.subscores : SUBSCORES` (the old plain `??` fall-through on empty arrays was patched in the same commit).
+Client state: `stage` (`'idle' | 'analyzing' | 'result'`), `domain`, `submittedDomain`, `scanResult`, `scanError`, `pendingDomain` (deferred-scan buffer for the lead gate). Scan endpoint driven by `NEXT_PUBLIC_FREE_SCORE_ENDPOINT` (defaults to `/api/scan`); gate driven by `NEXT_PUBLIC_FREE_SCORE_REQUIRE_GATE`.
 
-`isValidDomain()` mirrors the backend regex exactly so obviously-invalid inputs don't round-trip the API for a generic 400. The "Try: notion.so" pill is guarded against `stage === 'analyzing'` so a mid-scan click can't restart the effect.
-
-**Sub-component patches in the same commit:**
-- `ScoreDial.tsx` — `Number.isFinite` guard + `Math.max(0, Math.min(100, score))` clamp on the arc math; an undefined or out-of-range score no longer produces NaN paths.
-- `PromptCards.tsx` — `escapeForRegex()` helper on `brandWord` before constructing the `HighlightedExcerpt` RegExp. Brands containing `.`, `+`, etc. (e.g. "Booking.com", "C++") used to throw or mis-match. Empty-brand guard added.
+Sub-components under `components/free-score/`:
+- **`EmailGate.tsx`** — the submit-time lead form for the free-score page. Collects email + optional details, mounts `TurnstileWidget`, POSTs to a lead endpoint (writes the signed `SCAN_COOKIE` when `REQUIRE_GATE=1`), then invokes `onSuccess()` so the parent resumes the deferred scan with `pendingDomain`. Sets `localStorage.clv_lead_captured = '1'` so returning visitors skip the gate.
+- **`TurnstileWidget.tsx`** — thin wrapper around Cloudflare Turnstile's client script; renders the invisible/managed challenge and exposes the token via callback. Reused by `ToolLeadModal.tsx`.
+- **`ScoreDial.tsx`**, **`SubscoreCards.tsx`**, **`PromptResults.tsx`**, **`PromptCards.tsx`**, **`RecommendationList.tsx`** — result visual sub-components. `ScoreDial` has `Number.isFinite` guard + `[0,100]` clamp so an undefined/out-of-range score doesn't produce NaN arc paths. `PromptCards` uses `escapeForRegex` on brand words before constructing the highlight regex (so "Booking.com" / "C++" don't blow up).
+- **`ThankYou.tsx`** — post-submit state (visible after `EmailGate.onSuccess` if the report is being emailed rather than shown inline).
 
 ### Env + ops
 
-- **`OPENROUTER_API_KEY`** in `site/.env.local` for dev; Railway env var for prod. Missing key → `503 service unavailable` (no longer the leak-y 500 message it used to be).
-- **In-memory caches / rate-limit are per-instance.** Railway currently runs a single replica, so this works. If you ever scale to multiple replicas, move both maps to Redis or shared SQLite (the admin console's better-sqlite3 setup on `feat/console-foundation` is the obvious home).
-- **Header gotcha (historical):** the `X-Title` header sent to OpenRouter must be pure ASCII — an em-dash (U+2014) crashes the `Headers` constructor. We use `-` or `|`, not `—`.
+- **`OPENAI_API_KEY`** in `site/.env.local` for dev, Railway env var for prod. `OPENROUTER_API_KEY` from v1 is no longer used and can be removed. Missing key → `503`.
+- **`REDIS_URL`** — optional; enables shared cache + rate-limit + spend caps across replicas. Without it, in-memory fallback (single-replica safe only).
+- **`TURNSTILE_SECRET_KEY`** (server) + **`NEXT_PUBLIC_TURNSTILE_SITE_KEY`** (client) — Cloudflare Turnstile.
+- **`LEAD_WEBHOOK_URL`** — Make.com webhook receiving both free-score leads AND per-tool leads (see `/api/tool-lead` section below). Falls back to a hard-coded URL if unset.
+- **`FREE_SCORE_REQUIRE_GATE`** (server) + **`NEXT_PUBLIC_FREE_SCORE_REQUIRE_GATE`** (client) — flag-gate the whole EmailGate flow. Set to `1` to enforce; unset / `0` skips the gate entirely.
+- **`NEXT_PUBLIC_FREE_SCORE_ENDPOINT`** — override the scan endpoint URL (defaults to `/api/scan`). Useful for pointing staging at prod's scan service.
 
 ### Costs (rough)
 
-`openai/gpt-4o` + 8-result web plugin = ~$0.07 per uncached scan. Cache hits are ~$0. Retry on template doubles the cost when it fires (we observed it fires on roughly 2–4 % of unknown-brand scans).
+Native OpenAI `gpt-4o-mini` + web-grounded, ~2 searches per scan = **~$0.01–0.02 per uncached scan** (v1 was ~$0.07 with gpt-4o + 8-result plugin — roughly 5× cheaper at similar quality for this task). Cache hits are ~$0. `getDailySpend` + `addDailySpend` in `store.ts` track a daily budget cap that returns `503` when hit.
+
+## Free-tool backend (real crawlers) — `/api/tools/*` + `/api/tool-lead`
+
+The four `/tools/*` pages (llms.txt Generator / AI Crawlability Checker / Robots.txt AI Bot Checker / Query Fan-Out Generator) are **real crawlers** (PR #29 replaced the hardcoded-mock UI shells). Each has its own endpoint under `/api/tools/<slug>` that fetches the target URL server-side, parses/analyzes, and returns a structured JSON result the client renders.
+
+### Endpoints
+
+- **`/api/tools/robots`** — fetches `https://<domain>/robots.txt`, parses user-agent groups + Allow/Disallow rules, computes per-AI-bot Allow/Block/Indeterminate status for 15 known bots (GPTBot, ClaudeBot, PerplexityBot, Google-Extended, CCBot, Applebot-Extended, Bytespider, etc.).
+- **`/api/tools/crawlability`** — fetches the target URL, checks robots.txt + `<meta name="robots">` + `X-Robots-Tag` header + rendering-detection heuristics; returns a per-bot readout of whether the page is truly reachable.
+- **`/api/tools/llms-txt`** — inspects the site for existing `llms.txt` / suggested sections; generates a well-formed `llms.txt` draft.
+- **`/api/tools/fanout`** — expands a seed query into intent-grouped sub-queries (calls OpenAI).
+
+### Shared server layer — `lib/tools/`
+
+- **`fetch.ts`** — SSRF-safe fetch (same private-range / IP blocklist as `freeScore/validate.ts`, redirect-following with cap, timeout, response-size cap).
+- **`html.ts`** — HTML parsing helpers (meta-tag extraction, X-Robots-Tag header parsing, canonical detection).
+- **`robots.ts`** — RFC 9309-ish robots.txt parser + per-user-agent matcher used by `/api/tools/robots` and `/api/tools/crawlability`.
+
+### Lead capture — `/api/tool-lead`
+
+Every tool is gated by a lead form on EVERY submit (no localStorage persistence — user preference: "gate every time"). Endpoint collects `{ name, email, turnstileToken, tool }`, verifies the Turnstile challenge server-side via `lib/freeScore/turnstile.ts`, then forwards to the **same Make.com webhook** as the free-score with a per-tool event name:
+
+- `robots-checker` → `robots_txt_checked`
+- `ai-crawlability-checker` → `ai_crawlability_checked`
+- `fanout` → `fanout_query_run`
+- `llms-txt-generator` → `llms_txt_generated`
+
+All tool leads land in the same downstream scenario alongside free-score leads.
+
+### Shared client layer — `components/tools/shared/`
+
+- **`useToolLeadGate.ts`** — the "gate every time" hook. `useToolLeadGate()` returns `{ open, request(action), success, close }`. Usage inside a tool's `FeatureContent.tsx`:
+  ```
+  const gate = useToolLeadGate()
+  // In submit handler, after input validation:
+  gate.request(() => runTheScan())
+  // Render:
+  <ToolLeadModal tool="robots-checker" open={gate.open}
+    onClose={gate.close} onSuccess={gate.success} />
+  ```
+  The `success` callback closes the modal, then invokes the stashed action so the scan runs immediately after the lead lands.
+- **`ToolLeadModal.tsx`** — the shared modal. Collects `{ name, email }`, mounts `TurnstileWidget` from `components/free-score/`, POSTs `/api/tool-lead`. Dark-brand styled (`CLOVION_LOGO` header, Clovion palette). Per-tool title + CTA copy in `TOOL_COPY` map.
+- **`ToolResultModal.tsx`** — dark result modal used by tools to render their per-tool result payload.
 
 ## Section seam blending (dark routes)
 
@@ -289,7 +346,7 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 /customers                                     (DARK — components/customers/*, LogoWall hero mock + filter grid + testimonials + FAQ)
 /docs
 /docs/getting-started
-/free-ai-visibility-score                      (DARK — components/free-score/*, interactive scan via /api/free-score)
+/free-ai-visibility-score                      (DARK — components/free-score/*, interactive scan via /api/scan — see "Free AI Visibility Score backend" section)
 /about
 /changelog
 /legal/privacy
@@ -309,7 +366,24 @@ The dark feature pages all share the same architecture: a server `page.tsx` expo
 
 Plus `<ChromeHeader />` + `<ChromeFooter />` gates (pick light or dark chrome by pathname), `<ThemeShell />` (toggles `.clv-dark` on `<html>` for SPA navigations), an inline pre-hydration `<script>` that synchronously sets `.clv-dark` based on a path check that matches all dark routes, **Google Tag Manager** + **Google Analytics 4** (via `@next/third-parties/google`), **Microsoft Clarity** + **Meta Pixel** + **LinkedIn Insight Tag** (inline IIFE bootstraps in `<head>` + matching `<noscript><img>` fallbacks at the top of `<body>`), and SEO/verification metadata. `<html suppressHydrationWarning>` is intentional — the bootstrap script mutates className before React hydration. See the dark-theme architecture section below for the full scoping story.
 
-**Lead-capture gate lives on the feature — and triggers at submit time, not on page mount.** The `LeadCaptureModal` is **no longer mounted globally in `app/layout.tsx`** and the old document-level capture-phase click interceptor has been **removed** — "Get Free Score" CTAs across the site now navigate normally to `/free-ai-visibility-score` (no `preventDefault`, no synthetic click trap). Landing on the page is **frictionless**: the hero, domain input, feature blocks, and FAQ all render fully interactive — no auto-modal. The gate triggers **only when the visitor clicks the scan submit button** (`Get my free score`). At submit time, `Hero.handleSubmit` reads `localStorage.getItem('clv_lead_captured')` — if `'1'`, the scan runs immediately; otherwise it stashes the typed domain as `pendingDomain` and opens the modal. After a successful `/api/lead` 2xx, `LeadCaptureModal.onSuccess` writes the flag, closes the modal, and the parent auto-resumes the deferred scan (`setSubmittedDomain(pendingDomain) + setStage('analyzing')`). Returning visitors (flag already set) skip the modal entirely — their submit runs the scan directly. Modal X-close is non-destructive: `pendingDomain` clears and the page stays fully interactive so the visitor can re-submit whenever. Direct URL hits (bookmark, organic) get the same treatment — the gate is on the submit event, not the click path or the page load. **`LeadCaptureModal` API is controlled**: `{ open, onClose, onSuccess }`; the modal itself owns the form fields + `/api/lead` POST + localStorage flag write. It never calls `router.push`.
+**Lead-capture gates live on the features — and trigger at submit time. There are TWO independent gates:**
+
+**1. Free-score gate (`/free-ai-visibility-score` — `EmailGate` + Turnstile + optional cookie)**. The old global `<LeadCaptureModal />` mount in `app/layout.tsx` + document-level capture-phase click interceptor were **removed**; "Get Free Score" CTAs across the site now navigate normally. Landing on the page is **frictionless** — hero, input, feature blocks, FAQ all render fully interactive. The gate triggers **only when the visitor clicks the scan submit** (`Get my free score`). At submit time, `Hero.handleSubmit` reads `localStorage.getItem('clv_lead_captured')` — if `'1'`, the scan runs immediately; otherwise it stashes the typed domain as `pendingDomain` and mounts `EmailGate.tsx` + `TurnstileWidget.tsx`. After a successful lead submit, `EmailGate.onSuccess` sets `localStorage.clv_lead_captured = '1'` (and the signed `SCAN_COOKIE` server-side when `FREE_SCORE_REQUIRE_GATE=1`), then the parent resumes the deferred scan (`setSubmittedDomain(pendingDomain) + setStage('analyzing')`). Returning visitors skip the gate entirely. Env-flag: `NEXT_PUBLIC_FREE_SCORE_REQUIRE_GATE=1` enforces it; unset skips. See "Free AI Visibility Score backend" section for the full server pipeline.
+
+**2. Free-tool gate (`/tools/*` — `ToolLeadModal` + `useToolLeadGate` + Turnstile, NO persistence)**. Every one of the four tool pages (`robots-checker`, `ai-crawlability-checker`, `fanout`, `llms-txt-generator`) gates its scan behind a lead form on **EVERY submit** — user preference: "gate every time", no localStorage skip. Pattern inside each tool's `FeatureContent.tsx`:
+
+```
+const gate = useToolLeadGate()   // { open, request, success, close }
+// Submit handler, after input validation:
+gate.request(() => runTheScan())
+// Render:
+<ToolLeadModal tool="robots-checker" open={gate.open}
+  onClose={gate.close} onSuccess={gate.success} />
+```
+
+`ToolLeadModal` collects `{ name, email, turnstileToken }`, POSTs to `/api/tool-lead` (server-side Turnstile verify + Make webhook forward), then `gate.success` closes the modal and invokes the stashed action. See "Free-tool backend (real crawlers)" section for the endpoints + shared server layer.
+
+**The old `LeadCaptureModal.tsx` component is retained** as a legacy building block (imported by neither gate — free-score uses `EmailGate`, tools use `ToolLeadModal`) but may be pruned in a future cleanup. Don't wire new features to it.
 
 ### Component layers
 
@@ -552,7 +626,7 @@ User-confirmed preferences. Treat as load-bearing:
 - **Saans-TRIAL-SemiBold is the typography for UI + headings.** Paragraphs on the 6 dark feature/pricing/affiliate pages use **Hanken Grotesk 400** via the `.clv-ai-vis-page p` scoped rule (Saans ships only SemiBold; Hanken gives true regular weight for body copy). All other pages still use Saans SemiBold for everything.
 - **Homepage hero emphasizes via a rotating engine logo, not a gradient.** Headline reads `See how AI {RotatingLogo} sees your brand` (no period). Dark feature pages use a TypingHeadline cycle. Light pages use plain ink headlines — no gradients, no rotating logos.
 - **Hero headlines are ≤5 words on light routes.** Dark feature pages have longer typed headlines (e.g. "See how one prompt becomes many.", "Make your site readable to AI.") — that's intentional for those pages.
-- **CTAs are title-cased.** "Start Free Trial" → `https://app.clovion.ai/signup` (same-tab, in-product); "Get Free Score" → `/free-ai-visibility-score` (the **page itself** gates lead capture, but only at submit time — landing on the page is frictionless; the modal opens when the visitor clicks the scan submit button AND `localStorage.clv_lead_captured !== '1'`, then the deferred scan auto-resumes after a successful `/api/lead` submit); "Log in" → `https://app.clovion.ai/login`; "Sign up" → `https://app.clovion.ai/signup`; "Talk to Sales" / "Talk to an Expert" → Calendly PopupWidget (see "Talk-to-Sales → Calendly" section). Button analytics matcher is case-insensitive (`text.toLowerCase().includes('free trial')`) so old lowercase still routes to `start_trial`/`get_free_score` events if it ever reappears. The Loop section's secondary CTA is "Talk to an Expert" (Calendly) — not "See the product". Sales CTAs ("Talk to Sales", "Talk to an Expert") are fine in pricing/enterprise/legal/home-loop contexts. No "View demo" / "Book a demo" — that variant was tried in the hero and removed.
+- **CTAs are title-cased.** "Start Free Trial" → `https://app.clovion.ai/signup` (same-tab, in-product); "Get Free Score" → `/free-ai-visibility-score` (the **page itself** gates lead capture, but only at submit time — landing on the page is frictionless; `EmailGate` opens when the visitor clicks the scan submit button AND `localStorage.clv_lead_captured !== '1'`, then the deferred scan auto-resumes and hits `/api/scan`); "Log in" → `https://app.clovion.ai/login`; "Sign up" → `https://app.clovion.ai/signup`; "Talk to Sales" / "Talk to an Expert" → Calendly PopupWidget (see "Talk-to-Sales → Calendly" section). Button analytics matcher is case-insensitive (`text.toLowerCase().includes('free trial')`) so old lowercase still routes to `start_trial`/`get_free_score` events if it ever reappears. The Loop section's secondary CTA is "Talk to an Expert" (Calendly) — not "See the product". Sales CTAs ("Talk to Sales", "Talk to an Expert") are fine in pricing/enterprise/legal/home-loop contexts. No "View demo" / "Book a demo" — that variant was tried in the hero and removed.
 - **Header top-right CTAs are Log in / Sign up**, both pointing at `app.clovion.ai`. Hero CTAs (Start Free Trial / Get Free Score) live below the headline, not in the header.
 - **Humanized voice.** Avoid triplet sentence rhythm, em-dash overuse, AI-startup buzzwords ("leverage", "unlock", "closed loop", "operating system", "the only X built for Y"). Vary sentence length. Section leads 20–25 words.
 - **Header nav is short — 4 items.** Features (mega-menu trigger only, NOT a link) / Pricing / Customers / Blog. The Features mega-menu has 7 children: AI Visibility Tracking / GEO Improvement Suggestions / Sentiment Analysis / Brand Perception / Fanout Query / AI Crawlability / Platform Coverage. **Sentiment Analysis and Brand Perception are now distinct pages** — Sentiment Analysis (URL `/features/sentiment-analysis`) tracks positive/neutral/negative tone of AI mentions; Brand Perception (URL `/features/brand-perception`) extracts WHAT AI says about your brand (ease of use, audience fit, pricing perception, maturity, etc.). **Compare and Docs live in the Footer only.** `/features` itself is a `redirect('/')` — direct URL silently lands on home, no 404, no destination page. The Header renders Features as a `<button>` (not a Link) because the nav data has no href on that item.
