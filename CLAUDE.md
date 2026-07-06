@@ -13,7 +13,7 @@ The workspace root contains a single Next.js project under `site/`. There is no 
 ├── site/                        # the Next.js 14 marketing site + admin console
 │   ├── app/                     # marketing routes + /admin tree (separate layout)
 │   ├── app/fonts/               # local font assets (Saans-TRIAL-SemiBold.otf)
-│   ├── components/home/         # the dark homepage redesign — sections used only by /
+│   ├── components/home/         # homepage sections used only by / (LIGHT #FAF9F7 as of 2026-07-03; ChatDemo/Loop/HomeCTA are self-scoped dark bands)
 │   ├── public/logos/            # 7 engine SVGs + 6 customer knockout PNGs (Canon/DHL/Netpower/Reckitt/SDS Manager/Unilever), each normalized to a uniform 800×200 canvas
 │   ├── components/home/mocks/   # the 4 PillarStepper dashboards, fully coded (JSX+CSS+SVG, zero raster) + motion.ts/glyphs.tsx/palette.ts shared primitives
 │   └── .env.example             # admin-console env vars template (feat branch)
@@ -268,7 +268,7 @@ Pages with meaningful inline content: `app/page.tsx` (homepage section compositi
 **Marketing surface — 26+ routes on `main`. Most ship dark — see "Dark theme" section below for the current scope. Light theme is rare now (mostly redirects). Route list:**
 
 ```
-/                                              (DARK — homepage, uses components/home/*)
+/                                              (LIGHT #FAF9F7 — homepage, uses components/home/*. Converted from dark 2026-07-03; uses the light Header/Footer. ChatDemo/Loop/HomeCTA stay self-scoped .clv-dark bands on the light page)
 /features                                      (REDIRECT → / via redirect('/') — no longer a destination)
 /features/ai-visibility-tracking               (DARK — components/ai-visibility/*)
 /features/geo-improvement-suggestions          (DARK — components/geo/*)
@@ -344,9 +344,9 @@ Plus `<ChromeHeader />` + `<ChromeFooter />` gates (pick light or dark chrome by
 
 **Name collision watchout.** Two `LogoMarquee` exports coexist: the OLD text-wordmark version in `components/sections.tsx` was previously used by `app/features/page.tsx`, but `/features` now just redirects to `/` so that consumer is gone. The NEW real-image marquee at `components/home/LogoMarquee.tsx` is homepage-only. The text-wordmark version may now be orphaned — audit before relying on it.
 
-#### Dark theme — broad coverage (was just `/`)
+#### Dark theme — broad coverage
 
-Originally only `/` shipped dark per the 2026-06-19 design handoff. Subsequent sessions expanded dark scope dramatically. Now covers: `/`, all 7 `/features/*` pages (ai-visibility-tracking, geo-improvement-suggestions, sentiment-analysis, brand-perception, fanout-query, ai-crawlability, platform-coverage), `/pricing`, `/affiliate`, `/free-ai-visibility-score`, `/customers`, `/about`, `/changelog`, and every page under `/blog/`, `/news/`, `/webinars/`, `/resources/`, `/faq/`, `/compare/`, `/alternatives/`, `/docs/`, `/legal/` prefixes. Light theme is rare now (mostly redirects, legacy `/features` redirect-to-home). Don't add to `DARK_ROUTES` (or the prefix list) without explicit user authorization for that page.
+Originally only `/` shipped dark per the 2026-06-19 design handoff, and subsequent sessions expanded dark scope dramatically. **`/` was reverted to LIGHT (`#FAF9F7`) on 2026-07-03** (see the "Homepage `/` ships LIGHT" note below) and removed from all dark-theme machinery. Dark scope now covers: all 7 `/features/*` pages (ai-visibility-tracking, geo-improvement-suggestions, sentiment-analysis, brand-perception, fanout-query, ai-crawlability, platform-coverage), `/pricing`, `/affiliate`, `/free-ai-visibility-score`, `/customers`, `/about`, `/changelog`, and every page under `/blog/`, `/news/`, `/webinars/`, `/resources/`, `/faq/`, `/compare/`, `/alternatives/`, `/docs/`, `/legal/` prefixes. Don't add to `DARK_ROUTES` (or the prefix list) without explicit user authorization for that page.
 
 **Homepage font override.** `app/page.tsx`'s root wrapper carries a `clv-home` class. A `globals.css` rule — `.clv-home, .clv-home * { font-family: var(--font-saans) … !important }` — forces **everything on `/` to Saans SemiBold**, overriding the JetBrains-mono labels and Hanken/`--font-body-reg` body text used inside the coded mocks (the `!important` beats their inline `font-family`). Per the user's directive that the whole homepage be Saans SemiBold. Scoped to `/` only (other routes keep mono/Hanken).
 
@@ -380,7 +380,7 @@ Originally only `/` shipped dark per the 2026-06-19 design handoff. Subsequent s
 
 **Theme scoping mechanism** — `.clv-dark` is the single class that flips the whole token system from light to dark. Applied in three layers, belt-and-suspenders against FOUC:
 
-1. **Inline pre-hydration script in `app/layout.tsx`** — runs synchronously when the browser parses the head, with an OR-chain matching all 14 dark route paths. This makes `<html>` carry `.clv-dark` from the very first CSS application, so the body bg paints `#08080b` instead of cream-flashing on initial load.
+1. **Inline pre-hydration script in `app/layout.tsx`** — runs synchronously when the browser parses the head, with an OR-chain matching the dark route paths. This makes `<html>` carry `.clv-dark` from the very first CSS application, so the body bg paints `#08080b` instead of cream-flashing on initial load. **`/` is intentionally NOT in this OR-chain** — the homepage ships light, so `<html>` stays clean on `/`.
 2. **`<ThemeShell />`** — client component, no markup. On `usePathname()` change, mirrors the script: adds `.clv-dark` for routes in the `DARK_ROUTES` Set plus the prefix scan list, removes it elsewhere. Handles SPA navigation that the inline script can't see.
 3. **`<div className="clv-dark clv-ai-vis-page">` wrapper in each dark page's `page.tsx`** — scopes dark tokens to the page content even if the global class hasn't been applied yet. The companion `.clv-ai-vis-page` class scopes Hanken Grotesk to paragraphs on dark feature pages (`#root p` style rule in globals.css).
 
@@ -446,7 +446,7 @@ Drop-in component for hero `<Section>`s. Renders 4 soft radial gradients at the 
 
 **Colors. Strict B&W brand book — no purple, no chromatic accents anywhere.** Body bg is cream `#FAFAF7`. Surfaces are white. Subtle alt bg is `#F5F3EF`. Line `#eceae5`. Ink `#0a0a0f` plus rgba steps via Tailwind tokens (`ink/80/70/60/50/40/20/10`). Mid-grays via Tailwind's built-in `neutral-*`. Distinctiveness comes from typography, density, surface contrast, dot-grid textures, and motion — **never color**. Gradients allowed but only monochrome (e.g. `from-black via-neutral-700 to-neutral-400`). **Do NOT reintroduce `purple-*` utilities.**
 
-**Theme exception: the homepage `/` ships dark** (`--bg: #08080b`, white-on-dark ramp) per the 2026-06-19 design handoff, scoped via `.clv-dark`. The single emerald `--positive` accent (`#047857`) appears only inside dashboard mocks for affordance — not in body copy or CTAs. All other 20 routes remain on the light B&W book. Don't add new routes to the dark scope without explicit user authorization. Full mechanics in "Homepage / is its own world" above.
+**Homepage `/` ships LIGHT** (`#FAF9F7` warm off-white, dark-ink text) as of 2026-07-03 — converted from its original dark design. It is NOT wrapped in `.clv-dark`; instead `app/page.tsx`'s root wrapper sets `background: #FAF9F7` and scopes `--bg: #FAF9F7` so every section's seam gradient blends to the page tone. `/` was removed from all four dark-theme machinery spots (layout bootstrap OR-chain, `ThemeShell` `DARK_ROUTES`, `Chrome` `HOME_ROUTES`) so it now renders with the light `Header`/`Footer`. **Three sections stay dark bands on the light page** — `ChatDemo` (self-scoped `.clv-dark`, edges fade to `#FAF9F7`), `Loop` (`.clv-dark` + `--bg` pinned to `#FAF9F7` so its seam still blends), and `HomeCTA` (inner rounded card `.clv-dark`) — matching the light brand book's dark `CTABanner` precedent. All other home sections auto-flip to light via the token system. The dark scope now applies to the feature/pricing/etc. routes only. Don't add new routes to the dark scope without explicit user authorization.
 
 **Typography.** Site-wide font is **Saans-TRIAL-SemiBold** (Indian Type Foundry), loaded via `next/font/local` from `site/app/fonts/Saans-TRIAL-SemiBold.otf`. Exposed as CSS variable `--font-saans`. Both `--font-display` and `--font-body` in globals.css resolve to `var(--font-saans)`. **Body weight defaults to 600 (Semibold)**, as do all `.display-*` classes, `.btn`, `.eyebrow`, `.tag`. The Tailwind utility `font-medium` and lighter have been globally converted to `font-semibold` across the source — keep using `font-semibold` for any new weight-related styling. Custom display classes `.display-xl` (clamp max 7.5rem / 120px), `.display-lg`, `.display-md`, `.display-sm`, and `.lead` own all letter-spacing. **Note: Saans is a TRIAL license** — production deploy requires the full ITF Saans license.
 
@@ -548,7 +548,7 @@ Filter to user-role messages, skip small thumbnails (`len(data) > 50000` is a de
 User-confirmed preferences. Treat as load-bearing:
 
 - **Brand is "Clovion AI"**. Twin-chevron mark + Saans Semibold wordmark.
-- **Strict B&W brand book.** No purple, no chromatic accents. **Light theme is the default**; dark is reserved for the 9 currently-dark routes (`/`, 5 dark feature pages, `/pricing`, `/affiliate`, `/free-ai-visibility-score`). Each was authorized by a specific design-system handoff — don't extend the dark scope to new routes without per-page confirmation. Memory file `feedback_light_theme.md` records the homepage override; the broader dark scope grew via subsequent handoffs.
+- **Strict B&W brand book.** No purple, no chromatic accents. **Light theme is the default**; dark is reserved for the feature pages, `/pricing`, `/affiliate`, `/free-ai-visibility-score`, and the content-prefix routes (see "Dark theme — broad coverage"). The homepage `/` was dark but was **reverted to LIGHT (`#FAF9F7`) on 2026-07-03** — it keeps `ChatDemo`/`Loop`/`HomeCTA` as self-scoped dark bands. Each dark route was authorized by a specific design-system handoff — don't extend the dark scope to new routes without per-page confirmation.
 - **Saans-TRIAL-SemiBold is the typography for UI + headings.** Paragraphs on the 6 dark feature/pricing/affiliate pages use **Hanken Grotesk 400** via the `.clv-ai-vis-page p` scoped rule (Saans ships only SemiBold; Hanken gives true regular weight for body copy). All other pages still use Saans SemiBold for everything.
 - **Homepage hero emphasizes via a rotating engine logo, not a gradient.** Headline reads `See how AI {RotatingLogo} sees your brand` (no period). Dark feature pages use a TypingHeadline cycle. Light pages use plain ink headlines — no gradients, no rotating logos.
 - **Hero headlines are ≤5 words on light routes.** Dark feature pages have longer typed headlines (e.g. "See how one prompt becomes many.", "Make your site readable to AI.") — that's intentional for those pages.
