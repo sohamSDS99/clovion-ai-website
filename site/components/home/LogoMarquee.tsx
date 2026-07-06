@@ -1,99 +1,62 @@
-'use client'
-
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Container, ArrowRight } from '@/components/ui'
 
-const LOGOS = [
-  { name: 'Canon', src: '/logos/ko-canon.png' },
-  { name: 'DHL', src: '/logos/ko-dhl.png' },
-  { name: 'Netpower', src: '/logos/ko-netpower.png' },
-  { name: 'Reckitt', src: '/logos/ko-reckitt.png' },
-  { name: 'SDS Manager', src: '/logos/ko-sdsmanager.png' },
-  { name: 'Unilever', src: '/logos/ko-unilever.png' }
+// Each knockout PNG is a transparent 800×200 (4:1) silhouette, tinted to the
+// brand's exact company color by using the PNG as an alpha mask and filling the
+// shape with `backgroundColor`. Solid, flat, full-opacity — no shading/fade.
+const LOGOS: { name: string; src: string; color: string; transform?: string }[] = [
+  { name: 'Unilever', src: '/logos/ko-unilever.png', color: '#1F36C7' },
+  { name: 'Canon', src: '/logos/ko-canon.png', color: '#CC0000' },
+  { name: 'DHL', src: '/logos/ko-dhl.png', color: '#D40511' },
+  { name: 'Netpower', src: '/logos/ko-netpower.png', color: '#0070A8' },
+  // Reckitt's knockout reads small + sits low in its canvas — scale up + nudge up to match the row.
+  { name: 'Reckitt', src: '/logos/ko-reckitt.png', color: '#FF007F', transform: 'translateY(-8%) scale(1.15)' }
 ]
 
 function LogoLockup({ logo }: { logo: (typeof LOGOS)[number] }) {
-  const [hover, setHover] = useState(false)
   return (
     <span
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="px-6 md:px-10 inline-flex items-center justify-center shrink-0"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={logo.src}
-        alt={logo.name}
-        loading="lazy"
-        decoding="async"
-        className="h-[40px] md:h-[56px] w-auto object-contain block"
-        style={{
-          opacity: hover ? 1 : 0.85,
-          transform: hover ? 'translateY(-2px)' : 'none',
-          transition: 'opacity 0.25s ease, transform 0.25s ease'
-        }}
-      />
-    </span>
+      role="img"
+      aria-label={logo.name}
+      title={logo.name}
+      style={{
+        display: 'block',
+        // width-driven + responsive so all five shrink to stay on one row
+        width: 'clamp(56px, 18vw, 224px)',
+        aspectRatio: '4 / 1',
+        flexShrink: 1,
+        minWidth: 0,
+        transform: logo.transform,
+        backgroundColor: logo.color,
+        WebkitMaskImage: `url(${logo.src})`,
+        maskImage: `url(${logo.src})`,
+        WebkitMaskRepeat: 'no-repeat',
+        maskRepeat: 'no-repeat',
+        WebkitMaskPosition: 'center',
+        maskPosition: 'center',
+        WebkitMaskSize: 'contain',
+        maskSize: 'contain'
+      }}
+    />
   )
 }
 
 export function LogoMarquee() {
-  const [reduce, setReduce] = useState(false)
-  const [paused, setPaused] = useState(false)
-
-  useEffect(() => {
-    setReduce(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-  }, [])
-
-  const track = [...LOGOS, ...LOGOS]
   return (
-    <section
-      className="py-10 md:py-14"
-      style={{
-        background: 'linear-gradient(to bottom, var(--bg) 0%, var(--subtle) 14%, var(--subtle) 86%, var(--bg) 100%)'
-      }}
-    >
+    <section className="py-10 md:py-14" data-track-location="home_logo_marquee" style={{ background: '#FAF9F7' }}>
       <Container>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 30 }}>
-          <span aria-hidden style={{ height: 1, width: 36, background: 'var(--line)' }} />
-          <p
-            style={{
-              margin: 0,
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.74rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.16em',
-              color: 'var(--ink-50)'
-            }}
-          >
-            Trusted by teams that move fast
-          </p>
-          <span aria-hidden style={{ height: 1, width: 36, background: 'var(--line)' }} />
+        {/* Left-aligned headline — matches the "Read customer stories" link size (0.9rem / 600). */}
+        <div style={{ textAlign: 'left', marginBottom: 30 }}>
+          <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--ink)' }}>Trusted partners</p>
         </div>
-        <div
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          style={{
-            position: 'relative',
-            overflow: 'hidden',
-            WebkitMaskImage: 'linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)',
-            maskImage: 'linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent)'
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              width: 'max-content',
-              animation: reduce ? 'none' : 'clv-marquee 34s linear infinite',
-              animationPlayState: paused ? 'paused' : 'running'
-            }}
-          >
-            {track.map((logo, i) => (
-              <LogoLockup key={logo.name + i} logo={logo} />
-            ))}
-          </div>
+
+        {/* Static single row — logos spread evenly across the full width, no wrap, no animation. */}
+        <div style={{ display: 'flex', flexWrap: 'nowrap', alignItems: 'center', justifyContent: 'space-between', gap: 'clamp(10px, 2vw, 28px)' }}>
+          {LOGOS.map((logo) => (
+            <LogoLockup key={logo.name} logo={logo} />
+          ))}
         </div>
+
         <div style={{ marginTop: 30, textAlign: 'center' }}>
           <Link
             href="/customers"

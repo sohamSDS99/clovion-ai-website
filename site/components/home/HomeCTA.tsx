@@ -3,9 +3,13 @@ import { TypingHeadline } from './TypingHeadline'
 
 export function HomeCTA() {
   return (
-    <section className="py-12 md:py-20">
+    <section className="py-12 md:py-20" data-track-location="home_final_cta">
       <Container>
+        {/* Dark rounded CTA card on the light homepage. .clv-dark scopes the
+            dark tokens so the surface, on-ink text, and white primary button
+            render as designed (same as the light brand book's dark CTABanner). */}
         <div
+          className="clv-dark"
           style={{
             position: 'relative',
             overflow: 'hidden',
