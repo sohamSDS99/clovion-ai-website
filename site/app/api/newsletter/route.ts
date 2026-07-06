@@ -4,12 +4,16 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 // Newsletter subscribe endpoint for the homepage "Weekly AI Visibility Insights"
-// popup. Validates the email and forwards it server-side to a webhook (keeps the
-// URL out of the client bundle and sidesteps browser CORS) — same pattern as
-// /api/lead. Prefers a dedicated newsletter destination; falls back to the
-// shared lead webhook, tagged with a DISTINCT event so the Make.com scenario can
-// route newsletter signups separately (add a filter on event === 'newsletter_subscribe').
-const WEBHOOK_URL = process.env.NEWSLETTER_WEBHOOK_URL || process.env.LEAD_WEBHOOK_URL || ''
+// popup. Validates the email and, when a destination is configured, forwards it
+// server-side to a webhook (keeps the URL out of the client bundle, sidesteps
+// CORS) — same pattern as /api/lead.
+//
+// UI-first rollout: capture isn't wired yet. There is intentionally NO fallback
+// to the free-score LEAD_WEBHOOK_URL, so newsletter signups never pollute the
+// trial pipeline. Until NEWSLETTER_WEBHOOK_URL is set, a valid signup is accepted
+// and logged (the popup confirms) but not forwarded. Set the env var later to
+// switch on real delivery — no code change needed.
+const WEBHOOK_URL = process.env.NEWSLETTER_WEBHOOK_URL || ''
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const MAX_FIELD = 200
@@ -50,8 +54,10 @@ export async function POST(req: NextRequest) {
   }
 
   if (!WEBHOOK_URL) {
-    console.warn('[newsletter] no webhook configured — set NEWSLETTER_WEBHOOK_URL (or LEAD_WEBHOOK_URL)')
-    return NextResponse.json({ error: 'not configured', code: 'not_configured' }, { status: 503 })
+    // Capture not wired yet — accept so the popup confirms; record for now.
+    // TODO: set NEWSLETTER_WEBHOOK_URL to forward these to the newsletter list.
+    console.log('[newsletter] pending signup (no webhook configured):', email)
+    return NextResponse.json({ ok: true })
   }
 
   const payload = [
