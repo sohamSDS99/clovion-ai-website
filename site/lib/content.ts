@@ -30,6 +30,11 @@ export const nav = {
           desc: 'Concrete fixes that make AI engines cite you more often'
         },
         {
+          label: 'Recommendation Engine',
+          href: '/features/recommendation-engine',
+          desc: 'Prioritized fixes, not dashboards — find the gap, fix the cause, track the outcome'
+        },
+        {
           label: 'Fanout Query',
           href: '/features/fanout-query',
           desc: 'Expand one seed prompt into the variations AI engines actually search'
