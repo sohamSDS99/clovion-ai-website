@@ -10,6 +10,7 @@ import { AgentsAtWork } from '@/components/home/AgentsAtWork'
 import { HomeFAQ } from '@/components/home/HomeFAQ'
 import { HOME_FAQS } from '@/components/home/homeFaqs'
 import { HomeCTA } from '@/components/home/HomeCTA'
+import { NewsletterPopup } from '@/components/home/NewsletterPopup'
 
 export const metadata: Metadata = {
   title: 'AI Visibility & GEO Platform | Clovion AI',
@@ -81,6 +82,7 @@ export default function HomePage() {
       <AgentsAtWork />
       <HomeCTA />
       <HomeFAQ />
+      <NewsletterPopup />
     </div>
   )
 }
