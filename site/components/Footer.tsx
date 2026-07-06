@@ -8,6 +8,7 @@ const groups = [
     links: [
       { label: 'AI Visibility Tracking', href: '/features/ai-visibility-tracking' },
       { label: 'GEO Suggestions', href: '/features/geo-improvement-suggestions' },
+      { label: 'Recommendation Engine', href: '/features/recommendation-engine' },
       { label: 'Sentiment Analysis', href: '/features/sentiment-analysis' },
       { label: 'Brand Perception', href: '/features/brand-perception' }
     ]
