@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/brand-perception/FeatureContent'
 
 export const metadata: Metadata = {
@@ -21,97 +22,39 @@ export const metadata: Metadata = {
   },
 }
 
-const faqJsonLd = {
+const breadcrumbJsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: 'What is Brand Perception in Clovion?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Brand Perception is a Clovion feature that shows how AI engines describe and position your brand. It surfaces the attributes AI associates with your product, such as audience fit, ease of use, pricing perception, product maturity, strengths, limitations, and competitor framing.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'How is Brand Perception different from Sentiment Analysis?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Sentiment Analysis shows whether an AI mention is positive, neutral, or negative. Brand Perception shows what AI believes about your brand, such as whether it is seen as enterprise-ready, easy to use, affordable, technical, niche, mature, or best for a specific audience.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What are brand perception attributes?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Brand perception attributes are recurring labels or themes AI engines attach to your brand. These may include ease of use, pricing, target audience, maturity, category fit, strengths, limitations, setup complexity, and competitor comparisons.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Why does AI brand perception matter?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'AI brand perception matters because buyers may rely on AI-generated answers before visiting your website. If AI engines describe your product inaccurately or incompletely, buyers may form the wrong impression before they reach your content.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can Clovion show if AI thinks my product is for SMBs or enterprise teams?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. Clovion can surface audience-fit signals, including whether AI engines describe your product as best for SMBs, startups, agencies, enterprise teams, technical users, marketers, or another audience.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can Clovion show if AI thinks my product is easy to use?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. Clovion can identify ease-of-use attributes, including whether AI describes your platform as simple, intuitive, technical, complex, beginner-friendly, or difficult to adopt.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Can Clovion compare my brand perception against competitors?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. Clovion can compare how AI engines describe your brand and competitors in the same answers, prompts, topics, and engines.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Does Brand Perception connect to GEO Recommendations?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Yes. When Clovion identifies a perception gap, the insight can support GEO recommendations that help your team improve content structure, messaging, schema, authority signals, and AI-readable explanations.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'What should I do if AI describes my brand incorrectly?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Start by identifying which prompts, engines, and sources contribute to the incorrect description. Then update owned content, strengthen relevant feature pages, improve schema and FAQs, and create clearer explanations around the perception gap.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: 'Which teams should use Brand Perception?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Brand Perception is useful for marketing, SEO, product marketing, communications, founders, and leadership teams that want to understand how AI engines are shaping buyer perception.',
-      },
-    },
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://clovion.ai/' },
+    { '@type': 'ListItem', position: 2, name: 'Features', item: 'https://clovion.ai/' },
+    { '@type': 'ListItem', position: 3, name: 'Brand Perception', item: 'https://clovion.ai/features/brand-perception' },
   ],
 }
 
+const webPageJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: 'Brand Perception',
+  url: 'https://clovion.ai/features/brand-perception',
+  description:
+    'Clovion analyzes AI responses to help you understand the characteristics, strengths, and perceptions AI consistently associates with your brand — the attributes, audience fit, competitive positioning, and confidence behind how AI describes your business.',
+  isPartOf: { '@type': 'WebSite', name: 'Clovion', url: 'https://clovion.ai' },
+}
+
 export default function BrandPerceptionPage() {
+  // Ships LIGHT, matching the homepage palette (#FAF9F7 warm off-white) and the
+  // sibling Brand Audit page. NOT wrapped in .clv-dark — the design tokens
+  // default to their light values, and `--bg` is scoped to #FAF9F7 so the page
+  // tone matches the homepage exactly. `clv-ai-vis-page` gives paragraph copy
+  // the Hanken Grotesk body weight, consistent with the other feature pages.
   return (
-    <div className="clv-dark clv-ai-vis-page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+    <div
+      className="clv-ai-vis-page"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <FeatureContent />
     </div>
   )
