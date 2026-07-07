@@ -10,7 +10,8 @@ const groups = [
       { label: 'GEO Suggestions', href: '/features/geo-improvement-suggestions' },
       { label: 'Recommendation Engine', href: '/features/recommendation-engine' },
       { label: 'Sentiment Analysis', href: '/features/sentiment-analysis' },
-      { label: 'Brand Perception', href: '/features/brand-perception' }
+      { label: 'Brand Perception', href: '/features/brand-perception' },
+      { label: 'Brand Audit', href: '/features/brand-audit' }
     ]
   },
   {
