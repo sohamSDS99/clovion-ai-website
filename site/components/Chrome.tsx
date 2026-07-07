@@ -6,8 +6,9 @@ import { Footer } from './Footer'
 import { HomeHeader } from './HomeHeader'
 import { HomeFooter } from './HomeFooter'
 
-// `/` is intentionally NOT here — the light homepage uses the light Header/Footer. See app/page.tsx.
-const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/features/platform-coverage', '/pricing', '/affiliate', '/free-ai-visibility-score', '/customers', '/about', '/changelog', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
+// `/` and `/pricing` are intentionally NOT here — both light routes use the
+// light Header/Footer. See app/page.tsx and app/pricing/page.tsx.
+const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/features/platform-coverage', '/affiliate', '/free-ai-visibility-score', '/customers', '/about', '/changelog', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
 
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
 const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
