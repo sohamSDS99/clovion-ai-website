@@ -19,6 +19,12 @@ import { useState } from 'react'
  * they flip under .clv-dark.
  */
 
+// Clove orange accent — mirrors the page palette. Marks the active topic and
+// the Clovion side of each breakdown; Peec stays neutral ink.
+const BRAND = '#C2410C'
+const BRAND_TINT = '#FBEEE7'
+const BRAND_BORDER = 'rgba(194,65,12,0.22)'
+
 export type DeepDiveItem = {
   n: string
   title: string
@@ -40,8 +46,8 @@ function SideBlock({
     <div
       style={{
         borderRadius: 16,
-        border: '1px solid var(--line)',
-        background: emphasized ? 'var(--subtle)' : 'var(--white)',
+        border: emphasized ? `1px solid ${BRAND_BORDER}` : '1px solid var(--line)',
+        background: emphasized ? BRAND_TINT : 'var(--white)',
         padding: '22px 24px'
       }}
     >
@@ -54,7 +60,7 @@ function SideBlock({
           fontSize: '0.7rem',
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
-          color: emphasized ? 'var(--ink)' : 'var(--ink-50)',
+          color: emphasized ? BRAND : 'var(--ink-50)',
           marginBottom: 14
         }}
       >
@@ -64,7 +70,7 @@ function SideBlock({
             width: 6,
             height: 6,
             borderRadius: 999,
-            background: emphasized ? 'var(--ink)' : 'var(--ink-25)'
+            background: emphasized ? BRAND : 'var(--ink-25)'
           }}
         />
         {label}
@@ -127,7 +133,7 @@ export function DeepDive({ items }: { items: DeepDiveItem[] }) {
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.8rem',
                   letterSpacing: '0.04em',
-                  color: on ? 'var(--ink)' : 'var(--ink-40)'
+                  color: on ? BRAND : 'var(--ink-40)'
                 }}
               >
                 {it.n}
@@ -159,7 +165,7 @@ export function DeepDive({ items }: { items: DeepDiveItem[] }) {
               fontFamily: 'var(--font-mono)',
               fontSize: 'clamp(1.8rem, 3vw, 2.4rem)',
               lineHeight: 1,
-              color: 'rgb(var(--ink-rgb) / 12%)'
+              color: 'rgba(194,65,12,0.24)'
             }}
           >
             {item.n}

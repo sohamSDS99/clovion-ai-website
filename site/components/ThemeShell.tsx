@@ -12,7 +12,13 @@ const DARK_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/featu
 // the comparison/alternatives pages.
 const DARK_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
+// Light exceptions inside an otherwise-dark prefix. This comparison page was
+// rebranded to the light homepage palette (#FAF9F7 + Clove orange), so it opts
+// out of the /compare dark scope while the hub + /clovion-vs-profound stay dark.
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai'])
+
 function isDarkRoute(pathname: string): boolean {
+  if (LIGHT_EXCEPTIONS.has(pathname)) return false
   if (DARK_ROUTES.has(pathname)) return true
   return DARK_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }

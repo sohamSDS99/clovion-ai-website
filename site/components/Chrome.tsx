@@ -13,7 +13,13 @@ const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/featu
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
 const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
+// Light exceptions inside an otherwise-dark prefix — must mirror ThemeShell's
+// LIGHT_EXCEPTIONS so this page gets the light Header/Footer to match its
+// rebranded light palette.
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai'])
+
 function isHomeChrome(pathname: string): boolean {
+  if (LIGHT_EXCEPTIONS.has(pathname)) return false
   if (HOME_ROUTES.has(pathname)) return true
   return HOME_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
