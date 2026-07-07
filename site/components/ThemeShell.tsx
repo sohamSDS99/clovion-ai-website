@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 // `/` and `/pricing` are intentionally NOT here — both ship LIGHT (#FAF9F7).
 // See app/page.tsx (home) and app/pricing/page.tsx (pricing light redesign).
-const DARK_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/features/platform-coverage', '/affiliate', '/free-ai-visibility-score', '/customers', '/about', '/changelog', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
+const DARK_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/features/platform-coverage', '/free-ai-visibility-score', '/customers', '/about', '/changelog', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
 
 // Prefix-matched dark sections — covers index + every nested/[slug] page.
 // The whole marketing site is dark, so this spans content, docs, legal, and

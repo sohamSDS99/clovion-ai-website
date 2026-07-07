@@ -25,7 +25,7 @@ const faqJsonLd = {
 
 export default function AffiliatePage() {
   return (
-    <div className="clv-dark clv-ai-vis-page">
+    <div className="clv-ai-vis-page">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <FeatureContent />
     </div>
