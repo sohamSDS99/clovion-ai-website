@@ -11,6 +11,18 @@ import {
 import { FAQAccordion } from '@/components/FAQAccordion'
 import { DeepDive, type DeepDiveItem } from './DeepDive'
 
+// ---------------------------------------------------------------------------
+// Brand palette — light homepage theme (#FAF9F7) + the "Clove" orange accent
+// (#C2410C) pulled from components/home/ClovAgent.tsx. Orange is the single
+// accent: it marks the Clovion side, the improvement loop, and CTAs. Peec and
+// neutral areas stay ink-on-warm-white so the brand side always reads as "ours".
+// ---------------------------------------------------------------------------
+const BRAND = '#C2410C' // Clove orange — primary accent (text + glyphs)
+const BRAND_GLOW = '#EA580C' // brighter orange — gradient start
+const BRAND_STRONG = '#9A3412' // deep orange — gradient end / on-white text
+const BRAND_TINT = '#FBEEE7' // pale orange — Clovion-column fills
+const BRAND_BORDER = 'rgba(194,65,12,0.22)' // orange hairline for the Clovion column
+
 export const metadata = {
   title: 'Clovion vs Peec AI: Multi-engine AI visibility comparison | Clovion AI',
   description:
@@ -336,7 +348,8 @@ const faqJsonLd = {
 function OutcomeGlyph({ form }: { form: 'solid' | 'ring' | 'diamond' | 'dashed' }) {
   const base = { width: 9, height: 9, flexShrink: 0 } as CSSProperties
   if (form === 'solid') {
-    return <span aria-hidden style={{ ...base, borderRadius: 999, background: 'var(--ink)' }} />
+    // "Landed" — the positive outcome gets the brand orange.
+    return <span aria-hidden style={{ ...base, borderRadius: 999, background: BRAND }} />
   }
   if (form === 'ring') {
     return (
@@ -382,7 +395,7 @@ function MatchupRow({
             fontFamily: 'var(--font-display)',
             fontSize: '1.15rem',
             fontWeight: 600,
-            color: emphasized ? 'var(--ink)' : 'var(--ink-70)'
+            color: emphasized ? BRAND : 'var(--ink-70)'
           }}
         >
           {name}
@@ -394,7 +407,7 @@ function MatchupRow({
           fontFamily: 'var(--font-mono)',
           fontSize: '1.5rem',
           letterSpacing: '-0.01em',
-          color: emphasized ? 'var(--ink)' : 'var(--ink-60)',
+          color: emphasized ? BRAND : 'var(--ink-60)',
           whiteSpace: 'nowrap'
         }}
       >
@@ -413,7 +426,7 @@ function GlanceCell({ value, emphasized }: { value: string; emphasized?: boolean
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '1.05rem',
-          color: emphasized ? 'var(--ink)' : 'var(--ink-70)'
+          color: emphasized ? BRAND : 'var(--ink-70)'
         }}
       >
         {value}
@@ -437,8 +450,8 @@ function EngineCell({ value }: { value: string | boolean }) {
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          background: 'var(--ink)',
-          color: 'var(--white)'
+          background: BRAND,
+          color: '#fff'
         }}
       >
         <Check className="h-3.5 w-3.5" />
@@ -456,7 +469,33 @@ function EngineCell({ value }: { value: string | boolean }) {
 
 export default function ClovionVsPeecAiPage() {
   return (
-    <>
+    <div
+      className="clv-peec-light"
+      style={
+        {
+          ['--bg' as string]: '#FAF9F7',
+          background: '#FAF9F7',
+          color: 'var(--ink)'
+        } as CSSProperties
+      }
+    >
+      {/* Scoped recolor. Eyebrows adopt the Clove orange; the orange CTA band
+          re-whitens its eyebrow + restyles its buttons. Class-based only —
+          inline styles are recoloured directly in the JSX below. */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+.clv-peec-light .eyebrow { color: ${BRAND}; }
+.clv-peec-light .eyebrow-dot::before { background: ${BRAND}; box-shadow: 0 0 0 4px rgba(194,65,12,0.12); }
+.clv-peec-light .clv-cta-orange .eyebrow { color: rgba(255,255,255,0.82); }
+.clv-peec-light .clv-cta-orange .eyebrow-dot::before { background: rgba(255,255,255,0.82); box-shadow: 0 0 0 4px rgba(255,255,255,0.14); }
+.clv-peec-light .clv-cta-orange .btn-primary { background: #fff; color: ${BRAND_STRONG}; }
+.clv-peec-light .clv-cta-orange .btn-primary:hover { background: rgba(255,255,255,0.9); }
+.clv-peec-light .clv-cta-orange .btn-secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.5); }
+.clv-peec-light .clv-cta-orange .btn-secondary:hover { background: rgba(255,255,255,0.2); }
+`
+        }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
@@ -481,7 +520,7 @@ export default function ClovionVsPeecAiPage() {
                     fontSize: '0.85rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.18em',
-                    color: 'var(--ink-60)',
+                    color: BRAND,
                     fontWeight: 600
                   }}
                 >
@@ -518,6 +557,7 @@ export default function ClovionVsPeecAiPage() {
               style={{
                 borderRadius: 20,
                 border: '1px solid var(--line)',
+                borderTop: `3px solid ${BRAND}`,
                 background: 'var(--white)',
                 padding: 28,
                 boxShadow: 'var(--shadow-soft)'
@@ -614,7 +654,7 @@ export default function ClovionVsPeecAiPage() {
                         top: '50%',
                         right: -18,
                         transform: 'translateY(-50%)',
-                        color: 'var(--ink-40)',
+                        color: BRAND,
                         zIndex: 1
                       }}
                     >
@@ -627,7 +667,7 @@ export default function ClovionVsPeecAiPage() {
                       fontFamily: 'var(--font-mono)',
                       fontSize: 'clamp(2.4rem, 4vw, 3.2rem)',
                       lineHeight: 1,
-                      color: 'rgb(var(--ink-rgb) / 10%)'
+                      color: 'rgba(194,65,12,0.22)'
                     }}
                   >
                     {`0${i + 1}`}
@@ -666,9 +706,9 @@ export default function ClovionVsPeecAiPage() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 999,
-                border: '1px solid var(--line)',
-                background: 'var(--white)',
-                color: 'var(--ink-60)'
+                border: `1px solid ${BRAND_BORDER}`,
+                background: BRAND_TINT,
+                color: BRAND
               }}
             >
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden>
@@ -749,10 +789,10 @@ export default function ClovionVsPeecAiPage() {
                   <div
                     style={{
                       ...headCell,
-                      color: 'var(--ink)',
-                      background: 'var(--subtle)',
-                      borderLeft: '1px solid var(--line)',
-                      borderRight: '1px solid var(--line)'
+                      color: BRAND,
+                      background: BRAND_TINT,
+                      borderLeft: `1px solid ${BRAND_BORDER}`,
+                      borderRight: `1px solid ${BRAND_BORDER}`
                     }}
                   >
                     Clovion AI
@@ -784,9 +824,9 @@ export default function ClovionVsPeecAiPage() {
                     <div
                       style={{
                         ...bodyCell,
-                        background: 'var(--subtle)',
-                        borderLeft: '1px solid var(--line)',
-                        borderRight: '1px solid var(--line)'
+                        background: BRAND_TINT,
+                        borderLeft: `1px solid ${BRAND_BORDER}`,
+                        borderRight: `1px solid ${BRAND_BORDER}`
                       }}
                     >
                       <EngineCell value={true} />
@@ -839,10 +879,10 @@ export default function ClovionVsPeecAiPage() {
                   <div
                     style={{
                       ...headCell,
-                      color: 'var(--ink)',
-                      background: 'var(--subtle)',
-                      borderLeft: '1px solid var(--line)',
-                      borderRight: '1px solid var(--line)'
+                      color: BRAND,
+                      background: BRAND_TINT,
+                      borderLeft: `1px solid ${BRAND_BORDER}`,
+                      borderRight: `1px solid ${BRAND_BORDER}`
                     }}
                   >
                     Clovion AI
@@ -861,7 +901,7 @@ export default function ClovionVsPeecAiPage() {
                     <div style={{ ...bodyCell, fontWeight: 600, color: 'var(--ink)', fontSize: '0.9rem' }}>
                       {row.cat}
                     </div>
-                    <div style={{ ...bodyCell, background: 'var(--subtle)', borderRight: '1px solid var(--line)', borderLeft: '1px solid var(--line)' }}>
+                    <div style={{ ...bodyCell, background: BRAND_TINT, borderRight: `1px solid ${BRAND_BORDER}`, borderLeft: `1px solid ${BRAND_BORDER}` }}>
                       <GlanceCell value={row.clovion} emphasized />
                     </div>
                     <div style={bodyCell}>
@@ -889,6 +929,7 @@ export default function ClovionVsPeecAiPage() {
               style={{
                 borderRadius: 20,
                 border: '1px solid var(--line)',
+                borderTop: `3px solid ${BRAND}`,
                 background: 'var(--white)',
                 boxShadow: 'var(--shadow-soft)',
                 padding: '30px 30px 8px'
@@ -899,7 +940,7 @@ export default function ClovionVsPeecAiPage() {
                   fontFamily: 'var(--font-display)',
                   fontSize: '1.4rem',
                   fontWeight: 600,
-                  color: 'var(--ink)'
+                  color: BRAND
                 }}
               >
                 When to choose Clovion
@@ -921,8 +962,8 @@ export default function ClovionVsPeecAiPage() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: 999,
-                        background: 'var(--ink)',
-                        color: 'var(--white)'
+                        background: BRAND,
+                        color: '#fff'
                       }}
                     >
                       <Check className="h-3 w-3" />
@@ -1028,10 +1069,10 @@ export default function ClovionVsPeecAiPage() {
                   <div
                     style={{
                       ...headCell,
-                      color: 'var(--ink)',
-                      background: 'var(--subtle)',
-                      borderLeft: '1px solid var(--line)',
-                      borderRight: '1px solid var(--line)'
+                      color: BRAND,
+                      background: BRAND_TINT,
+                      borderLeft: `1px solid ${BRAND_BORDER}`,
+                      borderRight: `1px solid ${BRAND_BORDER}`
                     }}
                   >
                     Clovion AI
@@ -1050,7 +1091,7 @@ export default function ClovionVsPeecAiPage() {
                     <div style={{ ...bodyCell, fontWeight: 600, color: 'var(--ink)', fontSize: '0.9rem' }}>
                       {row.cat}
                     </div>
-                    <div style={{ ...bodyCell, background: 'var(--subtle)', borderRight: '1px solid var(--line)', borderLeft: '1px solid var(--line)' }}>
+                    <div style={{ ...bodyCell, background: BRAND_TINT, borderRight: `1px solid ${BRAND_BORDER}`, borderLeft: `1px solid ${BRAND_BORDER}` }}>
                       <PriceCell plan={row.clovion.plan} body={row.clovion.body} emphasized />
                     </div>
                     <div style={bodyCell}>
@@ -1071,18 +1112,21 @@ export default function ClovionVsPeecAiPage() {
       <Section>
         <Container>
           <div
-            className="relative isolate overflow-hidden rounded-[28px] bg-ink text-white px-8 md:px-14 py-16 md:py-20 text-center"
+            className="clv-cta-orange relative isolate overflow-hidden rounded-[28px] text-white px-8 md:px-14 py-16 md:py-20 text-center"
             data-track-location="compare_peec_final_cta"
+            style={{
+              background: `linear-gradient(135deg, ${BRAND_GLOW} 0%, ${BRAND} 52%, ${BRAND_STRONG} 100%)`
+            }}
           >
             <div
               aria-hidden
-              className="absolute inset-0 -z-10 opacity-90"
+              className="absolute inset-0 -z-10"
               style={{
                 background:
-                  'radial-gradient(ellipse 70% 80% at 50% 50%, rgba(10,10,15,0.18), transparent 65%)'
+                  'radial-gradient(ellipse 72% 82% at 50% 34%, rgba(255,255,255,0.18), transparent 62%)'
               }}
             />
-            <div className="grid-bg absolute inset-0 -z-10 opacity-50 mix-blend-overlay" aria-hidden />
+            <div className="grid-bg absolute inset-0 -z-10 opacity-40 mix-blend-overlay" aria-hidden />
             <Eyebrow className="justify-center text-white/70">Why choose Clovion</Eyebrow>
             <h2
               className="mt-5 mx-auto text-balance"
@@ -1125,7 +1169,7 @@ export default function ClovionVsPeecAiPage() {
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }
 
@@ -1162,7 +1206,7 @@ function PriceCell({
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: '0.98rem',
-            color: emphasized ? 'var(--ink)' : 'var(--ink-80)',
+            color: emphasized ? BRAND : 'var(--ink-80)',
             marginBottom: 8
           }}
         >
