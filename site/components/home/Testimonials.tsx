@@ -6,11 +6,11 @@ import { Container } from '@/components/ui'
 const TESTIMONIALS = [
   {
     quote:
-      'Clovion showed us exactly which prompts mentioned our competitors but not us. The questions were neutral, they didn’t name anyone, so the results were honest. We fixed three pages based on the GEO suggestions and started getting cited within two weeks. Visibility score went from 14 to 52.',
-    author: 'Mirjam Meling',
-    role: 'Marketing and Communication Manager',
-    company: 'Netpower',
-    initials: 'MM'
+      'As AI search became more important for us, we wanted to understand what it was actually saying about our brand. I like that it doesn’t just show charts. It actually points you to the pages and explains why something might be affecting how AI talks about your company. We’ve only been using it for a month, but it’s already changed how we think about our content.',
+    author: 'Erlend Arnoy',
+    role: 'CEO',
+    company: 'Netpower IT solutions',
+    initials: 'EA'
   },
   {
     quote:
