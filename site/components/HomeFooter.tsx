@@ -55,7 +55,8 @@ const groups = [
     title: 'Comparisons',
     links: [
       { label: 'Clovion vs Peec AI', href: '/compare/clovion-vs-peec-ai' },
-      { label: 'Clovion vs Otterly', href: '/compare/clovion-vs-otterly' }
+      { label: 'Clovion vs Otterly', href: '/compare/clovion-vs-otterly' },
+      { label: 'Clovion vs Searchable', href: '/compare/clovion-vs-searchable' }
     ]
   }
 ]
