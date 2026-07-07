@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, type CSSProperties } from 'react'
 import PricingTiers from './PricingTiers'
 import ComparisonTable from './ComparisonTable'
 import { openCalendly } from '@/lib/openCalendly'
@@ -58,6 +58,26 @@ function LaunchBanner() {
 }
 
 /* ── Billing toggle (Monthly / Annually) ───────────────────────── */
+// useLayoutEffect on the client (measures before paint → no flash); falls back
+// to useEffect during SSR to avoid the "useLayoutEffect does nothing on the
+// server" warning.
+const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect
+
+const TAB_BTN: CSSProperties = {
+  border: 'none',
+  background: 'none',
+  fontFamily: 'inherit',
+  fontSize: '0.875rem',
+  fontWeight: 600,
+  padding: '9px 22px',
+  borderRadius: 999,
+  cursor: 'pointer',
+  position: 'relative',
+  zIndex: 2,
+  whiteSpace: 'nowrap',
+  transition: `color 200ms ${EASE}`,
+}
+
 function BillingToggle({
   billing,
   setBilling,
@@ -66,6 +86,32 @@ function BillingToggle({
   setBilling: (b: 'monthly' | 'annual') => void
 }) {
   const annual = billing === 'annual'
+  const monthlyRef = useRef<HTMLButtonElement>(null)
+  const annualRef = useRef<HTMLButtonElement>(null)
+  // The white pill tracks the ACTIVE button's real width/offset so it always
+  // wraps the label exactly — no fixed 50% that overflows the wider option.
+  const [ind, setInd] = useState<{ left: number; width: number }>({ left: 0, width: 0 })
+  const [animate, setAnimate] = useState(false)
+
+  useIsoLayoutEffect(() => {
+    const measure = () => {
+      const el = annual ? annualRef.current : monthlyRef.current
+      if (el) setInd({ left: el.offsetLeft, width: el.offsetWidth })
+    }
+    measure()
+    // Re-measure on resize and once web fonts finish loading (font swap changes
+    // label width). Enable the slide transition only after the first placement.
+    window.addEventListener('resize', measure)
+    if (typeof document !== 'undefined' && 'fonts' in document) {
+      document.fonts.ready.then(measure).catch(() => {})
+    }
+    const raf = requestAnimationFrame(() => setAnimate(true))
+    return () => {
+      window.removeEventListener('resize', measure)
+      cancelAnimationFrame(raf)
+    }
+  }, [annual])
+
   return (
     <div style={{ display: 'flex', justifyContent: 'center', marginTop: 34 }}>
       <div
@@ -85,59 +131,32 @@ function BillingToggle({
             position: 'absolute',
             top: 4,
             bottom: 4,
-            left: 4,
-            width: 'calc(50% - 4px)',
+            left: ind.left,
+            width: ind.width,
             background: 'var(--white)',
             borderRadius: 999,
             boxShadow: '0 1px 3px rgba(10,10,15,0.08)',
-            transform: annual ? 'translateX(100%)' : 'translateX(0)',
-            transition: `transform 220ms ${EASE}`,
+            opacity: ind.width ? 1 : 0,
+            transition: animate ? `left 220ms ${EASE}, width 220ms ${EASE}` : 'none',
           }}
         />
         <button
+          ref={monthlyRef}
           type="button"
           role="tab"
           aria-selected={!annual}
           onClick={() => setBilling('monthly')}
-          style={{
-            border: 'none',
-            background: 'none',
-            fontFamily: 'inherit',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: !annual ? 'var(--ink)' : 'var(--ink-70)',
-            padding: '9px 22px',
-            borderRadius: 999,
-            cursor: 'pointer',
-            position: 'relative',
-            zIndex: 2,
-            transition: `color 200ms ${EASE}`,
-          }}
+          style={{ ...TAB_BTN, color: !annual ? 'var(--ink)' : 'var(--ink-70)' }}
         >
           Monthly
         </button>
         <button
+          ref={annualRef}
           type="button"
           role="tab"
           aria-selected={annual}
           onClick={() => setBilling('annual')}
-          style={{
-            border: 'none',
-            background: 'none',
-            fontFamily: 'inherit',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-            color: annual ? 'var(--ink)' : 'var(--ink-70)',
-            padding: '9px 22px',
-            borderRadius: 999,
-            cursor: 'pointer',
-            position: 'relative',
-            zIndex: 2,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            transition: `color 200ms ${EASE}`,
-          }}
+          style={{ ...TAB_BTN, color: annual ? 'var(--ink)' : 'var(--ink-70)', display: 'flex', alignItems: 'center', gap: 8 }}
         >
           Annually
           <span
