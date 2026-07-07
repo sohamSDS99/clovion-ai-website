@@ -58,6 +58,11 @@ export const nav = {
           label: 'Brand Perception',
           href: '/features/brand-perception',
           desc: 'See how AI engines describe and position your brand.'
+        },
+        {
+          label: 'Brand Audit',
+          href: '/features/brand-audit',
+          desc: 'Audit your AI footprint before you start optimizing'
         }
       ]
     },
