@@ -14,9 +14,9 @@ const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/featu
 const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
 // Light exceptions inside an otherwise-dark prefix — must mirror ThemeShell's
-// LIGHT_EXCEPTIONS so this page gets the light Header/Footer to match its
+// LIGHT_EXCEPTIONS so these pages get the light Header/Footer to match their
 // rebranded light palette.
-const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai'])
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly'])
 
 function isHomeChrome(pathname: string): boolean {
   if (LIGHT_EXCEPTIONS.has(pathname)) return false
