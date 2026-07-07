@@ -71,7 +71,8 @@ export const metadata: Metadata = {
   verification: {
     google: 'Of0ydr1XJckA0sM0jA4HEKUzVOxrgvB-6R6ti5P3EjQ',
     other: {
-      'msvalidate.01': '1D569DC0A94228D66B05E262EAD9C8F5'
+      'msvalidate.01': '1D569DC0A94228D66B05E262EAD9C8F5',
+      'facebook-domain-verification': 'jun19086bk3h816jakt4xojw9cq3vm'
     }
   }
 }
