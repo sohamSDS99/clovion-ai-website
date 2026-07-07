@@ -1,6 +1,18 @@
+import type { CSSProperties } from 'react'
 import type { Metadata } from 'next'
 import FeatureContent from '@/components/pricing/FeatureContent'
 import { P_FAQS } from '@/components/pricing/faqs'
+
+// Remap the emerald "positive" accent to the Clove orange (#C2410C — same as
+// the homepage) for the whole pricing page. Overriding the tokens on the
+// wrapper flips every accent at once (Launch offer + Most popular badges, the
+// Growth card border, discount text, checkmarks, the comparison-table Growth
+// column, and the "2 months free" pill shade) without touching each callsite.
+const orangeAccent = {
+  ['--positive' as string]: '#C2410C',
+  ['--positive-bg' as string]: '#FBEEE7',
+  ['--positive-border' as string]: 'rgba(194,65,12,0.34)'
+} as CSSProperties
 
 export const metadata: Metadata = {
   title: 'Pricing — AI Visibility, Sentiment & GEO Tracking Plans',
@@ -48,7 +60,7 @@ const faqJsonLd = {
 
 export default function PricingPage() {
   return (
-    <div className="clv-ai-vis-page">
+    <div className="clv-ai-vis-page" style={orangeAccent}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <FeatureContent />
