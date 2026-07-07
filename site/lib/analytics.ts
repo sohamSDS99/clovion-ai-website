@@ -171,8 +171,9 @@ export const analytics = {
 
   formSubmit: (formName: string, location: string) =>
     track({
-      event: 'generate_lead',
+      event: 'form_submit',
       form_name: formName,
+      cta_location: location,
       form_location: location,
       button_id: buttonId(location, formName),
       button_event: buttonEvent(location, 'lead')
@@ -188,5 +189,9 @@ export const analytics = {
     }),
 
   pageView: (path: string) =>
-    track({ event: 'page_view', page_path: path })
+    track({
+      event: 'page_view',
+      page_path: path,
+      page_title: typeof document !== 'undefined' ? document.title : ''
+    })
 }
