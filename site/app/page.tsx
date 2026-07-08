@@ -18,6 +18,14 @@ export const metadata: Metadata = {
     'See how ChatGPT, Claude, Gemini, Perplexity, Grok, and Google AI Overviews describe your brand. Clovion tracks visibility daily, benchmarks against competitors, and ships the GEO fixes that move citation share.'
 }
 
+// Render the homepage dynamically (no long-lived full-route cache). A prior
+// deploy left the static "/" entry poisoned with the RSC/flight payload
+// (served as text/x-component with s-maxage=31536000), which survived rebuilds
+// and revalidatePath. force-dynamic content-negotiates per request — HTML for
+// document loads, flight only for genuine RSC requests — so the bare "/" URL
+// can never get stuck serving the flight payload again.
+export const dynamic = 'force-dynamic'
+
 const organizationJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
