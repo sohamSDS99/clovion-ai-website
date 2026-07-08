@@ -11,7 +11,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import TurnstileWidget from '@/components/free-score/TurnstileWidget'
-import { analytics } from '@/lib/analytics'
+import { analytics, newMetaEventId } from '@/lib/analytics'
 
 const CLOVION_LOGO =
   'https://res.cloudinary.com/doajh6jwk/image/upload/v1782804104/Clovion-Logo-white_xoqx8t.png'
@@ -103,17 +103,19 @@ export default function ToolLeadModal({
     }
     setStatus('submitting')
     setErrorMsg('')
+    // Shared id for Meta Pixel⇄CAPI dedup (browser + server report the same id).
+    const metaEventId = newMetaEventId('lead')
     try {
       const res = await fetch('/api/tool-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), tool, turnstileToken: token })
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), tool, turnstileToken: token, metaEventId })
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || 'Something went wrong. Please try again.')
       }
-      analytics.formSubmit('tool_lead', tool)
+      analytics.formSubmit('tool_lead', tool, metaEventId)
       onSuccess()
     } catch (err) {
       setStatus('error')

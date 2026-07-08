@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { sendMetaConversion } from '@/lib/meta/capi'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -49,9 +50,15 @@ export async function POST(req: NextRequest) {
   }
 
   const email = (typeof body.email === 'string' ? body.email.trim().slice(0, MAX_FIELD) : '').toLowerCase()
+  const metaEventId = typeof body.metaEventId === 'string' ? body.metaEventId : ''
   if (!EMAIL_RE.test(email)) {
     return NextResponse.json({ error: 'enter a valid email', code: 'bad_email' }, { status: 400 })
   }
+
+  // Server copy of the conversion (deduped against the browser Pixel via
+  // metaEventId). Fires whether or not a forwarding webhook is configured, since
+  // a valid submit is the conversion. No-ops without META_CAPI_TOKEN; never throws.
+  await sendMetaConversion({ req, eventName: 'Lead', eventId: metaEventId || undefined, email })
 
   if (!WEBHOOK_URL) {
     // Capture not wired yet — accept so the popup confirms; record for now.

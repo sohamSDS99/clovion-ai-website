@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui'
-import { analytics } from '@/lib/analytics'
+import { analytics, newMetaEventId } from '@/lib/analytics'
 import type { ResourceLeadField } from '@/lib/cms-types'
 
 type Props = {
@@ -92,11 +92,13 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
     }
 
     setSubmitting(true)
+    // Shared id for Meta Pixel⇄CAPI dedup (browser + server report the same id).
+    const metaEventId = newMetaEventId('lead')
     try {
       const res = await fetch('/api/resource-lead', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, email, data })
+        body: JSON.stringify({ slug, email, data, metaEventId })
       })
       const body = (await res.json().catch(() => null)) as
         | { downloadUrl?: string; error?: string }
@@ -106,7 +108,7 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
         return
       }
       setDownloadUrl(body.downloadUrl)
-      analytics.formSubmit('resource_lead', `resource_${slug}`)
+      analytics.formSubmit('resource_lead', `resource_${slug}`, metaEventId)
       analytics.fileDownload(resourceTitle, body.downloadUrl)
     } catch {
       setSubmitError('Network error. Please try again.')
