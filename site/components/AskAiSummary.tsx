@@ -8,7 +8,7 @@
  */
 
 const PROMPT =
-  'What is Clovion AI and what does it do? Give a short summary of the platform, who it is for, and its main features.'
+  "As a marketing specialist, I want to understand how Clovion AI helps manage the entire AI visibility lifecycle and what core benefits make it ideal for brands like mine, with a focus on ROI. Summarize the highlights from clovion.ai and explain if it's worth giving a try."
 const q = encodeURIComponent(PROMPT)
 
 const ENGINES = [
