@@ -5,27 +5,27 @@ import type { CSSProperties } from 'react'
 /* ── Feature comparison — source of truth is the pricing content spec.
    16 rows, Growth column highlighted. Purely informational (no CTAs). */
 
-type Cell = string | 'yes' | 'dash'
+type Cell = string | 'yes' | 'no' | 'dash'
 
 type Row = { label: string; starter: Cell; growth: Cell; enterprise: Cell }
 
 const ROWS: Row[] = [
-  { label: 'AI engines tracked', starter: '1', growth: '3', enterprise: '6' },
-  { label: 'Prompts tracked', starter: '50', growth: '150 / brand', enterprise: 'Unlimited' },
-  { label: 'Brands', starter: '1', growth: '2', enterprise: 'Unlimited' },
-  { label: 'Recommendations', starter: 'dash', growth: '20 / month', enterprise: 'Unlimited' },
-  { label: 'Sentiment analysis', starter: 'yes', growth: 'yes', enterprise: 'yes' },
-  { label: 'Brand perception', starter: 'dash', growth: 'yes', enterprise: 'yes' },
-  { label: 'Competitor analysis', starter: '5 competitors', growth: 'yes', enterprise: 'yes' },
-  { label: 'Fanout query analysis', starter: 'dash', growth: 'yes', enterprise: 'yes' },
-  { label: 'Region-level tracking', starter: 'dash', growth: 'dash', enterprise: 'yes' },
-  { label: 'Brand audit', starter: 'Limited', growth: 'yes', enterprise: 'yes' },
-  { label: 'Citation tracking', starter: 'yes', growth: 'yes', enterprise: 'yes' },
-  { label: 'Ask Clove', starter: 'dash', growth: '10 questions', enterprise: 'Unlimited' },
+  { label: 'AI Engine', starter: '1', growth: '3', enterprise: '6' },
+  { label: 'Users', starter: '1', growth: '2', enterprise: 'Custom' },
+  { label: 'Recommendations', starter: 'Limited', growth: '20 / month', enterprise: 'yes' },
+  { label: 'Sentiment', starter: 'yes', growth: 'yes', enterprise: 'yes' },
+  { label: 'Brand Perception', starter: 'no', growth: 'yes', enterprise: 'yes' },
+  { label: 'Competitor Analysis', starter: '5', growth: '10', enterprise: 'Custom' },
+  { label: 'Fanout', starter: 'no', growth: 'yes', enterprise: 'yes' },
+  { label: 'Region', starter: '1', growth: '1', enterprise: 'Custom' },
+  { label: 'Brand Audit', starter: 'Limited', growth: 'yes', enterprise: 'yes' },
+  { label: 'Prompt Tracking / Engine', starter: '50', growth: '50', enterprise: 'Custom' },
+  { label: 'Ask Clove', starter: '2 questions', growth: '10 questions', enterprise: 'Custom' },
+  { label: 'Citation', starter: 'yes', growth: 'yes', enterprise: 'yes' },
+  { label: 'Brands', starter: '1', growth: '2', enterprise: 'Custom' },
   { label: 'Google Analytics', starter: 'yes', growth: 'yes', enterprise: 'yes' },
-  { label: 'AI Agents', starter: 'dash', growth: 'dash', enterprise: 'yes' },
-  { label: 'Integrations', starter: 'dash', growth: 'yes', enterprise: 'yes' },
-  { label: 'Tracking frequency', starter: 'Daily', growth: 'Daily', enterprise: 'Daily' },
+  { label: 'AI Agents', starter: 'no', growth: 'no', enterprise: 'yes' },
+  { label: 'Integrations', starter: 'no', growth: 'yes', enterprise: 'yes' },
 ]
 
 const TH: CSSProperties = {
@@ -58,8 +58,17 @@ function Dash() {
   )
 }
 
+function No() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" role="img" aria-label="Not included" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
+      <path d="M6 6l12 12M18 6L6 18" stroke="var(--ink-40, rgba(10,10,15,0.4))" strokeWidth="2.25" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 function renderCell(v: Cell) {
   if (v === 'yes') return <Yes />
+  if (v === 'no') return <No />
   if (v === 'dash') return <Dash />
   return v
 }

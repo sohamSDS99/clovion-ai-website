@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useLayoutEffect, type CSSProperties } from 'react'
 import PricingTiers from './PricingTiers'
 import ComparisonTable from './ComparisonTable'
+import OurPartners from './OurPartners'
 import { openCalendly } from '@/lib/openCalendly'
 import { CALENDLY_URL } from '@/lib/calendly'
 import { FAQAccordion } from '@/components/FAQAccordion'
@@ -323,6 +324,7 @@ export default function FeatureContent() {
       <AgentNote />
       <AgencyBand />
       <Compare />
+      <OurPartners />
       <div style={{ paddingBottom: 40 }}>
         <FAQAccordion items={P_FAQS} />
       </div>
