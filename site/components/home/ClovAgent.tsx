@@ -30,6 +30,7 @@ type Phase = 'idle' | (typeof SEQ)[number]
 const DUR: Record<(typeof SEQ)[number], number> = { logo: 1750, question: 1950, thinking: 1500, answer: 2950, chart: 4400 }
 
 const STYLES = `
+.clv-agent-section { background: #FAF9F7; padding: var(--section) 0; }
 .clv-agent-grid { display: grid; grid-template-columns: 1.04fr 1fr; column-gap: clamp(48px, 6vw, 96px); align-items: center; }
 .clv-logo-wipe { display: inline-flex; color: var(--ink); animation: clvLogoWipe 1.65s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @keyframes clvLogoWipe { from { clip-path: inset(0 100% 0 0); opacity: 0; } 55% { opacity: 1; } to { clip-path: inset(0 0 0 0); opacity: 1; } }
@@ -46,6 +47,18 @@ const STYLES = `
   .clv-agent-grid { grid-template-columns: 1fr; row-gap: 44px; }
   .clv-ipad { max-width: 400px; padding: 11px; border-radius: 34px; }
   .clv-ipad-screen { border-radius: 25px; }
+}
+/* Short/wide desktop viewports (16:9 laptops & external monitors): the portrait
+   iPad + tall left column overflow the fold. zoom shrinks the device's layout box
+   (not just its paint) so the whole section frames between the sticky header and
+   the fold; tighter section padding reclaims the rest. ponytail: zoom is the only
+   lever that shrinks height without reflowing the chat text taller. */
+@media (min-width: 901px) and (max-height: 900px) {
+  .clv-agent-section { padding: clamp(2rem, 5vh, 4rem) 0; }
+  .clv-ipad { zoom: 0.86; }
+}
+@media (min-width: 901px) and (max-height: 760px) {
+  .clv-ipad { zoom: 0.74; }
 }
 `
 
@@ -238,7 +251,7 @@ export function ClovAgent() {
   }, [inView, reduced])
 
   return (
-    <section ref={ref} data-track-location="home_clov_agent" style={{ background: '#FAF9F7', padding: 'var(--section) 0' }}>
+    <section ref={ref} data-track-location="home_clov_agent" className="clv-agent-section">
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
       <Container>
