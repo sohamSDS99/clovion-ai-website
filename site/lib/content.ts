@@ -62,7 +62,8 @@ export const nav = {
       ]
     },
     { label: 'Pricing', href: '/pricing' },
-    { label: 'Customers', href: '/customers' },
+    // { label: 'Customers', href: '/customers' }, // temporarily hidden
+
     {
       label: 'Resources',
       children: [

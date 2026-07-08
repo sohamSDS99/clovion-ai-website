@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 import FeatureContent from '@/components/customers/FeatureContent'
 
 export const metadata: Metadata = {
@@ -63,6 +64,10 @@ const faqJsonLd = {
 }
 
 export default function CustomersPage() {
+  // TEMPORARILY HIDDEN: /customers redirects to home. To restore, delete the
+  // next line — the full page (metadata, JSON-LD, FeatureContent) is intact below.
+  redirect('/')
+
   return (
     <div className="clv-dark clv-ai-vis-page">
       <script
