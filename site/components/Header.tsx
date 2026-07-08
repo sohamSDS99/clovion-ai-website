@@ -108,11 +108,11 @@ export function Header() {
                     <div
                       className={cn(
                         'rounded-card bg-white border border-line shadow-card p-3',
-                        // Long menus (Features has 9 items) go 2-column so the
+                        // Long menus (Features has 9 items) go 3-column so the
                         // panel stays short enough for a laptop viewport; short
                         // menus (Resources) keep the single-column layout.
                         item.children!.length > 6
-                          ? 'w-[min(720px,calc(100vw-2rem))] grid grid-cols-2 gap-x-1 gap-y-0.5'
+                          ? 'w-[min(920px,calc(100vw-2rem))] grid grid-cols-3 gap-x-1 gap-y-0.5'
                           : 'w-[min(480px,calc(100vw-2rem))]'
                       )}
                     >
