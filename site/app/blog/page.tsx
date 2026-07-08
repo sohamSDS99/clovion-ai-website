@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import FeatureContent, { type Post } from '@/components/blog/FeatureContent'
+import type { CSSProperties } from 'react'
+import BlogIndex, { type Post } from '@/components/blog/BlogIndex'
 import { listContent } from '@/lib/cms'
 import type { CmsSummary } from '@/lib/cms-types'
 
@@ -80,12 +81,26 @@ export default async function BlogPage() {
   const cmsPosts = items.map(toPost)
 
   return (
-    <div className="clv-dark clv-ai-vis-page">
+    <div
+      className="clv-blog"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            /* Brand-orange eyebrow pulse dot, scoped to the light blog. */
+            .clv-blog .eyebrow-dot::before {
+              background: #C2410C;
+              box-shadow: 0 0 0 4px rgba(194, 65, 12, 0.07);
+            }
+          `
+        }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <FeatureContent cmsPosts={cmsPosts} />
+      <BlogIndex cmsPosts={cmsPosts} />
     </div>
   )
 }

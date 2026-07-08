@@ -21,8 +21,7 @@ import { useEffect, useState, type CSSProperties } from 'react'
  *     longhand and nothing animates). Uses the literal cubic-bezier value.
  *   • No Tailwind color utilities — everything inline-style via var(--*).
  *
- * Reference visual: site/components/blog/FeatureContent.tsx (the FAQ section).
- * That file stays as-is — every OTHER FAQ on the site migrates to this one.
+ * Every FAQ section on the site uses this canonical accordion.
  */
 
 export type FAQAccordionItem = { q: string; a: string }
