@@ -169,14 +169,18 @@ export const analytics = {
       button_event: buttonEvent(location, plan)
     }),
 
-  formSubmit: (formName: string, location: string) =>
+  formSubmit: (formName: string, location: string, metaEventId?: string) =>
     track({
       event: 'form_submit',
       form_name: formName,
       cta_location: location,
       form_location: location,
       button_id: buttonId(location, formName),
-      button_event: buttonEvent(location, 'lead')
+      button_event: buttonEvent(location, 'lead'),
+      // Shared id for Meta Pixel⇄CAPI dedup. The GTM "Lead" tag reads this via a
+      // Data Layer Variable and passes it as the Pixel eventID; the same id is
+      // POSTed to the API route + sent server-side (see lib/meta/capi.ts).
+      ...(metaEventId ? { meta_event_id: metaEventId } : {})
     }),
 
   fileDownload: (fileName: string, url: string) =>
@@ -194,4 +198,17 @@ export const analytics = {
       page_path: path,
       page_title: typeof document !== 'undefined' ? document.title : ''
     })
+}
+
+// One unique id per conversion, generated at form-submit time and shared
+// between the browser Meta Pixel (passed as `eventID`) and the server-side
+// Conversions API call (`event_id`) so Meta deduplicates the two into a single
+// event. Pass it to analytics.formSubmit(name, location, id) AND include it in
+// the API request body (see lib/meta/capi.ts).
+export function newMetaEventId(prefix = 'lead'): string {
+  const rand =
+    typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+      ? crypto.randomUUID()
+      : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`
+  return `${prefix}_${rand}`
 }

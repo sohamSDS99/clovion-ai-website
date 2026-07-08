@@ -7,7 +7,7 @@
 
 import { useCallback, useState } from 'react'
 import { countries } from '@/lib/countries'
-import { analytics } from '@/lib/analytics'
+import { analytics, newMetaEventId } from '@/lib/analytics'
 import TurnstileWidget from './TurnstileWidget'
 
 type FormState = {
@@ -48,17 +48,19 @@ export default function EmailGate({
     }
     setStatus('submitting')
     setErrorMsg('')
+    // Shared id for Meta Pixel⇄CAPI dedup (browser + server report the same id).
+    const metaEventId = newMetaEventId('lead')
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, domain, turnstileToken: token }),
+        body: JSON.stringify({ ...form, domain, turnstileToken: token, metaEventId }),
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
         throw new Error(data?.error || 'Something went wrong. Please try again.')
       }
-      analytics.formSubmit('free_score_lead', 'free_score_gate')
+      analytics.formSubmit('free_score_lead', 'free_score_gate', metaEventId)
       onGated(form.email)
     } catch (err) {
       setStatus('error')

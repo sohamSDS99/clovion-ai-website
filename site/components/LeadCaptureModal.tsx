@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { countries } from '@/lib/countries'
-import { analytics, track } from '@/lib/analytics'
+import { analytics, track, newMetaEventId } from '@/lib/analytics'
 
 // LeadCaptureModal — controlled-mode lead-capture dialog.
 //
@@ -105,11 +105,13 @@ export function LeadCaptureModal({
     if (status === 'submitting') return
     setStatus('submitting')
     setErrorMsg('')
+    // Shared id for Meta Pixel⇄CAPI dedup (browser + server report the same id).
+    const metaEventId = newMetaEventId('lead')
     try {
       const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ ...form, metaEventId })
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
@@ -124,7 +126,7 @@ export function LeadCaptureModal({
         // can still proceed with the in-memory success signal.
       }
       // Fire GA4 lead-generation event before handing control back to parent.
-      analytics.formSubmit('lead_capture', 'free_score_page')
+      analytics.formSubmit('lead_capture', 'free_score_page', metaEventId)
       // Hand off to parent. Parent decides whether to close, reveal scan UI,
       // celebrate, etc. — this component does not navigate.
       onSuccess()

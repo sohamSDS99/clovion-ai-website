@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { analytics } from '@/lib/analytics'
+import { analytics, newMetaEventId } from '@/lib/analytics'
 import { HaloMark } from '@/components/ui'
 
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
@@ -102,14 +102,16 @@ export function NewsletterPopup({ previewOpen = false }: { previewOpen?: boolean
       return
     }
     setStatus('submitting')
+    // Shared id for Meta Pixel⇄CAPI dedup (browser + server report the same id).
+    const metaEventId = newMetaEventId('lead')
     try {
       const res = await fetch('/api/newsletter', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: value })
+        body: JSON.stringify({ email: value, metaEventId })
       })
       if (!res.ok) throw new Error('subscribe failed')
-      analytics.formSubmit('newsletter', 'home_newsletter_popup')
+      analytics.formSubmit('newsletter', 'home_newsletter_popup', metaEventId)
       persistDismiss()
       setStatus('done')
       window.setTimeout(() => close(), 2600)

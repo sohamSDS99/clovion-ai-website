@@ -5,6 +5,7 @@
  */
 import { NextResponse } from "next/server";
 import { submitResourceLead } from "@/lib/cms";
+import { sendMetaConversion } from "@/lib/meta/capi";
 
 export const runtime = "nodejs";
 
@@ -13,6 +14,7 @@ export async function POST(req: Request) {
     slug?: string;
     email?: string;
     data?: Record<string, unknown>;
+    metaEventId?: string;
   } | null;
 
   if (!body?.slug || !body?.email) {
@@ -27,5 +29,15 @@ export async function POST(req: Request) {
   if (!result.ok) {
     return NextResponse.json({ error: result.error ?? "Submission failed." }, { status: 502 });
   }
+
+  // Server copy of the Lead conversion (deduped against the browser Pixel via
+  // metaEventId). No-ops when META_CAPI_TOKEN is unset; never throws.
+  await sendMetaConversion({
+    req,
+    eventName: "Lead",
+    eventId: body.metaEventId || undefined,
+    email: body.email,
+  });
+
   return NextResponse.json({ downloadUrl: result.downloadUrl });
 }

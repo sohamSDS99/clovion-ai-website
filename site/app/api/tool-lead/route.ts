@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyTurnstile } from '@/lib/freeScore/turnstile'
+import { sendMetaConversion } from '@/lib/meta/capi'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -53,6 +54,7 @@ export async function POST(req: NextRequest) {
   const name = clean(body.name)
   const email = clean(body.email).toLowerCase()
   const tool = clean(body.tool)
+  const metaEventId = clean(body.metaEventId)
   const turnstileToken = typeof body.turnstileToken === 'string' ? body.turnstileToken : ''
 
   if (!name || !email) {
@@ -122,6 +124,17 @@ export async function POST(req: NextRequest) {
     console.warn('[tool-lead] webhook request failed', err)
     return NextResponse.json({ error: 'could not submit', code: 'network' }, { status: 502 })
   }
+
+  // Server copy of the Lead conversion (deduped against the browser Pixel via
+  // metaEventId). No-ops when META_CAPI_TOKEN is unset; never throws.
+  await sendMetaConversion({
+    req,
+    eventName: 'Lead',
+    eventId: metaEventId || undefined,
+    email,
+    firstName: first_name,
+    lastName: last_name
+  })
 
   return NextResponse.json({ ok: true })
 }
