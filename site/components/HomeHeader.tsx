@@ -116,7 +116,14 @@ export function HomeHeader() {
                     )}
                   >
                     <div
-                      className="w-[min(480px,calc(100vw-2rem))] rounded-card border border-white/10 p-3"
+                      className={cn(
+                        'rounded-card border border-white/10 p-3',
+                        // Long menus (Features has 9 items) go 2-column so the
+                        // panel fits a laptop viewport; short menus keep 1 column.
+                        item.children!.length > 6
+                          ? 'w-[min(720px,calc(100vw-2rem))] grid grid-cols-2 gap-x-1 gap-y-0.5'
+                          : 'w-[min(480px,calc(100vw-2rem))]'
+                      )}
                       style={{
                         background: '#161619',
                         boxShadow: '0 24px 60px -24px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.4)'
