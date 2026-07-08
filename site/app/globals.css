@@ -484,9 +484,10 @@
   color: var(--ink);
 }
 
-/* The chat-window mock inside the dark ChatDemo section resets to the
-   light token ramp so it reads as a bright real product surface
-   glowing against the black section. */
+/* The chat-window mock (now inside the orange ClovAgent section) resets to the
+   light token ramp so it reads as a bright white product surface on the warm
+   orange panel — the LIGHT-token DMZ between the section orange and the emerald
+   RecoveryPlan chart inside it. */
 .clv-chat-island {
   --ink: #0a0a0f;
   --ink-rgb: 10 10 15;

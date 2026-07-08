@@ -1,149 +1,209 @@
+'use client'
+
+import { useState, type KeyboardEvent, type CSSProperties } from 'react'
 import { Container } from '@/components/ui'
-import { TypingHeadline } from './TypingHeadline'
 
 const TESTIMONIALS = [
   {
     quote:
-      "Clovion showed us exactly which prompts mentioned our competitors but not us. The questions were neutral, they didn't name anyone, so the results were honest. We fixed three pages based on the GEO suggestions and started getting cited within two weeks. Visibility score went from 14 to 52.",
+      'Clovion showed us exactly which prompts mentioned our competitors but not us. The questions were neutral, they didn’t name anyone, so the results were honest. We fixed three pages based on the GEO suggestions and started getting cited within two weeks. Visibility score went from 14 to 52.',
     author: 'Mirjam Meling',
     role: 'Marketing and Communication Manager',
-    company: 'Netpower'
+    company: 'Netpower',
+    initials: 'MM'
   },
   {
     quote:
       'Our Perplexity share of voice went from zero to top three in 30 days. We just followed the on-page suggestions rule by rule. The Gap Finder was the unlock — it showed us the exact competitor pages getting cited when our brand wasn’t mentioned. That’s a content roadmap you can’t get anywhere else.',
     author: 'Erlend Bruvik',
     role: 'CEO',
-    company: 'SDS Manager'
+    company: 'SDS Manager',
+    initials: 'EB'
   },
   {
     quote:
-      'We manage eight client brands and needed a scalable way to track AI visibility. The automatic competitor discovery found 11 new brands showing up in AI answers that none of our clients had on their radar — they auto-promoted after just 3 appearances each. Now we monitor all of them from one dashboard.',
+      'We manage eight client brands and needed a scalable way to track AI visibility. The automatic competitor discovery found 11 new brands showing up in AI answers that none of our clients had on their radar. Now we monitor all of them from one dashboard.',
     author: 'Morten André Hjelle',
     role: 'CEO',
-    company: 'CertainQMS'
+    company: 'CertainQMS',
+    initials: 'MH'
   }
 ]
 
-function initials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .slice(0, 2)
+/* The homepage forces Saans SemiBold on everything via `.clv-home *`. Saans has
+   no regular weight, so to genuinely UN-BOLD the story text we override the
+   font-family to the already-loaded Hanken Grotesk (400/500) with a higher-
+   specificity !important rule, and set light weights inline. */
+const STORIES_CSS = `
+.clv-home .clv-cs-soft, .clv-home .clv-cs-soft * {
+  font-family: var(--font-body-reg, 'Hanken Grotesk', system-ui, sans-serif) !important;
+}
+.clv-cs-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(0, 0.8fr);
+  gap: clamp(40px, 6vw, 100px);
+  align-items: center;
+}
+.clv-cs-fade { animation: clvCsFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
+@keyframes clvCsFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.clv-cs-quote { min-height: 4.6em; }
+.clv-cs-arrow { transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1); }
+.clv-cs-arrow:hover { background: var(--subtle); }
+.clv-cs-arrow:focus-visible, .clv-cs-dot:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+@media (max-width: 900px) {
+  .clv-cs-grid { grid-template-columns: 1fr; gap: 36px; }
+  .clv-cs-photo { order: -1; }
+  .clv-cs-quote { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .clv-cs-fade { animation: none; } }
+`
+
+function Chevron({ dir }: { dir: 'l' | 'r' }) {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      {dir === 'l' ? <path d="M15 6l-6 6 6 6" /> : <path d="M9 6l6 6-6 6" />}
+    </svg>
+  )
+}
+
+function CornerMark({ style }: { style: CSSProperties }) {
+  return <span aria-hidden style={{ position: 'absolute', width: 7, height: 7, background: 'rgba(10,10,15,0.18)', pointerEvents: 'none', ...style }} />
+}
+
+const arrowStyle: CSSProperties = {
+  width: 46,
+  height: 46,
+  borderRadius: 999,
+  background: 'var(--white)',
+  border: '1px solid var(--line)',
+  boxShadow: 'var(--shadow-card)',
+  color: 'var(--ink)',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  padding: 0
 }
 
 export function Testimonials() {
-  return (
-    <section style={{ padding: 'var(--section) 0', background: 'linear-gradient(to bottom, var(--bg) 0%, var(--subtle) 8%, var(--subtle) 92%, var(--bg) 100%)' }}>
-      <Container>
-        <div style={{ textAlign: 'center', maxWidth: 640, margin: '0 auto 48px' }}>
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.74rem',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: 'var(--ink-50)'
-            }}
-          >
-            Customer stories
-          </span>
-          <TypingHeadline
-            text="Teams running GEO as a real channel."
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'var(--display-md)',
-              fontWeight: 600,
-              letterSpacing: 'var(--track-display-md)',
-              lineHeight: 1.05,
-              margin: '16px 0 0',
-              textWrap: 'balance',
-              minHeight: '1.1em',
-              color: 'var(--ink)'
-            }}
-          />
-          <p
-            style={{
-              fontSize: 'var(--text-lead)',
-              lineHeight: 1.55,
-              color: 'var(--ink-70)',
-              marginTop: 20,
-              textWrap: 'balance'
-            }}
-          >
-            Growth, product, and marketing leaders who stopped guessing about AI search and started using data to fix it.
-          </p>
-        </div>
+  const [i, setI] = useState(0)
+  const n = TESTIMONIALS.length
+  const t = TESTIMONIALS[i]
+  const go = (d: number) => setI((v) => (v + d + n) % n)
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t) => (
-            <article
-              key={t.author}
-              style={{
-                background: 'var(--white)',
-                border: '1px solid var(--line)',
-                borderRadius: 20,
-                padding: '2rem',
-                boxShadow: 'var(--shadow-card)',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              <div style={{ color: 'var(--ink-15)' }}>
-                <svg width="28" height="22" viewBox="0 0 32 24" fill="currentColor" aria-hidden>
-                  <path d="M9 0C4.5 1 .5 5 .5 10v14h11V10H5C5 7 7.5 4 11 3L9 0zm14 0c-4.5 1-8.5 5-8.5 10v14h11V10H19c0-3 2.5-6 6-7L23 0z" />
-                </svg>
-              </div>
-              <blockquote
-                style={{
-                  margin: '20px 0 0',
-                  fontSize: '1.02rem',
-                  lineHeight: 1.6,
-                  color: 'var(--ink-80, var(--ink-70))',
-                  flex: 1
-                }}
-              >
-                {t.quote}
-              </blockquote>
-              <div
-                style={{
-                  marginTop: 24,
-                  paddingTop: 24,
-                  borderTop: '1px solid var(--line)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12
-                }}
-              >
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      go(-1)
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      go(1)
+    }
+  }
+
+  return (
+    <section data-track-location="home_testimonials" style={{ padding: 'var(--section) 0', background: '#FAF9F7' }}>
+      <style dangerouslySetInnerHTML={{ __html: STORIES_CSS }} />
+      <Container>
+        <div
+          role="group"
+          aria-roledescription="testimonial carousel"
+          aria-label="Customer stories"
+          onKeyDown={onKeyDown}
+          style={{ position: 'relative', paddingInline: 'clamp(4px, 2vw, 28px)' }}
+        >
+          {/* corner registration marks (from the reference) */}
+          <CornerMark style={{ top: -6, left: -6 }} />
+          <CornerMark style={{ top: -6, right: -6 }} />
+          <CornerMark style={{ bottom: -6, left: -6 }} />
+          <CornerMark style={{ bottom: -6, right: -6 }} />
+
+          <div key={i} className="clv-cs-fade" aria-live="polite" aria-atomic="true">
+            <div className="clv-cs-grid">
+              {/* LEFT — the story (unbolded, regular-weight Hanken) */}
+              <div className="clv-cs-soft">
+                {/* company wordmark */}
                 <div
                   style={{
-                    height: 40,
-                    width: 40,
-                    borderRadius: 999,
-                    background: 'var(--ink-10)',
-                    flexShrink: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.78rem',
-                    fontWeight: 600,
-                    color: 'var(--ink-60)'
+                    fontSize: '0.8125rem',
+                    fontWeight: 500,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: 'var(--ink-40)'
                   }}
                 >
-                  {initials(t.author)}
+                  {t.company}
                 </div>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, fontSize: '0.92rem', color: 'var(--ink)' }}>
-                    {t.author}
-                  </div>
-                  <div style={{ fontSize: '0.82rem', color: 'var(--ink-60)' }}>
-                    {t.role} · {t.company}
-                  </div>
+
+                <figure style={{ margin: '26px 0 0' }}>
+                  <blockquote
+                    className="clv-cs-quote"
+                    style={{
+                      margin: 0,
+                      fontWeight: 400,
+                      fontSize: 'clamp(1.4rem, 0.9rem + 1.9vw, 2.05rem)',
+                      lineHeight: 1.42,
+                      letterSpacing: '-0.008em',
+                      color: 'var(--ink)',
+                      textWrap: 'pretty'
+                    }}
+                  >
+                    “{t.quote}”
+                  </blockquote>
+
+                  <figcaption style={{ marginTop: 'clamp(28px, 3.5vw, 40px)' }}>
+                    <div style={{ fontWeight: 500, fontSize: '1.02rem', color: 'var(--ink)' }}>{t.author}</div>
+                    <div style={{ marginTop: 4, fontWeight: 400, fontSize: '0.95rem', color: 'var(--ink-50)' }}>
+                      {t.role} · {t.company}
+                    </div>
+                  </figcaption>
+                </figure>
+
+                {/* controls — prev / next + counter */}
+                <div style={{ marginTop: 'clamp(32px, 4vw, 48px)', display: 'flex', alignItems: 'center', gap: 16 }}>
+                  <button type="button" aria-label="Previous story" className="clv-cs-arrow" style={arrowStyle} onClick={() => go(-1)}>
+                    <Chevron dir="l" />
+                  </button>
+                  <button type="button" aria-label="Next story" className="clv-cs-arrow" style={arrowStyle} onClick={() => go(1)}>
+                    <Chevron dir="r" />
+                  </button>
                 </div>
               </div>
-            </article>
-          ))}
+
+              {/* RIGHT — the picture (portrait). Monogram placeholder until real photos are added. */}
+              <div className="clv-cs-photo">
+                <div
+                  style={{
+                    width: '100%',
+                    maxWidth: 400,
+                    aspectRatio: '4 / 5',
+                    marginInline: 'auto',
+                    borderRadius: 18,
+                    overflow: 'hidden',
+                    background: 'var(--subtle)',
+                    border: '1px solid var(--line)',
+                    boxShadow: 'var(--shadow-card)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {/* Swap this monogram for <img src=... alt=t.author> when photos are ready. */}
+                  <span
+                    aria-hidden
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: 'clamp(2.4rem, 6vw, 3.4rem)',
+                      letterSpacing: '0.02em',
+                      color: 'var(--ink-20)'
+                    }}
+                  >
+                    {t.initials}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </Container>
     </section>
