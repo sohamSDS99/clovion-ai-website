@@ -16,7 +16,7 @@ const DARK_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/co
 // to the light homepage palette (#FAF9F7 + Clove orange), so they opt out of
 // their section's dark scope. The blog listing + category pages are light; the
 // /blog/[slug] article reader stays dark via the /blog prefix.
-const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo', '/resources'])
 
 function isDarkRoute(pathname: string): boolean {
   if (LIGHT_EXCEPTIONS.has(pathname)) return false

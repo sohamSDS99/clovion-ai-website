@@ -17,7 +17,7 @@ const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/co
 // LIGHT_EXCEPTIONS so these pages get the light Header/Footer to match their
 // rebranded light palette. Blog listing + category pages are light; the
 // /blog/[slug] article reader stays dark via the /blog prefix.
-const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo'])
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/blog', '/blog/category/geo', '/blog/category/ai-search', '/blog/category/seo', '/resources'])
 
 function isHomeChrome(pathname: string): boolean {
   if (LIGHT_EXCEPTIONS.has(pathname)) return false
