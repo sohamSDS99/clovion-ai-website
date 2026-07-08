@@ -438,22 +438,25 @@ export default function ClovionVsPeecAiPage() {
         <div className="grid-bg absolute inset-0 -z-10 opacity-60" aria-hidden />
         <HeroShade />
         <Container>
-          <div className="mx-auto max-w-3xl text-center" data-track-location="compare_peec_hero">
-            <Eyebrow className="justify-center">Comparison</Eyebrow>
+          <div className="text-center" data-track-location="compare_peec_hero">
             <h1
-              className="mt-6 mx-auto text-balance"
+              className="mx-auto"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
-                lineHeight: 1.08,
-                fontSize: 'clamp(2rem, 4.4vw, 3.05rem)',
-                maxWidth: '17ch'
+                lineHeight: 1.12,
+                // Sized to sit on ONE line on desktop; wraps on smaller screens.
+                fontSize: 'clamp(1.5rem, 3.4vw, 2.05rem)',
+                maxWidth: 'none'
               }}
             >
               Clovion vs Peec AI: <span style={{ color: BRAND }}>multi-engine AI visibility comparison</span>
             </h1>
-            <p className="lead mt-6 mx-auto" style={{ color: 'var(--ink-70)', maxWidth: 640 }}>
+            <p
+              className="mt-6 mx-auto"
+              style={{ color: 'var(--ink-70)', fontSize: '0.82rem', lineHeight: 1.6, maxWidth: 'none' }}
+            >
               Clovion and Peec AI both track how your brand shows up in AI answers. The difference: Clovion
               covers 6 AI engines — including Claude and Grok — and tells you what to fix and how much it should
               help. Peec covers 3 engines per plan and focuses on tracking and reporting.
