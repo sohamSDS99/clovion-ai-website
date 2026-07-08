@@ -13,7 +13,13 @@ const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/featu
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
 const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
+// Explicit LIGHT-chrome exceptions under a dark prefix (mirrors ThemeShell's
+// LIGHT_ROUTES). `/compare/clovion-vs-otterly` ships light, so it uses the
+// light Header/Footer.
+const LIGHT_ROUTES = new Set<string>(['/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/resources'])
+
 function isHomeChrome(pathname: string): boolean {
+  if (LIGHT_ROUTES.has(pathname)) return false
   if (HOME_ROUTES.has(pathname)) return true
   return HOME_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
