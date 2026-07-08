@@ -770,6 +770,27 @@
 }
 .cms-prose th { background: rgba(10, 10, 15, 0.04); font-weight: 600; }
 
+/* ── Light blog article (.clv-light-article) — the whole /blog section ships
+   LIGHT (#FAF9F7) with the Clove orange accent. Body copy uses the regular
+   (Hanken) weight for long-form readability; inline links + the blockquote
+   rule get brand orange. Scoped so it never touches the still-dark /news
+   article reader. */
+.clv-light-article .cms-prose {
+  font-family: var(--font-body-reg, 'Hanken Grotesk', system-ui, sans-serif);
+  font-weight: 400;
+}
+.clv-light-article .cms-prose a {
+  color: #C2410C;
+  text-decoration-color: rgba(194, 65, 12, 0.4);
+}
+.clv-light-article .cms-prose a:hover {
+  opacity: 1;
+  text-decoration-color: #C2410C;
+}
+.clv-light-article .cms-prose blockquote {
+  border-left-color: #C2410C;
+}
+
 /* Homepage: force every text — including the coded mock labels (mono) and
    any body-reg/Hanken — to Saans SemiBold. !important beats the inline
    font-family set on the mock elements. Scoped to the homepage only. */

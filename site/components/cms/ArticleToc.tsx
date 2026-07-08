@@ -11,7 +11,8 @@ import type { TocItem } from './toc'
 // Scroll-spy is deterministic (not IntersectionObserver): on each rAF-throttled
 // scroll we pick the LAST heading whose top has crossed the offset line. That
 // handles short trailing sections and fast scrolls without the IO edge cases.
-export function ArticleToc({ items }: { items: TocItem[] }) {
+export function ArticleToc({ items, accentColor }: { items: TocItem[]; accentColor?: string }) {
+  const activeInk = accentColor ?? 'var(--ink)'
   const [active, setActive] = useState<string>(items[0]?.id ?? '')
   const tickingRef = useRef(false)
 
@@ -91,8 +92,8 @@ export function ArticleToc({ items }: { items: TocItem[] }) {
                 className="block py-1.5 pl-4 leading-snug transition-colors"
                 style={{
                   marginLeft: '-1px',
-                  borderLeft: `2px solid ${isActive ? 'var(--ink)' : 'transparent'}`,
-                  color: isActive ? 'var(--ink)' : 'var(--ink-50)'
+                  borderLeft: `2px solid ${isActive ? activeInk : 'transparent'}`,
+                  color: isActive ? activeInk : 'var(--ink-50)'
                 }}
               >
                 {item.text}

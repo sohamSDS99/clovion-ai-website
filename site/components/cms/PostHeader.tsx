@@ -13,7 +13,8 @@ export function PostHeader({
   excerpt,
   meta,
   backHref,
-  backLabel = 'Back'
+  backLabel = 'Back',
+  accentColor
 }: {
   eyebrow: string
   title: string
@@ -22,6 +23,9 @@ export function PostHeader({
   meta?: ReactNode
   backHref?: string
   backLabel?: string
+  // When set, the eyebrow renders in this color (e.g. brand orange on light
+  // blog articles). Omitted → default token color, so news stays unaffected.
+  accentColor?: string
 }) {
   return (
     <Section className="relative overflow-hidden">
@@ -43,7 +47,16 @@ export function PostHeader({
             order: the byline sits directly under the title — never below the
             body/excerpt. */}
         <div className={`mx-auto max-w-4xl text-center ${backHref ? 'mt-8' : ''}`}>
-          <Eyebrow>{eyebrow}</Eyebrow>
+          {accentColor ? (
+            <span
+              className="eyebrow"
+              style={{ color: accentColor, display: 'inline-block' }}
+            >
+              {eyebrow}
+            </span>
+          ) : (
+            <Eyebrow>{eyebrow}</Eyebrow>
+          )}
           <h1
             className="display-md mt-5 text-balance"
             style={{ fontSize: 'clamp(2.25rem, 3vw + 1rem, 3.5rem)' }}

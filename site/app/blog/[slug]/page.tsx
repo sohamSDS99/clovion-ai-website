@@ -68,11 +68,15 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   const { html: bodyHtml, toc } = extractToc(item.bodyHtml)
 
   return (
-    <article className="clv-dark clv-ai-vis-page">
+    <article
+      className="clv-light-article"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as React.CSSProperties}
+    >
       <JsonLd data={item.jsonLd} />
 
       <PostHeader
         eyebrow="Blog"
+        accentColor="#C2410C"
         title={item.title}
         coverImageUrl={item.coverImageUrl}
         excerpt={item.excerpt}
@@ -102,7 +106,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             {toc.length > 0 && (
               <aside className="hidden lg:block">
                 <div className="lg:sticky lg:top-24">
-                  <ArticleToc items={toc} />
+                  <ArticleToc items={toc} accentColor="#C2410C" />
                 </div>
               </aside>
             )}
