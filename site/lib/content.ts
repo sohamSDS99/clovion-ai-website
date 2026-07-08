@@ -67,8 +67,6 @@ export const nav = {
       label: 'Resources',
       children: [
         { label: 'Blog', href: '/blog', desc: 'GEO, AI search, and SEO insights' },
-        { label: 'News', href: '/news', desc: 'Product news and announcements' },
-        { label: 'Webinars', href: '/webinars', desc: 'Live sessions and on-demand recordings' },
         { label: 'Guides & Downloads', href: '/resources', desc: 'Whitepapers, ebooks, and templates' },
         { label: 'FAQ', href: '/faq', desc: 'Answers to common questions' }
       ]
