@@ -45,11 +45,6 @@ export const nav = {
           desc: 'Make sure AI crawlers can access, read, and cite your pages'
         },
         {
-          label: 'Platform Coverage',
-          href: '/features/platform-coverage',
-          desc: 'One dashboard. Every major AI search surface.'
-        },
-        {
           label: 'Sentiment Analysis',
           href: '/features/sentiment-analysis',
           desc: 'See how ChatGPT, Claude, Gemini, and Perplexity describe your brand'

@@ -26,7 +26,6 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/features/brand-perception', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/features/fanout-query', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/features/ai-crawlability', priority: 0.8, changeFrequency: 'monthly' },
-  { path: '/features/platform-coverage', priority: 0.8, changeFrequency: 'monthly' },
 
   // Free tools
   { path: '/tools/robots-checker', priority: 0.7, changeFrequency: 'monthly' },
