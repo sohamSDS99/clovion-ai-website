@@ -550,7 +550,7 @@ export default function BlogIndex({
         <Container>
           <div style={{ maxWidth: 820 }}>
             <h1 className="display-lg text-balance">
-              Research, <span style={{ color: ORANGE }}>playbooks</span>, engineering notes.
+              Blogs, Articles &amp; Industry <span style={{ color: ORANGE }}>Insights</span>.
             </h1>
             <p className="lead mt-7" style={{ maxWidth: 640, color: 'var(--ink-70)' }}>
               How AI engines decide who to cite — and how to win citations back. The patterns we see
