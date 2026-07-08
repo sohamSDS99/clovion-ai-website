@@ -390,17 +390,17 @@ function FilterBar({
               gap: 8,
               padding: '10px 20px',
               borderRadius: 999,
-              border: '1px solid transparent',
-              background: isActive ? 'var(--subtle)' : 'transparent',
-              color: isActive ? 'var(--ink)' : 'var(--ink-60)',
+              border: `1px solid ${isActive ? ORANGE_BORDER : 'transparent'}`,
+              background: isActive ? ORANGE_BG : 'transparent',
+              color: isActive ? ORANGE : 'var(--ink-60)',
               fontFamily: 'var(--font-display)',
               fontSize: '0.98rem',
               fontWeight: 600,
               cursor: 'pointer',
-              transition: 'background .2s ease, color .2s ease'
+              transition: 'background .2s ease, color .2s ease, border-color .2s ease'
             }}
             onMouseEnter={(e) => {
-              if (!isActive) e.currentTarget.style.color = 'var(--ink)'
+              if (!isActive) e.currentTarget.style.color = ORANGE
             }}
             onMouseLeave={(e) => {
               if (!isActive) e.currentTarget.style.color = 'var(--ink-60)'
