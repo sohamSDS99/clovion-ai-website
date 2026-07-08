@@ -5,7 +5,8 @@ import { PillarStepper } from '@/components/home/PillarStepper'
 import { ClovAgent } from '@/components/home/ClovAgent'
 import { MeasureExperiment } from '@/components/home/MeasureExperiment'
 import { LogoMarquee } from '@/components/home/LogoMarquee'
-import { Testimonials } from '@/components/home/Testimonials'
+// Testimonials temporarily hidden on the homepage — kept for easy restore.
+// import { Testimonials } from '@/components/home/Testimonials'
 import { AgentsAtWork } from '@/components/home/AgentsAtWork'
 import { HomeFAQ } from '@/components/home/HomeFAQ'
 import { HOME_FAQS } from '@/components/home/homeFaqs'
@@ -86,7 +87,8 @@ export default function HomePage() {
       <ClovAgent />
       <MeasureExperiment />
       <LogoMarquee />
-      <Testimonials />
+      {/* Testimonials temporarily hidden — restore by uncommenting this and the import above. */}
+      {/* <Testimonials /> */}
       <AgentsAtWork />
       <HomeCTA />
       <HomeFAQ />
