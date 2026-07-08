@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Container, HaloMark } from './ui'
 import { AskAiSummary } from './AskAiSummary'
+import { SocialLinks } from './SocialLinks'
 import { brand } from '@/lib/content'
 
 const groups = [
@@ -89,14 +90,7 @@ export function HomeFooter() {
               <div className="text-[0.78rem] font-semibold uppercase tracking-[0.08em] mb-4" style={{ color: 'rgba(255,255,255,0.50)' }}>
                 Follow Us On
               </div>
-              <div className="flex items-center gap-3">
-              <SocialLink href="https://twitter.com" label="X / Twitter">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-              </SocialLink>
-              <SocialLink href="https://linkedin.com" label="LinkedIn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zM8 17v-7H6v7zm-1-8.1a1.1 1.1 0 1 0 0-2.2 1.1 1.1 0 0 0 0 2.2zM18 17v-3.7c0-1.9-1-2.8-2.4-2.8-1.1 0-1.7.6-2 1V10h-2v7h2v-3.6c0-.9.6-1.5 1.4-1.5s1 .5 1 1.5V17z"/></svg>
-              </SocialLink>
-              </div>
+              <SocialLinks variant="dark" />
             </div>
           </div>
 
@@ -146,24 +140,5 @@ export function HomeFooter() {
         </div>
       </Container>
     </footer>
-  )
-}
-
-function SocialLink({ href, label, children }: { href: string; label: string; children: React.ReactNode }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={label}
-      className="inline-flex items-center justify-center h-9 w-9 rounded-full transition-colors hover:text-white"
-      style={{
-        background: 'rgba(255,255,255,0.04)',
-        border: '1px solid rgba(255,255,255,0.10)',
-        color: 'rgba(255,255,255,0.70)'
-      }}
-    >
-      {children}
-    </a>
   )
 }
