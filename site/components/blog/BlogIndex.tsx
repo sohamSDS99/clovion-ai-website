@@ -549,7 +549,9 @@ export default function BlogIndex({
       <Section className="section-y-xl relative overflow-hidden">
         <Container>
           <div style={{ maxWidth: 820 }}>
-            <h1 className="display-lg text-balance">Research, playbooks, engineering notes.</h1>
+            <h1 className="display-lg text-balance">
+              Research, <span style={{ color: ORANGE }}>playbooks</span>, engineering notes.
+            </h1>
             <p className="lead mt-7" style={{ maxWidth: 640, color: 'var(--ink-70)' }}>
               How AI engines decide who to cite — and how to win citations back. The patterns we see
               across customer data, written up before they become folklore.
