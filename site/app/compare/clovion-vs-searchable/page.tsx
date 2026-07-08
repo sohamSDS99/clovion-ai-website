@@ -22,7 +22,7 @@ export const metadata = {
 // This page ships LIGHT (homepage palette) — it is registered as a light
 // exception in ThemeShell / Chrome / the layout bootstrap, so var(--*) tokens
 // resolve to their light values and the light Header/Footer render. Accents:
-// orange #C2410C (brand energy) + emerald var(--positive) (Clovion affordance).
+// orange #C2410C (brand energy) + Clove orange accent (Clovion affordance).
 //
 // Content — VERBATIM from the source comparison brief. Do not paraphrase.
 // ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ const loop = [
   { k: 'Prove', d: 'prove the result' }
 ]
 
-// Four possible outcomes. "Landed" gets the emerald positive glyph; the rest
+// Four possible outcomes. "Landed" gets the Clove orange glyph; the rest
 // are differentiated by FORM.
 const outcomes: { label: string; form: 'landed' | 'ring' | 'diamond' | 'dashed' }[] = [
   { label: 'Landed', form: 'landed' },
@@ -353,8 +353,8 @@ const faqJsonLd = {
 function OutcomeGlyph({ form }: { form: 'landed' | 'ring' | 'diamond' | 'dashed' }) {
   const base = { width: 9, height: 9, flexShrink: 0 } as CSSProperties
   if (form === 'landed') {
-    // The one positive verdict — emerald filled dot.
-    return <span aria-hidden style={{ ...base, borderRadius: 999, background: 'var(--positive)' }} />
+    // The one positive verdict — Clove orange filled dot.
+    return <span aria-hidden style={{ ...base, borderRadius: 999, background: '#C2410C' }} />
   }
   if (form === 'ring') {
     return (
@@ -405,7 +405,7 @@ function MatchupRow({
           fontFamily: 'var(--font-mono)',
           fontSize: '1.5rem',
           letterSpacing: '-0.01em',
-          color: emphasized ? 'var(--positive)' : 'var(--ink-60)',
+          color: emphasized ? '#C2410C' : 'var(--ink-60)',
           whiteSpace: 'nowrap'
         }}
       >
@@ -423,7 +423,7 @@ function GlanceCell({ value, emphasized }: { value: string; emphasized?: boolean
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '1.05rem',
-          color: emphasized ? 'var(--positive)' : 'var(--ink-70)'
+          color: emphasized ? '#C2410C' : 'var(--ink-70)'
         }}
       >
         {value}
@@ -447,7 +447,7 @@ function EngineCell({ value }: { value: string | boolean }) {
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          background: 'var(--positive)',
+          background: '#C2410C',
           color: '#ffffff'
         }}
       >
@@ -767,12 +767,12 @@ export default function ClovionVsSearchablePage() {
                     alignItems: 'center',
                     gap: 9,
                     borderRadius: 999,
-                    border: o.form === 'landed' ? '1px solid var(--positive-border)' : '1px solid var(--line)',
-                    background: o.form === 'landed' ? 'var(--positive-bg)' : 'var(--white)',
+                    border: o.form === 'landed' ? '1px solid rgba(194,65,12,0.22)' : '1px solid var(--line)',
+                    background: o.form === 'landed' ? '#FBEEE7' : 'var(--white)',
                     padding: '8px 14px',
                     fontSize: '0.85rem',
                     fontWeight: 600,
-                    color: o.form === 'landed' ? 'var(--positive)' : 'var(--ink-70)'
+                    color: o.form === 'landed' ? '#C2410C' : 'var(--ink-70)'
                   }}
                 >
                   <OutcomeGlyph form={o.form} />
@@ -819,7 +819,7 @@ export default function ClovionVsSearchablePage() {
                     style={{
                       ...headCell,
                       color: 'var(--ink)',
-                      background: 'var(--positive-bg)',
+                      background: '#FBEEE7',
                       borderLeft: '1px solid var(--line)',
                       borderRight: '1px solid var(--line)'
                     }}
@@ -853,7 +853,7 @@ export default function ClovionVsSearchablePage() {
                     <div
                       style={{
                         ...bodyCell,
-                        background: 'var(--positive-bg)',
+                        background: '#FBEEE7',
                         borderLeft: '1px solid var(--line)',
                         borderRight: '1px solid var(--line)'
                       }}
@@ -909,7 +909,7 @@ export default function ClovionVsSearchablePage() {
                     style={{
                       ...headCell,
                       color: 'var(--ink)',
-                      background: 'var(--positive-bg)',
+                      background: '#FBEEE7',
                       borderLeft: '1px solid var(--line)',
                       borderRight: '1px solid var(--line)'
                     }}
@@ -933,7 +933,7 @@ export default function ClovionVsSearchablePage() {
                     <div
                       style={{
                         ...bodyCell,
-                        background: 'var(--positive-bg)',
+                        background: '#FBEEE7',
                         borderRight: '1px solid var(--line)',
                         borderLeft: '1px solid var(--line)'
                       }}
@@ -964,7 +964,7 @@ export default function ClovionVsSearchablePage() {
             <div
               style={{
                 borderRadius: 20,
-                border: '1px solid var(--positive-border)',
+                border: '1px solid rgba(194,65,12,0.22)',
                 background: 'var(--white)',
                 boxShadow: 'var(--shadow-soft)',
                 padding: '30px 30px 8px'
@@ -994,7 +994,7 @@ export default function ClovionVsSearchablePage() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: 999,
-                        background: 'var(--positive)',
+                        background: '#C2410C',
                         color: '#ffffff'
                       }}
                     >
@@ -1096,7 +1096,7 @@ export default function ClovionVsSearchablePage() {
                     style={{
                       ...headCell,
                       color: 'var(--ink)',
-                      background: 'var(--positive-bg)',
+                      background: '#FBEEE7',
                       borderLeft: '1px solid var(--line)',
                       borderRight: '1px solid var(--line)'
                     }}
@@ -1120,7 +1120,7 @@ export default function ClovionVsSearchablePage() {
                     <div
                       style={{
                         ...bodyCell,
-                        background: 'var(--positive-bg)',
+                        background: '#FBEEE7',
                         borderRight: '1px solid var(--line)',
                         borderLeft: '1px solid var(--line)'
                       }}

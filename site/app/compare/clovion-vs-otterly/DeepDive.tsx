@@ -13,7 +13,7 @@ import { useState } from 'react'
  * text — calm, premium, scannable.
  *
  * Palette: light homepage tokens (var(--*)). The Clovion side carries the
- * emerald --positive accent (affordance / "the differentiated side"); the
+ * Clove orange accent (affordance / "the differentiated side"); the
  * active topic marker uses the Clovion brand orange. Content is VERBATIM from
  * the source brief — never paraphrase.
  */
@@ -41,8 +41,8 @@ function SideBlock({
     <div
       style={{
         borderRadius: 16,
-        border: emphasized ? '1px solid var(--positive-border)' : '1px solid var(--line)',
-        background: emphasized ? 'var(--positive-bg)' : 'var(--white)',
+        border: emphasized ? '1px solid rgba(194,65,12,0.22)' : '1px solid var(--line)',
+        background: emphasized ? '#FBEEE7' : 'var(--white)',
         padding: '22px 24px'
       }}
     >
@@ -55,7 +55,7 @@ function SideBlock({
           fontSize: '0.7rem',
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
-          color: emphasized ? 'var(--positive)' : 'var(--ink-50)',
+          color: emphasized ? '#C2410C' : 'var(--ink-50)',
           marginBottom: 14
         }}
       >
@@ -65,7 +65,7 @@ function SideBlock({
             width: 6,
             height: 6,
             borderRadius: 999,
-            background: emphasized ? 'var(--positive)' : 'var(--ink-25)'
+            background: emphasized ? '#C2410C' : 'var(--ink-25)'
           }}
         />
         {label}

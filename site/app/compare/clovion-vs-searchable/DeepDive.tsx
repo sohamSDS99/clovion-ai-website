@@ -9,7 +9,7 @@ import { useState } from 'react'
  * right. Mirrors the clovion-vs-peec-ai DeepDive, adapted for Searchable.
  *
  * This page ships LIGHT (homepage palette), so var(--*) tokens resolve to their
- * light values — no .clv-dark on this route. Accents: emerald --positive for the
+ * light values — no .clv-dark on this route. Accents: Clove orange accent for the
  * Clovion (emphasized) side, orange #C2410C for the active topic + section
  * numerals. Never put var(--*) inside a transition shorthand — inline the
  * literal cubic-bezier instead.
@@ -39,8 +39,8 @@ function SideBlock({
       style={{
         position: 'relative',
         borderRadius: 16,
-        border: emphasized ? '1px solid var(--positive-border)' : '1px solid var(--line)',
-        background: emphasized ? 'var(--positive-bg)' : 'var(--white)',
+        border: emphasized ? '1px solid rgba(194,65,12,0.22)' : '1px solid var(--line)',
+        background: emphasized ? '#FBEEE7' : 'var(--white)',
         padding: '22px 24px',
         overflow: 'hidden'
       }}
@@ -53,7 +53,7 @@ function SideBlock({
             insetBlock: 0,
             left: 0,
             width: 3,
-            background: 'var(--positive)'
+            background: '#C2410C'
           }}
         />
       )}
@@ -66,7 +66,7 @@ function SideBlock({
           fontSize: '0.7rem',
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
-          color: emphasized ? 'var(--positive)' : 'var(--ink-50)',
+          color: emphasized ? '#C2410C' : 'var(--ink-50)',
           marginBottom: 14
         }}
       >
@@ -76,7 +76,7 @@ function SideBlock({
             width: 6,
             height: 6,
             borderRadius: 999,
-            background: emphasized ? 'var(--positive)' : 'var(--ink-25)'
+            background: emphasized ? '#C2410C' : 'var(--ink-25)'
           }}
         />
         {label}

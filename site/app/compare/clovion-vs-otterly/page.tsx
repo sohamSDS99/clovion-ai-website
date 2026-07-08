@@ -19,7 +19,7 @@ export const metadata = {
 }
 
 // Brand-accent palette — pulled from the homepage (single source of truth).
-// Orange is the Clovion brand accent ("Clove" on the homepage); emerald is the
+// Orange is the Clovion brand accent ("Clove" on the homepage); it is also the
 // positive/affordance accent (RecoveryPlan). Everything else stays B&W.
 const ORANGE = '#C2410C'
 const ORANGE_BG = 'rgba(194, 65, 12, 0.07)'
@@ -39,7 +39,7 @@ const loop = [
 ]
 
 // Four possible outcomes (verbatim from the brief). "Landed" is the positive
-// case → emerald; the rest are differentiated by FORM.
+// case → Clove orange; the rest are differentiated by FORM.
 const outcomes: { label: string; form: 'solid' | 'ring' | 'diamond' | 'dashed' }[] = [
   { label: 'Landed', form: 'solid' },
   { label: 'Null', form: 'ring' },
@@ -351,8 +351,8 @@ const faqJsonLd = {
 function OutcomeGlyph({ form }: { form: 'solid' | 'ring' | 'diamond' | 'dashed' }) {
   const base = { width: 9, height: 9, flexShrink: 0 } as CSSProperties
   if (form === 'solid') {
-    // "Landed" — the positive outcome → emerald.
-    return <span aria-hidden style={{ ...base, borderRadius: 999, background: 'var(--positive)' }} />
+    // "Landed" — the positive outcome → Clove orange.
+    return <span aria-hidden style={{ ...base, borderRadius: 999, background: '#C2410C' }} />
   }
   if (form === 'ring') {
     return (
@@ -443,7 +443,7 @@ function GlanceCell({ value, emphasized }: { value: string; emphasized?: boolean
 
 function EngineCell({ value }: { value: string | boolean }) {
   if (value === true) {
-    // Included on Clovion → emerald affordance check.
+    // Included on Clovion → Clove orange affordance check.
     return (
       <span
         aria-label="Included"
@@ -454,7 +454,7 @@ function EngineCell({ value }: { value: string | boolean }) {
           alignItems: 'center',
           justifyContent: 'center',
           borderRadius: 999,
-          background: 'var(--positive)',
+          background: '#C2410C',
           color: '#ffffff'
         }}
       >
@@ -812,9 +812,9 @@ export default function ClovionVsOtterlyPage() {
                     style={{
                       ...headCell,
                       color: ORANGE,
-                      background: 'var(--subtle)',
-                      borderLeft: '1px solid var(--line)',
-                      borderRight: '1px solid var(--line)'
+                      background: '#FBEEE7',
+                      borderLeft: '1px solid rgba(194,65,12,0.22)',
+                      borderRight: '1px solid rgba(194,65,12,0.22)'
                     }}
                   >
                     Clovion AI
@@ -846,9 +846,9 @@ export default function ClovionVsOtterlyPage() {
                     <div
                       style={{
                         ...bodyCell,
-                        background: 'var(--subtle)',
-                        borderLeft: '1px solid var(--line)',
-                        borderRight: '1px solid var(--line)'
+                        background: '#FBEEE7',
+                        borderLeft: '1px solid rgba(194,65,12,0.22)',
+                        borderRight: '1px solid rgba(194,65,12,0.22)'
                       }}
                     >
                       <EngineCell value={true} />
@@ -903,9 +903,9 @@ export default function ClovionVsOtterlyPage() {
                     style={{
                       ...headCell,
                       color: ORANGE,
-                      background: 'var(--subtle)',
-                      borderLeft: '1px solid var(--line)',
-                      borderRight: '1px solid var(--line)'
+                      background: '#FBEEE7',
+                      borderLeft: '1px solid rgba(194,65,12,0.22)',
+                      borderRight: '1px solid rgba(194,65,12,0.22)'
                     }}
                   >
                     Clovion AI
@@ -924,7 +924,7 @@ export default function ClovionVsOtterlyPage() {
                     <div style={{ ...bodyCell, fontWeight: 600, color: 'var(--ink)', fontSize: '0.9rem' }}>
                       {row.cat}
                     </div>
-                    <div style={{ ...bodyCell, background: 'var(--subtle)', borderRight: '1px solid var(--line)', borderLeft: '1px solid var(--line)' }}>
+                    <div style={{ ...bodyCell, background: '#FBEEE7', borderRight: ' . qq(1px solid rgba(194,65,12,0.22)) . q(', borderLeft: '1px solid rgba(194,65,12,0.22)' }}>
                       <GlanceCell value={row.clovion} emphasized />
                     </div>
                     <div style={bodyCell}>
@@ -984,7 +984,7 @@ export default function ClovionVsOtterlyPage() {
                         alignItems: 'center',
                         justifyContent: 'center',
                         borderRadius: 999,
-                        background: 'var(--positive)',
+                        background: '#C2410C',
                         color: '#ffffff'
                       }}
                     >
@@ -1086,9 +1086,9 @@ export default function ClovionVsOtterlyPage() {
                     style={{
                       ...headCell,
                       color: ORANGE,
-                      background: 'var(--subtle)',
-                      borderLeft: '1px solid var(--line)',
-                      borderRight: '1px solid var(--line)'
+                      background: '#FBEEE7',
+                      borderLeft: '1px solid rgba(194,65,12,0.22)',
+                      borderRight: '1px solid rgba(194,65,12,0.22)'
                     }}
                   >
                     Clovion AI
@@ -1107,7 +1107,7 @@ export default function ClovionVsOtterlyPage() {
                     <div style={{ ...bodyCell, fontWeight: 600, color: 'var(--ink)', fontSize: '0.9rem' }}>
                       {row.cat}
                     </div>
-                    <div style={{ ...bodyCell, background: 'var(--subtle)', borderRight: '1px solid var(--line)', borderLeft: '1px solid var(--line)' }}>
+                    <div style={{ ...bodyCell, background: '#FBEEE7', borderRight: ' . qq(1px solid rgba(194,65,12,0.22)) . q(', borderLeft: '1px solid rgba(194,65,12,0.22)' }}>
                       <PriceCell plan={row.clovion.plan} body={row.clovion.body} emphasized />
                     </div>
                     <div style={bodyCell}>
