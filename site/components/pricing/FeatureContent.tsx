@@ -192,13 +192,14 @@ function Hero({
         <h1
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.125rem, 4vw + 0.5rem, 2.75rem)',
+            // Sized to sit on ONE line on desktop; wraps gracefully on mobile.
+            fontSize: 'clamp(1.85rem, 4.2vw, 2.5rem)',
             fontWeight: 600,
             letterSpacing: '-0.025em',
             lineHeight: 1.12,
             color: 'var(--ink)',
             margin: '0 auto',
-            maxWidth: 640,
+            maxWidth: 'none',
           }}
         >
           Track how AI engines see your brand
@@ -208,7 +209,8 @@ function Hero({
             fontSize: '1.0625rem',
             lineHeight: 1.6,
             color: 'var(--ink-70)',
-            maxWidth: 540,
+            // Wide enough to land in TWO lines on desktop.
+            maxWidth: 760,
             margin: '16px auto 0',
           }}
         >
