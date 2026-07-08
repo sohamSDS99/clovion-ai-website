@@ -40,7 +40,7 @@ const groups = [
     title: 'Company',
     links: [
       { label: 'About', href: '/about' },
-      { label: 'Customers', href: '/customers' },
+      // { label: 'Customers', href: '/customers' }, // temporarily hidden
       { label: 'Affiliate Program', href: '/affiliate' }
     ]
   },
