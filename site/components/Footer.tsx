@@ -20,8 +20,6 @@ const groups = [
     // two in sync: the footer column shows exactly the dropdown's pages.
     links: [
       { label: 'Blog', href: '/blog' },
-      { label: 'News', href: '/news' },
-      { label: 'Webinars', href: '/webinars' },
       { label: 'Guides & Downloads', href: '/resources' },
       { label: 'FAQ', href: '/faq' }
     ]
@@ -41,7 +39,6 @@ const groups = [
     links: [
       { label: 'About', href: '/about' },
       { label: 'Customers', href: '/customers' },
-      { label: 'Compare', href: '/compare' },
       { label: 'Affiliate Program', href: '/affiliate' }
     ]
   },
@@ -55,9 +52,9 @@ const groups = [
   {
     title: 'Comparisons',
     links: [
-      { label: 'Clovion vs Peec AI', href: '/compare/clovion-vs-peec-ai' },
-      { label: 'Clovion vs Otterly', href: '/compare/clovion-vs-otterly' },
-      { label: 'Clovion vs Searchable', href: '/compare/clovion-vs-searchable' }
+      { label: 'vs Peec AI', href: '/compare/clovion-vs-peec-ai' },
+      { label: 'vs Otterly', href: '/compare/clovion-vs-otterly' },
+      { label: 'vs Searchable', href: '/compare/clovion-vs-searchable' }
     ]
   }
 ]
