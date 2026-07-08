@@ -11,14 +11,14 @@ import { HomeFooter } from './HomeFooter'
 const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/free-ai-visibility-score', '/customers', '/about', '/changelog'])
 
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
-// `/blog` is intentionally absent — the whole blog section is light, so it uses
-// the light Header/Footer (light + orange is the only pattern going forward).
-const HOME_PREFIXES = ['/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
+// `/blog` and `/resources` are intentionally absent — the whole content system
+// is light, so it uses the light Header/Footer (light + orange going forward).
+const HOME_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
 // Light exceptions inside an otherwise-dark prefix — must mirror ThemeShell's
 // LIGHT_EXCEPTIONS so these pages get the light Header/Footer to match their
 // rebranded light palette.
-const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/resources'])
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable'])
 
 function isHomeChrome(pathname: string): boolean {
   if (LIGHT_EXCEPTIONS.has(pathname)) return false

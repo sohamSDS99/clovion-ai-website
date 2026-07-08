@@ -10,15 +10,15 @@ const DARK_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/featu
 // Prefix-matched dark sections — covers index + every nested/[slug] page.
 // The whole marketing site is dark, so this spans content, docs, legal, and
 // the comparison/alternatives pages.
-// NOTE: `/blog` is intentionally NOT a dark prefix — the ENTIRE blog section
-// (listing, category, AND /blog/[slug] article reader) ships LIGHT (#FAF9F7 +
-// Clove orange). Light + orange is the only design pattern going forward.
-const DARK_PREFIXES = ['/news', '/webinars', '/resources', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
+// NOTE: `/blog` and `/resources` are intentionally NOT dark prefixes — the whole
+// content system (both listings, categories, AND every article/[slug]) ships
+// LIGHT (#FAF9F7 + Clove orange). Light + orange is the only pattern going forward.
+const DARK_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
 
 // Light exceptions inside an otherwise-dark prefix. These pages were rebranded
 // to the light homepage palette (#FAF9F7 + Clove orange), so they opt out of
 // their section's dark scope.
-const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/resources'])
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable'])
 
 function isDarkRoute(pathname: string): boolean {
   if (LIGHT_EXCEPTIONS.has(pathname)) return false

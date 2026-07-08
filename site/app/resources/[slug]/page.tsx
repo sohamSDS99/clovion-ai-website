@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import { Section, Container, Eyebrow, Tag } from '@/components/ui'
@@ -62,7 +63,10 @@ export default async function ResourceDetailPage({
   const fields = item.leadForm?.fields ?? []
 
   return (
-    <div className="clv-dark clv-ai-vis-page">
+    <div
+      className="clv-light-article"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
       <JsonLd data={item.jsonLd} />
 
       <Section className="relative overflow-hidden">
