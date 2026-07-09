@@ -37,6 +37,8 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/compare', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/compare/clovion-vs-profound', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/compare/clovion-vs-peec-ai', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/compare/clovion-vs-searchable', priority: 0.7, changeFrequency: 'monthly' },
+  { path: '/compare/clovion-vs-otterly', priority: 0.7, changeFrequency: 'monthly' },
   { path: '/alternatives/profound', priority: 0.7, changeFrequency: 'monthly' },
 
   // Company / social proof
