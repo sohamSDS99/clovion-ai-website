@@ -1,5 +1,8 @@
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { Section, Container, HeroShade } from '@/components/ui'
+
+const ORANGE = '#C2410C'
 
 export const metadata = {
   title: 'Privacy Policy | Clovion AI',
@@ -251,12 +254,15 @@ const sections = [
 
 export default function PrivacyPolicyPage() {
   return (
-    <>
+    <div
+      className="clv-legal-light"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
       {/* Hero strip */}
       <Section tight className="relative overflow-hidden">
         <HeroShade />
         <Container>
-          <div className="max-w-3xl">
+          <div className="max-w-3xl" data-track-location="privacy_hero">
             <div className="font-mono text-xs uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/50%)]">
               <Link href="/legal" className="hover:text-[var(--ink)] transition-colors">
                 Legal
@@ -286,14 +292,14 @@ export default function PrivacyPolicyPage() {
           <Container>
             <div className="grid gap-10 md:grid-cols-12">
               <div className="md:col-span-4">
-                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/50%)]">
+                <div className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: ORANGE }}>
                   Contents
                 </div>
                 <p className="mt-4 max-w-xs text-sm leading-relaxed text-[rgb(var(--ink-rgb)/60%)]">
                   Fourteen sections. Read the plain-English summary first if you only have a minute.
                 </p>
               </div>
-              <nav className="md:col-span-8">
+              <nav className="md:col-span-8" data-track-location="privacy_toc">
                 <ol className="divide-y divide-[var(--line)] font-mono text-[13px]">
                   {tableOfContents.map((item) => (
                     <li key={item.id}>
@@ -317,7 +323,7 @@ export default function PrivacyPolicyPage() {
       <Section bg="subtle" id="summary">
         <Container>
           <div className="mx-auto max-w-[720px]">
-            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/50%)]">
+            <div className="font-mono text-[11px] uppercase tracking-[0.18em]" style={{ color: ORANGE }}>
               01 — Summary
             </div>
             <h2 className="display-sm mt-4 text-[var(--ink)]">In short.</h2>
@@ -378,7 +384,7 @@ export default function PrivacyPolicyPage() {
                 }
               >
                 <div className="flex items-baseline gap-4">
-                  <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/40%)]">
+                  <span className="font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: ORANGE }}>
                     § {section.number}
                   </span>
                   <h3 className="font-mono text-[15px] uppercase tracking-[0.14em] text-[var(--ink)]">
@@ -393,7 +399,7 @@ export default function PrivacyPolicyPage() {
                     <ul className="mt-2 space-y-2.5 border-l border-[var(--line)] pl-5">
                       {section.bullets.map((b, i) => (
                         <li key={i} className="text-[15px] text-[rgb(var(--ink-rgb)/80%)]">
-                          <span className="mr-3 font-mono text-[11px] text-[rgb(var(--ink-rgb)/40%)]">
+                          <span className="mr-3 font-mono text-[11px]" style={{ color: ORANGE }}>
                             {String(i + 1).padStart(2, '0')}
                           </span>
                           {b}
@@ -409,11 +415,11 @@ export default function PrivacyPolicyPage() {
       </Section>
 
       {/* Subprocessor list */}
-      <div className="border-t border-[var(--line)] bg-[var(--white)]" id="subprocessor-list">
+      <div className="border-t border-[var(--line)] bg-[var(--white)]" id="subprocessor-list" data-track-location="privacy_subprocessors">
         <Section>
           <Container>
             <div className="flex items-baseline gap-4">
-              <span className="font-mono text-[12px] uppercase tracking-[0.18em] text-[rgb(var(--ink-rgb)/40%)]">
+              <span className="font-mono text-[12px] uppercase tracking-[0.18em]" style={{ color: ORANGE }}>
                 § 14
               </span>
               <h3 className="font-mono text-[15px] uppercase tracking-[0.14em] text-[var(--ink)]">
@@ -453,7 +459,8 @@ export default function PrivacyPolicyPage() {
                           href={sp.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[var(--ink)] underline-offset-4 hover:underline"
+                          className="underline-offset-4 hover:underline"
+                          style={{ color: ORANGE }}
                         >
                           View ↗
                         </a>
@@ -474,7 +481,7 @@ export default function PrivacyPolicyPage() {
       {/* Contact strip */}
       <Section bg="subtle" tight>
         <Container>
-          <div className="flex flex-col items-start justify-between gap-4 border-t border-[var(--line)] pt-10 md:flex-row md:items-center">
+          <div className="flex flex-col items-start justify-between gap-4 border-t border-[var(--line)] pt-10 md:flex-row md:items-center" data-track-location="privacy_contact">
             <p className="font-mono text-[13px] text-[rgb(var(--ink-rgb)/75%)]">
               Questions?{' '}
               <a href="mailto:security@clovion.ai" className="text-[var(--ink)] underline-offset-4 hover:underline">
@@ -492,6 +499,6 @@ export default function PrivacyPolicyPage() {
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }

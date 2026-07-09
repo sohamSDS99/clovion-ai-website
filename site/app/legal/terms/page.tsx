@@ -1,6 +1,9 @@
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { Section, Container, Button, Eyebrow, Tag, ArrowRight, Check, HairlineDivider, HeroShade } from '@/components/ui'
 import { TalkToSalesButton } from '@/components/TalkToSalesButton'
+
+const ORANGE = '#C2410C'
 
 export const metadata = {
   title: 'Terms of Service | Clovion AI',
@@ -60,9 +63,12 @@ const billingExamples = [
 
 export default function TermsPage() {
   return (
-    <>
+    <div
+      className="clv-legal-light"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
       {/* Section 1 — Hero strip */}
-      <section className="section-y-sm bg-[var(--bg)] border-b border-[var(--line)] relative overflow-hidden">
+      <section className="section-y-sm bg-[var(--bg)] border-b border-[var(--line)] relative overflow-hidden" data-track-location="terms_hero">
         <HeroShade />
         <Container>
           <div className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/50%)]">
@@ -90,7 +96,7 @@ export default function TermsPage() {
       {/* Section 2 — Table of contents */}
       <Section tight className="bg-[var(--white)] border-b border-[var(--line)]">
         <Container>
-          <div className="grid grid-cols-1 gap-x-12 gap-y-1 md:grid-cols-2 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-12 gap-y-1 md:grid-cols-2 lg:grid-cols-2" data-track-location="terms_toc">
             <div className="mb-6 md:col-span-2">
               <Eyebrow>Contents</Eyebrow>
               <p className="mt-3 font-mono text-[0.78rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/50%)]">
@@ -103,7 +109,7 @@ export default function TermsPage() {
                 href={item.href}
                 className="group flex items-baseline gap-5 border-b border-[var(--line)] py-3.5 hover:bg-[var(--subtle)] transition-colors"
               >
-                <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/40%)] w-6 shrink-0">
+                <span className="font-mono text-[0.72rem] uppercase tracking-[0.14em] w-6 shrink-0" style={{ color: ORANGE }}>
                   {item.num}
                 </span>
                 <span className="text-[rgb(var(--ink-rgb)/90%)] group-hover:text-[var(--ink)] font-semibold flex-1">
@@ -146,7 +152,7 @@ export default function TermsPage() {
       </Section>
 
       {/* Section 4 — Full terms */}
-      <section className="bg-[var(--bg)]">
+      <section className="bg-[var(--bg)]" data-track-location="terms_body">
         <Container>
           <div className="section-y max-w-[860px] mx-auto">
 
@@ -452,7 +458,7 @@ export default function TermsPage() {
       </section>
 
       {/* Section 5 — Performance Guarantee band */}
-      <section className="bg-[var(--white)] border-y border-[var(--line)]">
+      <section className="bg-[var(--white)] border-y border-[var(--line)]" data-track-location="terms_guarantee">
         <Container>
           <div className="section-y grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-14 items-center">
             <div className="lg:col-span-5">
@@ -490,7 +496,7 @@ export default function TermsPage() {
       {/* Section 6 — Contact */}
       <Section tight bg="subtle">
         <Container>
-          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+          <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between" data-track-location="terms_contact">
             <div>
               <Eyebrow>Questions?</Eyebrow>
               <p className="mt-4 font-mono text-[0.85rem] uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/75%)]">
@@ -504,14 +510,14 @@ export default function TermsPage() {
                 We reply to legal queue within two business days.
               </p>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3" data-track-location="legal_terms">
               <Button href="/pricing" trackLocation="legal_terms" variant="primary" size="md">Start Free Trial</Button>
               <TalkToSalesButton location="legal_terms" variant="secondary" size="md">Talk to sales</TalkToSalesButton>
             </div>
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }
 
@@ -520,7 +526,7 @@ export default function TermsPage() {
 function SectionHead({ num, title }: { num: string; title: string }) {
   return (
     <header className="mb-7 flex items-baseline gap-6 border-b border-[rgb(var(--ink-rgb)/10%)] pb-5">
-      <span className="font-mono text-[0.78rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/45%)]">
+      <span className="font-mono text-[0.78rem] uppercase tracking-[0.16em]" style={{ color: ORANGE }}>
         {num}
       </span>
       <h2 className="text-[1.625rem] md:text-[1.875rem] font-display font-semibold tracking-[-0.02em] text-[var(--ink)]">

@@ -12,7 +12,7 @@ import { RouteTracker } from '@/components/RouteTracker'
 // instead of cream→black flickering after ThemeShell's useEffect runs.
 // Mirrors ThemeShell's DARK_ROUTES set. NOTE: `/` is intentionally absent —
 // the homepage ships LIGHT (#FAF9F7); see app/page.tsx.
-const themeBootstrap = `(function(){try{var p=location.pathname;var pre=['/news','/webinars','/faq','/compare','/alternatives','/docs','/legal'];var darkPre=pre.some(function(x){return p===x||p.indexOf(x+'/')===0;});if((p==='/customers'||p==='/about'||p==='/changelog'||darkPre)&&p!=='/compare/clovion-vs-peec-ai'&&p!=='/compare/clovion-vs-otterly'&&p!=='/compare/clovion-vs-searchable')document.documentElement.classList.add('clv-dark');}catch(_){}})();`
+const themeBootstrap = `(function(){try{var p=location.pathname;var pre=['/news','/webinars','/faq','/compare','/alternatives','/docs','/legal'];var darkPre=pre.some(function(x){return p===x||p.indexOf(x+'/')===0;});if((p==='/customers'||p==='/about'||p==='/changelog'||darkPre)&&p!=='/compare/clovion-vs-peec-ai'&&p!=='/compare/clovion-vs-otterly'&&p!=='/compare/clovion-vs-searchable'&&p!=='/legal/privacy'&&p!=='/legal/terms')document.documentElement.classList.add('clv-dark');}catch(_){}})();`
 
 // Microsoft Clarity — session recordings + heatmaps. Project x8d3ot6py2.
 // Loads asynchronously; the snippet queues calls until the remote script
