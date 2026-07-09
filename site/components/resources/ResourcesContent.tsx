@@ -248,7 +248,7 @@ function Hero() {
         <div style={{ maxWidth: 820 }}>
           <Eyebrow>Guides &amp; Downloads</Eyebrow>
           <h1 style={{ ...DISPLAY_LG, fontSize: 'clamp(2rem, 4.2vw + 0.4rem, 3.4rem)', margin: '16px 0 0' }}>
-            Guides, playbooks, and reports.
+            Playbook, Study &amp; Report.
           </h1>
           <p style={{ ...LEAD, maxWidth: 640, margin: '1.75rem 0 0' }}>
             Practical material on AI visibility, GEO, and answer-engine optimization. Pick what fits
