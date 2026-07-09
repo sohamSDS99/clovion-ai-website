@@ -18,7 +18,7 @@ const DARK_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives'
 // Light exceptions inside an otherwise-dark prefix. These pages were rebranded
 // to the light homepage palette (#FAF9F7 + Clove orange), so they opt out of
 // their section's dark scope.
-const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/legal/privacy', '/legal/terms'])
+const LIGHT_EXCEPTIONS = new Set<string>(['/compare/clovion-vs-peec-ai', '/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/compare/clovion-vs-profound', '/legal/privacy', '/legal/terms'])
 
 function isDarkRoute(pathname: string): boolean {
   if (LIGHT_EXCEPTIONS.has(pathname)) return false
