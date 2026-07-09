@@ -72,6 +72,8 @@ const CMS_ROUTES: { type: CmsType; prefix: string }[] = [
   { type: 'NEWS', prefix: '/news' },
   { type: 'WEBINAR', prefix: '/webinars' },
   { type: 'RESOURCE', prefix: '/resources' },
+  // Research reports are gated downloads that live under /resources/<slug>.
+  { type: 'RESEARCH', prefix: '/resources' },
   { type: 'FAQ', prefix: '/faq' },
 ]
 
