@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import { Fragment } from 'react'
-import { Section, Container, Button, Eyebrow, ArrowRight, HeroShade } from '@/components/ui'
+import { Section, Container, Button, Eyebrow, ArrowRight } from '@/components/ui'
 import { FAQAccordion } from '@/components/FAQAccordion'
 
 export const metadata = {
@@ -432,9 +432,7 @@ export default function ClovionVsSearchablePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       {/* HERO --------------------------------------------------------------- */}
-      <Section className="section-y-xl relative overflow-hidden">
-        <div className="grid-bg absolute inset-0 -z-10 opacity-60" aria-hidden />
-        <HeroShade />
+      <Section className="section-y-xl">
         <Container>
           <div className="text-center" data-track-location="compare_searchable_hero">
             <h1
