@@ -17,8 +17,6 @@ export const metadata = {
 // the source HTML's placeholder hexes.
 // ---------------------------------------------------------------------------
 const BRAND = '#C2410C'
-const BRAND_GLOW = '#EA580C'
-const BRAND_STRONG = '#9A3412'
 const BRAND_TINT = '#FBEEE7'
 const BRAND_BORDER = 'rgba(194,65,12,0.22)'
 
@@ -465,12 +463,6 @@ export default function ClovionVsOtterlyPage() {
           __html: `
 .clv-otterly-light .eyebrow { color: ${BRAND}; }
 .clv-otterly-light .eyebrow-dot::before { background: ${BRAND}; box-shadow: 0 0 0 4px rgba(194,65,12,0.12); }
-.clv-otterly-light .clv-cta-orange .eyebrow { color: rgba(255,255,255,0.82); }
-.clv-otterly-light .clv-cta-orange .eyebrow-dot::before { background: rgba(255,255,255,0.82); box-shadow: 0 0 0 4px rgba(255,255,255,0.14); }
-.clv-otterly-light .clv-cta-orange .btn-primary { background: #fff; color: ${BRAND_STRONG}; }
-.clv-otterly-light .clv-cta-orange .btn-primary:hover { background: rgba(255,255,255,0.9); }
-.clv-otterly-light .clv-cta-orange .btn-secondary { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.5); }
-.clv-otterly-light .clv-cta-orange .btn-secondary:hover { background: rgba(255,255,255,0.2); }
 `
         }}
       />
@@ -483,21 +475,21 @@ export default function ClovionVsOtterlyPage() {
         <Container>
           <div className="text-center" data-track-location="compare_otterly_hero">
             <h1
-              className="mx-auto"
+              className="mx-auto text-balance"
               style={{
                 fontFamily: 'var(--font-display)',
                 fontWeight: 600,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.12,
-                fontSize: 'clamp(1.5rem, 3.4vw, 2.05rem)',
-                maxWidth: 'none'
+                fontSize: 'clamp(2.15rem, 4.6vw, 3.15rem)',
+                maxWidth: 900
               }}
             >
               Clovion vs Otterly AI: <span style={{ color: BRAND }}>multi-engine AI visibility comparison</span>
             </h1>
             <p
               className="mt-6 mx-auto"
-              style={{ color: 'var(--ink-70)', fontSize: '0.82rem', lineHeight: 1.6, maxWidth: 'none' }}
+              style={{ color: 'var(--ink-70)', fontSize: '1.02rem', lineHeight: 1.65, maxWidth: 720 }}
             >
               Clovion and Otterly AI both track how your brand shows up in AI answers. The difference: Clovion covers 6
               AI engines — including Claude and Grok — and tells you what to fix and how much it should help. Otterly
@@ -517,7 +509,7 @@ export default function ClovionVsOtterlyPage() {
       </Section>
 
       {/* CORE DIFFERENCE ---------------------------------------------------- */}
-      <Section bg="subtle">
+      <Section>
         <Container>
           <div className="max-w-2xl">
             <Eyebrow>How they differ</Eyebrow>
@@ -589,7 +581,7 @@ export default function ClovionVsOtterlyPage() {
       </Section>
 
       {/* ENGINE COVERAGE ---------------------------------------------------- */}
-      <Section bg="subtle">
+      <Section>
         <Container>
           <div className="max-w-2xl">
             <Eyebrow>Engine coverage</Eyebrow>
@@ -686,7 +678,7 @@ export default function ClovionVsOtterlyPage() {
       </Section>
 
       {/* CHOOSE WHICH ------------------------------------------------------- */}
-      <Section bg="subtle">
+      <Section>
         <Container>
           <div className="max-w-2xl">
             <Eyebrow>Which to choose</Eyebrow>
@@ -706,16 +698,19 @@ export default function ClovionVsOtterlyPage() {
       <Section>
         <Container>
           <div
-            className="clv-cta-orange relative isolate overflow-hidden rounded-[28px] text-white px-8 md:px-14 py-16 md:py-20 text-center"
+            className="clv-dark relative isolate overflow-hidden rounded-[28px] px-8 md:px-14 py-16 md:py-20 text-center"
             data-track-location="compare_otterly_final_cta"
-            style={{ background: `linear-gradient(135deg, ${BRAND_GLOW} 0%, ${BRAND} 52%, ${BRAND_STRONG} 100%)` }}
+            style={{ background: 'var(--ink-surface, var(--ink))', color: 'var(--on-ink)' }}
           >
             <div
               aria-hidden
               className="absolute inset-0 -z-10"
-              style={{ background: 'radial-gradient(ellipse 72% 82% at 50% 34%, rgba(255,255,255,0.18), transparent 62%)' }}
+              style={{
+                opacity: 0.6,
+                backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
+                backgroundSize: '24px 24px'
+              }}
             />
-            <div className="grid-bg absolute inset-0 -z-10 opacity-40 mix-blend-overlay" aria-hidden />
             <h2
               className="mx-auto text-balance"
               style={{
@@ -724,12 +719,13 @@ export default function ClovionVsOtterlyPage() {
                 letterSpacing: '-0.02em',
                 lineHeight: 1.12,
                 fontSize: 'clamp(1.8rem, 3.4vw, 2.5rem)',
-                maxWidth: 640
+                maxWidth: 640,
+                color: 'var(--on-ink)'
               }}
             >
               See what to fix — not just where you stand.
             </h2>
-            <p className="mt-5 mx-auto text-white/80" style={{ fontSize: '1.02rem', lineHeight: 1.55, maxWidth: 520 }}>
+            <p className="mt-5 mx-auto" style={{ fontSize: '1.02rem', lineHeight: 1.55, maxWidth: 520, color: 'var(--on-ink-70)' }}>
               Start a free trial and see exactly what to fix. No card required.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
