@@ -29,8 +29,15 @@ function toResourcePost(item: CmsSummary): ResourcePost {
 }
 
 export default async function ResourcesPage() {
-  const { items } = await listContent('RESOURCE', { limit: 60 })
-  const posts = items.map(toResourcePost)
+  // Resources AND research reports are both gated downloads shown on this page.
+  // Merge them into one collection, newest-published first.
+  const [resources, research] = await Promise.all([
+    listContent('RESOURCE', { limit: 60 }),
+    listContent('RESEARCH', { limit: 60 })
+  ])
+  const posts = [...resources.items, ...research.items]
+    .sort((a, b) => (b.publishedAt ?? '').localeCompare(a.publishedAt ?? ''))
+    .map(toResourcePost)
 
   return (
     <div

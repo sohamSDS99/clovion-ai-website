@@ -3,10 +3,13 @@
  * Source of truth: clovion-cms lib/public/serialize.ts (PublicContent).
  */
 
-export type CmsType = "BLOG" | "NEWS" | "WEBINAR" | "RESOURCE" | "FAQ";
+export type CmsType = "BLOG" | "RESEARCH" | "NEWS" | "WEBINAR" | "RESOURCE" | "FAQ";
 
 export const CMS_TYPE_SLUG: Record<CmsType, string> = {
   BLOG: "blog",
+  // RESEARCH is a gated downloadable report — served by the CMS under the same
+  // /resources gated endpoints as RESOURCE (see lib/cms getResource).
+  RESEARCH: "research",
   NEWS: "news",
   WEBINAR: "webinar",
   RESOURCE: "resource",

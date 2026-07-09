@@ -13,7 +13,13 @@ export const revalidate = 300
 export const dynamicParams = true
 
 export async function generateStaticParams() {
-  return (await listSlugs('RESOURCE')).map((slug) => ({ slug }))
+  // Both gated types resolve under /resources/[slug] (see getResource → CMS
+  // /resources/[slug], which serves RESOURCE and RESEARCH).
+  const [resources, research] = await Promise.all([
+    listSlugs('RESOURCE'),
+    listSlugs('RESEARCH')
+  ])
+  return [...new Set([...resources, ...research])].map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({
