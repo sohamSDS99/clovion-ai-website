@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/fanout/FeatureContent'
 
 export const metadata: Metadata = {
@@ -32,7 +33,10 @@ const faqJsonLd = {
 
 export default function FanoutQueryPage() {
   return (
-    <div className="clv-dark clv-ai-vis-page">
+    <div
+      className="clv-ai-vis-page"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <FeatureContent />
     </div>
