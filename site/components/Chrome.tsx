@@ -8,7 +8,7 @@ import { HomeFooter } from './HomeFooter'
 
 // `/` and `/pricing` are intentionally NOT here — both light routes use the
 // light Header/Footer. See app/page.tsx and app/pricing/page.tsx.
-const HOME_ROUTES = new Set<string>(['/features/ai-visibility-tracking', '/features/geo-improvement-suggestions', '/features/sentiment-analysis', '/features/fanout-query', '/features/ai-crawlability', '/customers', '/about', '/changelog'])
+const HOME_ROUTES = new Set<string>(['/customers', '/about', '/changelog'])
 
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
 // `/blog` and `/resources` are intentionally absent — the whole content system
