@@ -534,8 +534,8 @@ function Hero({
                       height: 16,
                       width: 16,
                       borderRadius: 999,
-                      background: '#ffffff',
-                      color: '#0a0a0f',
+                      background: 'var(--positive)',
+                      color: 'var(--white)',
                       display: 'inline-flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -666,8 +666,8 @@ function FeatureBlock({
                   width: 20,
                   borderRadius: 999,
                   marginTop: 1,
-                  background: '#ffffff',
-                  color: '#0a0a0f',
+                  background: 'var(--positive)',
+                  color: 'var(--white)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -752,7 +752,7 @@ function RecommendationsSection({
   )
 }
 
-/* ── 07 — METRICS STRIP (dark) ───────────────────────────────────── */
+/* ── 07 — METRICS STRIP (light) ──────────────────────────────────── */
 const REFRESH_STATS = [
   { k: 'Engines sampled', v: '1 engine' },
   { k: 'Prompts run', v: '10 buyer prompts' },
@@ -766,8 +766,8 @@ function MetricsBand() {
       style={{
         position: 'relative',
         padding: 'var(--section) 0',
-        background: 'var(--ink-surface, var(--ink))',
-        color: 'var(--on-ink)',
+        background: 'var(--subtle)',
+        color: 'var(--ink)',
         overflow: 'hidden'
       }}
     >
@@ -777,7 +777,7 @@ function MetricsBand() {
           position: 'absolute',
           inset: 0,
           opacity: 0.6,
-          backgroundImage: 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(rgba(10,10,15,0.05) 1px, transparent 1px)',
           backgroundSize: '24px 24px'
         }}
       />
@@ -785,14 +785,14 @@ function MetricsBand() {
         <div style={{ maxWidth: 720 }}>
           <TypingHeadline
             text="One snapshot. One engine. Ten prompts."
-            caretColor="var(--on-ink)"
-            style={{ ...DISPLAY_LG, margin: '0', color: 'var(--on-ink)' }}
+            caretColor="var(--ink)"
+            style={{ ...DISPLAY_LG, margin: '0', color: 'var(--ink)' }}
           />
-          <p style={{ ...LEAD, color: 'var(--on-ink-70)', marginTop: 24 }}>
+          <p style={{ ...LEAD, color: 'var(--ink-70)', marginTop: 24 }}>
             The free score samples a fixed buyer-prompt set on a single day. It is enough to see
             where you stand, which engines describe you well, and where competitors win.
           </p>
-          <p style={{ ...LEAD, color: 'var(--on-ink-70)', marginTop: 18 }}>
+          <p style={{ ...LEAD, color: 'var(--ink-70)', marginTop: 18 }}>
             The full Clovion product tracks the same signals daily, alerts when visibility shifts,
             and connects each finding to a fix.
           </p>
@@ -800,8 +800,8 @@ function MetricsBand() {
         <div
           style={{
             marginTop: 56,
-            borderTop: '1px solid var(--on-ink-15)',
-            borderBottom: '1px solid var(--on-ink-15)',
+            borderTop: '1px solid var(--line)',
+            borderBottom: '1px solid var(--line)',
             overflow: 'hidden',
             WebkitMaskImage:
               'linear-gradient(to right, transparent, black 4%, black 96%, transparent)',
@@ -822,7 +822,7 @@ function MetricsBand() {
                   flexShrink: 0,
                   width: 320,
                   padding: '28px 24px',
-                  borderRight: '1px solid var(--on-ink-15)'
+                  borderRight: '1px solid var(--line)'
                 }}
               >
                 <div
@@ -831,7 +831,7 @@ function MetricsBand() {
                     fontSize: '0.7rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.12em',
-                    color: 'var(--on-ink-50)'
+                    color: 'var(--ink-50)'
                   }}
                 >
                   {s.k}
@@ -843,7 +843,7 @@ function MetricsBand() {
                     fontSize: '1.35rem',
                     fontWeight: 600,
                     letterSpacing: '-0.02em',
-                    color: 'var(--on-ink)'
+                    color: 'var(--ink)'
                   }}
                 >
                   {s.v}
@@ -913,6 +913,7 @@ function FinalCTA() {
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={CONTAINER}>
         <div
+          className="clv-dark"
           style={{
             position: 'relative',
             overflow: 'hidden',
@@ -1213,7 +1214,7 @@ export default function FeatureContent() {
                 You’ve reached the free scan limit for now. Check your inbox for your report — or{' '}
                 <a
                   href="https://app.clovion.ai/signup"
-                  style={{ color: '#34d399', fontWeight: 600, textDecoration: 'none' }}
+                  style={{ color: 'var(--positive)', fontWeight: 600, textDecoration: 'none' }}
                 >
                   start a free trial
                 </a>{' '}
@@ -1226,7 +1227,7 @@ export default function FeatureContent() {
                   <>
                     {' '}
                     at{' '}
-                    <span style={{ fontWeight: 600, color: 'rgba(255,255,255,0.92)' }}>
+                    <span style={{ fontWeight: 600, color: 'var(--ink)' }}>
                       {submittedEmail}
                     </span>
                   </>

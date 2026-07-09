@@ -60,7 +60,7 @@ function SeverityPill({ severity }: { severity: string }) {
           textTransform: 'uppercase',
           letterSpacing: '0.14em',
           background: 'var(--ink)',
-          color: 'var(--on-ink, #fff)',
+          color: 'var(--white)',
           padding: '4px 10px',
           borderRadius: 6,
           fontWeight: 600

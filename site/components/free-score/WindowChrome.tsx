@@ -8,21 +8,21 @@ type WindowChromeProps = {
   dark?: boolean
 }
 
-export default function WindowChrome({ label, children, dark }: WindowChromeProps) {
+export default function WindowChrome({ label, children }: WindowChromeProps) {
   return (
     <div
       style={{
         borderRadius: 24,
-        border: 'none',
-        background: dark ? 'var(--ink-surface, var(--ink))' : 'var(--white)',
-        boxShadow: '0 30px 80px -40px rgba(0,0,0,0.65)',
+        border: '1px solid var(--line)',
+        background: 'var(--white)',
+        boxShadow: '0 30px 80px -40px rgba(10,10,15,0.25)',
         overflow: 'hidden'
       }}
     >
       <div
         style={{
           height: 44,
-          borderBottom: `1px solid ${dark ? 'var(--on-ink-15)' : 'var(--line)'}`,
+          borderBottom: '1px solid var(--line)',
           display: 'flex',
           alignItems: 'center',
           padding: '0 16px',
@@ -40,7 +40,7 @@ export default function WindowChrome({ label, children, dark }: WindowChromeProp
             textAlign: 'center',
             fontFamily: 'var(--font-mono)',
             fontSize: '0.72rem',
-            color: dark ? 'var(--on-ink-50)' : 'var(--ink-50)'
+            color: 'var(--ink-50)'
           }}
         >
           {label}

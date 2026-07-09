@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/free-score/FeatureContent'
 
 export const metadata: Metadata = {
@@ -70,9 +71,18 @@ const faqJsonLd = {
   ]
 }
 
+const lightWrapper = {
+  ['--bg']: '#FAF9F7',
+  ['--positive']: '#C2410C',
+  ['--positive-bg']: '#FBEEE7',
+  ['--positive-border']: 'rgba(194,65,12,0.34)',
+  background: '#FAF9F7',
+  color: 'var(--ink)'
+} as CSSProperties
+
 export default function FreeAIVisibilityScorePage() {
   return (
-    <div className="clv-dark clv-ai-vis-page">
+    <div className="clv-ai-vis-page" style={lightWrapper}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

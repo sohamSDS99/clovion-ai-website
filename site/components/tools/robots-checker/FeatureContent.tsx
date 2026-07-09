@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
 import { openCalendly } from '@/lib/openCalendly'
-import { RED } from '@/components/home/mocks/palette'
+import { RED, RED_BG, RED_BORDER } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger } from '@/components/home/mocks/motion'
 import { FAQAccordion } from '@/components/FAQAccordion'
 import ToolLeadModal from '@/components/tools/shared/ToolLeadModal'
@@ -39,16 +39,17 @@ const LEAD: CSSProperties = {
   textWrap: 'balance' as CSSProperties['textWrap']
 }
 
-/* Clovion white wordmark — used in the dark result modal header. */
+/* Clovion wordmark — used in the result modal header. The asset is a white
+   knockout, so on the light modal surface it is inverted to ink via CSS. */
 const CLOVION_LOGO =
   'https://res.cloudinary.com/doajh6jwk/image/upload/v1782804104/Clovion-Logo-white_xoqx8t.png'
 
-/* Dark-brand red for "Blocked" pills + Disallow tint (light pinks read wrong
-   on the black modal surface). */
-const RED_BRIGHT = '#f87171'
-const RED_BG_DARK = 'rgba(248,113,113,0.13)'
-const RED_BORDER_DARK = 'rgba(248,113,113,0.32)'
-const GREEN_BRIGHT = '#4ade80'
+/* Light-surface red for "Blocked" pills + Disallow tint; positive (Clove
+   orange) for Allow tint on the white modal surface. */
+const RED_BRIGHT = RED
+const RED_BG_DARK = RED_BG
+const RED_BORDER_DARK = RED_BORDER
+const GREEN_BRIGHT = 'var(--positive)'
 
 /* ── Result shape (from /api/tools/robots) ────────────────────────── */
 type Status = 'allowed' | 'blocked' | 'indeterminate'
@@ -222,8 +223,8 @@ function Hero({
               display: 'inline-flex',
               gap: 4,
               padding: 4,
-              background: 'var(--ink-surface)',
-              border: '1px solid var(--ink-25)',
+              background: 'var(--subtle)',
+              border: '1px solid var(--line)',
               borderRadius: 'var(--radius-pill)',
               position: 'relative'
             }}
@@ -315,9 +316,9 @@ function Hero({
                       width: '100%',
                       height: 56,
                       padding: '0 20px 0 46px',
-                      background: 'var(--ink-surface)',
+                      background: 'var(--subtle)',
                       color: 'var(--ink)',
-                      border: `1px solid ${error ? RED : 'var(--ink-25)'}`,
+                      border: `1px solid ${error ? RED : 'var(--line)'}`,
                       borderRadius: 'var(--radius-pill)',
                       fontFamily: 'var(--font-display)',
                       fontSize: '1rem',
@@ -355,9 +356,9 @@ function Hero({
                     width: '100%',
                     minHeight: 240,
                     padding: '16px 18px',
-                    background: 'var(--ink-surface)',
+                    background: 'var(--subtle)',
                     color: 'var(--ink)',
-                    border: `1px solid ${error ? RED : 'var(--ink-25)'}`,
+                    border: `1px solid ${error ? RED : 'var(--line)'}`,
                     borderRadius: 18,
                     fontFamily: 'var(--font-mono)',
                     fontSize: '0.88rem',
@@ -551,7 +552,7 @@ function ResultModal({
           border: '1px solid var(--line)',
           borderRadius: 24,
           padding: 'clamp(22px, 3.2cqw, 44px)',
-          boxShadow: '0 40px 120px -24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)',
+          boxShadow: '0 40px 120px -24px rgba(0,0,0,0.35), 0 0 0 1px var(--line)',
           width: '100%',
           maxWidth: 1080,
           maxHeight: '90vh',
@@ -576,7 +577,7 @@ function ResultModal({
           <img
             src={CLOVION_LOGO}
             alt="Clovion AI"
-            style={{ height: 26, width: 'auto', display: 'block' }}
+            style={{ height: 26, width: 'auto', display: 'block', filter: 'invert(1)' }}
           />
           <button
             type="button"
@@ -590,7 +591,7 @@ function ResultModal({
               height: 36,
               borderRadius: 999,
               border: '1px solid var(--line)',
-              background: 'var(--ink-surface)',
+              background: 'var(--subtle)',
               color: 'var(--ink-60)',
               cursor: 'pointer',
               flexShrink: 0,
@@ -918,8 +919,8 @@ function StatusPill({ status }: { status: Status }) {
         alignItems: 'center',
         gap: 6,
         padding: '4px 10px',
-        background: 'rgba(255,255,255,0.06)',
-        border: '1px solid var(--ink-25)',
+        background: 'rgba(10,10,15,0.05)',
+        border: '1px solid var(--line)',
         color: 'var(--ink-60)',
         borderRadius: 'var(--radius-pill)',
         fontFamily: 'var(--font-mono)',
@@ -970,9 +971,9 @@ function Pill({ tone, children }: { tone: 'ok' | 'bad' | 'neutral'; children: Re
     <span
       style={{
         ...styles,
-        background: 'rgba(255,255,255,0.06)',
+        background: 'rgba(10,10,15,0.05)',
         color: 'var(--ink-60)',
-        border: '1px solid var(--ink-25)'
+        border: '1px solid var(--line)'
       }}
     >
       {children}
@@ -1085,8 +1086,8 @@ function Educational() {
               key={t.title}
               style={{
                 padding: 24,
-                background: 'var(--ink-surface)',
-                border: '1px solid var(--ink-25)',
+                background: 'var(--white)',
+                border: '1px solid var(--line)',
                 borderRadius: 16,
                 textAlign: 'center'
               }}
@@ -1126,6 +1127,7 @@ function FinalCTA() {
     <section style={{ padding: 'var(--section) 0' }}>
       <div style={CONTAINER}>
         <div
+          className="clv-dark"
           style={{
             position: 'relative',
             overflow: 'hidden',

@@ -136,7 +136,7 @@ function Hero({
     width: '100%',
     height: 52,
     padding: '0 18px',
-    background: 'var(--ink-surface)',
+    background: 'var(--subtle)',
     color: 'var(--ink)',
     border: '1px solid var(--ink-25)',
     borderRadius: 14,
@@ -149,7 +149,7 @@ function Hero({
     width: '100%',
     minHeight: 86,
     padding: '14px 18px',
-    background: 'var(--ink-surface)',
+    background: 'var(--subtle)',
     color: 'var(--ink)',
     border: '1px solid var(--ink-25)',
     borderRadius: 14,
@@ -186,9 +186,9 @@ function Hero({
           zIndex: -1,
           pointerEvents: 'none',
           background: [
-            'radial-gradient(circle at 0% 0%, rgba(255,255,255,0.05), transparent 42%)',
-            'radial-gradient(circle at 100% 0%, rgba(255,255,255,0.05), transparent 42%)',
-            'radial-gradient(circle at 50% 100%, rgba(255,255,255,0.04), transparent 50%)'
+            'radial-gradient(circle at 0% 0%, rgba(10,10,15,0.05), transparent 42%)',
+            'radial-gradient(circle at 100% 0%, rgba(10,10,15,0.05), transparent 42%)',
+            'radial-gradient(circle at 50% 100%, rgba(10,10,15,0.04), transparent 50%)'
           ].join(', ')
         }}
       />
@@ -202,7 +202,7 @@ function Hero({
           pointerEvents: 'none',
           opacity: 0.35,
           backgroundImage:
-            'linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px)',
+            'linear-gradient(rgba(10,10,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(10,10,15,0.04) 1px, transparent 1px)',
           backgroundSize: '64px 64px',
           maskImage: 'radial-gradient(ellipse at top, black 30%, transparent 70%)',
           WebkitMaskImage: 'radial-gradient(ellipse at top, black 30%, transparent 70%)'
@@ -400,9 +400,9 @@ function ResultCard({
     URL.revokeObjectURL(u)
   }
 
-  // Plain content container — the ToolResultModal provides the dark card
-  // chrome. All `var(--*)` lookups resolve to their DARK values here (white
-  // text on the dark modal surface).
+  // Plain content container — the ToolResultModal provides the card chrome.
+  // All `var(--*)` lookups resolve to their light values here (ink text on
+  // the light modal surface).
   const root: CSSProperties = {
     color: 'var(--ink)',
     opacity: revealed ? 1 : 0,
@@ -438,15 +438,15 @@ function ResultCard({
 
   const codeBlock: CSSProperties = {
     margin: '16px 0 0',
-    background: '#0f0f14',
-    color: '#f4f4f6',
+    background: 'var(--subtle)',
+    color: 'var(--ink)',
     borderRadius: 14,
     padding: '20px 22px',
     fontFamily: 'var(--font-mono)',
     fontSize: '0.82rem',
     lineHeight: 1.6,
     overflowX: 'auto',
-    border: '1px solid #1a1a22',
+    border: '1px solid var(--line)',
     minHeight: 360,
     position: 'relative'
   }
@@ -466,9 +466,9 @@ function ResultCard({
     gap: 6,
     height: 30,
     padding: '0 10px',
-    background: 'rgba(255,255,255,0.06)',
-    color: 'rgba(255,255,255,0.9)',
-    border: '1px solid rgba(255,255,255,0.14)',
+    background: 'var(--white)',
+    color: 'var(--ink-70)',
+    border: '1px solid var(--line)',
     borderRadius: 8,
     fontFamily: 'var(--font-mono)',
     fontSize: '0.7rem',
@@ -481,10 +481,10 @@ function ResultCard({
   // Color-tone the rendered lines lightly: headings, blockquote, links.
   const formatted = display.split('\n').map((line, i) => {
     let color: string | undefined
-    if (line.startsWith('# ')) color = '#ffd28a'
-    else if (line.startsWith('## ')) color = '#9ae6b4'
-    else if (line.startsWith('> ')) color = '#a3b5d1'
-    else if (line.startsWith('- ')) color = '#f4f4f6'
+    if (line.startsWith('# ')) color = 'var(--ink)'
+    else if (line.startsWith('## ')) color = 'var(--ink-80)'
+    else if (line.startsWith('> ')) color = 'var(--ink-60)'
+    else if (line.startsWith('- ')) color = 'var(--ink-90)'
     return (
       <span key={i} style={{ display: 'block', color, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
         {line || ' '}
@@ -556,9 +556,9 @@ function ResultCard({
                 aria-label="Copy to clipboard"
                 style={{
                   ...iconBtn,
-                  background: copied ? 'rgba(154,230,180,0.16)' : iconBtn.background,
-                  color: copied ? '#9ae6b4' : iconBtn.color,
-                  borderColor: copied ? 'rgba(154,230,180,0.36)' : iconBtn.borderColor as string
+                  background: copied ? 'var(--positive-bg)' : iconBtn.background,
+                  color: copied ? 'var(--positive)' : iconBtn.color,
+                  borderColor: copied ? 'var(--positive-border)' : iconBtn.borderColor as string
                 }}
               >
                 {copied ? <CheckIcon size={12} /> : <CopyIcon size={12} />}
@@ -585,7 +585,7 @@ function ResultCard({
                     width: '0.55ch',
                     height: '1em',
                     verticalAlign: '-0.15em',
-                    background: '#f4f4f6',
+                    background: 'var(--ink)',
                     animation: 'clv-blink 0.9s steps(1) infinite',
                     marginLeft: 1
                   }}
@@ -697,18 +697,18 @@ function WhatIsLlmsTxt() {
               key={t.title}
               style={{
                 padding: 22,
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'var(--white)',
+                border: '1px solid var(--line)',
                 borderRadius: 18,
                 transition: `transform .25s ${cb}, border-color .25s ${cb}, background .25s ${cb}`
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.16)'
-                e.currentTarget.style.background = 'rgba(255,255,255,0.045)'
+                e.currentTarget.style.borderColor = 'var(--ink-25)'
+                e.currentTarget.style.background = 'var(--subtle)'
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)'
-                e.currentTarget.style.background = 'rgba(255,255,255,0.03)'
+                e.currentTarget.style.borderColor = 'var(--line)'
+                e.currentTarget.style.background = 'var(--white)'
               }}
             >
               <span
@@ -719,8 +719,8 @@ function WhatIsLlmsTxt() {
                   height: 44,
                   width: 44,
                   borderRadius: 12,
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.10)',
+                  background: 'var(--subtle)',
+                  border: '1px solid var(--line)',
                   color: 'var(--ink)'
                 }}
               >
@@ -762,6 +762,7 @@ function FinalCTA() {
     <section style={{ padding: '0 0 var(--section)' }}>
       <div style={CONTAINER}>
         <div
+          className="clv-dark"
           style={{
             position: 'relative',
             overflow: 'hidden',
