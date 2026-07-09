@@ -7,14 +7,12 @@
 // Collects just { name, email } + a Cloudflare Turnstile token, POSTs to
 // /api/tool-lead (which verifies the challenge and forwards to the same Make
 // webhook the free-score uses, with a per-tool event), then calls onSuccess()
-// so the parent can run the tool. Clovion dark-brand styling.
+// so the parent can run the tool. Clovion light-brand styling.
 
 import { useEffect, useRef, useState } from 'react'
 import TurnstileWidget from '@/components/free-score/TurnstileWidget'
+import { HaloMark } from '@/components/ui'
 import { analytics, newMetaEventId } from '@/lib/analytics'
-
-const CLOVION_LOGO =
-  'https://res.cloudinary.com/doajh6jwk/image/upload/v1782804104/Clovion-Logo-white_xoqx8t.png'
 
 // Inline literal — never put var(--*) inside a transition shorthand.
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
@@ -130,7 +128,7 @@ export default function ToolLeadModal({
     width: '100%',
     height: 50,
     padding: '0 16px',
-    background: 'var(--ink-surface)',
+    background: 'var(--subtle)',
     color: 'var(--ink)',
     border: '1px solid var(--ink-25)',
     borderRadius: 12,
@@ -172,7 +170,7 @@ export default function ToolLeadModal({
           border: '1px solid var(--line)',
           borderRadius: 22,
           padding: 'clamp(24px, 5vw, 34px)',
-          boxShadow: '0 40px 120px -24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)',
+          boxShadow: '0 40px 120px -24px rgba(0,0,0,0.28), 0 0 0 1px rgba(10,10,15,0.04)',
           textAlign: 'left',
           opacity: shown ? 1 : 0,
           transform: shown ? 'translateY(0)' : 'translateY(12px)',
@@ -189,8 +187,10 @@ export default function ToolLeadModal({
             marginBottom: 20
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CLOVION_LOGO} alt="Clovion AI" style={{ height: 24, width: 'auto', display: 'block' }} />
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '-0.02em', fontSize: '1.05rem' }}>
+            <HaloMark size={24} />
+            Clovion AI
+          </span>
           <button
             type="button"
             onClick={onClose}
@@ -204,7 +204,7 @@ export default function ToolLeadModal({
               height: 34,
               borderRadius: 999,
               border: '1px solid var(--line)',
-              background: 'var(--ink-surface)',
+              background: 'var(--subtle)',
               color: 'var(--ink-60)',
               cursor: submitting ? 'not-allowed' : 'pointer',
               flexShrink: 0

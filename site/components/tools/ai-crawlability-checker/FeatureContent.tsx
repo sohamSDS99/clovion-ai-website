@@ -230,10 +230,10 @@ function HeroWithForm({
           inset: 0,
           pointerEvents: 'none',
           background: [
-            'radial-gradient(circle at 0% 0%, rgba(255,255,255,0.06), transparent 42%)',
-            'radial-gradient(circle at 100% 0%, rgba(255,255,255,0.06), transparent 42%)',
-            'radial-gradient(circle at 0% 100%, rgba(255,255,255,0.04), transparent 42%)',
-            'radial-gradient(circle at 100% 100%, rgba(255,255,255,0.04), transparent 42%)'
+            'radial-gradient(circle at 0% 0%, rgba(10,10,15,0.05), transparent 42%)',
+            'radial-gradient(circle at 100% 0%, rgba(10,10,15,0.05), transparent 42%)',
+            'radial-gradient(circle at 0% 100%, rgba(10,10,15,0.04), transparent 42%)',
+            'radial-gradient(circle at 100% 100%, rgba(10,10,15,0.04), transparent 42%)'
           ].join(', ')
         }}
       />
@@ -285,7 +285,7 @@ function HeroWithForm({
                   flex: '1 1 320px',
                   height: 56,
                   padding: '0 20px',
-                  background: 'var(--ink-surface)',
+                  background: 'var(--subtle)',
                   color: 'var(--ink)',
                   border: `1px solid ${
                     error ? RED : focused ? 'var(--ink)' : 'var(--ink-25)'
@@ -293,7 +293,7 @@ function HeroWithForm({
                   borderRadius: 'var(--radius-pill, 999px)',
                   fontFamily: 'var(--font-display)',
                   fontSize: '1rem',
-                  outline: focused ? `2px solid var(--focus-ring, rgba(255,255,255,0.35))` : 'none',
+                  outline: focused ? `2px solid var(--focus-ring, rgba(10,10,15,0.25))` : 'none',
                   outlineOffset: 2,
                   transition: `border-color 0.2s ${cb}, outline-color 0.2s ${cb}`
                 }}
@@ -356,7 +356,7 @@ function HeroWithForm({
                     width: 6,
                     height: 6,
                     borderRadius: 999,
-                    background: 'var(--white)'
+                    background: 'var(--ink)'
                   }}
                 />
                 Instant readout
@@ -367,7 +367,7 @@ function HeroWithForm({
                     width: 6,
                     height: 6,
                     borderRadius: 999,
-                    background: 'var(--white)'
+                    background: 'var(--ink)'
                   }}
                 />
                 No signup
@@ -894,9 +894,9 @@ function EducationalSection() {
                   position: 'relative',
                   padding: 22,
                   borderRadius: 18,
-                  background: 'var(--ink-surface)',
-                  border: '1px solid var(--ink-25)',
-                  color: 'var(--white)',
+                  background: 'var(--white)',
+                  border: '1px solid var(--line)',
+                  color: 'var(--ink)',
                   overflow: 'hidden'
                 }}
               >
@@ -907,7 +907,7 @@ function EducationalSection() {
                     inset: 0,
                     opacity: 0.5,
                     background:
-                      'radial-gradient(ellipse 70% 60% at 100% 0%, rgba(255,255,255,0.06), transparent 60%)',
+                      'radial-gradient(ellipse 70% 60% at 100% 0%, rgba(10,10,15,0.05), transparent 60%)',
                     pointerEvents: 'none'
                   }}
                 />
@@ -918,7 +918,7 @@ function EducationalSection() {
                       fontSize: '1.05rem',
                       fontWeight: 600,
                       letterSpacing: '-0.01em',
-                      color: 'var(--white)'
+                      color: 'var(--ink)'
                     }}
                   >
                     {t.name}
@@ -930,10 +930,10 @@ function EducationalSection() {
                       fontFamily: 'var(--font-mono)',
                       fontSize: '0.74rem',
                       color: 'var(--ink-70)',
-                      background: 'rgba(255,255,255,0.05)',
+                      background: 'var(--subtle)',
                       padding: '4px 10px',
                       borderRadius: 999,
-                      border: '1px solid var(--ink-25)'
+                      border: '1px solid var(--line)'
                     }}
                   >
                     {t.ua}
@@ -968,11 +968,12 @@ function FinalCTA() {
     <section style={{ padding: 'clamp(3rem, 6vw, 5rem) 0' }}>
       <div style={CONTAINER}>
         <div
+          className="clv-dark"
           style={{
             position: 'relative',
             overflow: 'hidden',
             borderRadius: 24,
-            background: 'var(--ink-surface, var(--ink))',
+            background: 'var(--white)',
             color: 'var(--on-ink)',
             padding: 'clamp(2.25rem, 6vw, 6rem) clamp(1.25rem, 4vw, 3.5rem)'
           }}

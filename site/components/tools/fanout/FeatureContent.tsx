@@ -153,7 +153,7 @@ function Hero({
           inset: 0,
           pointerEvents: 'none',
           background:
-            'radial-gradient(ellipse 60% 40% at 50% 18%, rgba(255,255,255,0.04) 0%, transparent 60%)'
+            'radial-gradient(ellipse 60% 40% at 50% 18%, rgba(10,10,15,0.03) 0%, transparent 60%)'
         }}
       />
       <Container>
@@ -215,13 +215,13 @@ function Hero({
               style={{
                 position: 'relative',
                 borderRadius: 18,
-                background: 'var(--ink-surface)',
+                background: 'var(--subtle)',
                 border: `1px solid ${
                   error ? '#e5484d' : focused ? 'var(--ink)' : 'var(--ink-25)'
                 }`,
                 transition: `border-color 0.18s ${cb}, box-shadow 0.18s ${cb}`,
                 boxShadow: focused
-                  ? '0 0 0 3px rgba(255,255,255,0.10)'
+                  ? '0 0 0 3px rgba(10,10,15,0.08)'
                   : 'none'
               }}
             >
@@ -328,7 +328,7 @@ function Hero({
                   style={{
                     ...MONO_LABEL,
                     fontSize: '0.72rem',
-                    color: 'var(--white)',
+                    color: 'var(--ink)',
                     background: 'transparent',
                     border: 'none',
                     padding: 0,
@@ -790,8 +790,8 @@ function Educational() {
                 position: 'relative',
                 overflow: 'hidden',
                 padding: 24,
-                background: 'var(--ink-surface, rgba(255,255,255,0.02))',
-                border: '1px solid var(--ink-25)',
+                background: 'var(--subtle)',
+                border: '1px solid var(--line)',
                 borderRadius: 18
               }}
             >
@@ -856,11 +856,12 @@ function FinalCTA() {
     <Section>
       <Container>
         <div
+          className="clv-dark"
           style={{
             position: 'relative',
             overflow: 'hidden',
             borderRadius: 24,
-            background: 'var(--ink-surface, var(--ink))',
+            background: 'var(--ink-surface)',
             color: 'var(--on-ink)',
             padding: 'clamp(2.25rem, 6vw, 6rem) clamp(1.25rem, 4vw, 3.5rem)',
             border: '1px solid var(--ink-25)'

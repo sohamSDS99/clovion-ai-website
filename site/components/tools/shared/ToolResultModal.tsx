@@ -1,16 +1,13 @@
 'use client'
 
-// Shared result popup for the free tools — the dark Clovion-brand window that
+// Shared result popup for the free tools — the light Clovion-brand window that
 // every tool's result renders into (matches the robots-checker result modal).
 // Provides: fixed scrim + blur, scroll-lock, Esc / backdrop / × to close, the
-// Clovion white logo, and an entrance transition. The tool passes its result
-// body as children; the body should use dark tokens (var(--ink) text on the
-// var(--white) dark surface), NOT the LIGHT palette.
+// Clovion mark, and an entrance transition. The tool passes its result body as
+// children; the body uses the LIGHT palette (var(--ink) text on var(--white)).
 
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
-
-const CLOVION_LOGO =
-  'https://res.cloudinary.com/doajh6jwk/image/upload/v1782804104/Clovion-Logo-white_xoqx8t.png'
+import { HaloMark } from '@/components/ui'
 
 // Inline literal — never put var(--*) inside a transition shorthand.
 const EASE = 'cubic-bezier(0.16, 1, 0.3, 1)'
@@ -70,7 +67,7 @@ export default function ToolResultModal({
     border: '1px solid var(--line)',
     borderRadius: 24,
     padding: 'clamp(22px, 3.2cqw, 44px)',
-    boxShadow: '0 40px 120px -24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04)',
+    boxShadow: '0 40px 120px -24px rgba(0,0,0,0.28), 0 0 0 1px rgba(10,10,15,0.04)',
     textAlign: 'left',
     opacity: shown ? 1 : 0,
     transform: shown ? 'translateY(0)' : 'translateY(12px)',
@@ -109,8 +106,10 @@ export default function ToolResultModal({
             marginBottom: 22
           }}
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={CLOVION_LOGO} alt="Clovion AI" style={{ height: 26, width: 'auto', display: 'block' }} />
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: 'var(--ink)', fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '-0.02em', fontSize: '1.05rem' }}>
+            <HaloMark size={24} />
+            Clovion AI
+          </span>
           <button
             type="button"
             onClick={onClose}
@@ -123,7 +122,7 @@ export default function ToolResultModal({
               height: 36,
               borderRadius: 999,
               border: '1px solid var(--line)',
-              background: 'var(--ink-surface)',
+              background: 'var(--subtle)',
               color: 'var(--ink-60)',
               cursor: 'pointer',
               flexShrink: 0

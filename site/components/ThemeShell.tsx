@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 // `/` and `/pricing` are intentionally NOT here — both ship LIGHT (#FAF9F7).
 // See app/page.tsx (home) and app/pricing/page.tsx (pricing light redesign).
-const DARK_ROUTES = new Set<string>(['/free-ai-visibility-score', '/customers', '/about', '/changelog'])
+const DARK_ROUTES = new Set<string>(['/customers', '/about', '/changelog'])
 
 // Prefix-matched dark sections — covers index + every nested/[slug] page.
 // The whole marketing site is dark, so this spans content, docs, legal, and
@@ -13,7 +13,7 @@ const DARK_ROUTES = new Set<string>(['/free-ai-visibility-score', '/customers', 
 // NOTE: `/blog` and `/resources` are intentionally NOT dark prefixes — the whole
 // content system (both listings, categories, AND every article/[slug]) ships
 // LIGHT (#FAF9F7 + Clove orange). Light + orange is the only pattern going forward.
-const DARK_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/docs', '/legal', '/tools']
+const DARK_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/docs', '/legal']
 
 // Light exceptions inside an otherwise-dark prefix. These pages were rebranded
 // to the light homepage palette (#FAF9F7 + Clove orange), so they opt out of

@@ -2,8 +2,8 @@
 
 // Confirmation popup shown after the lead form. The score is delivered by email
 // (the scan runs server-side), so we acknowledge the request here rather than
-// rendering it on-page. Clovion brand style: shiny black card, white text, the
-// Clovion logo, the single emerald affordance accent.
+// rendering it on-page. Clovion light brand style: white card, ink text, the
+// Clovion logo, the single Clove-orange affordance accent.
 
 const LOGO_URL =
   'https://res.cloudinary.com/doajh6jwk/image/upload/v1782804104/Clovion-Logo-white_xoqx8t.png'
@@ -47,12 +47,10 @@ export default function ThankYou({
           overflow: 'hidden',
           padding: '40px 34px 32px',
           textAlign: 'center',
-          color: '#ffffff',
-          background:
-            'radial-gradient(135% 120% at 50% -10%, #20202b 0%, #121219 46%, #0a0a0f 100%)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          boxShadow:
-            '0 30px 80px -24px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.10)',
+          color: 'var(--ink)',
+          background: 'var(--white)',
+          border: '1px solid var(--line)',
+          boxShadow: '0 30px 80px -24px rgba(10,10,15,0.22)',
         }}
       >
         {/* top sheen — the "shine" */}
@@ -66,7 +64,7 @@ export default function ThankYou({
             height: 150,
             pointerEvents: 'none',
             background:
-              'radial-gradient(62% 100% at 50% 0%, rgba(255,255,255,0.12) 0%, transparent 72%)',
+              'radial-gradient(62% 100% at 50% 0%, rgba(10,10,15,0.04) 0%, transparent 72%)',
           }}
         />
 
@@ -76,7 +74,7 @@ export default function ThankYou({
             width={116}
             height={29}
             alt="Clovion AI"
-            style={{ display: 'block', width: 116, height: 29, margin: '0 auto 30px', border: 0 }}
+            style={{ display: 'block', width: 116, height: 29, margin: '0 auto 30px', border: 0, filter: 'brightness(0)' }}
           />
 
           <h2
@@ -87,7 +85,7 @@ export default function ThankYou({
               fontWeight: 600,
               letterSpacing: '-0.01em',
               lineHeight: 1.25,
-              color: '#ffffff',
+              color: 'var(--ink)',
             }}
           >
             {title}
@@ -98,7 +96,7 @@ export default function ThankYou({
               maxWidth: 328,
               fontSize: '0.92rem',
               lineHeight: 1.62,
-              color: 'rgba(255,255,255,0.62)',
+              color: 'var(--ink-60)',
             }}
           >
             {body}
@@ -114,8 +112,8 @@ export default function ThankYou({
               borderRadius: 999,
               border: 0,
               cursor: 'pointer',
-              background: '#ffffff',
-              color: '#0a0a0f',
+              background: 'var(--ink)',
+              color: 'var(--white)',
               fontSize: '1rem',
               fontWeight: 600,
               letterSpacing: '-0.01em',
