@@ -16,7 +16,7 @@ const HOME_PREFIXES = ['/blog', '/news', '/webinars', '/resources', '/faq', '/co
 // Explicit LIGHT-chrome exceptions under a dark prefix (mirrors ThemeShell's
 // LIGHT_ROUTES). `/compare/clovion-vs-otterly` ships light, so it uses the
 // light Header/Footer.
-const LIGHT_ROUTES = new Set<string>(['/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/resources'])
+const LIGHT_ROUTES = new Set<string>(['/compare/clovion-vs-otterly', '/compare/clovion-vs-searchable', '/resources', '/legal/privacy', '/legal/terms'])
 
 function isHomeChrome(pathname: string): boolean {
   if (LIGHT_ROUTES.has(pathname)) return false

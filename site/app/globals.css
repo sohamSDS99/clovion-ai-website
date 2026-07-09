@@ -716,6 +716,18 @@
 }
 .cms-prose a:hover { opacity: 0.7; }
 .cms-prose strong { font-weight: 600; }
+
+/* Privacy & Terms on the light homepage palette — orange (#C2410C) accent on
+   in-page + mailto links, matching the feature-page palette. The element
+   selector beats the token color utilities so these read orange without
+   per-link edits. */
+.clv-legal-light a[href^="#"],
+.clv-legal-light a[href^="mailto:"] {
+  color: #C2410C;
+  text-decoration-color: rgba(194, 65, 12, 0.4);
+}
+.clv-legal-light a[href^="#"]:hover,
+.clv-legal-light a[href^="mailto:"]:hover { color: #9A340A; }
 .cms-prose ul, .cms-prose ol { padding-left: 1.4rem; }
 .cms-prose ul { list-style: disc; }
 .cms-prose ol { list-style: decimal; }
