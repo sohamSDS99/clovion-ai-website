@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
+import { Button, Eyebrow, ArrowRight } from '@/components/ui'
 import { openCalendly } from '@/lib/openCalendly'
 import { RED, RED_BG, RED_BORDER } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger } from '@/components/home/mocks/motion'
@@ -197,7 +197,6 @@ function Hero({
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
-      <HeroShade />
       <div style={{ ...CONTAINER, padding: '6rem 2rem 4rem' }}>
         <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
           <Eyebrow>FREE TOOL</Eyebrow>

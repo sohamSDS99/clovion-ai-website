@@ -222,21 +222,6 @@ function HeroWithForm({
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
-      {/* HeroShade equivalent — 4 soft corner vignettes on the dark page */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          background: [
-            'radial-gradient(circle at 0% 0%, rgba(10,10,15,0.05), transparent 42%)',
-            'radial-gradient(circle at 100% 0%, rgba(10,10,15,0.05), transparent 42%)',
-            'radial-gradient(circle at 0% 100%, rgba(10,10,15,0.04), transparent 42%)',
-            'radial-gradient(circle at 100% 100%, rgba(10,10,15,0.04), transparent 42%)'
-          ].join(', ')
-        }}
-      />
       <div style={{ ...CONTAINER, padding: 'clamp(4rem, 8vw, 7rem) 2rem clamp(3rem, 5vw, 4.5rem)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <Eyebrow>Free Tool</Eyebrow>
@@ -900,17 +885,6 @@ function EducationalSection() {
                   overflow: 'hidden'
                 }}
               >
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    opacity: 0.5,
-                    background:
-                      'radial-gradient(ellipse 70% 60% at 100% 0%, rgba(10,10,15,0.05), transparent 60%)',
-                    pointerEvents: 'none'
-                  }}
-                />
                 <div style={{ position: 'relative' }}>
                   <div
                     style={{

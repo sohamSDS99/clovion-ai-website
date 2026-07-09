@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
-import { Container, Section, Button, Eyebrow, HeroShade, ArrowRight } from '@/components/ui'
+import { Container, Section, Button, Eyebrow, ArrowRight } from '@/components/ui'
 import { TAG_COLORS } from '@/components/home/mocks/palette'
 import { cb, useReducedMotion, useStagger, useCountUp } from '@/components/home/mocks/motion'
 import { openCalendly } from '@/lib/openCalendly'
@@ -144,18 +144,6 @@ function Hero({
 
   return (
     <Section className="relative overflow-hidden">
-      <HeroShade />
-      {/* Subtle scanline glow above the form */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          background:
-            'radial-gradient(ellipse 60% 40% at 50% 18%, rgba(10,10,15,0.03) 0%, transparent 60%)'
-        }}
-      />
       <Container>
         <div
           className="max-w-3xl mx-auto text-center"
@@ -409,20 +397,6 @@ function CategoryCard({
         transition: `opacity 0.5s ${cb}, transform 0.5s ${cb}`
       }}
     >
-      {/* Subtle corner accent */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          top: 0,
-          right: 0,
-          width: 60,
-          height: 60,
-          background:
-            'radial-gradient(circle at 100% 0%, rgba(10,10,15,0.05), transparent 70%)'
-        }}
-      />
-
       <div
         style={{
           display: 'flex',

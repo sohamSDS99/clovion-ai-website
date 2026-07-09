@@ -53,21 +53,6 @@ export default function ThankYou({
           boxShadow: '0 30px 80px -24px rgba(10,10,15,0.22)',
         }}
       >
-        {/* top sheen — the "shine" */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 150,
-            pointerEvents: 'none',
-            background:
-              'radial-gradient(62% 100% at 50% 0%, rgba(10,10,15,0.04) 0%, transparent 72%)',
-          }}
-        />
-
         <div style={{ position: 'relative' }}>
           <img
             src={LOGO_URL}
