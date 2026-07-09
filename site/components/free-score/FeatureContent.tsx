@@ -329,17 +329,6 @@ function Hero({
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: -1,
-          opacity: 0.5,
-          background:
-            'radial-gradient(ellipse 70% 55% at 70% 0%, rgba(10,10,15,0.06) 0%, rgba(10,10,15,0.02) 30%, transparent 70%)'
-        }}
-      />
       <div style={{ ...CONTAINER, padding: '7rem 2rem 5rem' }}>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-[1.02fr_1fr] md:gap-16 items-center">
           <div>
@@ -771,16 +760,6 @@ function MetricsBand() {
         overflow: 'hidden'
       }}
     >
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          opacity: 0.6,
-          backgroundImage: 'radial-gradient(rgba(10,10,15,0.05) 1px, transparent 1px)',
-          backgroundSize: '24px 24px'
-        }}
-      />
       <div style={{ ...CONTAINER, position: 'relative' }}>
         <div style={{ maxWidth: 720 }}>
           <TypingHeadline

@@ -177,37 +177,6 @@ function Hero({
 
   return (
     <section style={{ position: 'relative', overflow: 'hidden' }}>
-      {/* Subtle corner vignette */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: -1,
-          pointerEvents: 'none',
-          background: [
-            'radial-gradient(circle at 0% 0%, rgba(10,10,15,0.05), transparent 42%)',
-            'radial-gradient(circle at 100% 0%, rgba(10,10,15,0.05), transparent 42%)',
-            'radial-gradient(circle at 50% 100%, rgba(10,10,15,0.04), transparent 50%)'
-          ].join(', ')
-        }}
-      />
-      {/* Faint grid overlay */}
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: -1,
-          pointerEvents: 'none',
-          opacity: 0.35,
-          backgroundImage:
-            'linear-gradient(rgba(10,10,15,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(10,10,15,0.04) 1px, transparent 1px)',
-          backgroundSize: '64px 64px',
-          maskImage: 'radial-gradient(ellipse at top, black 30%, transparent 70%)',
-          WebkitMaskImage: 'radial-gradient(ellipse at top, black 30%, transparent 70%)'
-        }}
-      />
       <div style={{ ...CONTAINER, padding: '4.5rem 2rem 4rem' }}>
         <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
           <Eyebrow>FREE TOOL</Eyebrow>
