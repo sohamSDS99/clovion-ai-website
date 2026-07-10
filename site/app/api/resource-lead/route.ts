@@ -9,7 +9,7 @@
  * blocks or delays the visitor's download.
  */
 import { NextResponse } from "next/server";
-import { submitResourceLead } from "@/lib/cms";
+import { getResource, submitResourceLead } from "@/lib/cms";
 import { sendMetaConversion } from "@/lib/meta/capi";
 
 export const runtime = "nodejs";
@@ -124,13 +124,29 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "slug and email are required." }, { status: 400 });
   }
 
-  const result = await submitResourceLead(body.slug, {
-    email: body.email,
-    data: body.data ?? {},
-  });
+  // Gated vs ungated lives in typeData, not the top-level fields. Ungated
+  // resources expose a public downloadUrl and have NO lead endpoint — POSTing a
+  // lead there 4xxs, which is what surfaced as "Something went wrong". So serve
+  // the public URL directly for those; only gated resources go through the CMS
+  // lead endpoint (which issues a short-lived signed URL). Either way we still
+  // capture the email below for the Meta/Make lead events.
+  const resource = await getResource(body.slug);
+  const typeData = (resource?.typeData ?? {}) as { gated?: boolean; downloadUrl?: string };
+  const publicUrl = typeof typeData.downloadUrl === "string" ? typeData.downloadUrl : "";
+  const gated = typeData.gated ?? resource?.gated ?? false;
 
-  if (!result.ok) {
-    return NextResponse.json({ error: result.error ?? "Submission failed." }, { status: 502 });
+  let downloadUrl: string | undefined;
+  if (!gated && publicUrl) {
+    downloadUrl = publicUrl;
+  } else {
+    const result = await submitResourceLead(body.slug, {
+      email: body.email,
+      data: body.data ?? {},
+    });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error ?? "Submission failed." }, { status: 502 });
+    }
+    downloadUrl = result.downloadUrl;
   }
 
   // Server copy of the Lead conversion (deduped against the browser Pixel via
@@ -148,9 +164,9 @@ export async function POST(req: Request) {
   void notifyWebhook({
     email: body.email,
     slug: body.slug,
-    resourceTitle: body.resourceTitle ?? "",
+    resourceTitle: body.resourceTitle || resource?.title || "",
     ip: clientIp(req),
   });
 
-  return NextResponse.json({ downloadUrl: result.downloadUrl });
+  return NextResponse.json({ downloadUrl });
 }
