@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
 import BlogIndex from '@/components/blog/BlogIndex'
 import { listContent } from '@/lib/cms'
-import { toPost } from '@/app/blog/page'
+import { toPost } from '@/components/blog/toPost'
 
 export const dynamic = 'force-dynamic'
 

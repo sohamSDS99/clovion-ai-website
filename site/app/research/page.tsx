@@ -127,29 +127,6 @@ export default async function ResearchPage() {
               background: #C2410C;
               box-shadow: 0 0 0 4px rgba(194, 65, 12, 0.07);
             }
-            /* Card hover: gentle lift + orange hairline, CSS-only (no JS). */
-            .clv-research .research-card,
-            .clv-research .research-featured {
-              transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
-            }
-            .clv-research .research-card:hover,
-            .clv-research .research-featured:hover {
-              border-color: rgba(194, 65, 12, 0.28);
-              transform: translateY(-2px);
-              box-shadow: 0 1px 2px rgba(10,10,15,0.04), 0 18px 40px -18px rgba(10,10,15,0.18);
-            }
-            .clv-research .research-card:hover .research-arrow,
-            .clv-research .research-featured:hover .research-arrow {
-              transform: translateX(3px);
-            }
-            .clv-research .research-arrow { transition: transform .25s ease; }
-            @media (prefers-reduced-motion: reduce) {
-              .clv-research .research-card,
-              .clv-research .research-featured,
-              .clv-research .research-arrow { transition: none; }
-              .clv-research .research-card:hover,
-              .clv-research .research-featured:hover { transform: none; }
-            }
           `
         }}
       />
