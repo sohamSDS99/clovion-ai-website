@@ -23,6 +23,72 @@ function isoUtc(d: Date): string {
   return d.toISOString().replace('Z', '+00:00')
 }
 
+// Best-effort first/last name from the email local-part. Handles the common
+// `first.last` / `first_last` / `first-last` shapes; strips `+tags` and stray
+// digits; title-cases each token. One token → first name only, no last name.
+// Purely heuristic — a mailbox like `info@` yields { firstName: 'Info' }.
+function deriveName(email: string): { firstName: string; lastName: string } {
+  const local = (email.split('@')[0] || '').split('+')[0]
+  const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : '')
+  const tokens = local
+    .split(/[._-]+/)
+    .map((t) => t.replace(/\d+/g, '').trim())
+    .filter(Boolean)
+  if (tokens.length === 0) return { firstName: '', lastName: '' }
+  if (tokens.length === 1) return { firstName: cap(tokens[0]), lastName: '' }
+  return { firstName: cap(tokens[0]), lastName: cap(tokens[tokens.length - 1]) }
+}
+
+function isPrivateIp(ip: string): boolean {
+  return (
+    ip === 'unknown' ||
+    ip === '::1' ||
+    /^127\./.test(ip) ||
+    /^10\./.test(ip) ||
+    /^192\.168\./.test(ip) ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(ip) ||
+    /^(::ffff:)?(10|127|192\.168)\./.test(ip) ||
+    /^f[cd]/.test(ip.toLowerCase())
+  )
+}
+
+function countryName(code: string): string {
+  if (!code) return ''
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' }).of(code) || ''
+  } catch {
+    return ''
+  }
+}
+
+// Resolve the sender's country from their IP. Production sits behind Cloudflare,
+// which injects `CF-IPCountry` (ISO-2) at the edge — free, instant, no lookup.
+// Only when that header is absent (e.g. non-CF path) do we fall back to a geo-IP
+// API with a short timeout. Never throws; returns empty strings on any failure.
+async function resolveCountry(req: NextRequest, ip: string): Promise<{ country: string; countryCode: string }> {
+  const cf = req.headers.get('cf-ipcountry')?.trim().toUpperCase() || ''
+  let code = cf.length === 2 && cf !== 'XX' && cf !== 'T1' ? cf : ''
+
+  if (!code && !isPrivateIp(ip)) {
+    try {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), 3000)
+      const res = await fetch(`https://ipwho.is/${encodeURIComponent(ip)}?fields=success,country_code`, {
+        signal: controller.signal
+      })
+      clearTimeout(timer)
+      if (res.ok) {
+        const j = (await res.json()) as { success?: boolean; country_code?: string }
+        if (j?.success && typeof j.country_code === 'string') code = j.country_code.toUpperCase()
+      }
+    } catch {
+      // geo lookup is best-effort — swallow and return whatever we have
+    }
+  }
+
+  return { country: countryName(code), countryCode: code }
+}
+
 // Per-instance IP rate limit: 5 requests / 60s (mirrors the free-score guard).
 const g = globalThis as unknown as { __clvNewsletterRL?: Map<string, { n: number; t: number }> }
 if (!g.__clvNewsletterRL) g.__clvNewsletterRL = new Map()
@@ -55,10 +121,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'enter a valid email', code: 'bad_email' }, { status: 400 })
   }
 
+  // Enrich the lead: name from the email local-part, country from the IP.
+  const { firstName, lastName } = deriveName(email)
+  const { country, countryCode } = await resolveCountry(req, ip)
+
   // Server copy of the conversion (deduped against the browser Pixel via
   // metaEventId). Fires whether or not a forwarding webhook is configured, since
   // a valid submit is the conversion. No-ops without META_CAPI_TOKEN; never throws.
-  await sendMetaConversion({ req, eventName: 'Lead', eventId: metaEventId || undefined, email })
+  // Passing name improves Meta Event Match Quality.
+  await sendMetaConversion({
+    req,
+    eventName: 'Lead',
+    eventId: metaEventId || undefined,
+    email,
+    firstName: firstName || undefined,
+    lastName: lastName || undefined
+  })
 
   if (!WEBHOOK_URL) {
     // Capture not wired yet — accept so the popup confirms; record for now.
@@ -73,6 +151,10 @@ export async function POST(req: NextRequest) {
       timestamp: isoUtc(new Date()),
       data: {
         email,
+        first_name: firstName,
+        last_name: lastName,
+        country,
+        country_code: countryCode,
         source: 'home_popup',
         user_type: 'newsletter_subscriber',
         event: 'newsletter_subscribed'
