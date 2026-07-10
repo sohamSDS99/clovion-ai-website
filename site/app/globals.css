@@ -852,6 +852,13 @@
   border-radius: 999px;
   background: #C2410C;
 }
+/* Pull-quotes (blockquote WITHOUT a list) — the CMS often splits one quoted
+   sentence across several <p> (a hard return mid-sentence), which the default
+   block spacing renders as a fractured quote with gaps. Flow the paragraphs as
+   one continuous run (a space rejoins the split) so the quote reads as written. */
+.clv-light-article .cms-prose blockquote:not(:has(ul)) > * + * { margin-top: 0; }
+.clv-light-article .cms-prose blockquote:not(:has(ul)) > p { display: inline; }
+.clv-light-article .cms-prose blockquote:not(:has(ul)) > p + p::before { content: ' '; }
 /* Brand-orange eyebrow pulse dot on light article pages (e.g. the "RESOURCE"
    eyebrow on resource detail). PostHeader passes accentColor for blog posts;
    this covers standalone <Eyebrow> usages inside a light article wrapper. */
