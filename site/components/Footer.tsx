@@ -110,10 +110,6 @@ export function Footer() {
             <Link href="/legal/privacy" className="text-[0.8rem] text-ink-60 hover:text-ink hover:underline underline-offset-4 decoration-ink/30">Privacy</Link>
             <span aria-hidden className="h-3 w-px bg-ink/10" />
             <Link href="/legal/terms" className="text-[0.8rem] text-ink-60 hover:text-ink hover:underline underline-offset-4 decoration-ink/30">Terms</Link>
-            <span aria-hidden className="h-3 w-px bg-ink/10" />
-            <Link href="/docs" className="text-[0.8rem] text-ink-60 hover:text-ink hover:underline underline-offset-4 decoration-ink/30">Security</Link>
-            <span aria-hidden className="h-3 w-px bg-ink/10" />
-            <Link href="/docs" className="text-[0.8rem] text-ink-60 hover:text-ink hover:underline underline-offset-4 decoration-ink/30">DPA</Link>
           </div>
         </div>
       </Container>

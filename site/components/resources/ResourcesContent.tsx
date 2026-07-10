@@ -1,12 +1,14 @@
 'use client'
 
-import { useMemo, useState, type CSSProperties } from 'react'
+import { useMemo, useState } from 'react'
 import Link from 'next/link'
+import { Section, Container, Eyebrow, ArrowRight } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
 // Palette — homepage single source of truth (see memory: homepage-palette).
 // Light page: warm off-white bg, white surfaces, ink text. Two brand accents:
 // orange = brand energy (Playbooks), emerald = positive/affordance (Studies).
+// Mirrors the blog index's visual system (components/blog/BlogIndex.tsx).
 // ---------------------------------------------------------------------------
 const ORANGE = '#C2410C'
 const ORANGE_BG = 'rgba(194, 65, 12, 0.08)'
@@ -14,70 +16,6 @@ const ORANGE_BORDER = 'rgba(194, 65, 12, 0.24)'
 const EMERALD = 'var(--positive)' // #047857
 const EMERALD_BG = 'rgba(4, 120, 87, 0.08)'
 const EMERALD_BORDER = 'rgba(4, 120, 87, 0.22)'
-
-const CONTAINER: CSSProperties = {
-  maxWidth: 'var(--container-max)',
-  margin: '0 auto',
-  padding: '0 2rem'
-}
-
-const DISPLAY_LG: CSSProperties = {
-  fontFamily: 'var(--font-display)',
-  fontSize: 'var(--display-lg)',
-  fontWeight: 600,
-  letterSpacing: 'var(--track-display-lg)',
-  lineHeight: 1.02,
-  textWrap: 'balance' as CSSProperties['textWrap']
-}
-
-const DISPLAY_MD: CSSProperties = {
-  fontFamily: 'var(--font-display)',
-  fontSize: 'var(--display-md)',
-  fontWeight: 600,
-  letterSpacing: 'var(--track-display-md)',
-  lineHeight: 1.06,
-  textWrap: 'balance' as CSSProperties['textWrap']
-}
-
-const DISPLAY_SM: CSSProperties = {
-  fontFamily: 'var(--font-display)',
-  fontSize: 'var(--display-sm)',
-  fontWeight: 600,
-  letterSpacing: 'var(--track-display-sm)',
-  lineHeight: 1.14,
-  textWrap: 'balance' as CSSProperties['textWrap']
-}
-
-const LEAD: CSSProperties = {
-  fontSize: 'var(--text-lead)',
-  lineHeight: 1.55,
-  color: 'var(--ink-70)',
-  textWrap: 'balance' as CSSProperties['textWrap']
-}
-
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return (
-    <span
-      style={{
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.78rem',
-        textTransform: 'uppercase',
-        letterSpacing: '0.14em',
-        color: ORANGE
-      }}
-    >
-      {children}
-    </span>
-  )
-}
-
-function ArrowRight({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
-      <path d="M3 8h10m-4-4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
 
 // ---------------------------------------------------------------------------
 // Data shape + filtering
@@ -166,7 +104,56 @@ function KindChip({ post }: { post: ResourcePost }) {
   )
 }
 
-function CoverFrame({ post, aspect }: { post: ResourcePost; aspect: string }) {
+function Byline({ post, size = 'md' }: { post: ResourcePost; size?: 'md' | 'sm' }) {
+  const avatar = size === 'md' ? 34 : 30
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <span
+        style={{
+          width: avatar,
+          height: avatar,
+          borderRadius: 999,
+          background: 'var(--ink)',
+          color: '#fff',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: size === 'md' ? '0.74rem' : '0.66rem',
+          fontWeight: 600,
+          letterSpacing: '0.04em',
+          flexShrink: 0
+        }}
+      >
+        {initials(post.author)}
+      </span>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <span style={{ fontSize: size === 'md' ? '0.9rem' : '0.82rem', fontWeight: 600, color: 'var(--ink)' }}>
+          {post.author}
+        </span>
+        {formatDate(post.date) && (
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.66rem',
+              textTransform: 'uppercase',
+              letterSpacing: '0.14em',
+              color: 'var(--ink-50)'
+            }}
+          >
+            {formatDate(post.date)}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Cover frame. Uses object-fit: CONTAIN on a subtle backdrop so the whole cover
+// graphic is always visible — resource covers are text-heavy card art whose
+// edges get sliced by cover-crop (that was the "bleeding"). CLS-free: the
+// aspect box reserves space before load. On-top hairline frames dark/near-black
+// covers so they still read as a bounded region.
+function Cover({ post, aspect }: { post: ResourcePost; aspect: string }) {
   if (post.coverImageUrl) {
     return (
       <div style={{ position: 'relative', aspectRatio: aspect, overflow: 'hidden', background: 'var(--subtle)' }}>
@@ -174,7 +161,7 @@ function CoverFrame({ post, aspect }: { post: ResourcePost; aspect: string }) {
         <img
           src={post.coverImageUrl}
           alt={post.title}
-          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
+          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
         />
         <span
           aria-hidden
@@ -187,15 +174,7 @@ function CoverFrame({ post, aspect }: { post: ResourcePost; aspect: string }) {
   const kind = classifyKind(post)
   const accent = kind === 'playbook' ? ORANGE : kind === 'study-reports' ? EMERALD : 'var(--ink)'
   return (
-    <div
-      style={{
-        position: 'relative',
-        aspectRatio: aspect,
-        overflow: 'hidden',
-        background: 'var(--subtle)',
-        borderBottom: '1px solid var(--line)'
-      }}
-    >
+    <div style={{ position: 'relative', aspectRatio: aspect, overflow: 'hidden', background: 'var(--subtle)' }}>
       <div
         aria-hidden
         style={{
@@ -216,7 +195,7 @@ function CoverFrame({ post, aspect }: { post: ResourcePost; aspect: string }) {
             lineHeight: 0.85,
             letterSpacing: '-0.04em',
             color: accent,
-            opacity: 0.85,
+            opacity: 0.14,
             userSelect: 'none'
           }}
         >
@@ -227,140 +206,7 @@ function CoverFrame({ post, aspect }: { post: ResourcePost; aspect: string }) {
   )
 }
 
-// ---------------------------------------------------------------------------
-// Sections
-// ---------------------------------------------------------------------------
-function Hero() {
-  return (
-    <section style={{ position: 'relative', overflow: 'hidden' }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: -1,
-          opacity: 0.6,
-          background:
-            'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(194,65,12,0.06) 0%, rgba(10,10,15,0.02) 32%, transparent 70%)'
-        }}
-      />
-      <div style={{ ...CONTAINER, padding: '7rem 2rem 3rem' }}>
-        <div style={{ maxWidth: 820 }}>
-          <Eyebrow>Guides &amp; Downloads</Eyebrow>
-          <h1 style={{ ...DISPLAY_LG, fontSize: 'clamp(2rem, 4.2vw + 0.4rem, 3.4rem)', margin: '16px 0 0' }}>
-            Playbook, Study &amp; Report.
-          </h1>
-          <p style={{ ...LEAD, maxWidth: 640, margin: '1.75rem 0 0' }}>
-            Practical material on AI visibility, GEO, and answer-engine optimization. Pick what fits
-            your team and download it in a couple of clicks.
-          </p>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// Two latest resources, rendered as a prominent side-by-side highlight above
-// the filter bar. Always the two newest (unfiltered) — a fixed spotlight.
-function LatestTwo({ posts }: { posts: ResourcePost[] }) {
-  if (posts.length === 0) return null
-  return (
-    <section data-track-location="resources_latest" style={{ padding: '0.5rem 0 0' }}>
-      <div style={CONTAINER}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-7">
-          {posts.map((post) => (
-            <Link
-              key={post.slug}
-              href={`/resources/${post.slug}`}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                borderRadius: 24,
-                border: '1px solid var(--line)',
-                background: 'var(--white)',
-                overflow: 'hidden',
-                textDecoration: 'none',
-                color: 'inherit',
-                boxShadow: 'var(--shadow-card)',
-                transition: 'border-color .25s ease, transform .25s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = ORANGE_BORDER
-                e.currentTarget.style.transform = 'translateY(-2px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--line)'
-                e.currentTarget.style.transform = 'translateY(0)'
-              }}
-            >
-              <CoverFrame post={post} aspect="16 / 9" />
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 'clamp(1.4rem, 2.2vw, 1.9rem)', flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                  <KindChip post={post} />
-                  {formatDate(post.date) && (
-                    <span style={{ fontSize: '0.82rem', color: 'var(--ink-50)' }}>{formatDate(post.date)}</span>
-                  )}
-                </div>
-                <h2 style={{ ...DISPLAY_SM, fontSize: 'clamp(1.35rem, 1.6vw + 0.5rem, 1.85rem)', margin: 0 }}>
-                  {post.title}
-                </h2>
-                {post.excerpt && (
-                  <p
-                    style={{
-                      ...LEAD,
-                      fontSize: '1rem',
-                      margin: 0,
-                      display: '-webkit-box',
-                      WebkitLineClamp: 3,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {post.excerpt}
-                  </p>
-                )}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto', paddingTop: 4 }}>
-                  <span
-                    style={{
-                      width: 34,
-                      height: 34,
-                      borderRadius: 999,
-                      background: 'var(--ink)',
-                      color: 'var(--white)',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '0.72rem',
-                      fontWeight: 600
-                    }}
-                  >
-                    {initials(post.author)}
-                  </span>
-                  <span style={{ fontSize: '0.86rem', fontWeight: 600, color: 'var(--ink)' }}>{post.author}</span>
-                  <span
-                    style={{
-                      marginLeft: 'auto',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      fontSize: '0.9rem',
-                      fontWeight: 600,
-                      color: ORANGE
-                    }}
-                  >
-                    View resource <ArrowRight />
-                  </span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// Filter pills — the interactive segmented control (image reference).
+// Interactive segmented filter — Playbook / Study & Reports / All.
 function FilterBar({
   active,
   onChange,
@@ -371,11 +217,7 @@ function FilterBar({
   counts: Record<Filter, number>
 }) {
   return (
-    <div
-      role="tablist"
-      aria-label="Filter resources"
-      style={{ display: 'flex', flexWrap: 'wrap', gap: 8, alignItems: 'center' }}
-    >
+    <div role="tablist" aria-label="Filter resources" style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
       {FILTERS.map((f) => {
         const isActive = active === f.id
         return (
@@ -388,22 +230,16 @@ function FilterBar({
               display: 'inline-flex',
               alignItems: 'center',
               gap: 8,
-              padding: '10px 20px',
+              height: 38,
+              padding: '0 18px',
               borderRadius: 999,
-              border: `1px solid ${isActive ? ORANGE_BORDER : 'transparent'}`,
-              background: isActive ? ORANGE_BG : 'transparent',
-              color: isActive ? ORANGE : 'var(--ink-60)',
-              fontFamily: 'var(--font-display)',
-              fontSize: '0.98rem',
+              border: `1px solid ${isActive ? ORANGE : 'var(--line)'}`,
+              background: isActive ? ORANGE_BG : 'var(--white)',
+              color: isActive ? ORANGE : 'var(--ink-70)',
+              fontSize: '0.85rem',
               fontWeight: 600,
               cursor: 'pointer',
               transition: 'background .2s ease, color .2s ease, border-color .2s ease'
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive) e.currentTarget.style.color = ORANGE
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) e.currentTarget.style.color = 'var(--ink-60)'
             }}
           >
             {f.label}
@@ -423,32 +259,121 @@ function FilterBar({
   )
 }
 
+// Featured resource — the blog's horizontal split: cover left, text right.
+function FeaturedCard({ post }: { post: ResourcePost }) {
+  const textBlock = (
+    <div
+      style={{
+        height: '100%',
+        boxSizing: 'border-box',
+        padding: 'clamp(1.75rem, 2.5vw, 2.5rem)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 18
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.72rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.18em',
+            color: ORANGE
+          }}
+        >
+          Featured
+        </span>
+        <KindChip post={post} />
+      </div>
+      <h2 className="display-sm" style={{ fontSize: 'clamp(1.5rem, 1.7vw + 0.5rem, 2.1rem)', lineHeight: 1.1, margin: 0 }}>
+        {post.title}
+      </h2>
+      {post.excerpt && (
+        <p
+          className="lead"
+          style={{
+            fontSize: '1.02rem',
+            margin: 0,
+            maxWidth: 640,
+            color: 'var(--ink-70)',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
+          }}
+        >
+          {post.excerpt}
+        </p>
+      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginTop: 'auto', paddingTop: 8 }}>
+        <Byline post={post} />
+        <span
+          style={{
+            marginLeft: 'auto',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: '0.92rem',
+            fontWeight: 600,
+            color: ORANGE
+          }}
+        >
+          View resource <ArrowRight />
+        </span>
+      </div>
+    </div>
+  )
+
+  return (
+    <Section tight>
+      <Container>
+        <Link
+          href={`/resources/${post.slug}`}
+          className="group block"
+          style={{
+            position: 'relative',
+            borderRadius: 28,
+            border: '1px solid var(--line)',
+            background: 'var(--white)',
+            overflow: 'hidden',
+            textDecoration: 'none',
+            color: 'inherit',
+            boxShadow: 'var(--shadow-card)'
+          }}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
+            <div style={{ position: 'relative', overflow: 'hidden', borderRight: '1px solid var(--line)' }}>
+              <Cover post={post} aspect="16 / 9" />
+            </div>
+            <div className="relative" style={{ overflow: 'hidden' }}>
+              <div className="md:absolute md:inset-0">{textBlock}</div>
+            </div>
+          </div>
+        </Link>
+      </Container>
+    </Section>
+  )
+}
+
+// Grid card — the blog's vertical PostCard.
 function ResourceCard({ post }: { post: ResourcePost }) {
   return (
     <Link
       href={`/resources/${post.slug}`}
+      className="group flex flex-col h-full"
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        borderRadius: 20,
+        borderRadius: 22,
         border: '1px solid var(--line)',
         background: 'var(--white)',
         textDecoration: 'none',
         color: 'inherit',
-        overflow: 'hidden',
-        height: '100%',
-        transition: 'border-color .25s ease, transform .25s ease'
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.borderColor = ORANGE_BORDER
-        e.currentTarget.style.transform = 'translateY(-2px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = 'var(--line)'
-        e.currentTarget.style.transform = 'translateY(0)'
+        overflow: 'hidden'
       }}
     >
-      <CoverFrame post={post} aspect="16 / 9" />
+      <div style={{ flexShrink: 0, borderBottom: '1px solid var(--line)' }}>
+        <Cover post={post} aspect="4 / 3" />
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           <KindChip post={post} />
@@ -456,7 +381,9 @@ function ResourceCard({ post }: { post: ResourcePost }) {
             <span style={{ fontSize: '0.78rem', color: 'var(--ink-50)' }}>{formatDate(post.date)}</span>
           )}
         </div>
-        <h3 style={{ ...DISPLAY_SM, fontSize: 'clamp(1.1rem, 1.4vw + 0.4rem, 1.35rem)', margin: 0 }}>{post.title}</h3>
+        <h3 className="display-sm" style={{ fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)', margin: 0 }}>
+          {post.title}
+        </h3>
         {post.excerpt && (
           <p
             style={{
@@ -465,7 +392,7 @@ function ResourceCard({ post }: { post: ResourcePost }) {
               color: 'var(--ink-70)',
               margin: 0,
               display: '-webkit-box',
-              WebkitLineClamp: 3,
+              WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden'
             }}
@@ -473,10 +400,20 @@ function ResourceCard({ post }: { post: ResourcePost }) {
             {post.excerpt}
           </p>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 'auto', paddingTop: 6 }}>
-          <span style={{ fontSize: '0.82rem', fontWeight: 600, color: 'var(--ink)' }}>{post.author}</span>
-          <span style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.86rem', fontWeight: 600, color: ORANGE }}>
-            View <ArrowRight size={13} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto', paddingTop: 8 }}>
+          <Byline post={post} size="sm" />
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: '0.86rem',
+              fontWeight: 600,
+              color: ORANGE
+            }}
+          >
+            View <ArrowRight />
           </span>
         </div>
       </div>
@@ -487,7 +424,7 @@ function ResourceCard({ post }: { post: ResourcePost }) {
 function FinalCTA() {
   return (
     <section data-track-location="resources_final_cta" style={{ padding: 'var(--section) 0' }}>
-      <div style={CONTAINER}>
+      <Container>
         <div
           style={{
             position: 'relative',
@@ -520,8 +457,10 @@ function FinalCTA() {
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.14em', color: '#F0A88A' }}>
               Skip the reading
             </span>
-            <h2 style={{ ...DISPLAY_LG, margin: '20px 0 0', color: 'var(--white)' }}>See your AI visibility score.</h2>
-            <p style={{ ...LEAD, color: 'rgba(255,255,255,0.72)', marginTop: 24, maxWidth: 520 }}>
+            <h2 className="display-lg" style={{ margin: '20px 0 0', color: 'var(--white)' }}>
+              See your AI visibility score.
+            </h2>
+            <p className="lead" style={{ color: 'rgba(255,255,255,0.72)', marginTop: 24, maxWidth: 520 }}>
               Free score in 60 seconds. Enter your domain and see how the major AI engines mention
               you, which competitors appear, and where to improve.
             </p>
@@ -539,7 +478,7 @@ function FinalCTA() {
             </div>
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   )
 }
@@ -551,15 +490,7 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
   const [active, setActive] = useState<Filter>('all')
 
   // Newest first.
-  const sorted = useMemo(
-    () => [...posts].sort((a, b) => (a.date < b.date ? 1 : -1)),
-    [posts]
-  )
-
-  // Two newest → spotlight band above the filters. The full collection fills
-  // the filterable grid below (the two latest reappear there as part of the
-  // browsable set) so the grid and counts stay meaningful even with few posts.
-  const latest = sorted.slice(0, 2)
+  const sorted = useMemo(() => [...posts].sort((a, b) => (a.date < b.date ? 1 : -1)), [posts])
 
   const counts = useMemo<Record<Filter, number>>(() => {
     const c: Record<Filter, number> = { all: sorted.length, playbook: 0, 'study-reports': 0 }
@@ -576,15 +507,36 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
     return sorted.filter((p) => classifyKind(p) === active)
   }, [active, sorted])
 
+  const featured = filtered[0]
+  const rest = filtered.slice(1)
   const empty = sorted.length === 0
 
   return (
     <>
-      <Hero />
+      {/* HERO ------------------------------------------------------------- */}
+      <Section className="section-y-xl relative overflow-hidden">
+        <Container>
+          <div style={{ maxWidth: 820 }}>
+            <Eyebrow>Guides &amp; Downloads</Eyebrow>
+            <h1 className="display-lg text-balance" style={{ marginTop: 16 }}>
+              Playbook, Study &amp; Report.
+            </h1>
+            <p className="lead mt-7" style={{ maxWidth: 640, color: 'var(--ink-70)' }}>
+              Practical material on AI visibility, GEO, and answer-engine optimization. Pick what fits
+              your team and download it in a couple of clicks.
+            </p>
+            {!empty && (
+              <div className="mt-9">
+                <FilterBar active={active} onChange={setActive} counts={counts} />
+              </div>
+            )}
+          </div>
+        </Container>
+      </Section>
 
       {empty ? (
-        <section style={{ padding: '1rem 0 var(--section)' }}>
-          <div style={CONTAINER}>
+        <Section tight>
+          <Container>
             <div
               style={{
                 padding: '4rem 2rem',
@@ -597,27 +549,31 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
             >
               Nothing published yet. New resources are on the way — check back soon.
             </div>
-          </div>
-        </section>
-      ) : (
+          </Container>
+        </Section>
+      ) : featured ? (
         <>
-          <LatestTwo posts={latest} />
+          <FeaturedCard post={featured} />
 
-          <section data-track-location="resources_grid" style={{ padding: '2.75rem 0 var(--section)' }}>
-            <div style={CONTAINER}>
+          {/* GRID -------------------------------------------------------- */}
+          <Section tight>
+            <Container>
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
+                  alignItems: 'flex-end',
                   justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: 16,
                   paddingBottom: 28,
-                  borderBottom: '1px solid var(--line)',
-                  marginBottom: 32
+                  flexWrap: 'wrap',
+                  gap: 16
                 }}
               >
-                <FilterBar active={active} onChange={setActive} counts={counts} />
+                <div>
+                  <Eyebrow>Latest</Eyebrow>
+                  <h2 className="display-sm" style={{ margin: '12px 0 0' }}>
+                    {filtered.length} {filtered.length === 1 ? 'resource' : 'resources'}
+                  </h2>
+                </div>
                 <span
                   style={{
                     fontFamily: 'var(--font-mono)',
@@ -630,30 +586,45 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
                   Newest first
                 </span>
               </div>
-
-              {filtered.length === 0 ? (
+              {rest.length === 0 ? (
                 <div
                   style={{
-                    padding: '4rem 2rem',
+                    padding: '3rem 2rem',
                     textAlign: 'center',
                     border: '1px dashed var(--line)',
                     borderRadius: 22,
-                    color: 'var(--ink-60)',
-                    background: 'var(--white)'
+                    color: 'var(--ink-60)'
                   }}
                 >
-                  Nothing here yet. Try another filter.
+                  That is the only resource in this filter so far. More on the way.
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
-                  {filtered.map((post) => (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {rest.map((post) => (
                     <ResourceCard key={post.slug} post={post} />
                   ))}
                 </div>
               )}
-            </div>
-          </section>
+            </Container>
+          </Section>
         </>
+      ) : (
+        <Section tight>
+          <Container>
+            <div
+              style={{
+                padding: '4rem 2rem',
+                textAlign: 'center',
+                border: '1px dashed var(--line)',
+                borderRadius: 22,
+                color: 'var(--ink-60)',
+                background: 'var(--white)'
+              }}
+            >
+              Nothing here yet. Try another filter.
+            </div>
+          </Container>
+        </Section>
       )}
 
       <FinalCTA />

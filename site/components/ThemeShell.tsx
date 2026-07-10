@@ -13,7 +13,7 @@ const DARK_ROUTES = new Set<string>(['/customers', '/about', '/changelog'])
 // NOTE: `/blog` and `/resources` are intentionally NOT dark prefixes — the whole
 // content system (both listings, categories, AND every article/[slug]) ships
 // LIGHT (#FAF9F7 + Clove orange). Light + orange is the only pattern going forward.
-const DARK_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/docs', '/legal']
+const DARK_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/legal']
 
 // Light exceptions inside an otherwise-dark prefix. These pages were rebranded
 // to the light homepage palette (#FAF9F7 + Clove orange), so they opt out of

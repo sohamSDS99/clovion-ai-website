@@ -10,8 +10,7 @@ const BASE = 'https://www.clovion.ai'
 
 type ChangeFreq = MetadataRoute.Sitemap[number]['changeFrequency']
 
-// Static marketing routes. `/features` is intentionally omitted — it
-// redirect()s to `/`. `/api/*` and dynamic `[slug]` routes are handled
+// Static marketing routes. `/api/*` and dynamic `[slug]` routes are handled
 // separately (the latter via the CMS below).
 const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFreq }[] = [
   { path: '/', priority: 1.0, changeFrequency: 'weekly' },
@@ -20,6 +19,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/free-ai-visibility-score', priority: 0.9, changeFrequency: 'monthly' },
 
   // Feature pages
+  { path: '/features', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/features/ai-visibility-tracking', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/features/geo-improvement-suggestions', priority: 0.8, changeFrequency: 'monthly' },
   { path: '/features/sentiment-analysis', priority: 0.8, changeFrequency: 'monthly' },
@@ -56,10 +56,6 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/resources', priority: 0.5, changeFrequency: 'weekly' },
   { path: '/faq', priority: 0.5, changeFrequency: 'weekly' },
   { path: '/changelog', priority: 0.5, changeFrequency: 'weekly' },
-
-  // Docs
-  { path: '/docs', priority: 0.5, changeFrequency: 'monthly' },
-  { path: '/docs/getting-started', priority: 0.5, changeFrequency: 'monthly' },
 
   // Legal
   { path: '/legal/privacy', priority: 0.3, changeFrequency: 'yearly' },

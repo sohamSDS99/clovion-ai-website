@@ -13,7 +13,7 @@ const HOME_ROUTES = new Set<string>(['/customers', '/about', '/changelog'])
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
 // `/blog` and `/resources` are intentionally absent — the whole content system
 // is light, so it uses the light Header/Footer (light + orange going forward).
-const HOME_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/docs', '/legal']
+const HOME_PREFIXES = ['/news', '/webinars', '/faq', '/compare', '/alternatives', '/legal']
 
 // Light exceptions inside an otherwise-dark prefix — must mirror ThemeShell's
 // LIGHT_EXCEPTIONS so these pages get the light Header/Footer to match their
