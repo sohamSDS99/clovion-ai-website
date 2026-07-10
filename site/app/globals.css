@@ -702,12 +702,12 @@
 }
 /* Headings own their top space; tighten the gap to the text that follows so a
    heading reads as attached to its section, not floating between paragraphs. */
-.cms-prose h2 { font-size: 1.7rem; margin-top: 2.2em; }
-.cms-prose h3 { font-size: 1.35rem; margin-top: 1.75em; }
-.cms-prose h4 { font-size: 1.12rem; margin-top: 1.5em; }
+.cms-prose h2 { font-size: 1.7rem; margin-top: 3.2em; }
+.cms-prose h3 { font-size: 1.35rem; margin-top: 2.2em; }
+.cms-prose h4 { font-size: 1.12rem; margin-top: 1.8em; }
 /* Breathing room under a heading so it doesn't stick to the following text. */
-.cms-prose h2 + * { margin-top: 1em; }
-.cms-prose h3 + *, .cms-prose h4 + * { margin-top: 0.7em; }
+.cms-prose h2 + * { margin-top: 1.25em; }
+.cms-prose h3 + *, .cms-prose h4 + * { margin-top: 0.8em; }
 .cms-prose p { margin: 0; }
 /* Paragraph spacing — needs higher specificity than `.cms-prose p { margin: 0 }`
    above, which otherwise zeroes the `> * + *` gap and runs paragraphs together.
