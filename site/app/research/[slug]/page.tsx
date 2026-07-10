@@ -5,13 +5,18 @@ import Link from 'next/link'
 import { Section, Container, Eyebrow, ArrowRight } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
-import { getResource } from '@/lib/cms'
-import type { CmsCoverImage } from '@/lib/cms-types'
+import { getContent, getResource } from '@/lib/cms'
+import type { CmsContent, CmsCoverImage } from '@/lib/cms-types'
 
-// Reports are served by the CMS under the shared gated-download endpoint (which
-// covers RESEARCH and research-flavoured RESOURCE), so a single fetch resolves
-// any card that links here. This page is intentionally UNGATED — the report
-// reads in full and the file downloads directly, with no email capture.
+// A report can be a RESEARCH-type long-form article (body IS the report) OR a
+// research-flavoured RESOURCE (a downloadable file). Resolve either: try the
+// RESEARCH content item first, then fall back to the gated-download endpoint
+// (which serves RESOURCE). This page is intentionally UNGATED — the report
+// reads in full and any attached file downloads directly, no email capture.
+async function getReport(slug: string): Promise<CmsContent | null> {
+  return (await getContent('RESEARCH', slug)) ?? (await getResource(slug))
+}
+
 export const dynamic = 'force-dynamic'
 
 function formatDate(iso: string | null): string | null {
@@ -30,7 +35,7 @@ export async function generateMetadata({
 }: {
   params: { slug: string }
 }): Promise<Metadata> {
-  const item = await getResource(params.slug)
+  const item = await getReport(params.slug)
   if (!item) return { title: 'Research not found' }
   const seo = item.seo ?? {}
   const title = seo.metaTitle || item.title
@@ -134,7 +139,7 @@ export default async function ResearchDetailPage({
 }: {
   params: { slug: string }
 }) {
-  const item = await getResource(params.slug)
+  const item = await getReport(params.slug)
   if (!item) notFound()
 
   const td = (item.typeData ?? {}) as {
