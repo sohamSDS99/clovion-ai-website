@@ -42,6 +42,17 @@ export interface CmsCategory {
   slug: string;
 }
 
+/** Cover image with responsive WebP variants + intrinsic size. Lets a card pick
+ *  the right-sized source (srcset) and decide cover-vs-contain from the ratio. */
+export interface CmsCoverImage {
+  url: string;
+  thumb: string | null;
+  md: string | null;
+  lg: string | null;
+  width: number | null;
+  height: number | null;
+}
+
 /** Full single-item payload (GET /content/{type}/{slug} -> { data }). */
 export interface CmsContent {
   id: string;
@@ -51,6 +62,7 @@ export interface CmsContent {
   excerpt: string | null;
   bodyHtml: string;
   coverImageUrl: string | null;
+  coverImage: CmsCoverImage | null;
   seo: CmsSeo;
   jsonLd: Record<string, unknown>;
   publishedAt: string | null;

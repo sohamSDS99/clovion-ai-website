@@ -39,8 +39,10 @@ function toReport(item: CmsSummary): Report {
     category: item.category?.name ?? null,
     categorySlug: item.category?.slug ?? null,
     author: item.author?.displayName ?? 'Clovion Research',
+    avatar: item.author?.avatar ?? null,
     date: item.publishedAt ?? '',
     coverImageUrl: item.coverImageUrl ?? null,
+    coverImage: item.coverImage ?? null,
     tags: (item.tags ?? []).map((t) => t.name)
   }
 }
