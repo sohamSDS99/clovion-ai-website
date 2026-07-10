@@ -4,6 +4,7 @@ import { Section, Container, ArrowRight } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { PostHeader } from '@/components/cms/PostHeader'
+import { AuthorCard } from '@/components/cms/AuthorCard'
 import { getContent, listSlugs } from '@/lib/cms'
 import type { NewsData } from '@/lib/cms-types'
 
@@ -75,7 +76,7 @@ export default async function NewsArticlePage({
         excerpt={item.excerpt}
         meta={
           date || dateline || sourceUrl ? (
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--ink-60)]">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--ink-60)]" data-track-location="news_post_meta">
               {dateline && <span className="text-[var(--ink-80)]">{dateline}</span>}
               {date && <span>{date}</span>}
               {sourceUrl && (
@@ -96,8 +97,9 @@ export default async function NewsArticlePage({
 
       <Section tight className="!pt-0">
         <Container>
-          <div className="mx-auto max-w-3xl">
+          <div className="mx-auto max-w-3xl" data-track-location="news_post_body">
             <ProseHtml html={item.bodyHtml} />
+            <AuthorCard author={item.author} />
           </div>
         </Container>
       </Section>

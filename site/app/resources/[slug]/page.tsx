@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Section, Container, Eyebrow, Tag } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
+import { AuthorCard } from '@/components/cms/AuthorCard'
 import { getResource, listSlugs } from '@/lib/cms'
 import type { ResourceData } from '@/lib/cms-types'
 import { LeadGate } from './LeadGate'
@@ -82,7 +83,7 @@ export default async function ResourceDetailPage({
       <Section tight>
         <Container>
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-[7fr_5fr] lg:gap-16">
-            <div>
+            <div data-track-location="resource_post_body">
               {item.coverImageUrl ? (
                 <div className="mb-10 overflow-hidden rounded-card border border-[var(--line)] bg-[var(--subtle)]">
                   <Image
@@ -96,6 +97,7 @@ export default async function ResourceDetailPage({
                 </div>
               ) : null}
               <ProseHtml html={item.bodyHtml} />
+              <AuthorCard author={item.author} />
             </div>
 
             <div>
