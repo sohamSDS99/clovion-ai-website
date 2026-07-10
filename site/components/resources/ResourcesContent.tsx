@@ -532,8 +532,9 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
 
   return (
     <>
-      {/* HERO ------------------------------------------------------------- */}
-      <Section className="section-y-xl relative overflow-hidden">
+      {/* HERO — tight top, no bottom padding so it hugs the content below (the
+          next section supplies the gap); the XL padding left dead whitespace. */}
+      <Section tight className="relative overflow-hidden !pb-0">
         <Container>
           <div style={{ maxWidth: 820 }}>
             <Eyebrow>Guides &amp; Downloads</Eyebrow>
