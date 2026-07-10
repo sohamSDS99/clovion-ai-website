@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { Section, Container, Eyebrow, Tag } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
+import { AuthorCard } from '@/components/cms/AuthorCard'
 import { getResource, listSlugs } from '@/lib/cms'
 import type { ResourceData } from '@/lib/cms-types'
 import { LeadGate } from './LeadGate'
@@ -106,6 +107,7 @@ export default async function ResourceDetailPage({
                 </div>
               ) : null}
               <ProseHtml html={item.bodyHtml} />
+              <AuthorCard author={item.author} />
             </div>
 
             <div>
