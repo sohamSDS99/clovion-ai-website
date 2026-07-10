@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
-import BlogIndex, { type Post } from '@/components/blog/BlogIndex'
+import BlogIndex from '@/components/blog/BlogIndex'
+import { toPost } from '@/components/blog/toPost'
 import { listContent } from '@/lib/cms'
-import type { CmsSummary } from '@/lib/cms-types'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,23 +57,6 @@ const faqJsonLd = {
       }
     }
   ]
-}
-
-// Map a CMS blog summary into the composer's card shape. publishedAt is
-// guarded (falls back to "" so sorting puts undated items last); category
-// passes through as the CMS slug — the composer's categoryLabel handles any
-// value gracefully and the ChipRail filter matches geo/ai-search/seo.
-export function toPost(item: CmsSummary): Post {
-  return {
-    slug: item.slug,
-    title: item.title,
-    excerpt: item.excerpt ?? '',
-    category: item.category?.slug ?? 'geo',
-    author: item.author?.displayName ?? 'Clovion AI',
-    date: item.publishedAt ?? '',
-    tag: item.tags?.[0]?.name,
-    coverImageUrl: item.coverImageUrl ?? null
-  }
 }
 
 export default async function BlogPage() {
