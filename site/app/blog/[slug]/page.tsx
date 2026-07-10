@@ -3,6 +3,7 @@ import { OG_IMAGES } from '@/lib/og'
 import { notFound } from 'next/navigation'
 import { Section, Container } from '@/components/ui'
 import { CTABanner } from '@/components/sections'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { PostHeader } from '@/components/cms/PostHeader'
@@ -65,6 +66,11 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     item.category?.name
   ].filter(Boolean) as string[]
 
+  // FAQ arrives as structured typeData (faqItems), not in bodyHtml.
+  const faqItems = (((item.typeData as { faqItems?: { question: string; answer: string }[] })?.faqItems) ?? [])
+    .filter((f) => f?.question && f?.answer)
+    .map((f) => ({ q: f.question, a: f.answer }))
+
   // Inject stable ids into the body's H2s and pull the section list for the
   // sticky TOC rail.
   const { html: bodyHtml, toc } = extractToc(item.bodyHtml)
@@ -119,6 +125,8 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           </div>
         </Container>
       </Section>
+
+      {faqItems.length > 0 && <FAQAccordion items={faqItems} />}
 
       <CTABanner
         sub="See your AI visibility score"

@@ -4,6 +4,7 @@ import { OG_IMAGES } from '@/lib/og'
 import { notFound } from 'next/navigation'
 import { Section, Container } from '@/components/ui'
 import { CTABanner } from '@/components/sections'
+import { FAQAccordion } from '@/components/FAQAccordion'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { PostHeader } from '@/components/cms/PostHeader'
@@ -11,7 +12,7 @@ import { AuthorCard } from '@/components/cms/AuthorCard'
 import { ArticleToc } from '@/components/cms/ArticleToc'
 import { extractToc } from '@/components/cms/toc'
 import { getContent, getResource } from '@/lib/cms'
-import type { CmsContent } from '@/lib/cms-types'
+import type { CmsContent, FaqData } from '@/lib/cms-types'
 
 // A report can be a RESEARCH-type long-form article (body IS the report) OR a
 // research-flavoured RESOURCE (a downloadable file). Resolve either: try the
@@ -64,10 +65,16 @@ export default async function ResearchDetailPage({
   const item = await getReport(params.slug)
   if (!item) notFound()
 
-  const td = (item.typeData ?? {}) as { resourceKind?: string }
+  const td = (item.typeData ?? {}) as { resourceKind?: string } & FaqData
   const published = formatDate(item.publishedAt)
   const kind = item.category?.name ?? td.resourceKind ?? 'Report'
   const meta = [published, item.author?.displayName, kind].filter(Boolean) as string[]
+
+  // FAQ arrives as structured typeData (faqItems), not in bodyHtml — render it
+  // as its own section below the article.
+  const faqItems = (td.faqItems ?? [])
+    .filter((f) => f?.question && f?.answer)
+    .map((f) => ({ q: f.question, a: f.answer }))
 
   // Inject stable ids into the body's H2s and pull the section list for the
   // sticky TOC rail — same reading layout as a blog post.
@@ -131,6 +138,8 @@ export default async function ResearchDetailPage({
           </Container>
         </Section>
       )}
+
+      {faqItems.length > 0 && <FAQAccordion items={faqItems} />}
 
       <CTABanner
         sub="See your AI visibility score"
