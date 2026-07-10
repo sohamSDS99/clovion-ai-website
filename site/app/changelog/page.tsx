@@ -47,7 +47,6 @@ const entries: ChangelogEntry[] = [
       'ChatGPT runs no longer time out when a prompt returns more than 12 citations.',
       'Sentiment scoring respects punctuation in non-English locales.'
     ],
-    learnMore: '/docs/how-tracking-works'
   },
   {
     id: 'wp-auto-apply',
@@ -59,7 +58,6 @@ const entries: ChangelogEntry[] = [
     contributors: ['AN', 'KT'],
     mock: 'auto-apply',
     stat: { label: 'Average time to ship a fix', value: '11 days → 2 days' },
-    learnMore: '/docs/cms'
   },
   {
     id: 'claude-3-7',
@@ -70,7 +68,6 @@ const entries: ChangelogEntry[] = [
     body: 'Tracked separately from Claude 3.5 so you can watch the migration as it happens. Both versions are scored on the same prompt set with identical sentiment models; the comparison view in your dashboard now defaults to showing them side by side.',
     contributors: ['JL'],
     mock: 'engine-grid',
-    learnMore: '/docs/per-engine'
   },
   {
     id: 'bulk-import',
@@ -82,7 +79,6 @@ const entries: ChangelogEntry[] = [
     contributors: ['SR', 'MP'],
     mock: 'csv',
     stat: { label: 'Largest import processed', value: '4,812 prompts in 38s' },
-    learnMore: '/docs/prompts'
   },
   {
     id: 'oct-9-cleanup',
@@ -118,7 +114,6 @@ const entries: ChangelogEntry[] = [
       'Token scopes can be limited to a single workspace or a single prompt set.',
       'Rate limits are per-token, not per-user, so personal and shared tokens coexist cleanly.'
     ],
-    learnMore: '/docs/mcp'
   },
   {
     id: 'citation-weighting',
@@ -141,7 +136,6 @@ const entries: ChangelogEntry[] = [
     body: 'Our Type II audit covering October 2025 through September 2026 wrapped with zero exceptions. The report is available under NDA from the Trust Center; ISO 27001 is mid-audit and tracking for Q1 2027. Nothing in the product changes — this is paperwork that lets larger buyers move faster.',
     contributors: ['KT'],
     mock: 'soc2',
-    learnMore: '/docs/trust'
   },
   {
     id: 'sep-10-cleanup',
@@ -172,7 +166,6 @@ const entries: ChangelogEntry[] = [
     contributors: ['MP', 'SR'],
     mock: 'webhook',
     stat: { label: 'Event types', value: '7 · created, approved, shipped, measured, dismissed, edited, expired' },
-    learnMore: '/docs/webhooks'
   }
 ]
 
@@ -701,8 +694,8 @@ export default function ChangelogPage() {
                 See releases land in your stack via webhook, MCP, or the REST API.
               </p>
             </div>
-            <Button href="/docs" variant="invert" size="lg">
-              Read API docs <ArrowRight className="w-4 h-4 ml-1.5" />
+            <Button href="https://app.clovion.ai/signup" variant="invert" size="lg">
+              Start Free Trial <ArrowRight className="w-4 h-4 ml-1.5" />
             </Button>
           </div>
         </Container>

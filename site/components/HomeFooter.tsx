@@ -133,10 +133,6 @@ export function HomeFooter() {
             <Link href="/legal/privacy" className="text-[0.8rem] hover:text-white" style={{ color: 'rgba(255,255,255,0.60)' }}>Privacy</Link>
             <span aria-hidden className="h-3 w-px" style={{ background: 'rgba(255,255,255,0.10)' }} />
             <Link href="/legal/terms" className="text-[0.8rem] hover:text-white" style={{ color: 'rgba(255,255,255,0.60)' }}>Terms</Link>
-            <span aria-hidden className="h-3 w-px" style={{ background: 'rgba(255,255,255,0.10)' }} />
-            <Link href="/docs" className="text-[0.8rem] hover:text-white" style={{ color: 'rgba(255,255,255,0.60)' }}>Security</Link>
-            <span aria-hidden className="h-3 w-px" style={{ background: 'rgba(255,255,255,0.10)' }} />
-            <Link href="/docs" className="text-[0.8rem] hover:text-white" style={{ color: 'rgba(255,255,255,0.60)' }}>DPA</Link>
           </div>
         </div>
       </Container>
