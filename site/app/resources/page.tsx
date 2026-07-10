@@ -23,6 +23,7 @@ function toResourcePost(item: CmsSummary): ResourcePost {
     category: item.category?.name ?? null,
     categorySlug: item.category?.slug ?? null,
     author: item.author?.displayName ?? 'Clovion AI',
+    authorAvatar: item.author?.avatar ?? null,
     date: item.publishedAt ?? '',
     coverImageUrl: item.coverImageUrl ?? null
   }

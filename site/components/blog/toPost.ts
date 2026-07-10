@@ -14,6 +14,7 @@ export function toPost(item: CmsSummary): Post {
     excerpt: item.excerpt ?? '',
     category: item.category?.slug ?? 'geo',
     author: item.author?.displayName ?? 'Clovion AI',
+    authorAvatar: item.author?.avatar ?? null,
     date: item.publishedAt ?? '',
     tag: item.tags?.[0]?.name,
     coverImageUrl: item.coverImageUrl ?? null
