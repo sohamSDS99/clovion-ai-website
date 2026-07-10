@@ -301,7 +301,7 @@ export function FeaturedCard({
   )
 
   return (
-    <Section tight>
+    <Section tight className="!pb-0">
       <Container>
         <Link
           href={`${hrefBase}/${post.slug}`}
@@ -415,7 +415,7 @@ export function NewsletterBand() {
   const [email, setEmail] = useState('')
   const [submitted, setSubmitted] = useState(false)
   return (
-    <Section tight>
+    <Section tight className="!pb-0">
       <Container>
         <div
           className="md:grid-cols-[1.1fr_1fr]"

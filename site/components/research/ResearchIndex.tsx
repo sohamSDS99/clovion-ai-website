@@ -116,7 +116,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
           <FeaturedCard post={toCard(featured)} hrefBase="/research" fit="contain" />
 
           {/* REPORT GRID ------------------------------------------------ */}
-          <Section tight>
+          <Section tight className="!pb-0">
             <Container>
               <div
                 style={{
@@ -169,7 +169,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
           </Section>
         </>
       ) : (
-        <Section tight>
+        <Section tight className="!pb-0">
           <Container>
             <div
               style={{
