@@ -4,6 +4,7 @@ import { Section, Container, ArrowRight } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { PostHeader } from '@/components/cms/PostHeader'
+import { AuthorCard } from '@/components/cms/AuthorCard'
 import { getContent, listSlugs } from '@/lib/cms'
 import type { NewsData } from '@/lib/cms-types'
 
@@ -98,6 +99,7 @@ export default async function NewsArticlePage({
         <Container>
           <div className="mx-auto max-w-3xl">
             <ProseHtml html={item.bodyHtml} />
+            <AuthorCard author={item.author} />
           </div>
         </Container>
       </Section>

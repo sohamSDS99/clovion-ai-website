@@ -5,6 +5,7 @@ import { CTABanner } from '@/components/sections'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
 import { PostHeader } from '@/components/cms/PostHeader'
+import { AuthorCard } from '@/components/cms/AuthorCard'
 import { ArticleToc } from '@/components/cms/ArticleToc'
 import { extractToc } from '@/components/cms/toc'
 import { getContent, listSlugs } from '@/lib/cms'
@@ -112,6 +113,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
             )}
             <div className="min-w-0 max-w-3xl">
               <ProseHtml html={bodyHtml} />
+              <AuthorCard author={item.author} />
             </div>
           </div>
         </Container>

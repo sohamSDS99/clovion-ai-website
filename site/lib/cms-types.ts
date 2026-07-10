@@ -27,6 +27,7 @@ export interface CmsSeo {
 export interface CmsAuthor {
   displayName: string;
   slug: string;
+  title?: string | null;
   bio?: string | null;
   avatar?: string | null;
   socials?: Record<string, string>;
