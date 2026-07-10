@@ -14,7 +14,8 @@ export function PostHeader({
   meta,
   backHref,
   backLabel = 'Back',
-  accentColor
+  accentColor,
+  coverFit = 'cover'
 }: {
   eyebrow: string
   title: string
@@ -26,6 +27,11 @@ export function PostHeader({
   // When set, the eyebrow renders in this color (e.g. brand orange on light
   // blog articles). Omitted → default token color, so news stays unaffected.
   accentColor?: string
+  // How the cover fills the 16:9 frame. 'cover' (default) crops to fill —
+  // right for photographic blog/news covers. 'contain' fits the whole image
+  // (letterboxed on the dark frame) — right for wide branded graphics (e.g.
+  // research report covers) that must not crop.
+  coverFit?: 'cover' | 'contain'
 }) {
   return (
     <Section className="relative overflow-hidden">
@@ -76,7 +82,11 @@ export function PostHeader({
           <div className="relative mx-auto mt-8 aspect-[16/9] max-w-4xl overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--ink-surface,#0a0a0f)]">
             {/* CMS-hosted on an external host → plain <img>, not next/image. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coverImageUrl} alt={title} className="block h-full w-full object-cover object-center" />
+            <img
+              src={coverImageUrl}
+              alt={title}
+              className={`block h-full w-full object-center ${coverFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+            />
             {/* Hairline on top of the image so a dark/broken cover still frames. */}
             <span
               aria-hidden
