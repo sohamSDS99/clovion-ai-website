@@ -98,7 +98,7 @@ export function LeadGate({ slug, resourceTitle, gated, fields }: Props) {
       const res = await fetch('/api/resource-lead', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ slug, email, data, metaEventId })
+        body: JSON.stringify({ slug, email, resourceTitle, data, metaEventId })
       })
       const body = (await res.json().catch(() => null)) as
         | { downloadUrl?: string; error?: string }
