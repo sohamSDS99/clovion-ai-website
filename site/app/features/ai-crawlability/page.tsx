@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/crawl/FeatureContent'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     description: 'Block training crawlers. Allow search crawlers. Auto-generate llms.txt, robots.txt, and JSON-LD. Connected to your Visibility Score. Not a standalone audit tool.',
     url: 'https://www.clovion.ai/features/ai-crawlability',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 

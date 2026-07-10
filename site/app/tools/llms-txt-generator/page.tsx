@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { OG_IMAGES } from '@/lib/og'
 import type { Metadata } from 'next'
 import FeatureContent from '@/components/tools/llms-txt-generator/FeatureContent'
 import { FAQS } from '@/components/tools/llms-txt-generator/faqs'
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
     description:
       'Generate a clean llms.txt for your site so AI engines can find and cite your most important pages.',
     url: 'https://www.clovion.ai/tools/llms-txt-generator',
-    type: 'website'
+    type: 'website',
+    images: OG_IMAGES,
   }
 }
 

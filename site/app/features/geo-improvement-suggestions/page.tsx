@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/geo/FeatureContent'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     description: 'A prioritized queue of generative engine optimization fixes: structure, schema, authority, crawlability — with one-click patches and AI-written suggestions.',
     url: 'https://www.clovion.ai/features/geo-improvement-suggestions',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 

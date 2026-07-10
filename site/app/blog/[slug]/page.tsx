@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import { notFound } from 'next/navigation'
 import { Section, Container } from '@/components/ui'
 import { CTABanner } from '@/components/sections'
@@ -41,7 +42,7 @@ export async function generateMetadata({
       title: seo.metaTitle || item.title,
       description: seo.metaDescription || item.excerpt || undefined,
       type: 'article',
-      images: ogImage ? [{ url: ogImage }] : undefined
+      images: ogImage ? [{ url: ogImage }] : OG_IMAGES
     }
   }
 }

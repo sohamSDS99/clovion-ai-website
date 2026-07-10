@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
@@ -42,7 +43,7 @@ export async function generateMetadata({
     openGraph: {
       title,
       description,
-      images: ogImage ? [ogImage] : undefined
+      images: ogImage ? [ogImage] : OG_IMAGES
     },
     robots: { index: !seo.noIndex, follow: !seo.noIndex },
     alternates: seo.canonicalUrl ? { canonical: seo.canonicalUrl } : undefined

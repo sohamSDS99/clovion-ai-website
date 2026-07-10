@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import FeatureContent from '@/components/affiliate/FeatureContent'
 
 export const metadata: Metadata = {
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
     description: 'Promote a fast-growing AI visibility platform across ChatGPT, Claude, Gemini, Perplexity, Grok, and AI Overviews. Share your link, earn recurring commission on every signup.',
     url: 'https://www.clovion.ai/affiliate',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 

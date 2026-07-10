@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import { notFound } from 'next/navigation'
 import { Section, Container, ArrowRight } from '@/components/ui'
 import { ProseHtml } from '@/components/cms/ProseHtml'
@@ -47,7 +48,7 @@ export async function generateMetadata({
       title,
       description,
       type: 'article',
-      ...(ogImage ? { images: [ogImage] } : {})
+      ...(ogImage ? { images: [ogImage] } : { images: OG_IMAGES })
     }
   }
 }

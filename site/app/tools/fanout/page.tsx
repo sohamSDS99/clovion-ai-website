@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/tools/fanout/FeatureContent'
 import { FAQS } from '@/components/tools/fanout/faqs'
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
     description:
       'Expand any buyer query into the sub-queries AI engines run behind the scenes. Free tool from Clovion AI.',
     url: 'https://www.clovion.ai/tools/fanout',
-    type: 'website'
+    type: 'website',
+    images: OG_IMAGES,
   }
 }
 

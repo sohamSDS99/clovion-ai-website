@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/brand-audit/FeatureContent'
 
@@ -13,12 +14,7 @@ export const metadata: Metadata = {
       'A comprehensive audit of your AI footprint: source coverage, website substance, consistency, and factual accuracy. Traceable findings that become the foundation for every recommendation.',
     url: 'https://clovion.ai/features/brand-audit',
     type: 'website',
-    images: [
-      {
-        url: 'https://clovion.ai/og/brand-audit.png',
-        alt: 'Clovion AI Brand Audit — scanning a website and third-party sources into a brand profile, with traceable findings categorized Critical, Warning, or Passed and flowing into recommendations.',
-      },
-    ],
+    images: OG_IMAGES,
   },
 }
 

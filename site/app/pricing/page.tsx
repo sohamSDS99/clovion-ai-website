@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { OG_IMAGES } from '@/lib/og'
 import type { Metadata } from 'next'
 import FeatureContent from '@/components/pricing/FeatureContent'
 import { P_FAQS } from '@/components/pricing/faqs'
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
     description: 'Starter, Growth, and Enterprise plans for AI visibility tracking, sentiment analysis, prompt tracking, competitor analysis, and GEO recommendations. Start tracking how AI describes your brand.',
     url: 'https://www.clovion.ai/pricing',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 

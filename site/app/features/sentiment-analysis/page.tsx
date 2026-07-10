@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/sentiment/FeatureContent'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     description: 'Track how ChatGPT, Claude, Gemini, Perplexity, Grok, and AI Overviews describe your brand. Per-engine sentiment, competitor framing, and negative brand mentions — connected to fixes.',
     url: 'https://www.clovion.ai/features/sentiment-analysis',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 
