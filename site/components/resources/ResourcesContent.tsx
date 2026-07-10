@@ -148,39 +148,20 @@ function Byline({ post, size = 'md' }: { post: ResourcePost; size?: 'md' | 'sm' 
   )
 }
 
-// Cover frame. Uses object-fit: CONTAIN on a subtle backdrop so the whole cover
-// graphic is always visible — resource covers are text-heavy card art whose
-// edges get sliced by cover-crop (that was the "bleeding"). CLS-free: the
-// aspect box reserves space before load. On-top hairline frames dark/near-black
-// covers so they still read as a bounded region.
+// Cover frame. object-fit: COVER fills the whole frame edge-to-edge (matches the
+// blog cards + the reference design) — covers are authored 16:9 card art, so a
+// 16:9 frame fits with no crop, and the grid's 4:3 frame trims only the sides.
+// CLS-free: the aspect box reserves space before load. On-top hairline frames
+// dark/near-black covers so they still read as a bounded region.
 function Cover({ post, aspect }: { post: ResourcePost; aspect: string }) {
   if (post.coverImageUrl) {
     return (
       <div style={{ position: 'relative', aspectRatio: aspect, overflow: 'hidden', background: 'var(--subtle)' }}>
-        {/* Blurred cover-fit backdrop fills the letterbox with the image's own
-            colors so an off-ratio graphic has no empty band around it. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={post.coverImageUrl}
-          alt=""
-          aria-hidden
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            filter: 'blur(28px)',
-            transform: 'scale(1.15)'
-          }}
-        />
-        {/* Sharp, fully-visible image on top. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={post.coverImageUrl}
           alt={post.title}
-          style={{ position: 'relative', display: 'block', width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
         />
         <span
           aria-hidden
@@ -345,7 +326,7 @@ function FeaturedCard({ post }: { post: ResourcePost }) {
   )
 
   return (
-    <Section tight>
+    <Section tight className="!pb-0">
       <Container>
         <Link
           href={`/resources/${post.slug}`}
@@ -391,7 +372,7 @@ function ResourceCard({ post }: { post: ResourcePost }) {
       }}
     >
       <div style={{ flexShrink: 0, borderBottom: '1px solid var(--line)' }}>
-        <Cover post={post} aspect="4 / 3" />
+        <Cover post={post} aspect="16 / 9" />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
@@ -555,7 +536,7 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
       </Section>
 
       {empty ? (
-        <Section tight>
+        <Section tight className="!pb-0">
           <Container>
             <div
               style={{
@@ -576,7 +557,7 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
           <FeaturedCard post={featured} />
 
           {/* GRID -------------------------------------------------------- */}
-          <Section tight>
+          <Section tight className="!pb-0">
             <Container>
               <div
                 style={{
@@ -629,7 +610,7 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
           </Section>
         </>
       ) : (
-        <Section tight>
+        <Section tight className="!pb-0">
           <Container>
             <div
               style={{

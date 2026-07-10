@@ -168,7 +168,7 @@ export default function BlogIndex({
           <FeaturedCard post={toCard(featured)} hrefBase="/blog" />
 
           {/* POST GRID -------------------------------------------------- */}
-          <Section tight>
+          <Section tight className="!pb-0">
             <Container>
               <div
                 style={{
@@ -221,7 +221,7 @@ export default function BlogIndex({
           </Section>
         </>
       ) : (
-        <Section tight>
+        <Section tight className="!pb-0">
           <Container>
             <div
               style={{
