@@ -39,6 +39,75 @@ function initials(name: string) {
     .toUpperCase()
 }
 
+// Cover renderer shared by both cards. Default fit='cover' fills the frame edge
+// to edge (the blog's landscape heroes — clean, no bars). fit='contain' shows
+// the WHOLE graphic over a blurred same-image fill, so nothing is ever cropped
+// whatever the upload's aspect ratio or the card's size — used by /research,
+// whose report art is text-heavy and off-ratio. This is deterministic: it does
+// not depend on CMS-reported dimensions, so every future upload fits its card
+// automatically. The aspect box reserves space before load → CLS-free.
+function CoverImage({
+  src,
+  alt,
+  aspectClass,
+  fit = 'cover',
+  bordered = false
+}: {
+  src: string
+  alt: string
+  aspectClass: string
+  fit?: 'cover' | 'contain'
+  bordered?: boolean
+}) {
+  const contain = fit === 'contain'
+  return (
+    <div
+      className={aspectClass}
+      style={{
+        position: 'relative',
+        flexShrink: 0,
+        overflow: 'hidden',
+        background: 'var(--subtle)',
+        borderBottom: bordered ? '1px solid var(--line)' : undefined
+      }}
+    >
+      {contain && (
+        // Blurred backdrop fills the letterbox with the image's own colours.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={src}
+          alt=""
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            filter: 'blur(28px)',
+            transform: 'scale(1.15)'
+          }}
+        />
+      )}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        style={{
+          position: 'relative',
+          display: 'block',
+          width: '100%',
+          height: '100%',
+          objectFit: contain ? 'contain' : 'cover',
+          objectPosition: 'center'
+        }}
+      />
+    </div>
+  )
+}
+
 // Light placeholder for posts with no cover image. A warm subtle panel with the
 // category set large in ink at low opacity — no dark blocks on the light page.
 function CoverPlaceholder({ post, tall = false }: { post: CardPost; tall?: boolean }) {
@@ -147,7 +216,15 @@ function Byline({ post, size = 'md' }: { post: CardPost; size?: 'md' | 'sm' }) {
   )
 }
 
-export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: string }) {
+export function FeaturedCard({
+  post,
+  hrefBase,
+  fit = 'cover'
+}: {
+  post: CardPost
+  hrefBase: string
+  fit?: 'cover' | 'contain'
+}) {
   const textBlock = (
     <div
       style={{
@@ -242,14 +319,7 @@ export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: str
           <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
             <div style={{ position: 'relative', overflow: 'hidden' }}>
               {post.coverImageUrl ? (
-                <div className="aspect-[16/9]" style={{ position: 'relative', overflow: 'hidden', background: 'var(--subtle)' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={post.coverImageUrl}
-                    alt={post.title}
-                    style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-                  />
-                </div>
+                <CoverImage src={post.coverImageUrl} alt={post.title} aspectClass="aspect-[16/9]" fit={fit} />
               ) : (
                 <CoverPlaceholder post={post} />
               )}
@@ -264,7 +334,15 @@ export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: str
   )
 }
 
-export function PostCard({ post, hrefBase }: { post: CardPost; hrefBase: string }) {
+export function PostCard({
+  post,
+  hrefBase,
+  fit = 'cover'
+}: {
+  post: CardPost
+  hrefBase: string
+  fit?: 'cover' | 'contain'
+}) {
   return (
     <Link
       href={`${hrefBase}/${post.slug}`}
@@ -279,17 +357,7 @@ export function PostCard({ post, hrefBase }: { post: CardPost; hrefBase: string 
       }}
     >
       {post.coverImageUrl ? (
-        <div
-          className="aspect-[4/3]"
-          style={{ position: 'relative', flexShrink: 0, overflow: 'hidden', background: 'var(--subtle)', borderBottom: '1px solid var(--line)' }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={post.coverImageUrl}
-            alt={post.title}
-            style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-          />
-        </div>
+        <CoverImage src={post.coverImageUrl} alt={post.title} aspectClass="aspect-[4/3]" fit={fit} bordered />
       ) : (
         <CoverPlaceholder post={post} tall />
       )}

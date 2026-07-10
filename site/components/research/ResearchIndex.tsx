@@ -113,7 +113,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
 
       {featured ? (
         <>
-          <FeaturedCard post={toCard(featured)} hrefBase="/research" />
+          <FeaturedCard post={toCard(featured)} hrefBase="/research" fit="contain" />
 
           {/* REPORT GRID ------------------------------------------------ */}
           <Section tight>
@@ -161,7 +161,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {rest.map((report) => (
-                    <PostCard key={report.slug} post={toCard(report)} hrefBase="/research" />
+                    <PostCard key={report.slug} post={toCard(report)} hrefBase="/research" fit="contain" />
                   ))}
                 </div>
               )}
