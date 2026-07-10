@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Section, Container, Button, ArrowRight } from '@/components/ui'
 import { FAQAccordion } from '@/components/FAQAccordion'
 import { CTABanner } from '@/components/sections'
+import type { CmsCoverImage } from '@/lib/cms-types'
 
 // Brand accents — homepage palette (single source of truth): warm off-white
 // page, ink text, Clove orange as the primary accent, emerald reserved for the
@@ -23,15 +24,16 @@ export type Report = {
   category: string | null
   categorySlug: string | null
   author: string
+  avatar?: string | null
   date: string
   coverImageUrl?: string | null
+  coverImage?: CmsCoverImage | null
   tags: string[]
 }
 
-// Reports live under the existing RESOURCE detail route (/resources/[slug]) —
-// we reuse that page rather than duplicate it, which also keeps a single
-// canonical URL per report.
-const reportHref = (slug: string) => `/resources/${slug}`
+// Reports open on the dedicated, UNGATED research detail route (/research/[slug])
+// — the report reads in full and downloads directly, with no email gate.
+const reportHref = (slug: string) => `/research/${slug}`
 
 function formatDate(iso: string) {
   if (!iso) return ''
@@ -77,34 +79,82 @@ function issueNo(rank: number) {
 // by a blurred cover-fit copy of the same image — no empty band, nothing
 // cropped. Mirrors the resources Cover (single source of truth for cover art).
 // The aspect box reserves space before load, so this is CLS-free.
-function Cover({ report, aspect }: { report: Report; aspect: string }) {
-  if (report.coverImageUrl) {
+// Build a srcset from the CMS cover variants (320/768/1280) + the original so
+// the browser fetches the smallest source that fills the card — the "dynamic
+// optimization" that happens automatically for whatever the author uploads.
+function coverSrcSet(cover: CmsCoverImage): string {
+  const w = cover.width && cover.width > 0 ? cover.width : 1600
+  return [
+    cover.thumb ? `${cover.thumb} 320w` : null,
+    cover.md ? `${cover.md} 768w` : null,
+    cover.lg ? `${cover.lg} 1280w` : null,
+    `${cover.url} ${w}w`
+  ]
+    .filter(Boolean)
+    .join(', ')
+}
+
+function Cover({
+  report,
+  aspect,
+  sizes,
+  frameRatio
+}: {
+  report: Report
+  aspect: string
+  sizes: string
+  frameRatio: number
+}) {
+  const cover = report.coverImage ?? null
+  const src = cover?.url ?? report.coverImageUrl ?? null
+  if (src) {
+    const srcSet = cover ? coverSrcSet(cover) : undefined
+    // Hybrid fit: when the upload's own ratio is within ~12% of the card frame,
+    // fill it edge-to-edge (cover) — clean, no bars. Otherwise show the WHOLE
+    // graphic (contain) over a blurred fill so nothing is ever cropped, at any
+    // card size. Ratio comes from the CMS-reported intrinsic width/height.
+    const ratio =
+      cover?.width && cover?.height ? cover.width / cover.height : null
+    const fill = ratio !== null && Math.abs(ratio - frameRatio) / frameRatio <= 0.12
     return (
       <div className={aspect} style={{ position: 'relative', overflow: 'hidden', background: 'var(--subtle)' }}>
-        {/* Blurred cover-fit backdrop fills the letterbox with the image's own
-            colors so an off-ratio graphic has no empty band around it. */}
+        {!fill && (
+          // Blurred backdrop fills the letterbox with the image's own colors.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={src}
+            srcSet={srcSet}
+            sizes={sizes}
+            alt=""
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center',
+              filter: 'blur(28px)',
+              transform: 'scale(1.15)'
+            }}
+          />
+        )}
+        {/* Sharp image on top — fully visible (contain) or edge-to-edge (cover). */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={report.coverImageUrl}
-          alt=""
-          aria-hidden
+          src={src}
+          srcSet={srcSet}
+          sizes={sizes}
+          alt={report.title}
+          loading="lazy"
           style={{
-            position: 'absolute',
-            inset: 0,
+            position: 'relative',
+            display: 'block',
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            filter: 'blur(28px)',
-            transform: 'scale(1.15)'
+            objectFit: fill ? 'cover' : 'contain',
+            objectPosition: 'center'
           }}
-        />
-        {/* Sharp, fully-visible image on top. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={report.coverImageUrl}
-          alt={report.title}
-          style={{ position: 'relative', display: 'block', width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
         />
         <span
           aria-hidden
@@ -185,7 +235,15 @@ function KindChip({ report }: { report: Report }) {
   )
 }
 
-function Byline({ report, size = 'md' }: { report: Report; size?: 'md' | 'sm' }) {
+function Byline({
+  report,
+  size = 'md',
+  showDate = true
+}: {
+  report: Report
+  size?: 'md' | 'sm'
+  showDate?: boolean
+}) {
   const avatar = size === 'md' ? 34 : 30
   const date = formatDate(report.date)
   return (
@@ -203,16 +261,27 @@ function Byline({ report, size = 'md' }: { report: Report; size?: 'md' | 'sm' })
           fontSize: size === 'md' ? '0.76rem' : '0.68rem',
           fontWeight: 600,
           letterSpacing: '0.04em',
-          flexShrink: 0
+          flexShrink: 0,
+          overflow: 'hidden'
         }}
       >
-        {initials(report.author)}
+        {report.avatar ? (
+          // The author's real photo when set; initials monogram otherwise.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={report.avatar}
+            alt=""
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          initials(report.author)
+        )}
       </span>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{ fontSize: size === 'md' ? '0.9rem' : '0.82rem', fontWeight: 600, color: 'var(--ink)' }}>
           {report.author}
         </span>
-        {date && (
+        {showDate && date && (
           <span
             style={{
               fontFamily: 'var(--font-mono)',
@@ -250,7 +319,12 @@ function FeaturedReport({ report, rank }: { report: Report; rank: number }) {
         >
           <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
             <div style={{ position: 'relative', overflow: 'hidden' }}>
-              <Cover report={report} aspect="aspect-[16/9]" />
+              <Cover
+                report={report}
+                aspect="aspect-[16/9]"
+                sizes="(min-width: 768px) 60vw, 100vw"
+                frameRatio={16 / 9}
+              />
             </div>
             <div className="relative" style={{ overflow: 'hidden' }}>
               <div
@@ -325,7 +399,10 @@ function FeaturedReport({ report, rank }: { report: Report; rank: number }) {
 }
 
 // ── Report card (grid) ───────────────────────────────────────────────────────
-function ReportCard({ report, rank }: { report: Report; rank: number }) {
+function ReportCard({ report }: { report: Report }) {
+  const date = formatDate(report.date)
+  const catLower = (report.category ?? '').toLowerCase()
+  const tags = (report.tags ?? []).filter((t) => t && t.toLowerCase() !== catLower).slice(0, 2)
   return (
     <Link
       href={reportHref(report.slug)}
@@ -340,34 +417,25 @@ function ReportCard({ report, rank }: { report: Report; rank: number }) {
       }}
     >
       <div style={{ position: 'relative', flexShrink: 0 }}>
-        <Cover report={report} aspect="aspect-[4/3]" />
-        <span
-          style={{
-            position: 'absolute',
-            top: 12,
-            right: 12,
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.66rem',
-            letterSpacing: '0.16em',
-            color: 'var(--ink-60)',
-            background: 'rgba(255,255,255,0.9)',
-            border: '1px solid var(--line)',
-            borderRadius: 999,
-            padding: '3px 9px',
-            backdropFilter: 'blur(4px)'
-          }}
-        >
-          No. {issueNo(rank)}
-        </span>
+        <Cover
+          report={report}
+          aspect="aspect-[16/10]"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          frameRatio={16 / 10}
+        />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <KindChip report={report} />
-          {formatDate(report.date) && (
-            <span style={{ fontSize: '0.78rem', color: 'var(--ink-50)' }}>{formatDate(report.date)}</span>
-          )}
-        </div>
-        <h3 className="display-sm" style={{ fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)', margin: 0 }}>
+        <h3
+          className="display-sm"
+          style={{
+            fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)',
+            margin: 0,
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden'
+          }}
+        >
           {report.title}
         </h3>
         {report.excerpt && (
@@ -378,7 +446,7 @@ function ReportCard({ report, rank }: { report: Report; rank: number }) {
               color: 'var(--ink-70)',
               margin: 0,
               display: '-webkit-box',
-              WebkitLineClamp: 3,
+              WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden'
             }}
@@ -386,11 +454,31 @@ function ReportCard({ report, rank }: { report: Report; rank: number }) {
             {report.excerpt}
           </p>
         )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto', paddingTop: 8 }}>
-          <Byline report={report} size="sm" />
-          <span style={{ marginLeft: 'auto', color: 'var(--ink-60)', display: 'inline-flex' }}>
-            <ArrowRight className="research-arrow" />
-          </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 'auto', paddingTop: 8 }}>
+          <Byline report={report} size="sm" showDate={false} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            {date && <span style={{ fontSize: '0.8rem', color: 'var(--ink-50)' }}>{date}</span>}
+            {date && <span aria-hidden style={{ width: 1, height: 12, background: 'var(--line)' }} />}
+            <KindChip report={report} />
+            {tags.map((t) => (
+              <span
+                key={t}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '3px 10px',
+                  borderRadius: 999,
+                  border: '1px solid var(--line)',
+                  background: 'var(--white)',
+                  color: 'var(--ink-60)',
+                  fontSize: '0.72rem',
+                  fontWeight: 600
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </Link>
@@ -720,7 +808,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {rest.map((report) => (
-                    <ReportCard key={report.slug} report={report} rank={rankOf.get(report.slug) ?? 0} />
+                    <ReportCard key={report.slug} report={report} />
                   ))}
                 </div>
               </Container>
