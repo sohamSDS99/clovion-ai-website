@@ -15,22 +15,6 @@ export const metadata: Metadata = {
   alternates: { canonical: '/research' }
 }
 
-// Bridge: until every report is published under the dedicated RESEARCH type,
-// also surface research-flavoured RESOURCE items (e.g. "…A Study"). A RESOURCE
-// qualifies when its category, a tag, or its title names a research-type body
-// of work. RESEARCH items are always included. Both types serve their detail
-// under /resources/<slug> (see sitemap CMS_ROUTES), so every card links there
-// and no link breaks regardless of the item's underlying type.
-const RESEARCH_RE = /research|report|study|benchmark|\bindex\b|analysis|state of/i
-
-function resourceIsResearch(item: CmsSummary): boolean {
-  const cat = `${item.category?.slug ?? ''} ${item.category?.name ?? ''}`
-  const tags = (item.tags ?? []).map((t) => `${t.slug} ${t.name}`).join(' ')
-  return (
-    RESEARCH_RE.test(cat) || RESEARCH_RE.test(tags) || RESEARCH_RE.test(item.title)
-  )
-}
-
 function toReport(item: CmsSummary): Report {
   return {
     slug: item.slug,
@@ -97,21 +81,16 @@ const faqJsonLd = {
 }
 
 export default async function ResearchPage() {
-  // Pull the dedicated RESEARCH type plus research-flavoured RESOURCE items,
-  // then de-dupe by slug (RESEARCH wins). listContent degrades to [] on CMS
-  // failure, so a single-source outage never blanks the whole page.
-  const [research, resources] = await Promise.all([
-    listContent('RESEARCH', { limit: 100 }),
-    listContent('RESOURCE', { limit: 100 })
-  ])
+  // The library is exactly the published RESEARCH-type items — nothing else.
+  // The count and cards below are driven entirely by this list, so publishing
+  // (or unpublishing) a RESEARCH report is all it takes to change what shows
+  // and the "N reports" tally. RESOURCE/guide items live on /resources and are
+  // intentionally NOT surfaced here, even if their title says "study/report".
+  // listContent degrades to [] on CMS failure, so an outage never crashes.
+  const research = await listContent('RESEARCH', { limit: 100 })
 
   const bySlug = new Map<string, Report>()
   for (const item of research.items) bySlug.set(item.slug, toReport(item))
-  for (const item of resources.items) {
-    if (!bySlug.has(item.slug) && resourceIsResearch(item)) {
-      bySlug.set(item.slug, toReport(item))
-    }
-  }
   const reports = Array.from(bySlug.values())
 
   return (

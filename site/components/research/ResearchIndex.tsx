@@ -73,11 +73,12 @@ function issueNo(rank: number) {
 // Real cover when present; otherwise a warm, branded placeholder that reads as
 // a research plate — a large italic kind letterform over a dotted-grid field.
 //
-// Cover images are text-heavy report art at arbitrary aspect ratios (the live
-// one is 2.18:1), so object-fit: cover would slice their edges. Instead the
-// whole graphic is shown with object-fit: CONTAIN, and the letterbox is filled
-// by a blurred cover-fit copy of the same image — no empty band, nothing
-// cropped. Mirrors the resources Cover (single source of truth for cover art).
+// Cover images are report art at arbitrary aspect ratios, so the WHOLE graphic
+// is ALWAYS shown with object-fit: CONTAIN — nothing is ever cropped, whatever
+// the upload's ratio and whatever the card's size. The letterbox is filled by a
+// blurred cover-fit copy of the same image, so there's no empty band either.
+// This is deterministic: it does NOT depend on CMS-reported dimensions (which
+// are often missing), so every future upload fits its card automatically.
 // The aspect box reserves space before load, so this is CLS-free.
 // Build a srcset from the CMS cover variants (320/768/1280) + the original so
 // the browser fetches the smallest source that fills the card — the "dynamic
@@ -97,25 +98,20 @@ function coverSrcSet(cover: CmsCoverImage): string {
 function Cover({
   report,
   aspect,
-  sizes,
-  frameRatio
+  sizes
 }: {
   report: Report
   aspect: string
   sizes: string
-  frameRatio: number
 }) {
   const cover = report.coverImage ?? null
   const src = cover?.url ?? report.coverImageUrl ?? null
   if (src) {
     const srcSet = cover ? coverSrcSet(cover) : undefined
-    // Hybrid fit: when the upload's own ratio is within ~12% of the card frame,
-    // fill it edge-to-edge (cover) — clean, no bars. Otherwise show the WHOLE
-    // graphic (contain) over a blurred fill so nothing is ever cropped, at any
-    // card size. Ratio comes from the CMS-reported intrinsic width/height.
-    const ratio =
-      cover?.width && cover?.height ? cover.width / cover.height : null
-    const fill = ratio !== null && Math.abs(ratio - frameRatio) / frameRatio <= 0.12
+    // Always CONTAIN the whole graphic over a blurred fill — never crop. The
+    // blurred backdrop always renders so the letterbox reads as intentional
+    // regardless of the upload's aspect ratio.
+    const fill = false
     return (
       <div className={aspect} style={{ position: 'relative', overflow: 'hidden', background: 'var(--subtle)' }}>
         {!fill && (
@@ -323,7 +319,6 @@ function FeaturedReport({ report, rank }: { report: Report; rank: number }) {
                 report={report}
                 aspect="aspect-[16/9]"
                 sizes="(min-width: 768px) 60vw, 100vw"
-                frameRatio={16 / 9}
               />
             </div>
             <div className="relative" style={{ overflow: 'hidden' }}>
@@ -421,7 +416,6 @@ function ReportCard({ report }: { report: Report }) {
           report={report}
           aspect="aspect-[16/10]"
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          frameRatio={16 / 10}
         />
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
