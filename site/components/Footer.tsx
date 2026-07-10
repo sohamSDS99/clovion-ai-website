@@ -22,6 +22,7 @@ const groups = [
     // two in sync: the footer column shows exactly the dropdown's pages.
     links: [
       { label: 'Blog', href: '/blog' },
+      { label: 'Clovion Research', href: '/research' },
       { label: 'Guides & Downloads', href: '/resources' },
       { label: 'FAQ', href: '/faq' }
     ]

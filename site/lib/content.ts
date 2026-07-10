@@ -68,6 +68,7 @@ export const nav = {
       label: 'Resources',
       children: [
         { label: 'Blog', href: '/blog', desc: 'GEO, AI search, and SEO insights' },
+        { label: 'Clovion Research', href: '/research', desc: 'Original studies, benchmarks, and reports' },
         { label: 'Guides & Downloads', href: '/resources', desc: 'Whitepapers, ebooks, and templates' },
         { label: 'FAQ', href: '/faq', desc: 'Answers to common questions' }
       ]
