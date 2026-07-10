@@ -16,7 +16,9 @@ export default async function FaqListPage() {
 
   return (
     <div className="clv-dark clv-ai-vis-page">
-      <Section className="relative overflow-hidden">
+      {/* Hero — tight vertical rhythm; default section padding left dead space
+          above the title. Keeps its bottom padding as the gap (content is pt-0). */}
+      <Section tight className="relative overflow-hidden">
         <Container>
           <div className="max-w-3xl">
             <Eyebrow>FAQ</Eyebrow>

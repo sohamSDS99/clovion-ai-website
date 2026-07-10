@@ -34,7 +34,9 @@ export function PostHeader({
   coverFit?: 'cover' | 'contain'
 }) {
   return (
-    <Section className="relative overflow-hidden">
+    // Tight vertical rhythm — the default section padding left dead whitespace
+    // above the title and between the header and the article body.
+    <Section tight className="relative overflow-hidden">
       <Container>
         {backHref && (
           <Link
