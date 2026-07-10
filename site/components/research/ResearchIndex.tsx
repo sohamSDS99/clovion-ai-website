@@ -703,7 +703,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
   return (
     <>
       {/* HERO — masthead ------------------------------------------------------ */}
-      <Section className="section-y-xl relative overflow-hidden">
+      <Section className="relative overflow-hidden !pt-[clamp(3.5rem,6vw,5rem)] !pb-[clamp(1.75rem,3vw,2.75rem)]">
         <div
           aria-hidden
           style={{
@@ -727,31 +727,6 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
               AI engines decide which brands to cite, and what actually moves the needle. Read the
               method, then download the report.
             </p>
-            {ordered.length > 0 && (
-              <div
-                style={{
-                  marginTop: 34,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 16,
-                  flexWrap: 'wrap',
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.72rem',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.14em',
-                  color: 'var(--ink-50)'
-                }}
-              >
-                <span>
-                  {ordered.length} {ordered.length === 1 ? 'report' : 'reports'} published
-                </span>
-                <span aria-hidden style={{ opacity: 0.4 }}>·</span>
-                <span>6 AI engines tracked</span>
-                <span aria-hidden style={{ opacity: 0.4 }}>·</span>
-                <span>First-party data</span>
-              </div>
-            )}
             {showRail && (
               <div className="mt-9" style={{ display: 'flex', justifyContent: 'center' }}>
                 <TopicRail topics={topics} active={topic} onChange={setTopic} />
