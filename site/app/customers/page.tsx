@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import { redirect } from 'next/navigation'
 import FeatureContent from '@/components/customers/FeatureContent'
 
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
     description:
       'Real brands, real numbers. See how 200+ teams used Clovion to lift AI mentions, citations, and share of voice across the major AI answer engines.',
     url: 'https://www.clovion.ai/customers',
-    type: 'website'
+    type: 'website',
+    images: OG_IMAGES,
   }
 }
 

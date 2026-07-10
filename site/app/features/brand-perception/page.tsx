@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/brand-perception/FeatureContent'
 
@@ -13,12 +14,7 @@ export const metadata: Metadata = {
       'Is AI calling you enterprise or budget? Easy or complex? Brand Perception extracts the actual characterizations. Per engine. Connected to fixes.',
     url: 'https://clovion.ai/features/brand-perception',
     type: 'website',
-    images: [
-      {
-        url: 'https://clovion.ai/og/brand-perception.png',
-        alt: 'Clovion AI brand perception dashboard showing extracted brand attributes per AI engine — ChatGPT, Claude, Perplexity, Gemini — with attribute categories for usability, market fit, pricing, and capability, plus a perception gap indicator highlighting mismatches between intended and actual positioning.',
-      },
-    ],
+    images: OG_IMAGES,
   },
 }
 

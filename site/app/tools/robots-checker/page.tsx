@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { OG_IMAGES } from '@/lib/og'
 import type { Metadata } from 'next'
 import FeatureContent from '@/components/tools/robots-checker/FeatureContent'
 import { FAQS } from '@/components/tools/robots-checker/faqs'
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
       'See exactly which AI crawlers your robots.txt allows or blocks. Free, no signup. Covers 15 AI bots including GPTBot, ClaudeBot, PerplexityBot, and Google-Extended.',
     url: 'https://www.clovion.ai/tools/robots-checker',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 

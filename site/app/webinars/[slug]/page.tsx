@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { Section, Container, Button, Eyebrow } from '@/components/ui'
@@ -32,7 +33,7 @@ export async function generateMetadata({
     openGraph: {
       title: seo.metaTitle || item.title,
       description: seo.metaDescription || item.excerpt || undefined,
-      images: ogImage ? [ogImage] : undefined
+      images: ogImage ? [ogImage] : OG_IMAGES
     }
   }
 }

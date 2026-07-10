@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/free-score/FeatureContent'
 
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
     description:
       'Find out how AI engines describe your brand. Mentions, sentiment, citations, and competitive position in one free snapshot.',
     url: 'https://www.clovion.ai/free-ai-visibility-score',
-    type: 'website'
+    type: 'website',
+    images: OG_IMAGES,
   }
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/fanout/FeatureContent'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     description: 'AI engines fan out every prompt into 6–14+ hidden sub-queries. Clovion AI generates and tracks a prompt set that covers the full fan-out surface. Deterministic. Brand-neutral. Daily.',
     url: 'https://www.clovion.ai/features/fanout-query',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 

@@ -68,6 +68,14 @@ export const metadata: Metadata = {
     description: 'See how AI engines describe your brand. Fix what is holding you back. Across ChatGPT, Claude, Perplexity, Gemini, and AI Overviews.',
     type: 'website'
   },
+  // X/Twitter reads the large-image card + falls back to the OG image (the
+  // site-wide app/opengraph-image, or a page's own). Inherited by every route
+  // that doesn't set its own twitter block.
+  twitter: {
+    card: 'summary_large_image',
+    site: '@clovionai',
+    creator: '@clovionai'
+  },
   verification: {
     google: 'Of0ydr1XJckA0sM0jA4HEKUzVOxrgvB-6R6ti5P3EjQ',
     other: {

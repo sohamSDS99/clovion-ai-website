@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/tools/ai-crawlability-checker/FeatureContent'
 import { FAQS } from '@/components/tools/ai-crawlability-checker/faqs'
@@ -13,7 +14,8 @@ export const metadata: Metadata = {
     description:
       'Find out which AI crawlers can access your site. A free, instant readout for ten of the most relevant AI bots.',
     url: 'https://www.clovion.ai/tools/ai-crawlability-checker',
-    type: 'website'
+    type: 'website',
+    images: OG_IMAGES,
   }
 }
 

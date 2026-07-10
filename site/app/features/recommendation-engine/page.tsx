@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/recommendation/FeatureContent'
 
@@ -13,12 +14,7 @@ export const metadata: Metadata = {
       'Prioritized recommendations your team can act on: find the gap, fix the cause, and track the outcome from Baselined to Resolved.',
     url: 'https://clovion.ai/features/recommendation-engine',
     type: 'website',
-    images: [
-      {
-        url: 'https://clovion.ai/og/recommendation-engine.png',
-        alt: 'Clovion AI Recommendation Engine — raw dashboard signals resolving into a prioritized, actionable fix card, then tracked from Baselined to Resolved.',
-      },
-    ],
+    images: OG_IMAGES,
   },
 }
 

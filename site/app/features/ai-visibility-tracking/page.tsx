@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { OG_IMAGES } from '@/lib/og'
 import type { CSSProperties } from 'react'
 import FeatureContent from '@/components/ai-visibility/FeatureContent'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
     description: 'LLM rank tracking across ChatGPT, Claude, Gemini, Perplexity, Grok, and AI Overviews. Daily refresh. Brand-neutral prompts. One dashboard.',
     url: 'https://www.clovion.ai/features/ai-visibility-tracking',
     type: 'website',
+    images: OG_IMAGES,
   },
 }
 
