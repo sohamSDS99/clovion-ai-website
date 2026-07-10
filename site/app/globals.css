@@ -702,16 +702,16 @@
 }
 /* Headings own their top space; tighten the gap to the text that follows so a
    heading reads as attached to its section, not floating between paragraphs. */
-.cms-prose h2 { font-size: 1.7rem; margin-top: 3.2em; }
-.cms-prose h3 { font-size: 1.35rem; margin-top: 2.2em; }
-.cms-prose h4 { font-size: 1.12rem; margin-top: 1.8em; }
-/* Breathing room under a heading so it doesn't stick to the following text. */
-.cms-prose h2 + * { margin-top: 1.25em; }
-.cms-prose h3 + *, .cms-prose h4 + * { margin-top: 0.8em; }
+/* Space is set on the heading itself (margin-top above / margin-bottom below).
+   Do NOT use `h2 + * { margin-top }` for the below-gap: `.cms-prose p { margin: 0 }`
+   has equal specificity + comes later, so it wins and the heading sticks to its
+   text. margin-bottom on the heading isn't overridden by anything. */
+.cms-prose h2 { font-size: 1.7rem; margin-top: 2.6em; margin-bottom: 0.9em; }
+.cms-prose h3 { font-size: 1.35rem; margin-top: 2em; margin-bottom: 0.65em; }
+.cms-prose h4 { font-size: 1.12rem; margin-top: 1.7em; margin-bottom: 0.55em; }
 .cms-prose p { margin: 0; }
 /* Paragraph spacing — needs higher specificity than `.cms-prose p { margin: 0 }`
-   above, which otherwise zeroes the `> * + *` gap and runs paragraphs together.
-   (`.cms-prose h2 + *` keeps the tighter heading→paragraph gap.) */
+   above, which otherwise zeroes the `> * + *` gap and runs paragraphs together. */
 .cms-prose > p + p { margin-top: 1.1em; }
 .cms-prose p { text-wrap: pretty; }
 .cms-prose a {
