@@ -802,6 +802,56 @@
 .clv-light-article .cms-prose blockquote {
   border-left-color: #C2410C;
 }
+/* "Key Takeaways" callout — a blockquote that wraps a list (vs a plain
+   pull-quote of paragraphs) renders as a soft gray card with a bold display
+   heading and orange dot bullets, not an italic ruled quote. */
+.clv-light-article .cms-prose blockquote:has(ul) {
+  border-left: none;
+  margin-left: 0;
+  padding: 1.6rem 1.9rem;
+  background: #F1F1F4;
+  border-radius: 16px;
+  color: rgba(10, 10, 15, 0.82);
+  font-style: normal;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.clv-light-article .cms-prose blockquote:has(ul) > p:first-child {
+  margin: 0;
+  font-style: normal;
+}
+/* CMS emits <p><br><strong>Key Takeaways</strong></p>; drop the leading break
+   so the heading sits at the top of the card. */
+.clv-light-article .cms-prose blockquote:has(ul) > p:first-child br { display: none; }
+.clv-light-article .cms-prose blockquote:has(ul) > p:first-child strong {
+  display: block;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.clv-light-article .cms-prose blockquote:has(ul) ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 1.1em;
+}
+.clv-light-article .cms-prose blockquote:has(ul) li {
+  position: relative;
+  margin-top: 1em;
+  padding-left: 1.6rem;
+  font-style: normal;
+}
+.clv-light-article .cms-prose blockquote:has(ul) li::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #C2410C;
+}
 /* Brand-orange eyebrow pulse dot on light article pages (e.g. the "RESOURCE"
    eyebrow on resource detail). PostHeader passes accentColor for blog posts;
    this covers standalone <Eyebrow> usages inside a light article wrapper. */
