@@ -83,6 +83,7 @@ export default async function ResearchDetailPage({
       <PostHeader
         eyebrow="Research"
         accentColor="#C2410C"
+        coverFit="contain"
         title={item.title}
         coverImageUrl={item.coverImageUrl}
         excerpt={item.excerpt}
