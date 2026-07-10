@@ -124,7 +124,6 @@ export default async function ResearchDetailPage({
                 </aside>
                 <div className="min-w-0 max-w-3xl">
                   <ProseHtml html={bodyHtml} />
-                  <AuthorCard author={item.author} />
                 </div>
               </div>
             ) : (
@@ -132,14 +131,24 @@ export default async function ResearchDetailPage({
                  report body must not collapse into the empty rail's column). */
               <div className="mx-auto max-w-3xl">
                 <ProseHtml html={bodyHtml} />
-                <AuthorCard author={item.author} />
               </div>
             )}
           </Container>
         </Section>
       )}
 
+      {/* FAQ sits after the article (conclusion), before the author profile. */}
       {faqItems.length > 0 && <FAQAccordion items={faqItems} />}
+
+      {item.author && (
+        <Section tight className="!pt-0">
+          <Container>
+            <div className="mx-auto max-w-3xl">
+              <AuthorCard author={item.author} />
+            </div>
+          </Container>
+        </Section>
+      )}
 
       <CTABanner
         sub="See your AI visibility score"

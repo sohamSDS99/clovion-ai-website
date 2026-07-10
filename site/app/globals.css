@@ -705,7 +705,9 @@
 .cms-prose h2 { font-size: 1.7rem; margin-top: 2.2em; }
 .cms-prose h3 { font-size: 1.35rem; margin-top: 1.75em; }
 .cms-prose h4 { font-size: 1.12rem; margin-top: 1.5em; }
-.cms-prose h2 + *, .cms-prose h3 + *, .cms-prose h4 + * { margin-top: 0.6em; }
+/* Breathing room under a heading so it doesn't stick to the following text. */
+.cms-prose h2 + * { margin-top: 1em; }
+.cms-prose h3 + *, .cms-prose h4 + * { margin-top: 0.7em; }
 .cms-prose p { margin: 0; }
 /* Paragraph spacing — needs higher specificity than `.cms-prose p { margin: 0 }`
    above, which otherwise zeroes the `> * + *` gap and runs paragraphs together.
