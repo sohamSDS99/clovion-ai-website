@@ -157,11 +157,30 @@ function Cover({ post, aspect }: { post: ResourcePost; aspect: string }) {
   if (post.coverImageUrl) {
     return (
       <div style={{ position: 'relative', aspectRatio: aspect, overflow: 'hidden', background: 'var(--subtle)' }}>
+        {/* Blurred cover-fit backdrop fills the letterbox with the image's own
+            colors so an off-ratio graphic has no empty band around it. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={post.coverImageUrl}
+          alt=""
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center',
+            filter: 'blur(28px)',
+            transform: 'scale(1.15)'
+          }}
+        />
+        {/* Sharp, fully-visible image on top. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={post.coverImageUrl}
           alt={post.title}
-          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
+          style={{ position: 'relative', display: 'block', width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }}
         />
         <span
           aria-hidden
