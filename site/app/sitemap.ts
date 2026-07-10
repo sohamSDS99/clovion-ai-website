@@ -54,6 +54,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/news', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/webinars', priority: 0.5, changeFrequency: 'weekly' },
   { path: '/resources', priority: 0.5, changeFrequency: 'weekly' },
+  { path: '/research', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/faq', priority: 0.5, changeFrequency: 'weekly' },
   { path: '/changelog', priority: 0.5, changeFrequency: 'weekly' },
 
