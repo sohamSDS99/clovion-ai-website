@@ -47,6 +47,7 @@ function toCard(report: Report): CardPost {
     excerpt: report.excerpt,
     categoryLabel: kindLabel(report),
     author: report.author,
+    authorAvatar: report.avatar,
     date: report.date,
     tag: report.tags[0],
     coverImageUrl: report.coverImageUrl

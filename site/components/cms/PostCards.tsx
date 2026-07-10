@@ -18,6 +18,7 @@ export type CardPost = {
   excerpt: string
   categoryLabel: string
   author: string
+  authorAvatar?: string | null
   date: string
   readTime?: string
   tag?: string
@@ -174,27 +175,36 @@ function CoverPlaceholder({ post, tall = false }: { post: CardPost; tall?: boole
 }
 
 function Byline({ post, size = 'md' }: { post: CardPost; size?: 'md' | 'sm' }) {
-  const avatar = size === 'md' ? 34 : 30
+  const dim = size === 'md' ? 34 : 30
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      <span
-        style={{
-          width: avatar,
-          height: avatar,
-          borderRadius: 999,
-          background: ORANGE,
-          color: '#fff',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: size === 'md' ? '0.76rem' : '0.68rem',
-          fontWeight: 600,
-          letterSpacing: '0.04em',
-          flexShrink: 0
-        }}
-      >
-        {initials(post.author)}
-      </span>
+      {post.authorAvatar ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={post.authorAvatar}
+          alt={post.author}
+          style={{ width: dim, height: dim, borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
+        />
+      ) : (
+        <span
+          style={{
+            width: dim,
+            height: dim,
+            borderRadius: 999,
+            background: ORANGE,
+            color: '#fff',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: size === 'md' ? '0.76rem' : '0.68rem',
+            fontWeight: 600,
+            letterSpacing: '0.04em',
+            flexShrink: 0
+          }}
+        >
+          {initials(post.author)}
+        </span>
+      )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <span style={{ fontSize: size === 'md' ? '0.9rem' : '0.82rem', fontWeight: 600, color: 'var(--ink)' }}>
           {post.author}

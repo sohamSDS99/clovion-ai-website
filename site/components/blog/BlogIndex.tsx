@@ -42,6 +42,7 @@ export type Post = {
   excerpt: string
   category: string
   author: string
+  authorAvatar?: string | null
   date: string
   readTime?: string
   tag?: string
@@ -56,6 +57,7 @@ function toCard(post: Post): CardPost {
     excerpt: post.excerpt,
     categoryLabel: categoryLabel(post.category),
     author: post.author,
+    authorAvatar: post.authorAvatar,
     date: post.date,
     readTime: post.readTime,
     tag: post.tag,
