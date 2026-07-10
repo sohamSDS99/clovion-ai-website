@@ -94,8 +94,10 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
 
   return (
     <>
-      {/* HERO ------------------------------------------------------------- */}
-      <Section className="section-y-xl relative overflow-hidden">
+      {/* HERO — tight top, no bottom padding so it hugs the content below (the
+          next section supplies the gap). The signature XL padding left too much
+          dead space above the title and below the intro. */}
+      <Section tight className="relative overflow-hidden !pb-0">
         <Container>
           <div style={{ maxWidth: 820 }}>
             <h1 className="display-lg text-balance">
