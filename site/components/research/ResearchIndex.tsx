@@ -230,30 +230,6 @@ function Byline({ report, size = 'md' }: { report: Report; size?: 'md' | 'sm' })
   )
 }
 
-// ── Masthead kicker ─────────────────────────────────────────────────────────
-function Kicker() {
-  return (
-    <div
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 12,
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.75rem',
-        textTransform: 'uppercase',
-        letterSpacing: '0.18em'
-      }}
-    >
-      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: ORANGE }}>
-        <span style={{ width: 7, height: 7, borderRadius: 999, background: ORANGE, boxShadow: '0 0 0 4px rgba(194,65,12,0.10)' }} />
-        Clovion Research
-      </span>
-      <span aria-hidden style={{ height: 1, width: 26, background: 'var(--line)' }} />
-      <span style={{ color: 'var(--ink-60)' }}>Independent studies on AI search</span>
-    </div>
-  )
-}
-
 // ── Featured (latest) report ────────────────────────────────────────────────
 function FeaturedReport({ report, rank }: { report: Report; rank: number }) {
   return (
@@ -468,95 +444,6 @@ function TopicRail({
   )
 }
 
-// ── Methodology band ──────────────────────────────────────────────────────────
-// The page's signature section — the thing a reader remembers. Signals rigor
-// with emerald numerals and a plain-spoken account of how the reports are made.
-const METHOD = [
-  {
-    title: 'First-party data',
-    body: 'Aggregated, anonymized signal from the brands we monitor — measured, not scraped or guessed.'
-  },
-  {
-    title: 'Controlled experiments',
-    body: 'The same prompts run across ChatGPT, Claude, Gemini, Perplexity, Grok, and AI Overviews, scored on who gets cited.'
-  },
-  {
-    title: 'Reproducible method',
-    body: 'Every report documents its sample, dates, and method — so you can check the work, not just trust it.'
-  }
-]
-
-function MethodologyBand() {
-  return (
-    <Section tight>
-      <Container>
-        <div
-          style={{
-            borderRadius: 26,
-            border: '1px solid var(--line)',
-            background: 'var(--white)',
-            padding: 'clamp(2rem, 4vw, 3.25rem)'
-          }}
-        >
-          <div style={{ maxWidth: 620 }}>
-            <span
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.72rem',
-                textTransform: 'uppercase',
-                letterSpacing: '0.16em',
-                color: EMERALD
-              }}
-            >
-              <span style={{ width: 7, height: 7, borderRadius: 999, background: EMERALD, boxShadow: `0 0 0 4px ${EMERALD_BG}` }} />
-              How Clovion Research works
-            </span>
-            <h2 className="display-sm" style={{ margin: '16px 0 0', fontSize: 'clamp(1.6rem, 2.6vw + 0.4rem, 2.2rem)' }}>
-              Rigor you can reproduce.
-            </h2>
-            <p className="lead" style={{ fontSize: '0.98rem', margin: '14px 0 0', maxWidth: 520, color: 'var(--ink-70)' }}>
-              No hot takes. Every report starts with data we can measure and a method you can repeat.
-            </p>
-          </div>
-          <div
-            className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[var(--line)]"
-            style={{ marginTop: 36, borderTop: '1px solid var(--line)' }}
-          >
-            {METHOD.map((m, i) => (
-              <div
-                key={m.title}
-                className="bg-[var(--white)]"
-                style={{ padding: 'clamp(1.5rem, 2.2vw, 2rem) clamp(1.25rem, 2vw, 1.75rem)' }}
-              >
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.8rem',
-                    fontWeight: 500,
-                    letterSpacing: '0.1em',
-                    color: EMERALD
-                  }}
-                >
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-                <h3 className="display-sm" style={{ fontSize: '1.15rem', margin: '14px 0 0' }}>
-                  {m.title}
-                </h3>
-                <p style={{ fontSize: '0.94rem', lineHeight: 1.6, color: 'var(--ink-70)', margin: '10px 0 0' }}>
-                  {m.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </Container>
-    </Section>
-  )
-}
-
 // ── Research briefing signup ──────────────────────────────────────────────────
 function BriefingBand() {
   const [email, setEmail] = useState('')
@@ -742,9 +629,8 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
         />
         <Container>
           <div style={{ maxWidth: 860 }}>
-            <Kicker />
-            <h1 className="display-lg text-balance" style={{ marginTop: 22 }}>
-              The research behind <span style={{ color: ORANGE }}>AI visibility</span>.
+            <h1 className="display-lg text-balance">
+              Insights into how AI engines <span style={{ color: ORANGE }}>discover, describe, and recommend</span> brands.
             </h1>
             <p className="lead mt-7" style={{ maxWidth: 660, color: 'var(--ink-70)' }}>
               Studies, benchmarks, and first-party data from the Clovion Research team — how the major
@@ -856,8 +742,6 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
           </Container>
         </Section>
       )}
-
-      <MethodologyBand />
 
       <BriefingBand />
 
