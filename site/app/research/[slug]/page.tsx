@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import type { CSSProperties } from 'react'
 import { OG_IMAGES } from '@/lib/og'
 import { notFound } from 'next/navigation'
-import { Section, Container, ArrowRight } from '@/components/ui'
+import { Section, Container } from '@/components/ui'
 import { CTABanner } from '@/components/sections'
 import { ProseHtml } from '@/components/cms/ProseHtml'
 import { JsonLd } from '@/components/cms/JsonLd'
@@ -64,12 +64,7 @@ export default async function ResearchDetailPage({
   const item = await getReport(params.slug)
   if (!item) notFound()
 
-  const td = (item.typeData ?? {}) as {
-    downloadUrl?: string
-    fileLabel?: string
-    resourceKind?: string
-  }
-  const downloadUrl = typeof td.downloadUrl === 'string' ? td.downloadUrl : null
+  const td = (item.typeData ?? {}) as { resourceKind?: string }
   const published = formatDate(item.publishedAt)
   const kind = item.category?.name ?? td.resourceKind ?? 'Report'
   const meta = [published, item.author?.displayName, kind].filter(Boolean) as string[]
@@ -106,26 +101,6 @@ export default async function ResearchDetailPage({
           ) : null
         }
       />
-
-      {/* Direct, ungated download — reports may ship a PDF the blog never has;
-          centered under the header, before the body. */}
-      {downloadUrl && (
-        <Section tight className="!pt-0">
-          <Container>
-            <div className="mx-auto flex max-w-4xl justify-center">
-              <a
-                href={downloadUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-semibold"
-                style={{ background: 'var(--ink)', color: '#fff', textDecoration: 'none' }}
-              >
-                Download the report{td.fileLabel ? ` (${td.fileLabel})` : ' (PDF)'} <ArrowRight />
-              </a>
-            </div>
-          </Container>
-        </Section>
-      )}
 
       {item.bodyHtml && (
         <Section tight className="!pt-0">
