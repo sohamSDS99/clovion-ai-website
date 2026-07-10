@@ -628,11 +628,13 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
           }}
         />
         <Container>
-          <div style={{ maxWidth: 860 }}>
-            <h1 className="display-lg text-balance">
-              Insights into how AI engines <span style={{ color: ORANGE }}>discover, describe, and recommend</span> brands.
+          <div style={{ maxWidth: 960, margin: '0 auto', textAlign: 'center' }}>
+            {/* Sized to land on two lines at desktop widths; text-balance evens
+                the wrap. All-ink (no accent). */}
+            <h1 className="display-lg text-balance" style={{ fontSize: 'clamp(1.9rem, 3.4vw + 0.4rem, 3.25rem)' }}>
+              Insights into how AI engines discover, describe, and recommend brands.
             </h1>
-            <p className="lead mt-7" style={{ maxWidth: 660, color: 'var(--ink-70)' }}>
+            <p className="lead" style={{ maxWidth: 660, margin: '1.75rem auto 0', color: 'var(--ink-70)' }}>
               Studies, benchmarks, and first-party data from the Clovion Research team — how the major
               AI engines decide which brands to cite, and what actually moves the needle. Read the
               method, then download the report.
@@ -643,6 +645,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
                   marginTop: 34,
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: 16,
                   flexWrap: 'wrap',
                   fontFamily: 'var(--font-mono)',
@@ -662,7 +665,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
               </div>
             )}
             {showRail && (
-              <div className="mt-9">
+              <div className="mt-9" style={{ display: 'flex', justifyContent: 'center' }}>
                 <TopicRail topics={topics} active={topic} onChange={setTopic} />
               </div>
             )}
