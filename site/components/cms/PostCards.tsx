@@ -4,24 +4,34 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Section, Container, Eyebrow, Button, ArrowRight } from '@/components/ui'
 
-// Shared card primitives for the CMS index pages (blog + research). Extracted
-// from BlogIndex so both indexes render the SAME featured banner, grid card,
-// byline, placeholder, and newsletter band — the look can't drift between them.
-// Each card links under `hrefBase` (/blog or /research); the display category
-// string is resolved by the caller into `categoryLabel`.
+// Shared card primitives for the CMS index pages (blog + research + resources),
+// so every index renders the SAME featured banner, grid card, byline,
+// placeholder, and newsletter band — the look can't drift between them. Each
+// card links under `hrefBase` (/blog, /research, /resources); the display
+// category string is resolved by the caller into `categoryLabel`.
 
 const ORANGE = '#C2410C'
+const EMERALD = 'var(--positive)' // #047857
+
+// Chip tones — the two homepage brand accents (orange = brand energy,
+// emerald = positive/affordance). Callers pick per category; orange default.
+const CHIP_TONES = {
+  orange: { color: ORANGE, bg: 'rgba(194, 65, 12, 0.08)', border: 'rgba(194, 65, 12, 0.24)' },
+  emerald: { color: EMERALD, bg: 'rgba(4, 120, 87, 0.08)', border: 'rgba(4, 120, 87, 0.22)' }
+} as const
+
+export type ChipTone = keyof typeof CHIP_TONES
 
 export type CardPost = {
   slug: string
   title: string
   excerpt: string
   categoryLabel: string
+  chipTone?: ChipTone
   author: string
   authorAvatar?: string | null
   date: string
   readTime?: string
-  tag?: string
   coverImageUrl?: string | null
 }
 
@@ -40,11 +50,12 @@ function initials(name: string) {
     .toUpperCase()
 }
 
-// Cover renderer shared by all index cards (blog / research / resources). Shows
-// the WHOLE graphic over a blurred same-image fill, so nothing is ever cropped
-// whatever the upload's aspect ratio or the card's size. This is deterministic:
-// it does not depend on CMS-reported dimensions, so every future upload fits its
-// card automatically. The aspect box reserves space before load → CLS-free.
+// Cover renderer shared by ALL index cards (blog / research / resources) — the
+// resources design: a 16:9 frame filled edge-to-edge (object-fit: cover, no
+// letterboxing, no blur). Covers are authored as 16:9 card art, so a 16:9 frame
+// shows the whole graphic with no crop. CLS-free: the aspect box reserves space
+// before load. The on-top hairline frames dark/near-black covers so they still
+// read as a bounded region.
 function CoverImage({
   src,
   alt,
@@ -67,53 +78,66 @@ function CoverImage({
         borderBottom: bordered ? '1px solid var(--line)' : undefined
       }}
     >
-      {/* Blurred backdrop fills the letterbox with the image's own colours. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt=""
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          filter: 'blur(28px)',
-          transform: 'scale(1.15)'
-        }}
-      />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
         loading="lazy"
         style={{
-          position: 'relative',
           display: 'block',
           width: '100%',
           height: '100%',
-          objectFit: 'contain',
+          objectFit: 'cover',
           objectPosition: 'center'
         }}
+      />
+      <span
+        aria-hidden
+        style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 1px rgba(10,10,15,0.08)', pointerEvents: 'none' }}
       />
     </div>
   )
 }
 
+// A small color-coded pill marking the post's category (the resources design,
+// now global). Orange by default; emerald for "positive" categories (studies).
+function Chip({ label, tone = 'orange' }: { label: string; tone?: ChipTone }) {
+  const t = CHIP_TONES[tone]
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '4px 11px',
+        borderRadius: 999,
+        border: `1px solid ${t.border}`,
+        background: t.bg,
+        color: t.color,
+        fontFamily: 'var(--font-mono)',
+        fontSize: '0.68rem',
+        textTransform: 'uppercase',
+        letterSpacing: '0.12em',
+        fontWeight: 600
+      }}
+    >
+      {label}
+    </span>
+  )
+}
+
 // Light placeholder for posts with no cover image. A warm subtle panel with the
 // category set large in ink at low opacity — no dark blocks on the light page.
-function CoverPlaceholder({ post, tall = false }: { post: CardPost; tall?: boolean }) {
+function CoverPlaceholder({ post, bordered = false }: { post: CardPost; bordered?: boolean }) {
   return (
     <div
       aria-hidden
-      className={tall ? 'aspect-[4/3]' : 'aspect-[16/9]'}
+      className="aspect-[16/9]"
       style={{
         position: 'relative',
         overflow: 'hidden',
         background: 'var(--subtle)',
-        borderBottom: tall ? '1px solid var(--line)' : undefined
+        borderBottom: bordered ? '1px solid var(--line)' : undefined
       }}
     >
       <div
@@ -219,7 +243,15 @@ function Byline({ post, size = 'md' }: { post: CardPost; size?: 'md' | 'sm' }) {
   )
 }
 
-export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: string }) {
+export function FeaturedCard({
+  post,
+  hrefBase,
+  cta = 'View resource'
+}: {
+  post: CardPost
+  hrefBase: string
+  cta?: string
+}) {
   const textBlock = (
     <div
       style={{
@@ -231,20 +263,19 @@ export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: str
         gap: 18
       }}
     >
-      <div
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 10,
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.72rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.18em'
-        }}
-      >
-        <span style={{ color: ORANGE }}>Featured</span>
-        <span style={{ height: 1, width: 24, background: 'var(--line)' }} />
-        <span style={{ color: 'var(--ink-60)' }}>{post.categoryLabel}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.72rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.18em',
+            color: ORANGE
+          }}
+        >
+          Featured
+        </span>
+        <Chip label={post.categoryLabel} tone={post.chipTone} />
       </div>
       <h2
         className="display-sm"
@@ -286,10 +317,10 @@ export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: str
             gap: 8,
             fontSize: '0.92rem',
             fontWeight: 600,
-            color: 'var(--ink)'
+            color: ORANGE
           }}
         >
-          Read story <ArrowRight />
+          {cta} <ArrowRight />
         </span>
       </div>
     </div>
@@ -308,11 +339,12 @@ export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: str
             background: 'var(--white)',
             overflow: 'hidden',
             textDecoration: 'none',
-            color: 'inherit'
+            color: 'inherit',
+            boxShadow: 'var(--shadow-card)'
           }}
         >
           <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
-            <div style={{ position: 'relative', overflow: 'hidden' }}>
+            <div style={{ position: 'relative', overflow: 'hidden', borderRight: '1px solid var(--line)' }}>
               {post.coverImageUrl ? (
                 <CoverImage src={post.coverImageUrl} alt={post.title} aspectClass="aspect-[16/9]" />
               ) : (
@@ -329,7 +361,15 @@ export function FeaturedCard({ post, hrefBase }: { post: CardPost; hrefBase: str
   )
 }
 
-export function PostCard({ post, hrefBase }: { post: CardPost; hrefBase: string }) {
+export function PostCard({
+  post,
+  hrefBase,
+  cta = 'View'
+}: {
+  post: CardPost
+  hrefBase: string
+  cta?: string
+}) {
   return (
     <Link
       href={`${hrefBase}/${post.slug}`}
@@ -344,28 +384,15 @@ export function PostCard({ post, hrefBase }: { post: CardPost; hrefBase: string 
       }}
     >
       {post.coverImageUrl ? (
-        <CoverImage src={post.coverImageUrl} alt={post.title} aspectClass="aspect-[4/3]" bordered />
+        <CoverImage src={post.coverImageUrl} alt={post.title} aspectClass="aspect-[16/9]" bordered />
       ) : (
-        <CoverPlaceholder post={post} tall />
+        <CoverPlaceholder post={post} bordered />
       )}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 10,
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.7rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.16em'
-          }}
-        >
-          <span style={{ color: ORANGE }}>{post.categoryLabel}</span>
-          {post.tag && (
-            <>
-              <span style={{ color: 'var(--ink-50)', opacity: 0.6 }}>·</span>
-              <span style={{ color: 'var(--ink-50)' }}>{post.tag}</span>
-            </>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+          <Chip label={post.categoryLabel} tone={post.chipTone} />
+          {formatDate(post.date) && (
+            <span style={{ fontSize: '0.78rem', color: 'var(--ink-50)' }}>{formatDate(post.date)}</span>
           )}
         </div>
         <h3 className="display-sm" style={{ fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)', margin: 0 }}>
@@ -387,8 +414,18 @@ export function PostCard({ post, hrefBase }: { post: CardPost; hrefBase: string 
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto', paddingTop: 8 }}>
           <Byline post={post} size="sm" />
-          <span style={{ marginLeft: 'auto', color: 'var(--ink-60)', display: 'inline-flex' }}>
-            <ArrowRight />
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              fontSize: '0.86rem',
+              fontWeight: 600,
+              color: ORANGE
+            }}
+          >
+            {cta} <ArrowRight />
           </span>
         </div>
       </div>
