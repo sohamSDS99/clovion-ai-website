@@ -49,7 +49,6 @@ function toCard(report: Report): CardPost {
     author: report.author,
     authorAvatar: report.avatar,
     date: report.date,
-    tag: report.tags[0],
     coverImageUrl: report.coverImageUrl
   }
 }
@@ -114,7 +113,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
 
       {featured ? (
         <>
-          <FeaturedCard post={toCard(featured)} hrefBase="/research" />
+          <FeaturedCard post={toCard(featured)} hrefBase="/research" cta="Read report" />
 
           {/* REPORT GRID ------------------------------------------------ */}
           <Section tight className="!pb-0">
@@ -162,7 +161,7 @@ export default function ResearchIndex({ reports = [] }: { reports?: Report[] }) 
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {rest.map((report) => (
-                    <PostCard key={report.slug} post={toCard(report)} hrefBase="/research" />
+                    <PostCard key={report.slug} post={toCard(report)} hrefBase="/research" cta="Read" />
                   ))}
                 </div>
               )}

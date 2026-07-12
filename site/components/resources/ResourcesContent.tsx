@@ -55,12 +55,15 @@ function kindLabel(kind: ReturnType<typeof classifyKind>): string {
 
 // Map a resource onto the shared CMS card shape. The category label prefers the
 // CMS category name, then the classified kind, so untagged items still read.
+// Studies get the emerald chip (positive accent); playbooks stay orange.
 function toCard(post: ResourcePost): CardPost {
+  const kind = classifyKind(post)
   return {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
-    categoryLabel: post.category ?? kindLabel(classifyKind(post)),
+    categoryLabel: post.category ?? kindLabel(kind),
+    chipTone: kind === 'study-reports' ? 'emerald' : 'orange',
     author: post.author,
     authorAvatar: post.authorAvatar,
     date: post.date,

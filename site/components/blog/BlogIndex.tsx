@@ -60,7 +60,6 @@ function toCard(post: Post): CardPost {
     authorAvatar: post.authorAvatar,
     date: post.date,
     readTime: post.readTime,
-    tag: post.tag,
     coverImageUrl: post.coverImageUrl
   }
 }
@@ -167,7 +166,7 @@ export default function BlogIndex({
 
       {featured ? (
         <>
-          <FeaturedCard post={toCard(featured)} hrefBase="/blog" />
+          <FeaturedCard post={toCard(featured)} hrefBase="/blog" cta="Read story" />
 
           {/* POST GRID -------------------------------------------------- */}
           <Section tight className="!pb-0">
@@ -215,7 +214,7 @@ export default function BlogIndex({
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {rest.map((post) => (
-                    <PostCard key={post.slug} post={toCard(post)} hrefBase="/blog" />
+                    <PostCard key={post.slug} post={toCard(post)} hrefBase="/blog" cta="Read" />
                   ))}
                 </div>
               )}
