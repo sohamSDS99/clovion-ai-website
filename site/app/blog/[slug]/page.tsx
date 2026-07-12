@@ -126,7 +126,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       </Section>
 
       {/* FAQ sits after the article (conclusion), before the author profile. */}
-      {faqItems.length > 0 && <FAQAccordion items={faqItems} />}
+      {faqItems.length > 0 && <FAQAccordion items={faqItems} tight />}
 
       {item.author && (
         <Section tight className="!pt-0">

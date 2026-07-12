@@ -138,7 +138,7 @@ export default async function ResearchDetailPage({
       )}
 
       {/* FAQ sits after the article (conclusion), before the author profile. */}
-      {faqItems.length > 0 && <FAQAccordion items={faqItems} />}
+      {faqItems.length > 0 && <FAQAccordion items={faqItems} tight />}
 
       {item.author && (
         <Section tight className="!pt-0">
