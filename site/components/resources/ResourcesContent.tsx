@@ -1,21 +1,17 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import Link from 'next/link'
 import { Section, Container, Eyebrow, ArrowRight } from '@/components/ui'
+import { FeaturedCard, PostCard, type CardPost } from '@/components/cms/PostCards'
 
 // ---------------------------------------------------------------------------
 // Palette — homepage single source of truth (see memory: homepage-palette).
-// Light page: warm off-white bg, white surfaces, ink text. Two brand accents:
-// orange = brand energy (Playbooks), emerald = positive/affordance (Studies).
-// Mirrors the blog index's visual system (components/blog/BlogIndex.tsx).
+// Light page: warm off-white bg, white surfaces, ink text. Cards come from the
+// shared CMS card system (components/cms/PostCards) so blog / research /
+// resources render identically; only the filter bar + CTA are local.
 // ---------------------------------------------------------------------------
 const ORANGE = '#C2410C'
 const ORANGE_BG = 'rgba(194, 65, 12, 0.08)'
-const ORANGE_BORDER = 'rgba(194, 65, 12, 0.24)'
-const EMERALD = 'var(--positive)' // #047857
-const EMERALD_BG = 'rgba(4, 120, 87, 0.08)'
-const EMERALD_BORDER = 'rgba(4, 120, 87, 0.22)'
 
 // ---------------------------------------------------------------------------
 // Data shape + filtering
@@ -57,163 +53,19 @@ function kindLabel(kind: ReturnType<typeof classifyKind>): string {
   return 'Resource'
 }
 
-function formatDate(iso: string): string | null {
-  if (!iso) return null
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return null
-  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
-function initials(name: string) {
-  return name
-    .split(' ')
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase()
-}
-
-// A small color-coded pill marking the resource kind. Orange for Playbooks,
-// emerald for Studies — the two homepage brand accents.
-function KindChip({ post }: { post: ResourcePost }) {
-  const kind = classifyKind(post)
-  const isPlaybook = kind === 'playbook'
-  const isStudy = kind === 'study-reports'
-  const color = isPlaybook ? ORANGE : isStudy ? EMERALD : 'var(--ink-60)'
-  const bg = isPlaybook ? ORANGE_BG : isStudy ? EMERALD_BG : 'var(--subtle)'
-  const border = isPlaybook ? ORANGE_BORDER : isStudy ? EMERALD_BORDER : 'var(--line)'
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        padding: '4px 11px',
-        borderRadius: 999,
-        border: `1px solid ${border}`,
-        background: bg,
-        color,
-        fontFamily: 'var(--font-mono)',
-        fontSize: '0.68rem',
-        textTransform: 'uppercase',
-        letterSpacing: '0.12em',
-        fontWeight: 600
-      }}
-    >
-      {post.category ?? kindLabel(kind)}
-    </span>
-  )
-}
-
-function Byline({ post, size = 'md' }: { post: ResourcePost; size?: 'md' | 'sm' }) {
-  const dim = size === 'md' ? 34 : 30
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-      {post.authorAvatar ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={post.authorAvatar}
-          alt={post.author}
-          style={{ width: dim, height: dim, borderRadius: 999, objectFit: 'cover', flexShrink: 0 }}
-        />
-      ) : (
-        <span
-          style={{
-            width: dim,
-            height: dim,
-            borderRadius: 999,
-            background: 'var(--ink)',
-            color: '#fff',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: size === 'md' ? '0.74rem' : '0.66rem',
-            fontWeight: 600,
-            letterSpacing: '0.04em',
-            flexShrink: 0
-          }}
-        >
-          {initials(post.author)}
-        </span>
-      )}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <span style={{ fontSize: size === 'md' ? '0.9rem' : '0.82rem', fontWeight: 600, color: 'var(--ink)' }}>
-          {post.author}
-        </span>
-        {formatDate(post.date) && (
-          <span
-            style={{
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.66rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.14em',
-              color: 'var(--ink-50)'
-            }}
-          >
-            {formatDate(post.date)}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// Cover frame. object-fit: COVER fills the whole frame edge-to-edge (matches the
-// blog cards + the reference design) — covers are authored 16:9 card art, so a
-// 16:9 frame fits with no crop, and the grid's 4:3 frame trims only the sides.
-// CLS-free: the aspect box reserves space before load. On-top hairline frames
-// dark/near-black covers so they still read as a bounded region.
-function Cover({ post, aspect }: { post: ResourcePost; aspect: string }) {
-  if (post.coverImageUrl) {
-    return (
-      <div style={{ position: 'relative', aspectRatio: aspect, overflow: 'hidden', background: 'var(--subtle)' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={post.coverImageUrl}
-          alt={post.title}
-          style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }}
-        />
-        <span
-          aria-hidden
-          style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 1px rgba(10,10,15,0.08)', pointerEvents: 'none' }}
-        />
-      </div>
-    )
+// Map a resource onto the shared CMS card shape. The category label prefers the
+// CMS category name, then the classified kind, so untagged items still read.
+function toCard(post: ResourcePost): CardPost {
+  return {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    categoryLabel: post.category ?? kindLabel(classifyKind(post)),
+    author: post.author,
+    authorAvatar: post.authorAvatar,
+    date: post.date,
+    coverImageUrl: post.coverImageUrl
   }
-  // No cover → warm branded placeholder with the resource kind letterform.
-  const kind = classifyKind(post)
-  const accent = kind === 'playbook' ? ORANGE : kind === 'study-reports' ? EMERALD : 'var(--ink)'
-  return (
-    <div style={{ position: 'relative', aspectRatio: aspect, overflow: 'hidden', background: 'var(--subtle)' }}>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          opacity: 0.5,
-          backgroundImage: 'radial-gradient(rgba(10,10,15,0.06) 1px, transparent 1px)',
-          backgroundSize: '18px 18px'
-        }}
-      />
-      <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontStyle: 'italic',
-            fontWeight: 600,
-            fontSize: 'clamp(3rem, 8vw, 6rem)',
-            lineHeight: 0.85,
-            letterSpacing: '-0.04em',
-            color: accent,
-            opacity: 0.14,
-            userSelect: 'none'
-          }}
-        >
-          {kindLabel(kind).split(' ')[0]}
-        </span>
-      </div>
-    </div>
-  )
 }
 
 // Interactive segmented filter — Playbook / Study & Reports / All.
@@ -266,168 +118,6 @@ function FilterBar({
         )
       })}
     </div>
-  )
-}
-
-// Featured resource — the blog's horizontal split: cover left, text right.
-function FeaturedCard({ post }: { post: ResourcePost }) {
-  const textBlock = (
-    <div
-      style={{
-        height: '100%',
-        boxSizing: 'border-box',
-        padding: 'clamp(1.75rem, 2.5vw, 2.5rem)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 18
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-        <span
-          style={{
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.72rem',
-            textTransform: 'uppercase',
-            letterSpacing: '0.18em',
-            color: ORANGE
-          }}
-        >
-          Featured
-        </span>
-        <KindChip post={post} />
-      </div>
-      <h2 className="display-sm" style={{ fontSize: 'clamp(1.5rem, 1.7vw + 0.5rem, 2.1rem)', lineHeight: 1.1, margin: 0 }}>
-        {post.title}
-      </h2>
-      {post.excerpt && (
-        <p
-          className="lead"
-          style={{
-            fontSize: '1.02rem',
-            margin: 0,
-            maxWidth: 640,
-            color: 'var(--ink-70)',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden'
-          }}
-        >
-          {post.excerpt}
-        </p>
-      )}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap', marginTop: 'auto', paddingTop: 8 }}>
-        <Byline post={post} />
-        <span
-          style={{
-            marginLeft: 'auto',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: '0.92rem',
-            fontWeight: 600,
-            color: ORANGE
-          }}
-        >
-          View resource <ArrowRight />
-        </span>
-      </div>
-    </div>
-  )
-
-  return (
-    <Section tight className="!pb-0">
-      <Container>
-        <Link
-          href={`/resources/${post.slug}`}
-          className="group block"
-          style={{
-            position: 'relative',
-            borderRadius: 28,
-            border: '1px solid var(--line)',
-            background: 'var(--white)',
-            overflow: 'hidden',
-            textDecoration: 'none',
-            color: 'inherit',
-            boxShadow: 'var(--shadow-card)'
-          }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1fr]">
-            <div style={{ position: 'relative', overflow: 'hidden', borderRight: '1px solid var(--line)' }}>
-              <Cover post={post} aspect="16 / 9" />
-            </div>
-            <div className="relative" style={{ overflow: 'hidden' }}>
-              <div className="md:absolute md:inset-0">{textBlock}</div>
-            </div>
-          </div>
-        </Link>
-      </Container>
-    </Section>
-  )
-}
-
-// Grid card — the blog's vertical PostCard.
-function ResourceCard({ post }: { post: ResourcePost }) {
-  return (
-    <Link
-      href={`/resources/${post.slug}`}
-      className="group flex flex-col h-full"
-      style={{
-        borderRadius: 22,
-        border: '1px solid var(--line)',
-        background: 'var(--white)',
-        textDecoration: 'none',
-        color: 'inherit',
-        overflow: 'hidden'
-      }}
-    >
-      <div style={{ flexShrink: 0, borderBottom: '1px solid var(--line)' }}>
-        <Cover post={post} aspect="16 / 9" />
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14, padding: '22px 24px', flex: 1 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <KindChip post={post} />
-          {formatDate(post.date) && (
-            <span style={{ fontSize: '0.78rem', color: 'var(--ink-50)' }}>{formatDate(post.date)}</span>
-          )}
-        </div>
-        <h3 className="display-sm" style={{ fontSize: 'clamp(1.15rem, 1.5vw + 0.4rem, 1.45rem)', margin: 0 }}>
-          {post.title}
-        </h3>
-        {post.excerpt && (
-          <p
-            style={{
-              fontSize: '0.95rem',
-              lineHeight: 1.6,
-              color: 'var(--ink-70)',
-              margin: 0,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden'
-            }}
-          >
-            {post.excerpt}
-          </p>
-        )}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 'auto', paddingTop: 8 }}>
-          <Byline post={post} size="sm" />
-          <span
-            style={{
-              marginLeft: 'auto',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              fontSize: '0.86rem',
-              fontWeight: 600,
-              color: ORANGE
-            }}
-          >
-            View <ArrowRight />
-          </span>
-        </div>
-      </div>
-    </Link>
   )
 }
 
@@ -564,7 +254,7 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
         </Section>
       ) : featured ? (
         <>
-          <FeaturedCard post={featured} />
+          <FeaturedCard post={toCard(featured)} hrefBase="/resources" />
 
           {/* GRID -------------------------------------------------------- */}
           <Section tight className="!pb-0">
@@ -612,7 +302,7 @@ export default function ResourcesContent({ posts = [] }: { posts?: ResourcePost[
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {rest.map((post) => (
-                    <ResourceCard key={post.slug} post={post} />
+                    <PostCard key={post.slug} post={toCard(post)} hrefBase="/resources" />
                   ))}
                 </div>
               )}
