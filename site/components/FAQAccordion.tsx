@@ -15,7 +15,9 @@ import { useEffect, useState, type CSSProperties } from 'react'
  *     does NOT close the others. State is a Set<number> of open indices.
  *   • Each row: question text left, plus icon right (rotates to × on open),
  *     thin hairline divider below.
- *   • Section padding: var(--section) 0.
+ *   • Section padding: var(--section) 0. With `tight` (embedded mid-article,
+ *     e.g. blog/research post pages) the section brings no top padding — the
+ *     preceding section's bottom padding supplies the gap — and a small bottom.
  *   • prefers-reduced-motion: reduce → snaps to final (no transitions).
  *   • NEVER puts var(--*) inside a transition shorthand (React drops the
  *     longhand and nothing animates). Uses the literal cubic-bezier value.
@@ -30,6 +32,8 @@ export type FAQAccordionProps = {
   /** Override the default headline. Locked to "Frequently Asked Questions" if omitted. */
   headline?: string
   items: FAQAccordionItem[]
+  /** Embedded mid-article: drop the standalone section padding (no top, small bottom). */
+  tight?: boolean
 }
 
 /** Cubic-bezier literal — inline this in transition shorthands instead of var(--ease-out-expo). */
@@ -160,6 +164,7 @@ function FAQRow({
 export function FAQAccordion({
   headline = 'Frequently Asked Questions',
   items,
+  tight = false,
 }: FAQAccordionProps) {
   // Multi-open — each row tracks its own state independently. Opening one
   // does NOT close the others. Set<number> of open indices, ALL closed at mount.
@@ -176,7 +181,7 @@ export function FAQAccordion({
   }
 
   return (
-    <section style={{ padding: 'var(--section) 0' }}>
+    <section style={{ padding: tight ? '0 0 clamp(3rem, 6vw, 5rem)' : 'var(--section) 0' }}>
       <div style={CONTAINER}>
         <h2 style={{ ...DISPLAY_MD, margin: 0, textAlign: 'center' }}>{headline}</h2>
         <div style={{ maxWidth: 760, margin: '40px auto 0' }}>
