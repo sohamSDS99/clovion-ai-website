@@ -13,6 +13,8 @@ import type {
   CmsSummary,
   ResourcePublic,
   CmsAuthor,
+  CourseContent,
+  CourseLessonSummary,
 } from "./cms-types";
 import { CMS_TYPE_SLUG } from "./cms-types";
 
@@ -78,6 +80,33 @@ export async function getContent(
     tagsFor(type, slug)
   );
   return json?.data ?? null;
+}
+
+/** A single course lesson incl. the `course` navigation block (typed view of
+ *  getContent("COURSE", …) — same endpoint, narrowed payload type). */
+export async function getCourseLesson(
+  slug: string
+): Promise<CourseContent | null> {
+  return (await getContent("COURSE", slug)) as CourseContent | null;
+}
+
+/** All published course lessons with their typeData, for grouping into courses
+ *  on /courses. The COURSE list endpoint includes typeData; if a CMS build
+ *  omits it, fall back to fetching the affected items individually (each fetch
+ *  is ISR-cached, so this stays cheap). */
+export async function listCourseLessons(
+  limit = 100
+): Promise<CourseLessonSummary[]> {
+  const { items } = await listContent("COURSE", { limit });
+  const summaries = items as CourseLessonSummary[];
+  if (summaries.every((s) => s.typeData?.courseSlug)) return summaries;
+  return Promise.all(
+    summaries.map(async (s) => {
+      if (s.typeData?.courseSlug) return s;
+      const full = await getCourseLesson(s.slug);
+      return full ? { ...s, typeData: full.typeData } : s;
+    })
+  );
 }
 
 /** Gated-safe resource view incl. its lead-form definition (no PDF URL). */

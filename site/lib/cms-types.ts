@@ -3,7 +3,14 @@
  * Source of truth: clovion-cms lib/public/serialize.ts (PublicContent).
  */
 
-export type CmsType = "BLOG" | "RESEARCH" | "NEWS" | "WEBINAR" | "RESOURCE" | "FAQ";
+export type CmsType =
+  | "BLOG"
+  | "RESEARCH"
+  | "NEWS"
+  | "WEBINAR"
+  | "RESOURCE"
+  | "FAQ"
+  | "COURSE";
 
 export const CMS_TYPE_SLUG: Record<CmsType, string> = {
   BLOG: "blog",
@@ -14,6 +21,7 @@ export const CMS_TYPE_SLUG: Record<CmsType, string> = {
   WEBINAR: "webinar",
   RESOURCE: "resource",
   FAQ: "faq",
+  COURSE: "course",
 };
 
 export interface CmsSeo {
@@ -97,6 +105,55 @@ export interface NewsData {
   sourceUrl?: string;
   dateline?: string;
 }
+
+/* ── COURSE — one CMS item per lesson; lessons group into a course by
+   typeData.courseSlug. The single-item endpoint additionally returns a
+   `course` block with the full lesson list + prev/next for navigation. ───── */
+export interface CourseDownload {
+  label: string;
+  url: string;
+  filename?: string;
+}
+export interface CourseLessonData {
+  courseSlug: string;
+  courseTitle: string;
+  lessonNumber: number;
+  keyLearnings?: string[];
+  downloads?: CourseDownload[];
+}
+export interface CourseNavItem {
+  slug: string;
+  title: string;
+}
+export interface CourseOutlineLesson {
+  slug: string;
+  title: string;
+  lessonNumber: number;
+  excerpt: string;
+  /** Estimated read time in minutes (~200 wpm). Optional for older payloads. */
+  readMinutes?: number;
+  /** Number of downloadable worksheets/templates attached to the lesson. */
+  downloadsCount?: number;
+}
+export interface CourseNav {
+  courseSlug: string;
+  courseTitle: string;
+  lessons: CourseOutlineLesson[];
+  prev: CourseNavItem | null;
+  next: CourseNavItem | null;
+}
+/** Single-lesson payload — CmsContent plus the course navigation context.
+ *  `course` is optional for safety: a lesson still renders standalone if the
+ *  CMS omits it. */
+export interface CourseContent extends CmsContent {
+  typeData: CourseLessonData & Record<string, unknown>;
+  course?: CourseNav | null;
+}
+/** COURSE list item — the list endpoint includes typeData for grouping on the
+ *  /courses landing page. Optional for safety (see listCourseLessons). */
+export type CourseLessonSummary = CmsSummary & {
+  typeData?: CourseLessonData;
+};
 
 /** Public gated-resource view (GET /resources/{slug}) + its lead form. */
 export interface ResourceLeadField {

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
-import { listContent } from '@/lib/cms'
+import { listContent, listCourseLessons } from '@/lib/cms'
+import { groupCourses } from '@/lib/courses'
 import type { CmsSummary, CmsType } from '@/lib/cms-types'
 
 // Revalidate on the same cadence as the CMS reads so freshly-published
@@ -54,6 +55,7 @@ const STATIC_ROUTES: { path: string; priority: number; changeFrequency: ChangeFr
   { path: '/news', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/webinars', priority: 0.5, changeFrequency: 'weekly' },
   { path: '/resources', priority: 0.5, changeFrequency: 'weekly' },
+  { path: '/courses', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/research', priority: 0.6, changeFrequency: 'weekly' },
   { path: '/faq', priority: 0.5, changeFrequency: 'weekly' },
   { path: '/changelog', priority: 0.5, changeFrequency: 'weekly' },
@@ -72,7 +74,40 @@ const CMS_ROUTES: { type: CmsType; prefix: string }[] = [
   // Research reports live under /research/<slug> (their own section).
   { type: 'RESEARCH', prefix: '/research' },
   { type: 'FAQ', prefix: '/faq' },
+  // COURSE is special-cased below: lessons group into courses, with a landing
+  // URL per course (/courses/<courseSlug>) plus one URL per lesson
+  // (/courses/<courseSlug>/<lessonSlug>).
 ]
+
+// Course landing + lesson URLs. Landing lastmod = newest lesson in the course.
+// listCourseLessons caps at 100 lessons — plenty for the course catalog.
+async function courseEntries(now: Date): Promise<MetadataRoute.Sitemap> {
+  const courses = groupCourses(await listCourseLessons(100))
+  const entries: MetadataRoute.Sitemap = []
+  for (const course of courses) {
+    const lessons = course.lessons.filter((l) => !l.seo?.noIndex)
+    if (lessons.length === 0) continue
+    const newest = lessons.reduce<Date | null>((acc, l) => {
+      const d = l.publishedAt ? new Date(l.publishedAt) : null
+      return d && (!acc || d > acc) ? d : acc
+    }, null)
+    entries.push({
+      url: `${BASE}/courses/${course.slug}`,
+      lastModified: newest ?? now,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    })
+    for (const lesson of lessons) {
+      entries.push({
+        url: `${BASE}/courses/${course.slug}/${lesson.slug}`,
+        lastModified: lesson.publishedAt ? new Date(lesson.publishedAt) : now,
+        changeFrequency: 'monthly',
+        priority: 0.5,
+      })
+    }
+  }
+  return entries
+}
 
 // Pull every published slug for a type, paginating defensively. Returns []
 // on any CMS failure (listContent already degrades gracefully).
@@ -98,6 +133,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: r.priority,
   }))
 
+  const courses = await courseEntries(now)
+
   const cmsGroups = await Promise.all(
     CMS_ROUTES.map(async ({ type, prefix }) => {
       const items = await allItems(type)
@@ -112,5 +149,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   )
 
-  return [...staticEntries, ...cmsGroups.flat()]
+  return [...staticEntries, ...cmsGroups.flat(), ...courses]
 }

@@ -24,6 +24,7 @@ const groups = [
       { label: 'Blog', href: '/blog' },
       { label: 'Clovion Research', href: '/research' },
       { label: 'Guides & Downloads', href: '/resources' },
+      { label: 'Courses', href: '/courses' },
       { label: 'FAQ', href: '/faq' }
     ]
   },
