@@ -734,6 +734,27 @@
 }
 .clv-legal-light a[href^="#"]:hover,
 .clv-legal-light a[href^="mailto:"]:hover { color: #9A340A; }
+
+/* About page — light homepage palette (#FAF9F7 + orange #C2410C accent).
+   Contact-section mailto links read orange to match the migrated legal pages,
+   and the hero plays a single orchestrated staggered rise on load. */
+.clv-about a[href^="mailto:"] {
+  color: #C2410C;
+  text-decoration-color: rgba(194, 65, 12, 0.4);
+}
+.clv-about a[href^="mailto:"]:hover { color: #9A340A; }
+
+@keyframes clv-about-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.clv-about [data-rise] {
+  opacity: 0;
+  animation: clv-about-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .clv-about [data-rise] { animation: none; opacity: 1; transform: none; }
+}
 .cms-prose ul, .cms-prose ol { padding-left: 1.4rem; }
 .cms-prose ul { list-style: disc; }
 .cms-prose ol { list-style: decimal; }

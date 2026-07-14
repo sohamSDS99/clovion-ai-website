@@ -6,9 +6,10 @@ import { Footer } from './Footer'
 import { HomeHeader } from './HomeHeader'
 import { HomeFooter } from './HomeFooter'
 
-// `/` and `/pricing` are intentionally NOT here — both light routes use the
-// light Header/Footer. See app/page.tsx and app/pricing/page.tsx.
-const HOME_ROUTES = new Set<string>(['/customers', '/about', '/changelog'])
+// `/`, `/pricing`, and `/about` are intentionally NOT here — all light routes
+// use the light Header/Footer. See app/page.tsx, app/pricing/page.tsx, and
+// app/about/page.tsx.
+const HOME_ROUTES = new Set<string>(['/customers', '/changelog'])
 
 // Prefix-matched dark-chrome sections — index + every nested/[slug] page.
 // `/blog` and `/resources` are intentionally absent — the whole content system

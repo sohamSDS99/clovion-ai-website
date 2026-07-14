@@ -1,5 +1,11 @@
+import type { CSSProperties } from 'react'
 import { Section, Container, Button, Tag, ArrowRight, HeroShade } from '@/components/ui'
 import { principles, leadership, companyStats, research, offices, contactPaths } from '@/lib/content'
+
+// Homepage palette — the single source of truth for new/redesigned pages.
+// Orange = brand energy, emerald = positive affordance, on a warm off-white canvas.
+const ORANGE = '#C2410C'
+const EMERALD = '#047857'
 
 export const metadata = {
   title: 'About | Clovion AI',
@@ -13,9 +19,24 @@ const founderQuote = {
   role: 'CEO & Co-founder, Clovion AI'
 }
 
+// Small orange section label — mirrors the migrated legal pages.
+function Label({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span
+      className={`font-mono text-[0.72rem] uppercase tracking-[0.18em] ${className}`}
+      style={{ color: ORANGE }}
+    >
+      {children}
+    </span>
+  )
+}
+
 export default function AboutPage() {
   return (
-    <>
+    <div
+      className="clv-about"
+      style={{ ['--bg' as string]: '#FAF9F7', background: '#FAF9F7', color: 'var(--ink)' } as CSSProperties}
+    >
       {/* Section 1 — Hero */}
       <section className="relative overflow-hidden">
         <div className="grid-bg absolute inset-0 -z-10" aria-hidden />
@@ -23,15 +44,26 @@ export default function AboutPage() {
         <Container>
           <div className="section-y-xl">
             <div className="max-w-[1100px]">
-              <h1 className="display-xl text-balance">
-                We bet on AI.
+              <div data-rise style={{ animationDelay: '0ms' }} className="mb-8 flex items-center gap-4">
+                <Label>Clovion AI / Since 2025</Label>
+                <a
+                  href="mailto:careers@clovion.ai"
+                  className="inline-flex items-center gap-2 rounded-full border px-3 py-1 font-mono text-[0.68rem] uppercase tracking-[0.12em] no-underline transition-colors"
+                  style={{ color: EMERALD, borderColor: 'rgba(4,120,87,0.28)', backgroundColor: 'rgba(4,120,87,0.06)' }}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: EMERALD }} aria-hidden />
+                  We&rsquo;re hiring · 30 roles
+                </a>
+              </div>
+              <h1 data-rise style={{ animationDelay: '90ms' }} className="display-xl text-balance">
+                We bet on <span style={{ color: ORANGE }}>AI</span>.
               </h1>
-              <p className="lead mt-8 max-w-[58ch] text-balance">
+              <p data-rise style={{ animationDelay: '180ms' }} className="lead mt-8 max-w-[58ch] text-balance text-[rgb(var(--ink-rgb)/72%)]">
                 200+ teams. 1.8B real prompts. One conviction: brands that AI describes well will out-earn the ones it doesn&rsquo;t, by a multiple, by 2030.
               </p>
-              <div className="mt-12 flex items-center gap-6 text-[0.78rem] font-mono uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/50%)]">
+              <div data-rise style={{ animationDelay: '270ms' }} className="mt-12 flex items-center gap-6 text-[0.78rem] font-mono uppercase tracking-[0.12em] text-[rgb(var(--ink-rgb)/50%)]">
                 <span>Founded 2025</span>
-                <span className="h-px w-8 bg-[rgb(var(--ink-rgb)/15%)]" />
+                <span className="h-px w-10" style={{ backgroundColor: 'rgba(194,65,12,0.5)' }} />
                 <span>San Francisco · New York · London</span>
               </div>
             </div>
@@ -43,7 +75,11 @@ export default function AboutPage() {
       <section className="section-y-xl">
         <Container>
           <figure className="mx-auto max-w-[1000px] text-center">
-            <span aria-hidden className="block font-display italic text-[rgb(var(--ink-rgb)/15%)]" style={{ fontSize: 'clamp(4rem, 8vw, 7rem)', lineHeight: 0.8 }}>
+            <span
+              aria-hidden
+              className="block font-display italic"
+              style={{ fontSize: 'clamp(4rem, 8vw, 7rem)', lineHeight: 0.8, color: 'rgba(194,65,12,0.28)' }}
+            >
               &ldquo;
             </span>
             <blockquote
@@ -53,7 +89,7 @@ export default function AboutPage() {
               {founderQuote.text}
             </blockquote>
             <figcaption className="mt-14 font-mono text-[0.78rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/60%)]">
-              <span className="inline-block h-px w-10 bg-[rgb(var(--ink-rgb)/30%)] align-middle mr-4" />
+              <span className="inline-block h-px w-10 align-middle mr-4" style={{ backgroundColor: ORANGE }} />
               {founderQuote.author}, {founderQuote.role}
             </figcaption>
           </figure>
@@ -64,9 +100,7 @@ export default function AboutPage() {
       <Section className="bg-[var(--white)] border-t border-[var(--line)]">
         <Container>
           <div className="max-w-[58ch] mb-14">
-            <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
-              By the numbers / 2026
-            </span>
+            <Label>By the numbers / 2026</Label>
             <h2 className="display-md mt-5 text-balance">
               Eighteen months in. The shape of the company.
             </h2>
@@ -76,17 +110,17 @@ export default function AboutPage() {
             {companyStats.map((s, i) => (
               <div
                 key={s.label}
-                className={`py-10 md:py-12 px-6 md:px-8 ${
+                className={`group py-10 md:py-12 px-6 md:px-8 ${
                   i > 0 ? 'md:border-l border-[var(--line)] border-t md:border-t-0' : 'border-t border-[var(--line)] md:border-t-0'
                 }`}
               >
-                <div className="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-[rgb(var(--ink-rgb)/40%)] mb-6">
+                <div className="font-mono text-[0.72rem] uppercase tracking-[0.14em] mb-6" style={{ color: ORANGE }}>
                   {String(i + 1).padStart(2, '0')} / 04
                 </div>
                 <div className="font-display text-[clamp(2.5rem,4vw,3.75rem)] font-semibold tracking-[-0.035em] leading-none text-[var(--ink)]">
                   {s.value}
                 </div>
-                <div className="hairline mt-7 mb-5 max-w-[40px]" />
+                <div className="mt-7 mb-5 h-px w-[40px] transition-all duration-300 group-hover:w-[64px]" style={{ backgroundColor: ORANGE }} />
                 <p className="text-[0.92rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)] max-w-[26ch]">
                   {s.label}
                 </p>
@@ -100,9 +134,7 @@ export default function AboutPage() {
       <Section bg="subtle">
         <Container>
           <div className="max-w-[58ch] mb-16">
-            <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
-              How we operate
-            </span>
+            <Label>How we operate</Label>
             <h2 className="display-md mt-5 text-balance">
               Four principles. Used when there&rsquo;s a real tradeoff.
             </h2>
@@ -111,9 +143,10 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-12 lg:gap-x-10">
             {principles.map((p, i) => (
               <div key={p.title} className="max-w-[28ch]">
-                <div className="font-mono text-[0.78rem] text-[rgb(var(--ink-rgb)/40%)] mb-5 tracking-[0.04em]">
-                  {String(i + 1).padStart(2, '0')}.
+                <div className="font-mono text-[1.5rem] font-semibold mb-5 leading-none" style={{ color: ORANGE }}>
+                  {String(i + 1).padStart(2, '0')}
                 </div>
+                <div className="hairline mb-6 max-w-[36px]" style={{ backgroundColor: 'var(--line)' }} />
                 <h3 className="display-sm text-balance">{p.title}</h3>
                 <p className="mt-4 text-[0.95rem] leading-relaxed text-[rgb(var(--ink-rgb)/70%)]">
                   {p.body}
@@ -128,25 +161,23 @@ export default function AboutPage() {
       <Section className="bg-[var(--white)]">
         <Container>
           <div className="max-w-[58ch] mb-16">
-            <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
-              Leadership
-            </span>
+            <Label>Leadership</Label>
             <h2 className="display-md mt-5 text-balance">
               The people building Clovion AI.
             </h2>
-            <p className="lead mt-5 text-balance">
+            <p className="lead mt-5 text-balance text-[rgb(var(--ink-rgb)/72%)]">
               Engineering from Anthropic and Stripe. Product from HubSpot. Customer work from Intercom. We&rsquo;ve felt the GEO problem from every angle.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-10 md:gap-y-14 max-w-[1080px]">
             {leadership.map((person) => (
-              <div key={person.name} className="border-t border-[var(--line)] pt-8">
+              <div key={person.name} className="group border-t-2 pt-8 transition-colors" style={{ borderTopColor: 'var(--line)' }}>
                 <div className="flex items-start justify-between gap-6 mb-4">
                   <h3 className="display-sm text-balance">{person.name}</h3>
                   <Tag>{person.role.includes('CEO') || person.role.includes('CTO') ? 'Founder' : 'Exec'}</Tag>
                 </div>
-                <div className="font-mono text-[0.78rem] uppercase tracking-[0.1em] text-[rgb(var(--ink-rgb)/60%)] mb-5">
+                <div className="font-mono text-[0.78rem] uppercase tracking-[0.1em] mb-5" style={{ color: ORANGE }}>
                   {person.role}
                 </div>
                 <p className="text-[0.98rem] leading-[1.65] text-[rgb(var(--ink-rgb)/70%)] max-w-[44ch]">
@@ -162,13 +193,11 @@ export default function AboutPage() {
       <Section>
         <Container>
           <div className="max-w-[58ch] mb-16">
-            <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
-              Recent research
-            </span>
+            <Label>Recent research</Label>
             <h2 className="display-md mt-5 text-balance">
               What we&rsquo;ve published this year.
             </h2>
-            <p className="lead mt-5 text-balance">
+            <p className="lead mt-5 text-balance text-[rgb(var(--ink-rgb)/72%)]">
               We compete on substance. Methodology, raw numbers, and the assumptions behind them, in the open.
             </p>
           </div>
@@ -177,12 +206,12 @@ export default function AboutPage() {
             {research.map((r, i) => (
               <li
                 key={r.title}
-                className={`grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 py-10 ${
-                  i > 0 ? 'border-t border-[var(--line)]' : 'border-t border-[var(--line)]'
-                } ${i === research.length - 1 ? 'border-b border-[var(--line)]' : ''}`}
+                className={`group grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-10 py-10 border-t border-[var(--line)] ${
+                  i === research.length - 1 ? 'border-b border-[var(--line)]' : ''
+                }`}
               >
                 <div className="md:col-span-3">
-                  <div className="font-mono text-[0.78rem] uppercase tracking-[0.14em] text-[var(--ink)]">
+                  <div className="font-mono text-[0.78rem] uppercase tracking-[0.14em]" style={{ color: ORANGE }}>
                     {r.date.toUpperCase()}
                   </div>
                   <div className="font-mono text-[0.72rem] uppercase tracking-[0.1em] text-[rgb(var(--ink-rgb)/40%)] mt-2">
@@ -190,7 +219,7 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <div className="md:col-span-9">
-                  <h3 className="display-sm text-balance">{r.title}</h3>
+                  <h3 className="display-sm text-balance transition-colors group-hover:text-[var(--ink)]">{r.title}</h3>
                   <p className="mt-4 text-[0.98rem] leading-[1.65] text-[rgb(var(--ink-rgb)/70%)] max-w-[60ch]">
                     {r.description}
                   </p>
@@ -205,9 +234,7 @@ export default function AboutPage() {
       <Section bg="subtle">
         <Container>
           <div className="max-w-[58ch] mb-16">
-            <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
-              Offices
-            </span>
+            <Label>Offices</Label>
             <h2 className="display-md mt-5 text-balance">
               Three cities. Sixty-two people.
             </h2>
@@ -223,6 +250,7 @@ export default function AboutPage() {
                   <h3 className="display-md text-balance">{office.city}</h3>
                   {office.label && <Tag>{office.label}</Tag>}
                 </div>
+                <div className="mb-5 h-px w-[32px]" style={{ backgroundColor: ORANGE }} />
                 <div className="font-mono text-[0.84rem] leading-[1.7] text-[rgb(var(--ink-rgb)/70%)] max-w-[24ch]">
                   {office.address}
                 </div>
@@ -232,12 +260,12 @@ export default function AboutPage() {
         </Container>
       </Section>
 
-      {/* Section 8 — Careers (dark band) */}
+      {/* Section 8 — Careers (dark band — the light brand book keeps one dark CTA moment) */}
       <Section bg="ink">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-end" data-track-location="about_careers">
             <div className="lg:col-span-8">
-              <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-white/50">
+              <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em]" style={{ color: '#F97316' }}>
                 Careers
               </span>
               <h2 className="display-lg mt-6 text-white text-balance">
@@ -248,13 +276,13 @@ export default function AboutPage() {
               </p>
             </div>
             <div className="lg:col-span-4 flex lg:justify-end">
-              <Button href="mailto:careers@clovion.ai" variant="invert" size="lg">
+              <Button href="mailto:careers@clovion.ai" trackLocation="about_careers" variant="invert" size="lg">
                 See open roles <ArrowRight />
               </Button>
             </div>
           </div>
 
-          {/* Decorative team metric strip — keeps the band substantial */}
+          {/* Team metric strip — emerald as the positive affordance on the dark band */}
           <div className="mt-20 pt-10 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { v: '30', l: 'Open roles' },
@@ -263,7 +291,7 @@ export default function AboutPage() {
               { v: '12mo', l: 'Hiring runway' }
             ].map((m) => (
               <div key={m.l}>
-                <div className="font-display text-[1.75rem] font-semibold tracking-[-0.03em] text-white">
+                <div className="font-display text-[1.75rem] font-semibold tracking-[-0.03em]" style={{ color: '#34d399' }}>
                   {m.v}
                 </div>
                 <div className="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-white/50 mt-2">
@@ -279,22 +307,20 @@ export default function AboutPage() {
       <Section>
         <Container>
           <div className="max-w-[58ch] mb-16">
-            <span className="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-[rgb(var(--ink-rgb)/50%)]">
-              Get in touch
-            </span>
+            <Label>Get in touch</Label>
             <h2 className="display-md mt-5 text-balance">
               Six paths in. We answer.
             </h2>
-            <p className="lead mt-5 text-balance">
+            <p className="lead mt-5 text-balance text-[rgb(var(--ink-rgb)/72%)]">
               No tickets, no chatbots, no contact forms that vanish into a queue. Real humans, named teams, same-day on most.
             </p>
           </div>
 
-          <ul className="border-t border-[var(--line)]">
+          <ul className="border-t border-[var(--line)]" data-track-location="about_contact">
             {contactPaths.map((path) => (
               <li
                 key={path.email}
-                className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-10 py-8 border-b border-[var(--line)] group"
+                className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-10 py-8 border-b border-[var(--line)] group transition-colors hover:bg-[var(--white)]"
               >
                 <div className="md:col-span-3">
                   <h3 className="display-sm">{path.name}</h3>
@@ -302,7 +328,7 @@ export default function AboutPage() {
                 <div className="md:col-span-4">
                   <a
                     href={`mailto:${path.email}`}
-                    className="font-mono text-[0.92rem] text-[var(--ink)] underline-offset-4 hover:underline tracking-[-0.01em]"
+                    className="font-mono text-[0.92rem] underline-offset-4 hover:underline tracking-[-0.01em]"
                   >
                     {path.email}
                   </a>
@@ -316,16 +342,16 @@ export default function AboutPage() {
             ))}
           </ul>
 
-          <div className="mt-16 flex flex-wrap items-center gap-4">
+          <div className="mt-16 flex flex-wrap items-center gap-4" data-track-location="about_hero">
             <Button href="/pricing" trackLocation="about_hero" variant="primary" size="lg">
               Start Free Trial <ArrowRight />
             </Button>
-            <Button href="/contact" variant="ghost" size="lg">
+            <Button href="/contact" trackLocation="about_hero" variant="ghost" size="lg">
               General enquiries
             </Button>
           </div>
         </Container>
       </Section>
-    </>
+    </div>
   )
 }
