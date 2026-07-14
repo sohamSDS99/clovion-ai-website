@@ -737,6 +737,12 @@
 
 /* About page — light homepage palette (#FAF9F7 + orange #C2410C accent). */
 
+/* Hero headline forces a clean two-line split on desktop; on small screens the
+   break is removed so the headline wraps naturally to the viewport width. */
+@media (max-width: 767px) {
+  .clv-about .clv-hero-br { display: none; }
+}
+
 /* Platform capability grid */
 .clv-cap-grid {
   display: grid;

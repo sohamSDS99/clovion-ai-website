@@ -342,13 +342,17 @@ export function AboutContent() {
         <div className="grid-bg absolute inset-0 -z-10" aria-hidden />
         <Container>
           <div className="section-y-xl">
-            <div style={{ maxWidth: 940 }}>
+            <div style={{ maxWidth: 1120 }}>
               <Reveal delay={0}>
                 <Eyebrow>About Clovion</Eyebrow>
               </Reveal>
               <Reveal delay={80}>
-                <h1 className="display-xl text-balance" style={{ marginTop: 26 }}>
-                  Clovion turns AI visibility into <span style={{ color: ORANGE }}>action</span>.
+                <h1
+                  className="display-xl text-balance"
+                  style={{ marginTop: 26, fontSize: 'clamp(1.9rem, 4.8vw, 4.6rem)', lineHeight: 1.08 }}
+                >
+                  Clovion turns AI<br className="clv-hero-br" aria-hidden /> visibility into{' '}
+                  <span style={{ color: ORANGE }}>action</span>.
                 </h1>
               </Reveal>
               <Reveal delay={160}>
