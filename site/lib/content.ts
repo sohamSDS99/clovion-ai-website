@@ -70,8 +70,7 @@ export const nav = {
         { label: 'Blog', href: '/blog', desc: 'GEO, AI search, and SEO insights' },
         { label: 'Clovion Research', href: '/research', desc: 'Original studies, benchmarks, and reports' },
         { label: 'Guides & Downloads', href: '/resources', desc: 'Whitepapers, ebooks, and templates' },
-        { label: 'Courses', href: '/courses', desc: 'Free, self-paced lessons on GEO and AI search' },
-        { label: 'FAQ', href: '/faq', desc: 'Answers to common questions' }
+        { label: 'Courses', href: '/courses', desc: 'Free, self-paced lessons on GEO and AI search' }
       ]
     }
   ]

@@ -18,12 +18,11 @@ const groups = [
   },
   {
     title: 'Resources',
-    // Mirrors the header "Resources" dropdown (see lib/content.ts) — keep these
-    // two in sync: the footer column shows exactly the dropdown's pages.
+    // Roughly mirrors the header "Resources" dropdown (see lib/content.ts).
+    // FAQ is intentionally hidden from all nav.
     links: [
       { label: 'Blog', href: '/blog' },
-      { label: 'Guides & Downloads', href: '/resources' },
-      { label: 'FAQ', href: '/faq' }
+      { label: 'Guides & Downloads', href: '/resources' }
     ]
   },
   {
