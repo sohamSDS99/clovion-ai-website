@@ -735,25 +735,125 @@
 .clv-legal-light a[href^="#"]:hover,
 .clv-legal-light a[href^="mailto:"]:hover { color: #9A340A; }
 
-/* About page — light homepage palette (#FAF9F7 + orange #C2410C accent).
-   Contact-section mailto links read orange to match the migrated legal pages,
-   and the hero plays a single orchestrated staggered rise on load. */
-.clv-about a[href^="mailto:"] {
-  color: #C2410C;
-  text-decoration-color: rgba(194, 65, 12, 0.4);
-}
-.clv-about a[href^="mailto:"]:hover { color: #9A340A; }
+/* About page — light homepage palette (#FAF9F7 + orange #C2410C accent). */
 
-@keyframes clv-about-rise {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Platform capability grid */
+.clv-cap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
 }
-.clv-about [data-rise] {
-  opacity: 0;
-  animation: clv-about-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.clv-cap-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 26px 24px 28px;
+  border-radius: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 2px rgba(10, 10, 15, 0.04);
+  transition: border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@media (prefers-reduced-motion: reduce) {
-  .clv-about [data-rise] { animation: none; opacity: 1; transform: none; }
+.clv-cap-card:hover {
+  border-color: rgba(194, 65, 12, 0.45);
+  box-shadow: 0 22px 48px -22px rgba(10, 10, 15, 0.16);
+  transform: translateY(-3px);
+}
+.clv-cap-card .clv-cap-arrow {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), color 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.clv-cap-card:hover .clv-cap-arrow {
+  transform: translateX(4px);
+  color: #C2410C;
+}
+
+/* Loop diagram */
+.clv-loop-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  align-items: stretch;
+}
+.clv-loop-cell {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+.clv-loop-cell > .clv-loop-node {
+  flex: 1;
+}
+.clv-loop-node {
+  width: 100%;
+  padding: 22px 22px 24px;
+  border-radius: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+.clv-loop-arrow {
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: inline-flex;
+  padding: 4px;
+  background: var(--subtle);
+  border-radius: 999px;
+}
+
+/* Founders two-column */
+.clv-founders-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(32px, 6vw, 80px);
+  align-items: start;
+}
+.clv-founders-aside { position: sticky; top: 96px; }
+.clv-notjust {
+  margin-top: 36px;
+  padding-top: 30px;
+  border-top: 1px solid var(--line);
+}
+.clv-notjust-neg {
+  margin: 0 0 6px;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-30);
+  text-decoration: line-through;
+  text-decoration-color: rgba(10, 10, 15, 0.22);
+}
+.clv-notjust-pos {
+  margin: 16px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 1.6rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+/* Final CTA band */
+.clv-about-cta {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: clamp(2.5rem, 5vw, 4.5rem);
+  background: var(--ink-surface);
+}
+
+@media (max-width: 900px) {
+  .clv-cap-grid { grid-template-columns: repeat(2, 1fr); }
+  .clv-founders-grid { grid-template-columns: 1fr; gap: 32px; }
+  .clv-founders-aside { position: static; }
+  /* Loop stacks: 2x2 on tablet */
+  .clv-loop-row { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .clv-loop-arrow { display: none; }
+}
+@media (max-width: 560px) {
+  .clv-cap-grid { grid-template-columns: 1fr; }
+  .clv-loop-row { grid-template-columns: 1fr; }
 }
 .cms-prose ul, .cms-prose ol { padding-left: 1.4rem; }
 .cms-prose ul { list-style: disc; }
