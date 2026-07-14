@@ -174,8 +174,8 @@ function AnimatedChat({ phase, reduced }: { phase: Phase; reduced: boolean }) {
 
       {/* Agent reply */}
       <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', ...reveal(reduced || vis >= tIdx) }}>
-        <div style={{ height: 26, width: 26, flexShrink: 0, borderRadius: 999, background: 'var(--white)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ height: 7, width: 7, borderRadius: 999, background: 'var(--ink)' }} />
+        <div style={{ height: 26, width: 26, flexShrink: 0, borderRadius: 999, background: 'var(--white)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--ink)' }}>
+          <HaloMark size={12} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--ink-70)' }}>Clove AI</span>
