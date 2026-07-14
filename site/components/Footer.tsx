@@ -18,14 +18,13 @@ const groups = [
   },
   {
     title: 'Resources',
-    // Mirrors the header "Resources" dropdown (see lib/content.ts) — keep these
-    // two in sync: the footer column shows exactly the dropdown's pages.
+    // Roughly mirrors the header "Resources" dropdown (see lib/content.ts).
+    // FAQ is intentionally hidden from all nav; Courses is dropdown-only and
+    // intentionally not surfaced in the footer.
     links: [
       { label: 'Blog', href: '/blog' },
       { label: 'Clovion Research', href: '/research' },
-      { label: 'Guides & Downloads', href: '/resources' },
-      { label: 'Courses', href: '/courses' },
-      { label: 'FAQ', href: '/faq' }
+      { label: 'Guides & Downloads', href: '/resources' }
     ]
   },
   {
