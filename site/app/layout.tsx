@@ -105,6 +105,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           async
           src="https://assets.calendly.com/assets/external/widget.js"
         />
+        {/* Tolt affiliate tracking — plain <script async> on purpose; next/script
+            silently fails to load external scripts in this repo (same as Calendly). */}
+        <script
+          async
+          src="https://files.tlt-cdn.com/tlt.js"
+          data-tolt="pk_6W7tm3rWzsBJ8kP6M3GoJ1YX"
+        />
       </head>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">
