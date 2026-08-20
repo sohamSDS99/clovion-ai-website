@@ -31,6 +31,23 @@ const metaPixelBootstrap = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=fun
 // RouteTracker.tsx so client-side navs are tracked alongside fbq + GA4.
 const linkedInBootstrap = `_linkedin_partner_id="9552940";window._linkedin_data_partner_ids=window._linkedin_data_partner_ids||[];window._linkedin_data_partner_ids.push(_linkedin_partner_id);(function(l){if(!l){window.lintrk=function(a,b){window.lintrk.q.push([a,b])};window.lintrk.q=[]}var s=document.getElementsByTagName("script")[0];var b=document.createElement("script");b.type="text/javascript";b.async=true;b.src="https://snap.licdn.com/li.lms-analytics/insight.min.js";s.parentNode.insertBefore(b,s);})(window.lintrk);`
 
+// Relay messenger — Clovion's own support widget, workspace wrk_349lfeJlGteHN6KJrrPLX.
+// `app_id` is public by design: it sits in the HTML of every page and grants exactly one thing,
+// "start a conversation with this workspace". Claiming to *be* a signed-in user is the separate,
+// server-signed path, which a marketing site never needs.
+//
+// Two commands, both issued before the async bundle arrives. The queue stub is what makes that
+// safe — calls land in `relay.q` and the loader drains them on load, so a visitor who clicks the
+// launcher mid-download does not hit "relay is not defined".
+//
+// `consent` is the load-bearing one and it is deliberately its own call. The activity beacon is
+// gated on it: without consent nothing is recorded, no interest profile is built, and every
+// visitor keeps getting the cold opener no matter how much they read. It is set unconditionally
+// here because this site has no consent gate at all — GTM, Clarity (session recording), the Meta
+// pixel and the LinkedIn tag above all load the same way. If a banner ever lands, move this one
+// call behind it; nothing else about the install changes.
+const relayBootstrap = `(function(w){w.relay=w.relay||function(){(w.relay.q=w.relay.q||[]).push(arguments)}})(window);relay("boot",{app_id:"wrk_349lfeJlGteHN6KJrrPLX",api_url:"https://api-production-20119.up.railway.app"});relay("consent",true);`
+
 const saans = localFont({
   src: './fonts/Saans-TRIAL-SemiBold.otf',
   variable: '--font-saans',
@@ -111,6 +128,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           async
           src="https://files.tlt-cdn.com/tlt.js"
           data-tolt="pk_6W7tm3rWzsBJ8kP6M3GoJ1YX"
+        />
+        {/* Relay messenger — plain <script async> for the same reason as Calendly and Tolt:
+            next/script silently fails to load external scripts in this repo. The bootstrap above
+            has already queued boot + consent, so load order does not matter. */}
+        <script dangerouslySetInnerHTML={{ __html: relayBootstrap }} />
+        <script
+          async
+          src="https://widget-production-db3f.up.railway.app/boot.js"
         />
       </head>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
