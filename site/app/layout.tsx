@@ -112,6 +112,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           src="https://files.tlt-cdn.com/tlt.js"
           data-tolt="pk_6W7tm3rWzsBJ8kP6M3GoJ1YX"
         />
+        {/* SDS Analytics — first-party pageview/scroll/outbound tracking. Plain
+            <script defer> for the same reason as Calendly/Tolt above. */}
+        <script
+          defer
+          data-domain="clovion.ai"
+          src="https://sdsanalytics-production.up.railway.app/js/script.js"
+        />
       </head>
       <GoogleTagManager gtmId="GTM-WHCPZS4P" />
       <body className="font-sans antialiased">
